@@ -1,0 +1,4 @@
+namespace common {
+  struct dictionary {
+  };
+}

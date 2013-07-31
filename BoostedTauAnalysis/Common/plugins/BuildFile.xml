@@ -1,0 +1,12 @@
+<export>
+</export>
+<library   name="BoostedTauAnalysis_common" file="*.cc">
+  <flags   EDM_PLUGIN="1"/>
+  <use   name="FWCore/Framework"/>
+  <use   name="FWCore/MessageLogger"/>
+  <use   name="FWCore/PluginManager"/>
+  <use   name="FWCore/ParameterSet"/>
+  <use   name="FWCore/ServiceRegistry"/>
+  <use   name="CommonTools/UtilAlgos"/>
+  <use   name="DataFormats/JetReco"/>
+</library>

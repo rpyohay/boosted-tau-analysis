@@ -1,0 +1,10 @@
+<export>
+</export>
+<library   name="BoostedTauAnalysisTauSkimmer_plugins" file="*.cc">
+  <flags   EDM_PLUGIN="1"/>
+  <use   name="FWCore/Framework"/>
+  <use   name="FWCore/MessageLogger"/>
+  <use   name="FWCore/PluginManager"/>
+  <use   name="FWCore/ParameterSet"/>
+  <use   name="BoostedTauAnalysis/Common"/>
+</library>
