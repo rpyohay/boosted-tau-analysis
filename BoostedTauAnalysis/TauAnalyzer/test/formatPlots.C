@@ -242,10 +242,18 @@
   weightsSigBkgInd.push_back(1.936998118); /*Drell-Yan + jets ml+l- > 50 GeV weighted to 
 					     20 fb^-1*/
   weightsSigBkgInd.push_back(1.99738713); //tt+jets weighted to 20 fb^-1
-  weightsSigBkgInd.push_back(4.57); /*W-->munu + 1 jet weighted to 20 fb^-1*/
-  weightsSigBkgInd.push_back(1.01); /*W-->munu + 2 jets weighted to 20 fb^-1*/
-  weightsSigBkgInd.push_back(0.654); /*W-->munu + 3 jets weighted to 20 fb^-1*/
-  weightsSigBkgInd.push_back(0.313); /*W-->munu + 4 jets weighted to 20 fb^-1*/
+  weightsSigBkgInd.push_back(4.57); /*W-->munu + 1 jet weighted to 20 fb^-1
+				      (5400 pb(PREP xs) * 20000 pb^-1)/
+				      23141598(no. events processed)*/
+  weightsSigBkgInd.push_back(1.01); /*W-->munu + 2 jets weighted to 20 fb^-1
+				      (1750 pb(PREP xs) * 20000 pb^-1)/
+				      33844921(no. events processed)*/
+  weightsSigBkgInd.push_back(0.654); /*W-->munu + 3 jets weighted to 20 fb^-1
+				       (519 pb(PREP xs) * 20000 pb^-1)/
+				       15239503(no. events processed)*/
+  weightsSigBkgInd.push_back(0.313); /*W-->munu + 4 jets weighted to 20 fb^-1
+				       (214 pb(PREP xs) * 20000 pb^-1)/
+				       13382803(no. events processed)*/
   vector<float> weightsMCDataInd;
   weightsMCDataInd.push_back(1.0); //data
   weightsMCDataInd.push_back(0.7301387396); /*Drell-Yan + jets (10 < ml+l- < 50) GeV weighted to 
