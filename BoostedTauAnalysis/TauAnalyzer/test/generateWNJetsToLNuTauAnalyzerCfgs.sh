@@ -66,7 +66,7 @@ for i in `seq $iBeg $iEnd`
   cat <<EOF > tauanalyzer_${samples[${i}]}_cfg.sh
 #!/bin/bash
 
-jobDir="/afs/cern.ch/user/y/yohay/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/$dir"
+jobDir="`pwd`"
 fileNamePrefix="tauanalyzer_${samples[${i}]}"
 
 cd \$jobDir

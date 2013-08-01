@@ -2,7 +2,7 @@
   //load
   gROOT->Reset();
   gROOT->ProcessLine("#include <utility>");
-  string macroPath("/afs/cern.ch/user/y/yohay/CMSSW_5_3_3/src/BoostedTauAnalysis/");
+  string macroPath("/afs/cern.ch/user/y/yohay/CMSSW_5_3_3_Git/src/BoostedTauAnalysis/");
   macroPath+="TauAnalyzer/test/";
   gSystem->Load((macroPath + "STLDictionary.so").c_str());
   gROOT->LoadMacro((macroPath + "Plot.C++").c_str());
@@ -231,8 +231,9 @@
   const bool drawSame = false;
 
   //weights (sig. figs are probably wrong)
-  const float Wh1Weight20InvFb = 0.0681;
-  const float Wh1Weight2p5InvFb = 0.00851; //20 fb^-1 weight * (2.5/20)
+  const float Wh1Weight20InvFb = 0.07208; /*(0.3604 pb(Pythia LO xs) * 20000 pb^-1)/
+					   100000(no. events processed)*/
+  const float Wh1Weight2p5InvFb = 0.00901; //20 fb^-1 weight * (2.5/20)
   vector<float> weights1(8, 0.0);
   vector<float> weightsSigBkgInd;
   weightsSigBkgInd.push_back(Wh1Weight20InvFb);
@@ -241,10 +242,10 @@
   weightsSigBkgInd.push_back(1.936998118); /*Drell-Yan + jets ml+l- > 50 GeV weighted to 
 					     20 fb^-1*/
   weightsSigBkgInd.push_back(1.99738713); //tt+jets weighted to 20 fb^-1
-  weightsSigBkgInd.push_back(4.57); //W-->munu + 1 jet weighted to 20 fb^-1
-  weightsSigBkgInd.push_back(1.01); //W-->munu + 2 jets weighted to 20 fb^-1
-  weightsSigBkgInd.push_back(0.654); //W-->munu + 3 jets weighted to 20 fb^-1
-  weightsSigBkgInd.push_back(0.313); //W-->munu + 4 jets weighted to 20 fb^-1
+  weightsSigBkgInd.push_back(4.57); /*W-->munu + 1 jet weighted to 20 fb^-1*/
+  weightsSigBkgInd.push_back(1.01); /*W-->munu + 2 jets weighted to 20 fb^-1*/
+  weightsSigBkgInd.push_back(0.654); /*W-->munu + 3 jets weighted to 20 fb^-1*/
+  weightsSigBkgInd.push_back(0.313); /*W-->munu + 4 jets weighted to 20 fb^-1*/
   vector<float> weightsMCDataInd;
   weightsMCDataInd.push_back(1.0); //data
   weightsMCDataInd.push_back(0.7301387396); /*Drell-Yan + jets (10 < ml+l- < 50) GeV weighted to 
