@@ -1,18 +1,13 @@
 #!/bin/bash
 
 #arguments
-discriminator=$1
-sample=$2
-minJob=$3
-maxJob=$4
-#filePrefix=$5
-#suffix=$6
+minJob=$1
+maxJob=$2
+exclString=$3
 
 #macros
-#filePrefix="${sample}_${discriminator}/analyzeSelectionTemplate_${discriminator}_"
-filePrefix="../../TauSkimmer/test/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball-Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v2/res/CMSSW_"
+filePrefix="../../TauSkimmer/test/W4JetsToLNu_TuneZ2Star_8TeV-madgraph-Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v2/res/CMSSW_"
 suffix=".stdout"
-#suffix=".txt"
 
 #totals
 nProcessedTot=0
@@ -26,10 +21,27 @@ nTauMuonSoftTot=0
 nMuHadIsoTot=0
 nMuHadTot=0
 
+#jobs to exclude
+excludeList=`echo $exclString | sed -e "s%--exclude=\(.*\)%\1%"`
+iExclude=1
+go=1
+while [ $go -eq 1 ]
+  do
+  jobToExclude=`echo $excludeList | sed -e "s%\([0-9]*\).*%\1%"`
+  excludeArray[$iExclude]=$jobToExclude
+  preList="$excludeList"
+  excludeList=`echo $excludeList | sed -e "s%[0-9]*,\(.*\)%\1%"`
+  postList="$excludeList"
+  iExclude=`expr $iExclude + 1`
+  if [ "$preList" = "$postList" ]
+      then
+      go=0
+  fi
+done
+
 #loop over job outputs
 for iJob in `seq $minJob $maxJob`
   do
-  echo "Job #$iJob"
 
   #get the numbers of events passing each cut
 #  nProcessed=`grep genWMuNuSelector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*\([0-9]*\)[ ]*[0-9]*.*%\1%"`
@@ -44,22 +56,32 @@ for iJob in `seq $minJob $maxJob`
 #  nMuHadIso=`grep muHadIsoTauSelector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*[0-9]*[ ]*\([0-9]*\).*%\1%"`
   nMuHad=`grep muHadTauSelector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*[0-9]*[ ]*\([0-9]*\).*%\1%"`
 
+  #determine if this job should be skipped in the sum
+  skip=0
+  iSkip=1
+  while [ $skip -eq 0 ] && [ $iSkip -le ${#excludeArray[@]} ]
+    do
+    if [ $iJob -eq ${excludeArray[$iSkip]} ]
+	then
+	skip=1
+    fi
+    iSkip=`expr $iSkip + 1`
+  done
+
   #increment totals
-  #jobs 710, 843, and 850 are status 0 in CRAB but no file can be found for them
-  #job 173 is done but wasn't included in run over files in my EOS area
-#  if [ "$nWMuNu" != "" ] && [ "$nHLT" != "" ] && [ "$nWMuonPT" != "" ] && [ "$nWMuonIso" != "" ] && [ $iJob -ne 70 ] && [ $iJob -ne 135 ] && [ $iJob -ne 173 ] && [ $iJob -ne 251 ] && [ $iJob -ne 326 ] && [ $iJob -ne 390 ] && [ $iJob -ne 501 ] && [ $iJob -ne 546 ] && [ $iJob -ne 568 ] && [ $iJob -ne 710 ] && [ $iJob -ne 769 ] && [ $iJob -ne 835 ] && [ $iJob -ne 836 ] && [ $iJob -ne 843 ] && [ $iJob -ne 846 ] && [ $iJob -ne 850 ] && [ $iJob -ne 892 ] && [ $iJob -ne 1131 ]
-#      then
+  if [ $skip -eq 0 ]
+      then
       nProcessedTot=`expr $nProcessedTot + $nProcessed`
 #      nWMuNuTot=`expr $nWMuNuTot + $nWMuNu`
       nHLTTot=`expr $nHLTTot + $nHLT`
       nWMuonPTTot=`expr $nWMuonPTTot + $nWMuonPT`
       nWMuonIsoTot=`expr $nWMuonIsoTot + $nWMuonIso`
-#  fi
 #  nJetTot=`expr $nJetTot + $nJet`
-  nTauMuonPTTot=`expr $nTauMuonPTTot + $nTauMuonPT`
-  nTauMuonSoftTot=`expr $nTauMuonSoftTot + $nTauMuonSoft`
+      nTauMuonPTTot=`expr $nTauMuonPTTot + $nTauMuonPT`
+      nTauMuonSoftTot=`expr $nTauMuonSoftTot + $nTauMuonSoft`
 #  nMuHadIsoTot=`expr $nMuHadIsoTot + $nMuHadIso`
-  nMuHadTot=`expr $nMuHadTot + $nMuHad`
+      nMuHadTot=`expr $nMuHadTot + $nMuHad`
+  fi
 done
 
 #print totals

@@ -242,18 +242,18 @@
   weightsSigBkgInd.push_back(1.936998118); /*Drell-Yan + jets ml+l- > 50 GeV weighted to 
 					     20 fb^-1*/
   weightsSigBkgInd.push_back(1.99738713); //tt+jets weighted to 20 fb^-1
-  weightsSigBkgInd.push_back(4.57); /*W-->munu + 1 jet weighted to 20 fb^-1
-				      (5400 pb(PREP xs) * 20000 pb^-1)/
-				      23141598(no. events processed)*/
-  weightsSigBkgInd.push_back(1.01); /*W-->munu + 2 jets weighted to 20 fb^-1
-				      (1750 pb(PREP xs) * 20000 pb^-1)/
-				      33844921(no. events processed)*/
-  weightsSigBkgInd.push_back(0.654); /*W-->munu + 3 jets weighted to 20 fb^-1
-				       (519 pb(PREP xs) * 20000 pb^-1)/
-				       15239503(no. events processed)*/
-  weightsSigBkgInd.push_back(0.313); /*W-->munu + 4 jets weighted to 20 fb^-1
-				       (214 pb(PREP xs) * 20000 pb^-1)/
-				       13382803(no. events processed)*/
+  weightsSigBkgInd.push_back(4.666920582); /*W-->munu + 1 jet weighted to 20 fb^-1
+					     (5400 pb(PREP xs) * 20000 pb^-1)/
+					     23141598(no. events processed)*/
+  weightsSigBkgInd.push_back(1.034128577); /*W-->munu + 2 jets weighted to 20 fb^-1
+					     (1750 pb(PREP xs) * 20000 pb^-1)/
+					     33844921(no. events processed)*/
+  weightsSigBkgInd.push_back(0.6811245747); /*W-->munu + 3 jets weighted to 20 fb^-1
+					      (519 pb(PREP xs) * 20000 pb^-1)/
+					      15239503(no. events processed)*/
+  weightsSigBkgInd.push_back(0.3198134203); /*W-->munu + 4 jets weighted to 20 fb^-1
+					      (214 pb(PREP xs) * 20000 pb^-1)/
+					      13382803(no. events processed)*/
   vector<float> weightsMCDataInd;
   weightsMCDataInd.push_back(1.0); //data
   weightsMCDataInd.push_back(0.7301387396); /*Drell-Yan + jets (10 < ml+l- < 50) GeV weighted to 
@@ -265,16 +265,16 @@
 					      2950 pb(PREP xs) * 2500 pb^-1/
 					      30459503(no. events processed)*/
   weightsMCDataInd.push_back(0.2496733913); //tt+jets weighted to 2.5 fb^-1
-  weightsMCDataInd.push_back(0.57125); //W-->munu + 1 jet weighted to 2.5 fb^-1
-  weightsMCDataInd.push_back(0.12625); //W-->munu + 2 jets weighted to 2.5 fb^-1
-  weightsMCDataInd.push_back(0.08175); //W-->munu + 3 jets weighted to 2.5 fb^-1
-  weightsMCDataInd.push_back(0.039125); //W-->munu + 4 jets weighted to 2.5 fb^-1
+  weightsMCDataInd.push_back(0.5833650728); //W-->munu + 1 jet weighted to 2.5 fb^-1
+  weightsMCDataInd.push_back(0.1292660721); //W-->munu + 2 jets weighted to 2.5 fb^-1
+  weightsMCDataInd.push_back(0.0851405718); //W-->munu + 3 jets weighted to 2.5 fb^-1
+  weightsMCDataInd.push_back(0.0399766775); //W-->munu + 4 jets weighted to 2.5 fb^-1
   vector<float> weightsSigBkg;
   weightsSigBkg.push_back(Wh1Weight20InvFb);
   weightsSigBkg.push_back(8.0); /*DYJetsToLLRelXSecWeights already weighted to 2.5 fb^-1 ==> 
 				  multiply by 20/2.5 to get overall weight for 20 fb^-1*/
   weightsSigBkg.push_back(1.99738713); //tt+jets weighted to 20 fb^-1
-  weightsSigBkg.push_back(6524.691358); //W-->munu + jets weighted to 20 fb^-1
+  weightsSigBkg.push_back(1.0); //W-->munu + jets already weighted to 20 fb^-1
   vector<float> weightsMCData;
   weightsMCData.push_back(1.0); //data
   weightsMCData.push_back(1.0); /*DYJetsToLLRelXSecWeights already weighted to 2.5 fb^-1 ==> 
@@ -282,12 +282,13 @@
   weightsMCData.push_back(0.2496733913); /*tt+jets weighted to 2.5 fb^-1
 					   (136.3 pb(PREP xs) * 2500 pb^-1)/
 					   1364783(no. events processed)*/
-  weightsMCData.push_back(815.5864198); //W-->munu + jets 20 fb^-1 weight * (2.5/20)
+  weightsMCData.push_back(0.125); /*WNJetsToLNuRelXSecWeights already weighted to 20 fb^-1 ==> 
+				    multiply by 2.5/20 to get overall weight for 2.5 fb^-1*/
   vector<float> WNJetsToLNuRelXSecWeights;
-  WNJetsToLNuRelXSecWeights.push_back(0.00070041554);
-  WNJetsToLNuRelXSecWeights.push_back(0.00015423878);
-  WNJetsToLNuRelXSecWeights.push_back(0.00010017824);
-  WNJetsToLNuRelXSecWeights.push_back(0.000047972683);
+  WNJetsToLNuRelXSecWeights.push_back(4.666920582); //W-->munu + 1 jet weighted to 20 fb^-1
+  WNJetsToLNuRelXSecWeights.push_back(1.034128577); //W-->munu + 2 jets weighted to 20 fb^-1
+  WNJetsToLNuRelXSecWeights.push_back(0.6811245747); //W-->munu + 3 jets weighted to 20 fb^-1
+  WNJetsToLNuRelXSecWeights.push_back(0.3198134203); //W-->munu + 4 jets weighted to 20 fb^-1
   vector<float> DYJetsToLLRelXSecWeights;
   DYJetsToLLRelXSecWeights.push_back(0.7301387396); //weighted to 2.5 fb^-1
   DYJetsToLLRelXSecWeights.push_back(0.2421247648); //weighted to 2.5 fb^-1
