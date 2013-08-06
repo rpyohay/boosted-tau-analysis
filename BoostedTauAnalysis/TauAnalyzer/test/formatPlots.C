@@ -105,7 +105,8 @@
   canvasNames1D.push_back("dRSoftMuNearestGenMuHistCanvas");
   canvasNames1D.push_back("muHadPTCanvas");
   canvasNames1D.push_back("muHadMultiplicityCanvas");
-//   canvasNames1D.push_back("nGoodVtxCanvas");
+  canvasNames1D.push_back("nGoodVtxCanvas");
+  canvasNames1D.push_back("mWMuTauMuCanvas");
   vector<string> canvasNames2D;
   canvasNames2D.push_back("muHadMassVsDRSoftMuTauCanvas");
   canvasNames2D.push_back("tauHadIsoVsSoftMuPTCanvas");
@@ -149,7 +150,8 @@
   graphNames1D.push_back("dRSoftMuNearestGenMuHist");
   graphNames1D.push_back("muHadPT");
   graphNames1D.push_back("muHadMultiplicity");
-//   graphNames1D.push_back("nGoodVtx");
+  graphNames1D.push_back("nGoodVtx");
+  graphNames1D.push_back("mWMuTauMu");
   vector<string> graphNames2D;
   graphNames2D.push_back("muHadMassVsDRSoftMuTau");
   graphNames2D.push_back("tauHadIsoVsSoftMuPT");
@@ -178,14 +180,12 @@
   vector<string> legendHeaders2p5InvFbTTJets(canvasNames1D.size(), 
 					     "t#bar{t} + jets normalized to 2.5 fb^{-1}");
   vector<string> 
-    legendHeaders2p5InvFbWNJetsToLNu(canvasNames1D.size(), 
-				     "W#rightarrow#mu#nu + jets normalized to 2.5 fb^{-1}");
+    legendHeaders2p5InvFbWNJetsToLNu(canvasNames1D.size(), "W + jets normalized to 2.5 fb^{-1}");
   vector<string> legendHeaders1(canvasNames1D.size(), "Normalized to 1");
   vector<string> legendHeaders1DYJetsToLL(canvasNames1D.size(), 
 					  "Drell-Yan + jets normalized to 1");
   vector<string> legendHeaders1TTJets(canvasNames1D.size(), "t#bar{t} + jets normalized to 1");
-  vector<string> legendHeaders1WNJetsToLNu(canvasNames1D.size(), 
-					   "W#rightarrow#mu#nu + jets normalized to 1");
+  vector<string> legendHeaders1WNJetsToLNu(canvasNames1D.size(), "W + jets normalized to 1");
   vector<Color_t> colors;
   colors.push_back(kBlack);
   colors.push_back(/*kRed*/kAzure + 1);
@@ -205,21 +205,21 @@
   styles.push_back(26);
   styles.push_back(27);
   vector<string> legendEntriesSigBkgInd;
-  legendEntriesSigBkgInd.push_back("W#rightarrow#mu#nu + h_{1}");
+  legendEntriesSigBkgInd.push_back("Wh_{1}");
   legendEntriesSigBkgInd.push_back("Drell-Yan + jets (10 < m_{l^{+}l^{-}} < 50) GeV");
   legendEntriesSigBkgInd.push_back("Drell-Yan + jets m_{l^{+}l^{-}} > 50 GeV");
   legendEntriesSigBkgInd.push_back("t#bar{t} + jets");
-  legendEntriesSigBkgInd.push_back("W#rightarrow#mu#nu + 1 jet");
-  legendEntriesSigBkgInd.push_back("W#rightarrow#mu#nu + 2 jets");
-  legendEntriesSigBkgInd.push_back("W#rightarrow#mu#nu + 3 jets");
-  legendEntriesSigBkgInd.push_back("W#rightarrow#mu#nu + 4 jets");
+  legendEntriesSigBkgInd.push_back("W + 1 jet");
+  legendEntriesSigBkgInd.push_back("W + 2 jets");
+  legendEntriesSigBkgInd.push_back("W + 3 jets");
+  legendEntriesSigBkgInd.push_back("W + 4 jets");
   vector<string> legendEntriesMCDataInd(legendEntriesSigBkgInd);
   legendEntriesMCDataInd[0] = "Data 2.5 fb^{-1}";
   vector<string> legendEntriesSigBkg;
-  legendEntriesSigBkg.push_back("W#rightarrow#mu#nu + h_{1}");
+  legendEntriesSigBkg.push_back("Wh_{1}");
   legendEntriesSigBkg.push_back("Drell-Yan + jets");
   legendEntriesSigBkg.push_back("t#bar{t} + jets");
-  legendEntriesSigBkg.push_back("W#rightarrow#mu#nu + jets");
+  legendEntriesSigBkg.push_back("W + jets");
   vector<string> legendEntriesMCData(legendEntriesSigBkg);
   legendEntriesMCData[0] = "Data 2.5 fb^{-1}";
   vector<string> legendEntriesSearchVsControl;
@@ -301,12 +301,12 @@
   const string tag1("_normalizedTo1");
 
   //version tags
-  const string outputVTag("_v34");
-  const string dataVTag("_v32");
-  const string sigVTag("_v25");
-  const string WNJetsToLNuVTag("_v33");
-  const string TTJetsVTag("_v33");
-  const string DYJetsToLLVTag("_v33");
+  const string outputVTag("_v36");
+  const string dataVTag("_v36");
+  const string sigVTag("_v36");
+  const string WNJetsToLNuVTag("_v36");
+  const string TTJetsVTag("_v36");
+  const string DYJetsToLLVTag("_v36");
 
   //hadd data samples from different eras
 //   string dataIsoPrefix(analysisFilePath + "data/analysis/muHadIsoAnalysis_SingleMu");
@@ -358,10 +358,10 @@
     DYJetsToLLNonIsoName << DYJetsToLLNonIsoPrefix << *iMassBin << DYJetsToLLNonIsoSuffix;
     DYJetsToLLNonIsoHaddInputFiles.push_back(DYJetsToLLNonIsoName.str());
   }
-//   haddCanvases(DYJetsToLLIsoHaddOutputFile, DYJetsToLLIsoHaddInputFiles, DYJetsToLLRelXSecWeights, 
-// 	       canvasNames1D, graphNames1D, canvasNames2D, graphNames2D);
-//   haddCanvases(DYJetsToLLNonIsoHaddOutputFile, DYJetsToLLNonIsoHaddInputFiles, 
-// 	       DYJetsToLLRelXSecWeights, canvasNames1D, graphNames1D, canvasNames2D, graphNames2D);
+  haddCanvases(DYJetsToLLIsoHaddOutputFile, DYJetsToLLIsoHaddInputFiles, DYJetsToLLRelXSecWeights, 
+	       canvasNames1D, graphNames1D, canvasNames2D, graphNames2D);
+  haddCanvases(DYJetsToLLNonIsoHaddOutputFile, DYJetsToLLNonIsoHaddInputFiles, 
+	       DYJetsToLLRelXSecWeights, canvasNames1D, graphNames1D, canvasNames2D, graphNames2D);
 
   //hadd W+jets Njets binned samples
   string WNJetsToLNuIsoPrefix(analysisFilePath + "WNJetsToLNu/analysis/muHadIsoAnalysis_W");
@@ -385,12 +385,12 @@
     WNJetsToLNuAllTauName << WNJetsToLNuAllTauPrefix << iNJets << WNJetsToLNuSuffix;
     WNJetsToLNuAllTauHaddInputFiles.push_back(WNJetsToLNuAllTauName.str());
   }
-//   haddCanvases(WNJetsToLNuIsoHaddOutputFile, WNJetsToLNuIsoHaddInputFiles, 
-// 	       WNJetsToLNuRelXSecWeights, canvasNames1D, graphNames1D, canvasNames2D, 
-// 	       graphNames2D);
-//   haddCanvases(WNJetsToLNuNonIsoHaddOutputFile, WNJetsToLNuNonIsoHaddInputFiles, 
-// 	       WNJetsToLNuRelXSecWeights, canvasNames1D, graphNames1D, canvasNames2D, 
-// 	       graphNames2D);
+  haddCanvases(WNJetsToLNuIsoHaddOutputFile, WNJetsToLNuIsoHaddInputFiles, 
+	       WNJetsToLNuRelXSecWeights, canvasNames1D, graphNames1D, canvasNames2D, 
+	       graphNames2D);
+  haddCanvases(WNJetsToLNuNonIsoHaddOutputFile, WNJetsToLNuNonIsoHaddInputFiles, 
+	       WNJetsToLNuRelXSecWeights, canvasNames1D, graphNames1D, canvasNames2D, 
+	       graphNames2D);
 //   haddCanvases(WNJetsToLNuAllTauHaddOutputFile, WNJetsToLNuAllTauHaddInputFiles, 
 // 	       WNJetsToLNuRelXSecWeights, canvasNames1D, graphNames1D, canvasNames2D, 
 // 	       graphNames2D);

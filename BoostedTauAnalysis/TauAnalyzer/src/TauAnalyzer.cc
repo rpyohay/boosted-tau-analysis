@@ -399,8 +399,26 @@ TauAnalyzer::TauAnalyzer(const edm::ParameterSet& iConfig) :
 				   2.840e+04, 1.549e+04, 8.845e+03, 5.236e+03, 3.180e+03, 
 				   1.964e+03, 1.225e+03, 7.678e+02, 4.813e+02, 3.006e+02, 
 				   1.866e+02, 1.147e+02, 6.969e+01, 4.179e+01, 2.470e+01};
+  float Data20122p5InvFbPUDistArray[60] = {6.633e-03, 7.767e-02, 9.649e+02, 1.449e+05, 
+					   3.185e+05, 5.658e+05, 4.224e+06, 1.779e+07, 
+					   4.045e+07, 6.108e+07, 8.996e+07, 1.319e+08, 
+					   1.670e+08, 1.925e+08, 2.075e+08, 2.081e+08, 
+					   1.960e+08, 1.755e+08, 1.537e+08, 1.349e+08, 
+					   1.186e+08, 1.054e+08, 9.523e+07, 8.614e+07, 
+					   7.637e+07, 6.542e+07, 5.384e+07, 4.252e+07, 
+					   3.212e+07, 2.310e+07, 1.580e+07, 1.035e+07, 
+					   6.544e+06, 4.001e+06, 2.354e+06, 1.320e+06, 
+					   6.986e+05, 3.473e+05, 1.620e+05, 7.126e+04, 
+					   2.994e+04, 1.232e+04, 5.175e+03, 2.318e+03, 
+					   1.136e+03, 6.016e+02, 3.322e+02, 1.849e+02, 
+					   1.015e+02, 5.438e+01, 2.826e+01, 1.422e+01, 
+					   6.923e+00, 3.258e+00, 1.482e+00, 6.517e-01, 
+					   2.770e-01, 1.138e-01, 4.518e-02, 1.734e-02};
   std::vector<float> Data2012PUDist(Data2012PUDistArray, Data2012PUDistArray + 
 				    sizeof(Data2012PUDistArray)/sizeof(float));
+  std::vector<float> 
+    Data20122p5InvFbPUDist(Data20122p5InvFbPUDistArray, Data20122p5InvFbPUDistArray + 
+			   sizeof(Data20122p5InvFbPUDistArray)/sizeof(float));
   if (PUScenario_ == "S7") {
     float S7PUDistArray[60] = {2.344E-05, 2.344E-05, 2.344E-05, 2.344E-05, 4.687E-04, 4.687E-04, 
 			       7.032E-04, 9.414E-04, 1.234E-03, 1.603E-03, 2.464E-03, 3.250E-03, 
@@ -414,7 +432,8 @@ TauAnalyzer::TauAnalyzer(const edm::ParameterSet& iConfig) :
 			       5.081E-06, 1.898E-06, 6.688E-07, 2.221E-07, 6.947E-08, 2.047E-08};
     std::vector<float> S7PUDist(S7PUDistArray, S7PUDistArray + 
 				sizeof(S7PUDistArray)/sizeof(float));
-    PUReweight_ = edm::LumiReWeighting(S7PUDist, Data2012PUDist);
+//     PUReweight_ = edm::LumiReWeighting(S7PUDist, Data2012PUDist);
+    PUReweight_ = edm::LumiReWeighting(S7PUDist, Data20122p5InvFbPUDist);
   }
   else if (PUScenario_ == "S10") {
     float S10PUDistArray[60] = {2.560E-06, 5.239E-06, 1.420E-05, 5.005E-05, 1.001E-04, 2.705E-04, 
@@ -429,7 +448,8 @@ TauAnalyzer::TauAnalyzer(const edm::ParameterSet& iConfig) :
 				7.126E-05, 4.948E-05, 3.405E-05, 2.322E-05, 1.570E-05, 5.005E-06};
     std::vector<float> S10PUDist(S10PUDistArray, S10PUDistArray + 
 				 sizeof(S10PUDistArray)/sizeof(float));
-    PUReweight_ = edm::LumiReWeighting(S10PUDist, Data2012PUDist);
+//     PUReweight_ = edm::LumiReWeighting(S10PUDist, Data2012PUDist);
+    PUReweight_ = edm::LumiReWeighting(S10PUDist, Data20122p5InvFbPUDist);
   }
 }
 

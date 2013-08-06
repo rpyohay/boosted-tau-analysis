@@ -680,14 +680,18 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 			    weight, pHist->GetXaxis()->GetTitle(), 
 			    pHist->GetYaxis()->GetTitle());
 	if (setLogY) pHist->GetYaxis()->SetRangeUser(0.1, 10000.0);
+	string legendStyle("l");
 	if (drawStack) {
 // 	  pHist->SetFillStyle(0);
 // 	  pHist->SetFillColor(0);
 	  pHist->SetFillStyle(1001);
 	  pHist->SetFillColor(colors[fileIndex]);
+	  if (fileIndex == 0) legendStyle = "lp";
+	  else legendStyle = "f";
 	}
 	hists[canvasIndex][fileIndex] = pHist;
-	legends[canvasIndex]->AddEntry(pHist, legendEntries[fileIndex].c_str(), "l");
+	legends[canvasIndex]->
+	  AddEntry(pHist, legendEntries[fileIndex].c_str(), legendStyle.c_str());
 // 	if (fileIndex == (inputFiles.size() - 1)) stacks[canvasIndex]->Add(pHist, "HIST");
 // 	else stacks[canvasIndex]->Add(pHist, "HISTE");
 	if (fileIndex != 0) stacks[canvasIndex]->Add(pHist, "HIST");
@@ -722,7 +726,25 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
     }
     else {
       if (setLogY) {
-	stacks[canvasIndex]->SetMinimum(0.1);
+	Double_t histMin = stacks[canvasIndex]->GetMinimum();
+	Double_t axisMin = 1.0;
+	int exponent = 0;
+	if (histMin != 0.0) {
+	  while (histMin < 1.0) {
+	    histMin*=10;
+	    --exponent;
+	  }
+	  while (histMin >= 10.0) {
+	    histMin/=10;
+	    ++exponent;
+	  }
+	}
+	if (exponent < 0) {
+	  exponent+=(2*exponent);
+	  for (int i = 0; i < exponent; ++i) { axisMin/=10; }
+	}
+	else for (int i = 0; i < exponent; ++i) { axisMin*=10; }
+	stacks[canvasIndex]->SetMinimum(axisMin == 0.0 ? 0.1 : axisMin);
 	stacks[canvasIndex]->SetMaximum(10000.0);
       }
       stacks[canvasIndex]->Draw();
