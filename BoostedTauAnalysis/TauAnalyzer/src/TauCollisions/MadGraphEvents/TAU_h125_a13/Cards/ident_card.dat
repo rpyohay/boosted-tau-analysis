@@ -1,0 +1,289 @@
+ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c      written by the UFO converter
+ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+
+dsqmix 3 3 RRd3x3
+
+dsqmix 3 6 RRd3x6
+
+hmix 2 tb
+
+hmix 4 MA2
+
+msd2 1 1 RmD21x1
+
+msd2 3 3 RmD23x3
+
+mse2 1 1 RmE21x1
+
+mse2 3 3 RmE23x3
+
+msl2 1 1 RmL21x1
+
+msl2 3 3 RmL23x3
+
+msoft 1 RMx1
+
+msoft 2 RMx2
+
+msoft 3 RMx3
+
+msoft 21 mHd2
+
+msoft 22 mHu2
+
+msq2 1 1 RmQ21x1
+
+msq2 3 3 RmQ23x3
+
+msu2 1 1 RmU21x1
+
+msu2 3 3 RmU23x3
+
+nmamix 1 1 UP1x1
+
+nmamix 1 2 UP1x2
+
+nmamix 1 3 UP1x3
+
+nmamix 2 1 UP2x1
+
+nmamix 2 2 UP2x2
+
+nmamix 2 3 UP2x3
+
+nmhmix 1 1 US1x1
+
+nmhmix 1 2 US1x2
+
+nmhmix 1 3 US1x3
+
+nmhmix 2 1 US2x1
+
+nmhmix 2 2 US2x2
+
+nmhmix 2 3 US2x3
+
+nmhmix 3 1 US3x1
+
+nmhmix 3 2 US3x2
+
+nmhmix 3 3 US3x3
+
+nmnmix 1 1 RNN1x1
+
+nmnmix 1 2 RNN1x2
+
+nmnmix 1 3 RNN1x3
+
+nmnmix 1 4 RNN1x4
+
+nmnmix 1 5 RNN1x5
+
+nmnmix 2 1 RNN2x1
+
+nmnmix 2 2 RNN2x2
+
+nmnmix 2 3 RNN2x3
+
+nmnmix 2 4 RNN2x4
+
+nmnmix 2 5 RNN2x5
+
+nmnmix 3 1 RNN3x1
+
+nmnmix 3 2 RNN3x2
+
+nmnmix 3 3 RNN3x3
+
+nmnmix 3 4 RNN3x4
+
+nmnmix 3 5 RNN3x5
+
+nmnmix 4 1 RNN4x1
+
+nmnmix 4 2 RNN4x2
+
+nmnmix 4 3 RNN4x3
+
+nmnmix 4 4 RNN4x4
+
+nmnmix 4 5 RNN4x5
+
+nmnmix 5 1 RNN5x1
+
+nmnmix 5 2 RNN5x2
+
+nmnmix 5 3 RNN5x3
+
+nmnmix 5 4 RNN5x4
+
+nmnmix 5 5 RNN5x5
+
+nmssmrun 1 NMl
+
+nmssmrun 2 NMk
+
+nmssmrun 3 NMAl
+
+nmssmrun 4 NMAk
+
+nmssmrun 5 mueff
+
+nmssmrun 10 MS2
+
+selmix 3 3 RRl3x3
+
+selmix 3 6 RRl3x6
+
+sminputs 1 aEWM1
+
+sminputs 3 aS
+
+td 3 3 Rtd3x3
+
+te 3 3 Rte3x3
+
+tu 3 3 Rtu3x3
+
+umix 1 1 RUU1x1
+
+umix 1 2 RUU1x2
+
+usqmix 3 3 RRu3x3
+
+usqmix 3 6 RRu3x6
+
+vmix 1 1 RVV1x1
+
+vmix 1 2 RVV1x2
+
+yd 3 3 Ryd3x3
+
+ye 3 3 Rye3x3
+
+yu 3 3 Ryu3x3
+
+mass 23 MZ
+
+mass 24 MW
+
+mass 1000022 Mneu1
+
+mass 1000023 Mneu2
+
+mass 1000025 Mneu3
+
+mass 1000035 Mneu4
+
+mass 1000045 Mneu5
+
+mass 1000024 Mch1
+
+mass 1000037 Mch2
+
+mass 1000021 Mgo
+
+mass 25 MH01
+
+mass 45 MH03
+
+mass 36 MxA01
+
+mass 46 MxA02
+
+mass 37 MH
+
+mass 15 Mta
+
+mass 6 MT
+
+mass 5 MB
+
+mass 1000012 Msn1
+
+mass 1000016 Msn3
+
+mass 1000011 Msl1
+
+mass 1000015 Msl3
+
+mass 2000011 Msl4
+
+mass 2000015 Msl6
+
+mass 1000002 Msu1
+
+mass 1000006 Msu3
+
+mass 2000002 Msu4
+
+mass 2000006 Msu6
+
+mass 1000001 Msd1
+
+mass 1000005 Msd3
+
+mass 2000001 Msd4
+
+mass 2000005 Msd6
+
+decay 23 WZ
+
+decay 24 WW
+
+decay 1000023 Wneu2
+
+decay 1000025 Wneu3
+
+decay 1000035 Wneu4
+
+decay 1000045 Wneu5
+
+decay 1000024 Wch1
+
+decay 1000037 Wch2
+
+decay 1000021 Wgo
+
+decay 25 WH01
+
+decay 35 WH02
+
+decay 45 WH03
+
+decay 36 WA01
+
+decay 46 WA02
+
+decay 37 WH
+
+decay 6 WT
+
+decay 1000012 Wsn1
+
+decay 1000016 Wsn3
+
+decay 1000011 Wsl1
+
+decay 1000015 Wsl3
+
+decay 2000011 Wsl4
+
+decay 2000015 Wsl6
+
+decay 1000002 Wsu1
+
+decay 1000006 Wsu3
+
+decay 2000002 Wsu4
+
+decay 2000006 Wsu6
+
+decay 1000001 Wsd1
+
+decay 1000005 Wsd3
+
+decay 2000001 Wsd4
+
+decay 2000005 Wsd6
