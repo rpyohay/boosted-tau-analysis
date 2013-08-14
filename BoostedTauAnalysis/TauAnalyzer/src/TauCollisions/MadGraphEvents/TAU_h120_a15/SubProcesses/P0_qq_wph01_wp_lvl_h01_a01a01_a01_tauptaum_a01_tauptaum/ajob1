@@ -1,0 +1,79 @@
+#!/bin/bash
+k=run1_app.log
+script=ajob1                         
+j=G1.230
+     if [[ ! -e $j ]]; then
+          mkdir $j
+     fi
+     cd $j
+     rm -f $k
+     rm -f moffset.dat >& /dev/null
+      echo            1  > moffset.dat
+     if  [[ -e ftn26 ]]; then
+          cp ftn26 ftn25
+     fi
+     if [[ ! -e ftn25 ]]; then
+         echo "    1886       9       3" >& input_sg.txt
+         echo " -0.60895E+10" >> input_sg.txt
+         echo "2" >> input_sg.txt
+         echo "1" >> input_sg.txt
+         echo "   0 " >> input_sg.txt
+         echo "1.230" >>input_sg.txt
+          ../madevent >> $k <input_sg.txt
+          cat $k >> log.txt
+          if [[ -e ftn26 ]]; then
+               cp ftn26 ftn25
+          fi
+     else
+          rm -f $k
+         echo "    1886       9       3" >& input_sg.txt
+         echo " -0.60895E+10" >> input_sg.txt
+         echo "0" >> input_sg.txt
+         echo "1" >> input_sg.txt
+         echo "   0 " >> input_sg.txt
+         echo "1.230" >>input_sg.txt
+          if [[ -e ftn26 ]]; then
+               cp ftn26 ftn25
+          fi
+          ../madevent >> $k <input_sg.txt
+          cat $k >> log.txt
+     fi
+     cd ../
+j=G1.232
+     if [[ ! -e $j ]]; then
+          mkdir $j
+     fi
+     cd $j
+     rm -f $k
+     rm -f moffset.dat >& /dev/null
+      echo            1  > moffset.dat
+     if  [[ -e ftn26 ]]; then
+          cp ftn26 ftn25
+     fi
+     if [[ ! -e ftn25 ]]; then
+         echo "    1886       9       3" >& input_sg.txt
+         echo " -0.60895E+10" >> input_sg.txt
+         echo "2" >> input_sg.txt
+         echo "1" >> input_sg.txt
+         echo "   0 " >> input_sg.txt
+         echo "1.232" >>input_sg.txt
+          ../madevent >> $k <input_sg.txt
+          cat $k >> log.txt
+          if [[ -e ftn26 ]]; then
+               cp ftn26 ftn25
+          fi
+     else
+          rm -f $k
+         echo "    1886       9       3" >& input_sg.txt
+         echo " -0.60895E+10" >> input_sg.txt
+         echo "0" >> input_sg.txt
+         echo "1" >> input_sg.txt
+         echo "   0 " >> input_sg.txt
+         echo "1.232" >>input_sg.txt
+          if [[ -e ftn26 ]]; then
+               cp ftn26 ftn25
+          fi
+          ../madevent >> $k <input_sg.txt
+          cat $k >> log.txt
+     fi
+     cd ../

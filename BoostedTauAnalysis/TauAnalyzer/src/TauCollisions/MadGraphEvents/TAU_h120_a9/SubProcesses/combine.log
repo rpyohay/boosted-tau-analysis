@@ -1,0 +1,25 @@
+ A PDF is used, so alpha_s(MZ) is going to be modified
+ Old value of alpha_s from param_card:   0.11720000207424164     
+ New value of alpha_s from PDF cteq6l1:  0.13000000000000000     
+ Results.dat xsec =   6.48889999999999982E-007  abs xsec =   6.48889999999999982E-007
+ Found            1  subprocesses
+ SubProcess/Channel     kept   read   xsec 
+P0_qq_wph01_wp_lvl_h01_a01a01_a01_tauptaum_a01_tauptaum/G1.202/   18573   18573 0.548E-06
+P0_qq_wph01_wp_lvl_h01_a01a01_a01_tauptaum_a01_tauptaum/G1.203/   19240   19240 0.573E-06
+P0_qq_wph01_wp_lvl_h01_a01a01_a01_tauptaum_a01_tauptaum/G1.205/   20575   20575 0.598E-06
+P0_qq_wph01_wp_lvl_h01_a01a01_a01_tauptaum_a01_tauptaum/G1.206/   20575   20575 0.598E-06
+P0_qq_wph01_wp_lvl_h01_a01a01_a01_tauptaum_a01_tauptaum/G1.211/   22098   22381 0.623E-06
+P0_qq_wph01_wp_lvl_h01_a01a01_a01_tauptaum_a01_tauptaum/G1.212/   22098   22381 0.623E-06
+P0_qq_wph01_wp_lvl_h01_a01a01_a01_tauptaum_a01_tauptaum/G1.214/   22098   22381 0.623E-06
+P0_qq_wph01_wp_lvl_h01_a01a01_a01_tauptaum_a01_tauptaum/G1.215/   22098   22381 0.623E-06
+P0_qq_wph01_wp_lvl_h01_a01a01_a01_tauptaum_a01_tauptaum/G1.229/   22984   23267 0.647E-06
+P0_qq_wph01_wp_lvl_h01_a01a01_a01_tauptaum_a01_tauptaum/G1.230/   22985   23277 0.647E-06
+P0_qq_wph01_wp_lvl_h01_a01a01_a01_tauptaum_a01_tauptaum/G1.232/   23054   24871 0.648E-06
+P0_qq_wph01_wp_lvl_h01_a01a01_a01_tauptaum_a01_tauptaum/G1.233/   23054   24871 0.648E-06
+P0_qq_wph01_wp_lvl_h01_a01a01_a01_tauptaum_a01_tauptaum/G1.238/   23118   25410 0.649E-06
+P0_qq_wph01_wp_lvl_h01_a01a01_a01_tauptaum_a01_tauptaum/G1.239/   23118   25410 0.649E-06
+P0_qq_wph01_wp_lvl_h01_a01a01_a01_tauptaum_a01_tauptaum/G1.241/   23118   25410 0.649E-06
+P0_qq_wph01_wp_lvl_h01_a01a01_a01_tauptaum_a01_tauptaum/G1.242/   23118   25410 0.649E-06
+ Found        10299  events writing first        10000
+ Unweighting selected        10000  events.
+Truncated  0.01% of cross section
