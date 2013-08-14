@@ -37,9 +37,7 @@ mh01='115' #Define Higgs Mass for .C file
 ma01='9' #Define a01 Mass for .C file
 nevents='10000' #Define the number of events for MadGraph
 fname="Tau_Entries_$nevents" #Desired name of files 
-#MG5process="generate p p > w+ h01, w+ > e+ ve, (h01 > a01 a01, a01 > tau+ tau-) @0\nadd process p p > w+ h01, w+ > e+ ve, (h01 > a01 a01, a01 > tau+ tau-) j @1\nadd process p p > w+ h01, w+ > e+ ve, (h01 > a01 a01, a01 > tau+ tau-) j j @2\nadd process p p > w+ h01, w+ > e+ ve, (h01 > a01 a01, a01 > tau+ tau-) j j j @3\nadd process p p > w+ h01, w+ > e+ ve, (h01 > a01 a01, a01 > tau+ tau-) j j j j @4\nadd process p p > w- h01, w- > e- ve~, (h01 > a01 a01, a01 > tau+ tau-) @5\nadd process p p > w- h01, w- > e- ve~, (h01 > a01 a01, a01 > tau+ tau-) j @6\nadd process p p > w- h01, w- > e- ve~, (h01 > a01 a01, a01 > tau+ tau-) j j @7\nadd process p p > w- h01, w- > e- ve~, (h01 > a01 a01, a01 > tau+ tau-) j j j @8\nadd process p p > w- h01, w- > e- ve~, (h01 > a01 a01, a01 > tau+ tau-) j j j j @9" #Define specified MG5 process
-#MG5process="generate p p > w+ h01, w+ > e+ ve, (h01 > a01 a01, a01 > tau+ tau-) @0\nadd process p p > w+ h01, w+ > e+ ve, (h01 > a01 a01, a01 > tau+ tau-) j @1\nadd process p p > w+ h01, w+ > e+ ve, (h01 > a01 a01, a01 > tau+ tau-) j j @2\nadd process p p > w+ h01, w+ > e+ ve, (h01 > a01 a01, a01 > tau+ tau-) j j j @3\nadd process p p > w+ h01, w+ > e+ ve, (h01 > a01 a01, a01 > tau+ tau-) j j j j @4"
-MG5process="generate p p > w+ h01, w+ > e+ ve, (h01 > a01 a01, a01 > tau+ tau-)"
+MG5process="generate p p > w+ h01, w+ > e+ ve, (h01 > a01 a01, a01 > tau+ tau-)" #Define process for MadGraph
 var1='1.15e+02' #Define Higgs Mass for param_card
 var2='9.00e+00' #Define a01 Mass for param_card
 
@@ -88,10 +86,6 @@ amassC='7'
 
 #We store all of the .C and .h files in C_h_files_singleEvent and we store all of the
 #histograms and histogram root files in HistsAndHistRootFiles_singleEvent
-#	mv $fname.C ../C_h_files_singleEvent/
-#	mv $fname.h ../C_h_files_singleEvent/
-#	cp "events_$fname.root" ../C_h_files_singleEvent/
-#	cd ../C_h_files_singleEvent/
 	root -l -x -q ../RootMacros/"root_macro_compiler.C(\"$fname\")"
 	cp "Histograms_Entries_""$nevents""_h01_""$mh01""_a01_""$ma01"".root" ../HistsAndHistRootFiles_singleEvent
 	rm "Histograms_Entries_""$nevents""_h01_""$mh01""_a01_""$ma01"".root"
