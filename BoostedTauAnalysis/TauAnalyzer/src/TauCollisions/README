@@ -1,0 +1,47 @@
+Brenna Mockler, Michael Manighalam
+
+
+	***specify paths to ExRootAnalysis and MadGraph in MultiEventGenerator.sh and in singleEventGenerator.sh***
+	
+
+RUNNING SIMULATIONS AND OVERLAYING MULTIPLE HISTOGRAMS:
+To use madgraph to generate the process p p > h01 w+, w+ > e+ ve (h01 > a01 a01, a01 >tau+ tau-) with h01 mass of 115, 120, and 125 GeV, and a01 mass of 7, 9, 11, 13, and 15 GeV and overlay all the histograms with the same a01 mass do the following:
+
+	1. Go to macroCopy.sh and uncomment the line 'root -l -x "overlay_histograms_a01.C()"'. 
+	2. Make sure that the two similar lines that run the other overlay programs are commented out (they are 'root -l -x "overlay_histograms_h01.C()"' and 'root -l -x "2hist_overlay.C()"') 
+	3. Run MultiEventGenerator in terminal using the command "sh MultiEventGenerator.sh".
+
+To use madgraph to generate the above process but overlay all the histograms with the same h01 mass instead, do the same thing you would do to overlay the ones with the a01 mass, but uncomment the line 'root -l -x "overlay_histograms_h01.C()"' instead.
+
+RUNNING A SINGLE SIMULATION
+	1. Check singleEventGenerator.sh to make sure that you have entered in the desired parameters that it asks for in the comments at the top
+	2. Run using the command sh singleEventGenerator.sh
+
+OVERLAYING 2 HISTOGRAMS:
+To overlay just two histograms do the following:
+	
+	1. Open macroCopy.sh and comment out all the lines between (and including) this line: 
+
+*****echo "Enter Loop"   #This loop updates the macros using the template (templateRootMacro.C) and then compiles them*****
+
+ and this line: 
+
+*****root -l -x "overlay_histograms_h01.C()" #overlays the histograms with the same h01 mass*****
+
+	2. Uncomment the line:
+***** 'root -l -x "2hist_overlay.C()" #overlays two histograms specified in 2hist_overlay.C TO USE THIS COMMENT OUT THE PREVIOUS LINES UP 
+#UNTIL echo "Enter Loop"'***** if it is commented out. 
+	
+	3. If you want to use 2hist_overlay.C, you will need to change the code specified in the comments at the top of 2hist_overlay.C
+	
+	4. Run macroCopy.sh in terminal using the command "sh macroCopy.sh".
+
+
+
+UPDATING MACROS:
+If you've already ran madgraph and have the root macros for all of the mass combinations outlined above, and you want to update the macros, do the following:
+
+	1. Make whatever updates you want to make to the templateRootMacro.C file. 
+	2. Run macroCopy.sh in terminal using the command "sh macroCopy.sh".
+
+

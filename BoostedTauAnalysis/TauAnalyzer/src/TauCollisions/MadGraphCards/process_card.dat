@@ -1,0 +1,31 @@
+#************************************************************
+#*                        MadGraph 5                        *
+#*                                                          *
+#*                *                       *                 *
+#*                  *        * *        *                   *
+#*                    * * * * 5 * * * *                     *
+#*                  *        * *        *                   *
+#*                *                       *                 *
+#*                                                          *
+#*                                                          *
+#*         VERSION 1.3.30                2011-11-18         *
+#*                                                          *
+#*    The MadGraph Development Team - Please visit us at    *
+#*    https://server06.fynu.ucl.ac.be/projects/madgraph     *
+#*                                                          *
+#************************************************************
+#*                                                          *
+#*               Command File for MadGraph 5                *
+#*                                                          *
+#*     run as ./bin/mg5  filename                           *
+#*                                                          *
+#************************************************************
+
+import model nmssm -modelname
+# Specify process(es) to run
+generate p p > w+ h01, w+ > e+ ve, (h01 > a01 a01, a01 > tau+ tau-)
+# Output processes to MadEvent directory
+output Tau_Entries_10000
+y
+launch Tau_Entries_10000
+0
