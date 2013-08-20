@@ -204,7 +204,7 @@ class Common {
 			      const char*, const char*);
 
   //set 1D histogram drawing options
-  static void setHistogramOptions(TH1F*, const Color_t, const Size_t, const Style_t, 
+  static void setHistogramOptions(TH1*, const Color_t, const Size_t, const Style_t, 
 				  const Double_t, const char*, const char*, const Double_t);
 
   //set 1D histogram drawing options, excluding axis titles

@@ -1377,7 +1377,9 @@ process.noSelectedOutput = cms.OutputModule(
     "PoolOutputModule",
     SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring('p')),
     outputCommands = skimEventContent.outputCommands,
-    fileName = cms.untracked.string('/data1/yohay/Wh1_Medium/EDM_files/data_no_selection.root')
+    fileName = cms.untracked.string(
+    '/data1/yohay/Wh1_Medium/EDM_files/data_no_selection.root'
+    )
     )
 
 #sequences

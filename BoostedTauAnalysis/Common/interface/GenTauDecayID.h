@@ -12,7 +12,8 @@ class GenTauDecayID {
   //PDG IDs
   enum PDGID {        EPDGID = 11,         MUPDGID = 13,         TAUPDGID = 15, 
 	      ENEUTRINOPDGID = 12, MUNEUTRINOPDGID = 14, TAUNEUTRINOPDGID = 16, 
-		      ZPDGID = 23,          APDGID = 36, ANY_PDGID = 0};
+		      ZPDGID = 23,          APDGID = 36,       GAMMAPDGID = 22, 
+		   ANY_PDGID = 0};
 
   //decay types
   enum DecayType {HAD = 0, MU, E, UNKNOWN, NOT_TAU};

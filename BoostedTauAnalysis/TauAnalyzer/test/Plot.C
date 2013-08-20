@@ -39,6 +39,16 @@ void formatSavePath(string& savePath)
 }
 
 //set canvas drawing options
+void setCanvasOptions(TVirtualPad& canvas, const Int_t grid, const Int_t logY, const Int_t logZ)
+{
+  canvas.SetFillStyle(0);
+  canvas.SetFillColor(0);
+  canvas.SetGrid(grid, grid);
+  canvas.SetLogy(logY);
+  canvas.SetLogz(logZ);
+}
+
+//set canvas drawing options
 void setCanvasOptions(TCanvas& canvas, const Int_t grid, const Int_t logY, const Int_t logZ)
 {
   canvas.SetFillStyle(0);
@@ -46,6 +56,16 @@ void setCanvasOptions(TCanvas& canvas, const Int_t grid, const Int_t logY, const
   canvas.SetGrid(grid, grid);
   canvas.SetLogy(logY);
   canvas.SetLogz(logZ);
+}
+
+//set canvas margins
+void setCanvasMargins(TVirtualPad& canvas, const float left, const float top, const float right, 
+		      const float bottom)
+{
+  canvas.cd()->SetLeftMargin(left);
+  canvas.cd()->SetTopMargin(top);
+  canvas.cd()->SetRightMargin(right);
+  canvas.cd()->SetBottomMargin(bottom);
 }
 
 //set canvas margins
@@ -493,14 +513,26 @@ template<typename T>
 void setup(const vector<string>& canvasNames, vector<TCanvas*>& outputCanvases, 
 	   const bool setLogY, vector<TLegend*>& legends, vector<THStack*>& stacks, 
 	   const vector<string>& legendHeaders, vector<vector<T*> >& hists, 
-	   const unsigned int size)
+	   const unsigned int size, const bool dataMC)
 {
   for (vector<string>::const_iterator iCanvasName = canvasNames.begin(); 
        iCanvasName != canvasNames.end(); ++iCanvasName) {
     const unsigned int canvasIndex = iCanvasName - canvasNames.begin();
-    outputCanvases.push_back(new TCanvas(iCanvasName->c_str(), "", 600, 600));
-    setCanvasOptions(*outputCanvases[outputCanvases.size() - 1], 1, setLogY, 0);
-    setCanvasMargins(*outputCanvases[outputCanvases.size() - 1], 0.2, 0.2, 0.2, 0.2);
+    if (dataMC) {
+      outputCanvases.push_back(new TCanvas(iCanvasName->c_str(), "", 600, 900));
+      outputCanvases[outputCanvases.size() - 1]->Divide(1, 2);
+      outputCanvases[outputCanvases.size() - 1]->cd(1)->SetPad(0.0, 0.33, 1.0, 1.0);
+      setCanvasOptions(*outputCanvases[outputCanvases.size() - 1]->cd(1), 1, setLogY, 0);
+      setCanvasMargins(*outputCanvases[outputCanvases.size() - 1]->cd(1), 0.2, 0.2, 0.2, 0.2);
+      outputCanvases[outputCanvases.size() - 1]->cd(2)->SetPad(0.0, 0.0, 1.0, 0.33);
+      setCanvasOptions(*outputCanvases[outputCanvases.size() - 1]->cd(2), 1, 0, 0);
+      setCanvasMargins(*outputCanvases[outputCanvases.size() - 1]->cd(2), 0.2, 0.2, 0.2, 0.2);
+    }
+    else {
+      outputCanvases.push_back(new TCanvas(iCanvasName->c_str(), "", 600, 600));
+      setCanvasOptions(*outputCanvases[outputCanvases.size() - 1], 1, setLogY, 0);
+      setCanvasMargins(*outputCanvases[outputCanvases.size() - 1], 0.2, 0.2, 0.2, 0.2);
+    }
     legends.push_back(new TLegend(0.4, 0.55, 0.8, 0.75));
     string stackName(*iCanvasName);
     stackName.replace(stackName.find("Canvas"), 6, "Stack");
@@ -519,7 +551,7 @@ void setup(const vector<string>& canvasNames, vector<TCanvas*>& outputCanvases,
   vector<THStack*> stacks;
   vector<string> legendHeaders;
   vector<vector<TH1F*> > dummyHists;
-  setup(canvasNames, outputCanvases, false, legends, stacks, legendHeaders, dummyHists, 1);
+  setup(canvasNames, outputCanvases, false, legends, stacks, legendHeaders, dummyHists, 1, false);
   for (vector<string>::const_iterator iCanvasName = canvasNames.begin(); 
        iCanvasName != canvasNames.end(); ++iCanvasName) { hists.push_back(NULL); }
 }
@@ -632,7 +664,7 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 					   const vector<Style_t>& styles, 
 					   const vector<string>& legendEntries, 
 					   const vector<float>& weights, const bool setLogY, 
-					   const bool drawStack)
+					   const bool drawStack, const bool dataMC)
 {
   if ((inputFiles.size() > colors.size()) || (inputFiles.size() > styles.size()) || 
       (inputFiles.size() > legendEntries.size()) || (inputFiles.size() > weights.size()) || 
@@ -655,7 +687,7 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
   vector<THStack*> stacks;
   vector<vector<TH1F*> > hists;
   setup(canvasNames, outputCanvases, setLogY, legends, stacks, legendHeaders, hists, 
-	inputFiles.size());
+	inputFiles.size(), dataMC);
   for (vector<string>::const_iterator iInputFile = inputFiles.begin(); 
        iInputFile != inputFiles.end(); ++iInputFile) {
     const unsigned int fileIndex = iInputFile - inputFiles.begin();
@@ -675,10 +707,33 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
       }
       else {
 	pHist = (TH1F*)pCanvas->GetPrimitive(graphNames[canvasIndex].c_str());
+// 	if (string(pHist->GetName()) == "tauHadIso") {
+// 	  cout << *iInputFile << endl;
+// 	  cout << "Integral: " << pHist->Integral(0, -1) << endl;
+// 	}
 	float weight = weights[fileIndex] == 0.0 ? 1.0/pHist->Integral(0, -1) : weights[fileIndex];
 	setHistogramOptions(pHist, colors[fileIndex], 0.7, styles[fileIndex], 
-			    weight, pHist->GetXaxis()->GetTitle(), 
+			    weight, 
+			    string(pHist->GetName()) == "muHadPTOverMuHadMass" ? 
+			    "p_{T}/m" : pHist->GetXaxis()->GetTitle(), 
 			    pHist->GetYaxis()->GetTitle());
+	string histName(pHist->GetName());
+	if (histName == "jet_pt_etacut") pHist->GetXaxis()->SetTitle("p_{T} (GeV)");
+	if (histName == "jet_eta") pHist->GetXaxis()->SetTitle("#eta");
+	if (histName == "jet_phi") pHist->GetXaxis()->SetTitle("#phi");
+	if (histName == "jet_mass_etacut") pHist->GetXaxis()->SetTitle("m (GeV)");
+	if (histName == "jet_ptmj_etacut") {
+	  pHist->GetXaxis()->SetTitle("#frac{p_{T}}{m}");
+	}
+// 	if (string(pHist->GetName()) == "muHadPTOverMuHadMass") {
+// 	  cout << *iInputFile << endl;
+// 	  cout << "Integral(pT/m > 13): " << pHist->Integral(14, -1) << endl;
+// 	}
+// 	if (string(pHist->GetName()) == "tauHadIso") {
+// 	  cout << *iInputFile << endl;
+// 	  cout << "Integral: " << pHist->Integral(0, -1) << endl;
+// 	  cout << "Weight: " << weight << endl;
+// 	}
 	if (setLogY) pHist->GetYaxis()->SetRangeUser(0.1, 10000.0);
 	string legendStyle("l");
 	if (drawStack) {
@@ -697,7 +752,7 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 	if (fileIndex != 0) stacks[canvasIndex]->Add(pHist, "HIST");
       }
       outStream.cd();
-      outputCanvases[canvasIndex]->cd();
+      outputCanvases[canvasIndex]->cd(dataMC ? 1 : 0);
       if (fileIndex == 0) { if (pGraph != NULL) pGraph->Draw("AP"); }
       else if (pGraph != NULL) pGraph->Draw("PSAME");
     }
@@ -707,7 +762,7 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 	 iCanvasName != canvasNames.end(); ++iCanvasName) {
       const unsigned int canvasIndex = iCanvasName - canvasNames.begin();
       outStream.cd();
-      outputCanvases[canvasIndex]->cd();
+      outputCanvases[canvasIndex]->cd(dataMC ? 1 : 0);
       TH1F* pHistWithMaxMaxBin = histWithLargestBinContent(hists[canvasIndex]);
       if (pHistWithMaxMaxBin != NULL) pHistWithMaxMaxBin->Draw();
     }
@@ -716,7 +771,7 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
        iCanvasName != canvasNames.end(); ++iCanvasName) {
     const unsigned int canvasIndex = iCanvasName - canvasNames.begin();
     outStream.cd();
-    outputCanvases[canvasIndex]->cd();
+    outputCanvases[canvasIndex]->cd(dataMC ? 1 : 0);
     if (!drawStack) {
       for (vector<string>::const_iterator iInputFile = inputFiles.begin(); 
 	   iInputFile != inputFiles.end(); ++iInputFile) {
@@ -744,15 +799,35 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 	  for (int i = 0; i < exponent; ++i) { axisMin/=10; }
 	}
 	else for (int i = 0; i < exponent; ++i) { axisMin*=10; }
-	stacks[canvasIndex]->SetMinimum(axisMin == 0.0 ? 0.1 : axisMin);
+	stacks[canvasIndex]->SetMinimum(/*axisMin == 0.0 ? */0.1/* : axisMin*/);
 	stacks[canvasIndex]->SetMaximum(10000.0);
       }
       stacks[canvasIndex]->Draw();
-      TH1F* hist = (TH1F*)stacks[canvasIndex]->GetHists()->First();
+      TList* stackedHists = stacks[canvasIndex]->GetHists();
+      TH1F* hist = (TH1F*)stackedHists->First();
       stacks[canvasIndex]->GetXaxis()->SetTitle(hist->GetXaxis()->GetTitle());
       stacks[canvasIndex]->GetYaxis()->SetTitle(hist->GetYaxis()->GetTitle());
       hists[canvasIndex][0]->Draw("SAME");
+      TH1F* stackSumHist = NULL;
+      for (Int_t i = 0; i < stackedHists->GetEntries(); ++i) {
+	TH1F* stackHist = (TH1F*)stackedHists->At(i)->Clone();
+	stackHist->SetTitle("");
+	if (i == 0) stackSumHist = stackHist;
+	else stackSumHist->Add(stackHist);
+      }
+      TH1F* dataHist = (TH1F*)hists[canvasIndex][0]->Clone();
+      stackSumHist->Add(dataHist, -1.0);
+      stackSumHist->Divide(dataHist);
+      setHistogramOptions(stackSumHist, kBlack, 0.7, 20, 1.0, 
+			  stackSumHist->GetXaxis()->GetTitle(), 
+			  "#frac{N_{MC} - N_{data}}{N_{data}}");
+      stackSumHist->GetYaxis()->SetRangeUser(-1.0, 1.0);
+      if (dataMC) {
+	outputCanvases[canvasIndex]->cd(dataMC ? 2 : 0);
+	stackSumHist->Draw();
+      }
     }
+    outputCanvases[canvasIndex]->cd(dataMC ? 1 : 0);
     legends[canvasIndex]->Draw();
   }
   outStream.cd();

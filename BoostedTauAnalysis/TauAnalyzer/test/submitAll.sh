@@ -1,10 +1,13 @@
 #!/bin/bash
 
-cd v36
+cd v40
 ./submitDYJetsToLLTauAnalyzerJobs.sh
 ./submitDataTauAnalyzerJobs.sh
 ./submitTTJetsTauAnalyzerJobs.sh
 ./submitWNJetsToLNuTauAnalyzerJobs.sh
-cd v36
+./submitSingleTopTauAnalyzerJobs.sh
+./submitWZTauAnalyzerJobs.sh
+./submitZZTauAnalyzerJobs.sh
+cd ..
 
 exit 0

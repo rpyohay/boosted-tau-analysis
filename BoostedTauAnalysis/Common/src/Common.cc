@@ -390,7 +390,7 @@ void Common::setGraphOptions(TGraphAsymmErrors& graph, const Color_t color, cons
   setAxisOptions(graph.GetYaxis(), 0.05, 0.05, 1.05, yAxisTitle);
 }
 
-void Common::setHistogramOptions(TH1F* histogram, const Color_t color, const Size_t size, 
+void Common::setHistogramOptions(TH1* histogram, const Color_t color, const Size_t size, 
 				 const Style_t style, const Double_t scale, 
 				 const char* xAxisTitle, const char* yAxisTitle, 
 				 const Double_t xAxisLabelSize)

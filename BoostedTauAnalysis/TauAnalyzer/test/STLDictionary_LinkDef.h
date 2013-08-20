@@ -10,5 +10,6 @@
 #pragma link C++ class map<string, string>+;
 #pragma link C++ class map<string, pair<string, string> >+;
 #pragma link C++ class map<string, vector<string> >+;
+#pragma link C++ function std::reverse(vector<string>::iterator, vector<string>::iterator);
 
 #endif

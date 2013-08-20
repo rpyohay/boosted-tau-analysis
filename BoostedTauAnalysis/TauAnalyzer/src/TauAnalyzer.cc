@@ -157,6 +157,9 @@ private:
   //vertex tag
   edm::InputTag vtxTag_;
 
+  //all gen particles tag
+  edm::InputTag allGenParticleTag_;
+
   //dR matching distance
   double dR_;
 
@@ -272,6 +275,12 @@ private:
   //histogram of W muon + tau muon invariant mass
   TH1F* mWMuTauMu_;
 
+  //histogram of the PDG ID of the nearest status 1 particle to the soft muon
+  TH1F* PDGIDNearestStatus1GenParticleToSoftMu_;
+
+  //histogram of the PDG ID of the source particle of the gen muon nearest to the soft muon 
+  TH1F* PDGIDMuSrc_;
+
   //histogram of cleaned jet pT vs. cleaned tau pT
   TH2F* cleanedJetPTVsCleanedTauPT_;
 
@@ -329,8 +338,29 @@ private:
   //histogram of soft muon pT vs. hadronic tau pT
   TH2F* softMuPTVsTauHadPT_;
 
+  //histogram of pT/m vs. dimuon invariant mass
+  TH2F* muHadPTOverMuHadMassVsMWMuSoftMu_;
+
   //PU reweighting object
   edm::LumiReWeighting PUReweight_;
+
+  /*second jet pT for |eta| < 2.4, second jet is highest pT jet in the event excluding W muon and 
+    mu+had*/
+  TH1F *jet_pt_etacut;
+
+  //second jet eta, second jet is highest pT jet in the event excluding W muon and mu+had
+  TH1F *jet_eta;
+
+  //second jet phi, second jet is highest pT jet in the event excluding W muon and mu+had
+  TH1F *jet_phi;
+
+  /*second jet mass for |eta| < 2.4, second jet is highest pT jet in the event excluding W muon 
+    and mu+had*/
+  TH1F *jet_mass_etacut;
+
+  /*second jet pT/m for |eta| < 2.4, second jet is highest pT jet in the event excluding W muon 
+    and mu+had*/
+  TH1F *jet_ptmj_etacut;
 };
 
 //
@@ -360,6 +390,7 @@ TauAnalyzer::TauAnalyzer(const edm::ParameterSet& iConfig) :
   muonGenParticleTag_(iConfig.getParameter<edm::InputTag>("muonGenParticleTag")),
   PUTag_(iConfig.getParameter<edm::InputTag>("PUTag")),
   vtxTag_(iConfig.getParameter<edm::InputTag>("vtxTag")),
+  allGenParticleTag_(iConfig.getParameter<edm::InputTag>("allGenParticleTag")),
   dR_(iConfig.getParameter<double>("dR")),
   tauPTMin_(iConfig.getParameter<double>("tauPTMin")),
   tauDecayMode_(static_cast<reco::PFTau::hadronicDecayMode>
@@ -420,16 +451,26 @@ TauAnalyzer::TauAnalyzer(const edm::ParameterSet& iConfig) :
     Data20122p5InvFbPUDist(Data20122p5InvFbPUDistArray, Data20122p5InvFbPUDistArray + 
 			   sizeof(Data20122p5InvFbPUDistArray)/sizeof(float));
   if (PUScenario_ == "S7") {
-    float S7PUDistArray[60] = {2.344E-05, 2.344E-05, 2.344E-05, 2.344E-05, 4.687E-04, 4.687E-04, 
-			       7.032E-04, 9.414E-04, 1.234E-03, 1.603E-03, 2.464E-03, 3.250E-03, 
-			       5.021E-03, 6.644E-03, 8.502E-03, 1.121E-02, 1.518E-02, 2.033E-02, 
-			       2.608E-02, 3.171E-02, 3.667E-02, 4.060E-02, 4.338E-02, 4.520E-02, 
-			       4.641E-02, 4.735E-02, 4.816E-02, 4.881E-02, 4.917E-02, 4.909E-02, 
-			       4.842E-02, 4.707E-02, 4.501E-02, 4.228E-02, 3.896E-02, 3.521E-02, 
-			       3.118E-02, 2.702E-02, 2.287E-02, 1.885E-02, 1.508E-02, 1.166E-02, 
-			       8.673E-03, 6.190E-03, 4.222E-03, 2.746E-03, 1.698E-03, 9.971E-04, 
-			       5.549E-04, 2.924E-04, 1.457E-04, 6.864E-05, 3.054E-05, 1.282E-05, 
-			       5.081E-06, 1.898E-06, 6.688E-07, 2.221E-07, 6.947E-08, 2.047E-08};
+//     float S7PUDistArray[60] = {2.344E-05, 2.344E-05, 2.344E-05, 2.344E-05, 4.687E-04, 4.687E-04, 
+// 			       7.032E-04, 9.414E-04, 1.234E-03, 1.603E-03, 2.464E-03, 3.250E-03, 
+// 			       5.021E-03, 6.644E-03, 8.502E-03, 1.121E-02, 1.518E-02, 2.033E-02, 
+// 			       2.608E-02, 3.171E-02, 3.667E-02, 4.060E-02, 4.338E-02, 4.520E-02, 
+// 			       4.641E-02, 4.735E-02, 4.816E-02, 4.881E-02, 4.917E-02, 4.909E-02, 
+// 			       4.842E-02, 4.707E-02, 4.501E-02, 4.228E-02, 3.896E-02, 3.521E-02, 
+// 			       3.118E-02, 2.702E-02, 2.287E-02, 1.885E-02, 1.508E-02, 1.166E-02, 
+// 			       8.673E-03, 6.190E-03, 4.222E-03, 2.746E-03, 1.698E-03, 9.971E-04, 
+// 			       5.549E-04, 2.924E-04, 1.457E-04, 6.864E-05, 3.054E-05, 1.282E-05, 
+// 			       5.081E-06, 1.898E-06, 6.688E-07, 2.221E-07, 6.947E-08, 2.047E-08};
+    float S7PUDistArray[60] = {3.200e+02, 1.089e+03, 2.438e+03, 4.308e+03, 5.883e+03, 6.872e+03, 
+			       7.273e+03, 7.123e+03, 6.709e+03, 6.038e+03, 5.470e+03, 5.052e+03, 
+			       4.431e+03, 4.115e+03, 3.816e+03, 3.601e+03, 3.415e+03, 3.026e+03, 
+			       2.860e+03, 2.550e+03, 2.369e+03, 1.997e+03, 1.776e+03, 1.522e+03, 
+			       1.322e+03, 1.100e+03, 8.970e+02, 7.040e+02, 5.190e+02, 3.840e+02, 
+			       3.290e+02, 2.130e+02, 1.730e+02, 9.600e+01, 7.700e+01, 4.800e+01, 
+			       3.100e+01, 2.300e+01, 1.000e+01, 1.300e+01, 4.000e+00, 3.000e+00, 
+			       0.000e+00, 0.000e+00, 0.000e+00, 0.000e+00, 1.000e+00, 0.000e+00, 
+			       0.000e+00, 0.000e+00, 0.000e+00, 0.000e+00, 0.000e+00, 0.000e+00, 
+			       0.000e+00, 0.000e+00, 0.000e+00, 0.000e+00, 0.000e+00, 0.000e+00};
     std::vector<float> S7PUDist(S7PUDistArray, S7PUDistArray + 
 				sizeof(S7PUDistArray)/sizeof(float));
 //     PUReweight_ = edm::LumiReWeighting(S7PUDist, Data2012PUDist);
@@ -528,6 +569,10 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   edm::Handle<reco::VertexCollection> pVtx;
   iEvent.getByLabel(vtxTag_, pVtx);
 
+  //get all gen particles
+  edm::Handle<reco::GenParticleCollection> pAllGenParticles;
+  if (MC_) iEvent.getByLabel(allGenParticleTag_, pAllGenParticles);
+
 //   //debug
 //   for (reco::PFTauRefVector::const_iterator iTau = pTaus->begin(); iTau != pTaus->end(); 
 //        ++iTau) {
@@ -578,12 +623,20 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   //plot the transverse mass for the highest pT W muon
   plotMT(WMuonRefs[WMuonRefs.size() - 1], pMET, WMuMT_, PUWeight);
 
-  //fill an STL container of pointers to the gen particles
+  //fill STL containers of pointers to the gen particles
   std::vector<reco::GenParticle*> genParticlePtrs;
+  std::vector<reco::GenParticle*> status1GenParticlePtrs;
   if (MC_) {
     for (reco::GenParticleRefVector::const_iterator iGenParticle = pGenParticles->begin(); 
 	 iGenParticle != pGenParticles->end(); ++iGenParticle) {
       genParticlePtrs.push_back(const_cast<reco::GenParticle*>((*iGenParticle).get()));
+    }
+    for (reco::GenParticleCollection::const_iterator iGenParticle = pAllGenParticles->begin(); 
+	 iGenParticle != pAllGenParticles->end(); ++iGenParticle) {
+      if (iGenParticle->status() == 1) {
+	status1GenParticlePtrs.push_back(const_cast<reco::GenParticle*>(&*iGenParticle));
+// 	std::cerr << (*iGenParticle)->pdgId() << std::endl;
+      }
     }
   }
 
@@ -675,8 +728,9 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     reco::PFJet correctedTauJet;
     for (reco::PFJetCollection::const_iterator iJet = correctedOldJets.begin(); 
 	 iJet != correctedOldJets.end(); ++iJet) {
-      const unsigned int jetIndex = iJet - pOldJets->begin();
-      if (tauOldJetRef.key() != jetIndex) {
+      const unsigned int jetIndex = iJet - pOldJets->begin(); //what's going on here?
+
+      if (/*tauOldJetRef.key() != jetIndex*/deltaR(*iJet, **iTau) >= dR_) {
 	correctedOldJetsExcludingTau.push_back(*iJet);
       }
       else correctedTauJet = *iJet;
@@ -870,6 +924,12 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       double muHadPT = (removedMuonRefs[removedMuonRefs.size() - 1]->p4() + (*iTau)->p4()).pt();
       if (tauOldJetRef->pt() > uncorrJetPTMin_) {
 	muHadPTOverMuHadMass_->Fill(tauOldJetRef->pt()/tauOldJetRef->mass(), PUWeight);
+
+	//debug
+	if (tauOldJetRef->pt()/tauOldJetRef->mass() > 15.0) {
+	  std::cerr << iEvent.run() << " " << iEvent.id().event() << " ";
+	  std::cerr << iEvent.luminosityBlock() << std::endl;
+	}
       }
 
       //plot dR(soft muon, nearest gen muon)
@@ -881,6 +941,60 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       //plot invariant mass of W muon and tau muon
       mWMuTauMu_->Fill((WMuonRefs[WMuonRefs.size() - 1]->p4() + 
 			removedMuonRefs[removedMuonRefs.size() - 1]->p4()).M());
+
+      /*plot the PDG ID of the nearest status 1 particle to the soft muon and the PDG ID of the 
+	source particle of the gen muon nearest to the soft muon*/
+      int nearestStatus1GenParticleIndex = -1;
+      const reco::GenParticle* nearestStatus1GenParticle = NULL;
+      if (MC_) {
+	nearestStatus1GenParticle = 
+	  Common::nearestObject(removedMuonRefs[removedMuonRefs.size() - 1], 
+				status1GenParticlePtrs, nearestStatus1GenParticleIndex);
+      }
+      if (nearestStatus1GenParticle != NULL) {
+	if (reco::deltaR(*nearestStatus1GenParticle, 
+			 *removedMuonRefs[removedMuonRefs.size() - 1]) < dR_) {
+	  const unsigned int absNearestStatus1GenParticlePDGID = 
+	    fabs(nearestStatus1GenParticle->pdgId());
+	  unsigned int nearestGenParticleVal = 5;
+	  unsigned int muSrcVal = 1;
+	  const reco::Candidate* ancestor = nearestStatus1GenParticle->mother();
+	  switch (absNearestStatus1GenParticlePDGID) {
+	  case GenTauDecayID::EPDGID:
+	    nearestGenParticleVal = 0;
+	    break;
+	  case GenTauDecayID::MUPDGID:
+	    nearestGenParticleVal = 1;
+	    while ((fabs(ancestor->pdgId()) != GenTauDecayID::B) && 
+		   (fabs(ancestor->pdgId()) != GenTauDecayID::C) && 
+		   (ancestor->numberOfMothers() > 0)) {
+	      ancestor = ancestor->mother();
+	    }
+	    if ((fabs(ancestor->pdgId()) == GenTauDecayID::B) || 
+		(fabs(ancestor->pdgId()) == GenTauDecayID::C)) muSrcVal = 0;
+	    break;
+	  case GenTauDecayID::ENEUTRINOPDGID:
+	    nearestGenParticleVal = 2;
+	    break;
+	  case GenTauDecayID::MUNEUTRINOPDGID:
+	    nearestGenParticleVal = 2;
+	    break;
+	  case GenTauDecayID::TAUNEUTRINOPDGID:
+	    nearestGenParticleVal = 2;
+	    break;
+	  case GenTauDecayID::GAMMAPDGID:
+	    nearestGenParticleVal = 3;
+	    break;
+	  default:
+	    break;
+	  }
+	  if (absNearestStatus1GenParticlePDGID >= 111) nearestGenParticleVal = 4;
+	  PDGIDNearestStatus1GenParticleToSoftMu_->Fill(nearestGenParticleVal/*, PUWeight*/);
+	  PDGIDMuSrc_->Fill(muSrcVal/*, PUWeight*/);
+	}
+	else PDGIDNearestStatus1GenParticleToSoftMu_->Fill(6/*, PUWeight*/);
+      }
+      else if (MC_) PDGIDNearestStatus1GenParticleToSoftMu_->Fill(-1/*, PUWeight*/);
 
       //plot cleaned jet pT vs. cleaned tau pT
       cleanedJetPTVsCleanedTauPT_->Fill((*iTau)->pt(), tauJetRef->pt(), PUWeight);
@@ -951,8 +1065,42 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       softMuPTVsTauHadPT_->Fill((*iTau)->pt(), removedMuonRefs[removedMuonRefs.size() - 1]->pt(), 
 				PUWeight);
 
+      //plot 
+      if (tauOldJetRef->pt() > uncorrJetPTMin_) {
+	muHadPTOverMuHadMassVsMWMuSoftMu_->Fill((WMuonRefs[WMuonRefs.size() - 1]->p4() + 
+						 removedMuonRefs[removedMuonRefs.size() - 1]->p4()).M(), 
+						tauOldJetRef->pt()/tauOldJetRef->mass(), PUWeight);
+      }
+
       //increment mu+had multiplicity counter
       ++nMuHad;
+
+      /*oldJetRefsExcludingTau[oldJetRefsExcludingTau.size() - 1] is the highest pT corrected AK5 
+	PF jet excluding the W muon and the tau in DR = 0.3*/
+      if (oldJetRefsExcludingTau.size() > 0)
+	{ // if the jet doesn't overlap with the tau or the muon
+
+	  // plot basic kinematic variables
+
+	  jet_eta->
+	    Fill(oldJetRefsExcludingTau[oldJetRefsExcludingTau.size() - 1]->eta(), PUWeight);
+	  jet_phi->
+	    Fill(oldJetRefsExcludingTau[oldJetRefsExcludingTau.size() - 1]->phi(), PUWeight);
+
+	  if (fabs(oldJetRefsExcludingTau[oldJetRefsExcludingTau.size() - 1]->eta()) < 2.4)
+	    { // |eta| < 2.4
+
+	      // fill etacut plots
+	      jet_pt_etacut->
+		Fill(oldJetRefsExcludingTau[oldJetRefsExcludingTau.size() - 1]->pt(), PUWeight);
+	      jet_mass_etacut->
+		Fill(oldJetRefsExcludingTau[oldJetRefsExcludingTau.size() - 1]->mass(), PUWeight);
+	      jet_ptmj_etacut->
+		Fill(oldJetRefsExcludingTau[oldJetRefsExcludingTau.size() - 1]->pt()/
+		     oldJetRefsExcludingTau[oldJetRefsExcludingTau.size() - 1]->mass(), PUWeight);
+
+	    } // |eta| < 2.4    
+	} // if the jet doesn't overlap with the tau
     }
 
     //increment tau iterator
@@ -1034,13 +1182,16 @@ void TauAnalyzer::beginJob()
   softMuPTOverMuHadMass_ = 
     new TH1F("softMuPTOverMuHadMass", ";#frac{p_{T}^{#mu}}{m_{#mu+had}};", 80, 0.0, 80.0);
   muHadPTOverMuHadMass_ = 
-    new TH1F("muHadPTOverMuHadMass", ";#frac{p_{T}^{#mu+had}}{m_{#mu+had}};", 80, 0.0, 80.0);
+    new TH1F("muHadPTOverMuHadMass", ";#frac{p_{T}}{m};", 80, 0.0, 80.0);
   dRSoftMuNearestGenMuHist_ = 
     new TH1F("dRSoftMuNearestGenMuHist", ";#DeltaR(soft #mu, gen #mu);", 40, 0.0, 2.0);
   muHadPT_ = new TH1F("muHadPT", ";p_{T}^{#mu+had} (GeV);", 50, 0.0, 100.0);
   muHadMultiplicity_ = new TH1F("muHadMultiplicity", ";N_{#mu+had}/event;", 4, 0.5, 4.5);
   nGoodVtx_ = new TH1F("nGoodVtx", ";No. good vertices;", 60, -0.5, 59.5);
   mWMuTauMu_ = new TH1F("mWMuTauMu", ";m_{#mu#mu} (GeV);", 36, 0.0, 180.0);
+  PDGIDNearestStatus1GenParticleToSoftMu_ = 
+    new TH1F("PDGIDNearestStatus1GenParticleToSoftMu", ";PDG ID;", 6, -0.5, 5.5);
+  PDGIDMuSrc_ = new TH1F("PDGIDMuSrc", ";PDG ID;", 2, -0.5, 1.5);
   cleanedJetPTVsCleanedTauPT_ = 
     new TH2F("cleanedJetPTVsCleanedTauPT", ";#tau p_{T} (GeV);Jet p_{T} (GeV)", 
 	     50, 0.0, 100.0, 50, 0.0, 100.0);
@@ -1095,6 +1246,14 @@ void TauAnalyzer::beginJob()
   softMuPTVsTauHadPT_ = 
     new TH2F("softMuPTVsTauHadPT", ";p_{T}^{#tau} (GeV);p_{T}^{#mu} (GeV)", 
 	     20, 0.0, 100.0, 20, 0.0, 100.0);
+  muHadPTOverMuHadMassVsMWMuSoftMu_ = 
+    new TH2F("muHadPTOverMuHadMassVsMWMuSoftMu", ";m_{#mu#mu} (GeV);#frac{p_{T}}{m}", 
+	     36, 0.0, 180.0, 80, 0.0, 80.0);
+  jet_pt_etacut = new TH1F("jet_pt_etacut", ";p_{T} (GeV);", 100, 0., 200.);
+  jet_eta = new TH1F("jet_eta", "#eta", 70, -3.5, 3.5);
+  jet_phi = new TH1F("jet_phi", "#phi", 14, -3.5, 3.5);
+  jet_mass_etacut = new TH1F("jet_mass_etacut", "m (GeV)", 100, 0., 200.);
+  jet_ptmj_etacut = new TH1F("jet_ptmj_etacut", "#frac{p_{T}}{m}", 80, 0., 80.);
 
   //set bin labels
   jetParentParton_->GetXaxis()->SetBinLabel(1, "g");
@@ -1116,6 +1275,14 @@ void TauAnalyzer::beginJob()
     GetYaxis()->SetBinLabel(1, ("#DeltaR < " + dRStream.str()).c_str());
   genMuExistsVsSoftMuNearestMuProperties_->
     GetYaxis()->SetBinLabel(2, ("#DeltaR #geq " + dRStream.str()).c_str());
+  PDGIDNearestStatus1GenParticleToSoftMu_->GetXaxis()->SetBinLabel(1, "e");
+  PDGIDNearestStatus1GenParticleToSoftMu_->GetXaxis()->SetBinLabel(2, "#mu");
+  PDGIDNearestStatus1GenParticleToSoftMu_->GetXaxis()->SetBinLabel(3, "#nu");
+  PDGIDNearestStatus1GenParticleToSoftMu_->GetXaxis()->SetBinLabel(4, "#gamma");
+  PDGIDNearestStatus1GenParticleToSoftMu_->GetXaxis()->SetBinLabel(5, "h");
+  PDGIDNearestStatus1GenParticleToSoftMu_->GetXaxis()->SetBinLabel(6, "Other");
+  PDGIDMuSrc_->GetXaxis()->SetBinLabel(1, "b/c");
+  PDGIDMuSrc_->GetXaxis()->SetBinLabel(2, "Other");
 
   //set sumw2
   MET_->Sumw2();
@@ -1147,6 +1314,8 @@ void TauAnalyzer::beginJob()
   muHadMultiplicity_->Sumw2();
   nGoodVtx_->Sumw2();
   mWMuTauMu_->Sumw2();
+  PDGIDNearestStatus1GenParticleToSoftMu_->Sumw2();
+  PDGIDMuSrc_->Sumw2();
   cleanedJetPTVsCleanedTauPT_->Sumw2();
   uncleanedJetPTVsCleanedTauPT_->Sumw2();
   muHadMassVsDRSoftMuTau_->Sumw2();
@@ -1165,6 +1334,12 @@ void TauAnalyzer::beginJob()
   avgTauHadSoftMuPTOverMuHadMassVsTauHadIso_->Sumw2();
   muHadPTOverMuHadMassVsTauHadIso_->Sumw2();
   softMuPTVsTauHadPT_->Sumw2();
+  muHadPTOverMuHadMassVsMWMuSoftMu_->Sumw2();
+  jet_pt_etacut->Sumw2();
+  jet_eta->Sumw2();
+  jet_phi->Sumw2();
+  jet_mass_etacut->Sumw2();
+  jet_ptmj_etacut->Sumw2();
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
@@ -1202,6 +1377,10 @@ void TauAnalyzer::endJob()
   TCanvas muHadMultiplicityCanvas("muHadMultiplicityCanvas", "", 600, 600);
   TCanvas nGoodVtxCanvas("nGoodVtxCanvas", "", 600, 600);
   TCanvas mWMuTauMuCanvas("mWMuTauMuCanvas", "", 600, 600);
+  TCanvas 
+    PDGIDNearestStatus1GenParticleToSoftMuCanvas("PDGIDNearestStatus1GenParticleToSoftMuCanvas", 
+						 "", 600, 600);
+  TCanvas PDGIDMuSrcCanvas("PDGIDMuSrcCanvas", "", 600, 600);
   TCanvas cleanedJetPTVsCleanedTauPTCanvas("cleanedJetPTVsCleanedTauPTCanvas", "", 600, 600);
   TCanvas uncleanedJetPTVsCleanedTauPTCanvas("uncleanedJetPTVsCleanedTauPTCanvas", "", 600, 600);
   TCanvas muHadMassVsDRSoftMuTauCanvas("muHadMassVsDRSoftMuTauCanvas", "", 600, 600);
@@ -1228,6 +1407,13 @@ void TauAnalyzer::endJob()
   TCanvas 
     muHadPTOverMuHadMassVsTauHadIsoCanvas("muHadPTOverMuHadMassVsTauHadIsoCanvas", "", 600, 600);
   TCanvas softMuPTVsTauHadPTCanvas("softMuPTVsTauHadPTCanvas", "", 600, 600);
+  TCanvas 
+    muHadPTOverMuHadMassVsMWMuSoftMuCanvas("muHadPTOverMuHadMassVsMWMuSoftMuCanvas", "", 600, 600);
+  TCanvas jet_pt_etacutCanvas("jet_pt_etacutCanvas", "", 600, 600);
+  TCanvas jet_etaCanvas("jet_etaCanvas", "", 600, 600);
+  TCanvas jet_phiCanvas("jet_phiCanvas", "", 600, 600);
+  TCanvas jet_mass_etacutCanvas("jet_mass_etacutCanvas", "", 600, 600);
+  TCanvas jet_ptmj_etacutCanvas("jet_ptmj_etacutCanvas", "", 600, 600);
 
   //format and draw 1D plots
   Common::draw1DHistograms(METCanvas, MET_);
@@ -1259,6 +1445,14 @@ void TauAnalyzer::endJob()
   Common::draw1DHistograms(muHadMultiplicityCanvas, muHadMultiplicity_);
   Common::draw1DHistograms(nGoodVtxCanvas, nGoodVtx_);
   Common::draw1DHistograms(mWMuTauMuCanvas, mWMuTauMu_);
+  Common::draw1DHistograms(PDGIDNearestStatus1GenParticleToSoftMuCanvas, 
+			   PDGIDNearestStatus1GenParticleToSoftMu_);
+  Common::draw1DHistograms(PDGIDMuSrcCanvas, PDGIDMuSrc_);
+  Common::draw1DHistograms(jet_pt_etacutCanvas, jet_pt_etacut);
+  Common::draw1DHistograms(jet_etaCanvas, jet_eta);
+  Common::draw1DHistograms(jet_phiCanvas, jet_phi);
+  Common::draw1DHistograms(jet_mass_etacutCanvas, jet_mass_etacut);
+  Common::draw1DHistograms(jet_ptmj_etacutCanvas, jet_ptmj_etacut);
 
   //format and draw 2D plots
   Common::draw2DHistograms(cleanedJetPTVsCleanedTauPTCanvas, cleanedJetPTVsCleanedTauPT_);
@@ -1285,6 +1479,8 @@ void TauAnalyzer::endJob()
   Common::draw2DHistograms(muHadPTOverMuHadMassVsTauHadIsoCanvas, 
 			   muHadPTOverMuHadMassVsTauHadIso_);
   Common::draw2DHistograms(softMuPTVsTauHadPTCanvas, softMuPTVsTauHadPT_);
+  Common::draw2DHistograms(muHadPTOverMuHadMassVsMWMuSoftMuCanvas, 
+			   muHadPTOverMuHadMassVsMWMuSoftMu_);
 
   //set custom options
 
@@ -1319,6 +1515,8 @@ void TauAnalyzer::endJob()
   muHadMultiplicityCanvas.Write();
   nGoodVtxCanvas.Write();
   mWMuTauMuCanvas.Write();
+  PDGIDNearestStatus1GenParticleToSoftMuCanvas.Write();
+  PDGIDMuSrcCanvas.Write();
   cleanedJetPTVsCleanedTauPTCanvas.Write();
   uncleanedJetPTVsCleanedTauPTCanvas.Write();
   muHadMassVsDRSoftMuTauCanvas.Write();
@@ -1337,6 +1535,12 @@ void TauAnalyzer::endJob()
   avgTauHadSoftMuPTOverMuHadMassVsTauHadIsoCanvas.Write();
   muHadPTOverMuHadMassVsTauHadIsoCanvas.Write();
   softMuPTVsTauHadPTCanvas.Write();
+  muHadPTOverMuHadMassVsMWMuSoftMuCanvas.Write();
+  jet_pt_etacutCanvas.Write();
+  jet_etaCanvas.Write();
+  jet_phiCanvas.Write();
+  jet_mass_etacutCanvas.Write();
+  jet_ptmj_etacutCanvas.Write();
   out_->Write();
   out_->Close();
 }
@@ -1506,6 +1710,12 @@ void TauAnalyzer::reset(const bool doDelete)
   nGoodVtx_ = NULL;
   if (doDelete && (mWMuTauMu_ != NULL)) delete mWMuTauMu_;
   mWMuTauMu_ = NULL;
+  if (doDelete && (PDGIDNearestStatus1GenParticleToSoftMu_ != NULL)) {
+    delete PDGIDNearestStatus1GenParticleToSoftMu_;
+  }
+  PDGIDNearestStatus1GenParticleToSoftMu_ = NULL;
+  if (doDelete && (PDGIDMuSrc_ != NULL)) delete PDGIDMuSrc_;
+  PDGIDMuSrc_ = NULL;
   if (doDelete && (cleanedJetPTVsCleanedTauPT_ != NULL)) delete cleanedJetPTVsCleanedTauPT_;
   cleanedJetPTVsCleanedTauPT_ = NULL;
   if (doDelete && (uncleanedJetPTVsCleanedTauPT_ != NULL)) delete uncleanedJetPTVsCleanedTauPT_;
@@ -1554,6 +1764,20 @@ void TauAnalyzer::reset(const bool doDelete)
   muHadPTOverMuHadMassVsTauHadIso_ = NULL;
   if (doDelete && (softMuPTVsTauHadPT_ != NULL)) delete softMuPTVsTauHadPT_;
   softMuPTVsTauHadPT_ = NULL;
+  if (doDelete && (muHadPTOverMuHadMassVsMWMuSoftMu_ != NULL)) {
+    delete muHadPTOverMuHadMassVsMWMuSoftMu_;
+  }
+  muHadPTOverMuHadMassVsMWMuSoftMu_ = NULL;
+  if (doDelete && (jet_pt_etacut != NULL)) delete jet_pt_etacut;
+  jet_pt_etacut = NULL;
+  if (doDelete && (jet_eta != NULL)) delete jet_eta;
+  jet_eta = NULL;
+  if (doDelete && (jet_phi != NULL)) delete jet_phi;
+  jet_phi = NULL;
+  if (doDelete && (jet_mass_etacut != NULL)) delete jet_mass_etacut;
+  jet_mass_etacut = NULL;
+  if (doDelete && (jet_ptmj_etacut != NULL)) delete jet_ptmj_etacut;
+  jet_ptmj_etacut = NULL;
 }
 
 //define this as a plug-in

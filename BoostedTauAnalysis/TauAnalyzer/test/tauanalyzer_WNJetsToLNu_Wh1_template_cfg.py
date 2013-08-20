@@ -276,6 +276,7 @@ process.muHadIsoTauAnalyzer = cms.EDAnalyzer(
     muonGenParticleTag = cms.InputTag('genMuSelector'),
     PUTag = cms.InputTag('addPileupInfo'),
     vtxTag = cms.InputTag('offlinePrimaryVertices'),
+    allGenParticleTag = cms.InputTag('genParticles'),
     dR = cms.double(0.3),
     tauPTMin = cms.double(10.0), #GeV
     tauDecayMode = cms.int32(TAU_ALL_HAD),

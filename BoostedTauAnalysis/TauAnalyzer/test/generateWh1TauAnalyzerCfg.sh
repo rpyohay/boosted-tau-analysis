@@ -3,7 +3,7 @@
 ####STUFF TO CONFIGURE####
 
 #version
-version="v36"
+version="v40"
 infoTag=""
 dir=$version
 
@@ -20,11 +20,11 @@ cleanJetsOutputFilePrefix="`pwd`/${dir}/"
 #cleanJetsOutputFilePrefix=""
 
 #TauAnalyzer output file prefix
-tauAnalyzerOutputFilePrefix="/data1/yohay/Wh1_Medium/"
+tauAnalyzerOutputFilePrefix="/data1/`whoami`/Wh1_Medium/"
 #tauAnalyzerOutputFilePrefix=""
 
 #EDM output file prefix
-EDMOutputFilePrefix="/data1/yohay/Wh1_Medium/EDM_files/"
+EDMOutputFilePrefix="/data1/`whoami`/Wh1_Medium/EDM_files/"
 
 ####VECTORS OF QUANTITIES FOR EACH SAMPLE####
 

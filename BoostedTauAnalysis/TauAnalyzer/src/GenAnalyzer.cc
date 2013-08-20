@@ -35,6 +35,7 @@
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
 #include "BoostedTauAnalysis/Common/interface/Common.h"
 #include "DataFormats/Math/interface/deltaR.h"
+#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 #include "TFile.h"
 #include "TH1F.h"
 #include "TCanvas.h"
@@ -76,11 +77,23 @@ private:
   //gen particle tag
   edm::InputTag genParticleTag_;
 
+  //PU info tag
+  edm::InputTag PUTag_;
+
   //set of parameters for GenTauDecayID class
   edm::ParameterSet genTauDecayIDPSet_;
 
   //histogram of dR between gen objects from a1 decay
   TH1F* dRA1TauDaughters_;
+
+  //histogram of mu+had mu pT
+  TH1F* tauMuPT_;
+
+  //histogram of mu+had had pT
+  TH1F* tauHadPT_;
+
+  //histogram of true no. in-time interactions
+  TH1D* trueNInt_;
 };
 
 //
@@ -97,6 +110,7 @@ private:
 GenAnalyzer::GenAnalyzer(const edm::ParameterSet& iConfig) :
   outFileName_(iConfig.getParameter<std::string>("outFileName")),
   genParticleTag_(iConfig.getParameter<edm::InputTag>("genParticleTag")),
+  PUTag_(iConfig.getParameter<edm::InputTag>("PUTag")),
   genTauDecayIDPSet_(iConfig.getParameter<edm::ParameterSet>("genTauDecayIDPSet"))
 {
   //now do what ever initialization is needed
@@ -122,6 +136,10 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   //get gen particle collection
   edm::Handle<reco::GenParticleCollection> pGenParticles;
   iEvent.getByLabel(genParticleTag_, pGenParticles);
+
+  //get PU info
+  edm::Handle<std::vector<PileupSummaryInfo> > pPU;
+  iEvent.getByLabel(PUTag_, pPU);
 
   //find a1 tau decay products
   std::vector<GenTauDecayID> aDecayProducts;
@@ -154,9 +172,39 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	//ignore this tau in the future
 	keysToIgnore.push_back(tauKey);
       }
+
+      //is this a mu+had decay?
+      std::pair<reco::PFTau::hadronicDecayMode, GenTauDecayID::DecayType> thisDecay = 
+	iTau->tauDecayType(false, true);
+      std::pair<reco::PFTau::hadronicDecayMode, GenTauDecayID::DecayType> sisterDecay = 
+	iTau->sisterDecayType(false, true);
+      if (((thisDecay.second == GenTauDecayID::MU) && 
+	   (sisterDecay.second == GenTauDecayID::HAD)) || 
+	  ((thisDecay.second == GenTauDecayID::HAD) && 
+	   (sisterDecay.second == GenTauDecayID::MU))) {
+
+	//plot mu pT and had pT
+	reco::LeafCandidate::LorentzVector visibleP4 = iTau->getVisibleTauP4();
+	if (thisDecay.second == GenTauDecayID::MU) tauMuPT_->Fill(visibleP4.Pt());
+	if (thisDecay.second == GenTauDecayID::HAD) tauHadPT_->Fill(visibleP4.Pt());
+      }
     }
     catch (std::string& ex) { throw cms::Exception("GenAnalyzer") << ex; }
   }
+
+  //plot distribution of true no. in-time interactions
+  float trueNInt = -1;
+  std::vector<PileupSummaryInfo>::const_iterator iPU = pPU->begin();
+  int BX = 0;
+  while ((iPU != pPU->end()) && (BX == 0)) {
+    int BX = iPU->getBunchCrossing();
+    if (BX == 0) { 
+      trueNInt = iPU->getTrueNumInteractions();
+      BX = -1;
+    }
+    ++iPU;
+  }
+  trueNInt_->Fill(trueNInt);
 }
 
 
@@ -168,6 +216,9 @@ void GenAnalyzer::beginJob()
 
   //book histograms
   dRA1TauDaughters_ = new TH1F("dRA1TauDaughters", "", 60, 0.0, 3.0);
+  tauMuPT_ = new TH1F("tauMuPT", "", 50, 0.0, 100.0);
+  tauHadPT_ = new TH1F("tauHadPT", "", 50, 0.0, 100.0);
+  trueNInt_ = new TH1D("trueNInt", "", 60, 0.0, 60.0);
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
@@ -176,18 +227,39 @@ void GenAnalyzer::endJob()
   //make the canvases
   TCanvas dRA1TauDaughtersCanvas("dRA1TauDaughtersCanvas", "", 600, 600);
   Common::setCanvasOptions(dRA1TauDaughtersCanvas, 1, 0, 0);
+  TCanvas tauMuPTCanvas("tauMuPTCanvas", "", 600, 600);
+  Common::setCanvasOptions(tauMuPTCanvas, 1, 0, 0);
+  TCanvas tauHadPTCanvas("tauHadPTCanvas", "", 600, 600);
+  Common::setCanvasOptions(tauHadPTCanvas, 1, 0, 0);
+  TCanvas trueNIntCanvas("trueNIntCanvas", "", 600, 600);
+  Common::setCanvasOptions(trueNIntCanvas, 1, 0, 0);
 
   //format the plots
   Common::setHistogramOptions(dRA1TauDaughters_, kBlack, 0.7, 20, 1.0, "#DeltaR", "", 0.05);
   dRA1TauDaughters_->SetLineWidth(2);
+  Common::setHistogramOptions(tauMuPT_, kBlack, 0.7, 20, 1.0, "No. interactions", "", 0.05);
+  tauMuPT_->SetLineWidth(2);
+  Common::setHistogramOptions(tauHadPT_, kBlack, 0.7, 20, 1.0, "No. interactions", "", 0.05);
+  tauHadPT_->SetLineWidth(2);
+  Common::setHistogramOptions(trueNInt_, kBlack, 0.7, 20, 1.0, "No. interactions", "", 0.05);
+  trueNInt_->SetLineWidth(2);
 
   //draw plots
   dRA1TauDaughtersCanvas.cd();
   dRA1TauDaughters_->Draw();
+  tauMuPTCanvas.cd();
+  tauMuPT_->Draw();
+  tauHadPTCanvas.cd();
+  tauHadPT_->Draw();
+  trueNIntCanvas.cd();
+  trueNInt_->Draw();
 
   //write output file
   out_->cd();
   dRA1TauDaughtersCanvas.Write();
+  tauMuPTCanvas.Write();
+  tauHadPTCanvas.Write();
+  trueNIntCanvas.Write();
   out_->Write();
   out_->Close();
 }
@@ -229,6 +301,12 @@ void GenAnalyzer::reset(const bool doDelete)
   out_ = NULL;
   if ((doDelete) && (dRA1TauDaughters_ != NULL)) delete dRA1TauDaughters_;
   dRA1TauDaughters_ = NULL;
+  if ((doDelete) && (tauMuPT_ != NULL)) delete tauMuPT_;
+  tauMuPT_ = NULL;
+  if ((doDelete) && (tauHadPT_ != NULL)) delete tauHadPT_;
+  tauHadPT_ = NULL;
+  if ((doDelete) && (trueNInt_ != NULL)) delete trueNInt_;
+  trueNInt_ = NULL;
 }
 
 //define this as a plug-in

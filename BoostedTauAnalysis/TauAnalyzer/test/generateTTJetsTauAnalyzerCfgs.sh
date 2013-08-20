@@ -3,7 +3,7 @@
 ####STUFF TO CONFIGURE####
 
 #version
-version="v36"
+version="v40"
 infoTag=""
 dir=$version
 
@@ -24,7 +24,7 @@ cleanJetsOutputFilePrefix=""
 tauAnalyzerOutputFilePrefix=""
 
 #EDM output file prefix
-EDMOutputFilePrefix="/data1/yohay/TTJets/EDM_files/"
+EDMOutputFilePrefix="/data1/`whoami`/TTJets/EDM_files/"
 
 ####VECTORS OF QUANTITIES FOR EACH SAMPLE####
 
@@ -74,8 +74,8 @@ cd -
 cp \$jobDir/\${fileNamePrefix}_iso_cfg.py \$jobDir/\${fileNamePrefix}_nonIso_cfg.py .
 cmsRun \${fileNamePrefix}_iso_cfg.py
 cmsRun \${fileNamePrefix}_nonIso_cfg.py
-cmsStage -f ${isoTauAnalyzerOutputFiles[${i}]} /store/user/yohay/
-cmsStage -f ${nonIsoTauAnalyzerOutputFiles[${i}]} /store/user/yohay/
+cmsStage -f ${isoTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/
+cmsStage -f ${nonIsoTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/
 rm ${isoTauAnalyzerOutputFiles[${i}]} ${nonIsoTauAnalyzerOutputFiles[${i}]} 
 
 exit 0
@@ -103,7 +103,7 @@ cat <<EOF > submitTTJetsTauAnalyzerJobs.sh
 
 for file in \`ls -alh tauanalyzer*TTJets*.sh | awk '{ print \$9 }'\`
   do
-  jobName=\`echo \$file | sed -e "s%\.sh%%"\`
+  jobName=\`echo \$file | sed -e "s%\(.*\)\.sh%\1%"\`
   bsub -q 8nh -J \$jobName < \$file
 done
 
@@ -120,7 +120,7 @@ for sample in \`seq `expr $iBeg + 1` `expr $iEnd + 1`\`
   do
   for cut in Iso NonIso
     do
-    cmsStage -f /store/user/yohay/muHad\${cut}Analysis_TTJets_${version}.root /data1/yohay/TTJets/analysis/
+    cmsStage -f /store/user/`whoami`/muHad\${cut}Analysis_TTJets_${version}.root /data1/`whoami`/TTJets/analysis/
   done
 done
 

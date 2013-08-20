@@ -1,0 +1,261 @@
+Setup (only needs to be done once)
+
+1. Login to ucdavis.cern.ch
+
+2. Execute
+
+cmsrel CMSSW_5_3_3
+cd CMSSW_5_3_3
+cmsenv
+git init
+git pull git@github.com:rpyohay/boosted-tau-analysis
+cvs co -r CMSSW_5_3_3 DataFormats/HepMCCandidate
+cvs co -r CMSSW_5_3_3 DataFormats/MuonReco
+cvs co -r CMSSW_5_3_3 DataFormats/JetReco
+cvs co -r V00-04-00 CondFormats/EgammaObjects
+cvs co -r V01-04-13 RecoTauTag/Configuration
+cvs co -r V01-04-25 RecoTauTag/RecoTau
+cvs co -r V08-03-19 PhysicsTools/Utilities
+cvs co RecoLuminosity/LumiDB
+cp ~yohay/public/CMSSW_5_3_2_patch4/src/DataFormats/HepMCCandidate/src/* DataFormats/HepMCCandidate/src
+cp ~yohay/public/CMSSW_5_3_2_patch4/src/DataFormats/MuonReco/src/* DataFormats/MuonReco/src
+cp ~yohay/public/CMSSW_5_3_2_patch4/src/DataFormats/JetReco/src/* DataFormats/JetReco/src
+scram b
+
+3. Execute
+
+mkdir -p /data1/`whoami`/DYJetsToLL/analysis
+mkdir -p /data1/`whoami`/DYJetsToLL/EDM_files
+mkdir -p /data1/`whoami`/SingleTop/analysis
+mkdir -p /data1/`whoami`/SingleTop/EDM_files
+mkdir -p /data1/`whoami`/TTJets/analysis
+mkdir -p /data1/`whoami`/TTJets/EDM_files
+mkdir -p /data1/`whoami`/WNJetsToLNu/analysis
+mkdir -p /data1/`whoami`/WNJetsToLNu/EDM_files
+mkdir -p /data1/`whoami`/WZ/analysis
+mkdir -p /data1/`whoami`/WZ/EDM_files
+mkdir -p /data1/`whoami`/Wh1_Medium/EDM_files
+mkdir -p /data1/`whoami`/ZZ/analysis
+mkdir -p /data1/`whoami`/ZZ/EDM_files
+mkdir -p /data1/`whoami`/data/analysis
+mkdir -p /data1/`whoami`/data/EDM_files
+mkdir -p /data1/`whoami`/results
+
+4. In ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/formatPlots.C:
+
+Change the path in lines 5-6 to "/afs/cern.ch/user/<first_letter_of_your_username>/<your_username>/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/"
+
+Change the path in line 326 to "/data1/<your_username>/"
+
+5. In ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test/tauSelectionSkim_Wh1.py, replace "yohay" with your username in lines 1368, 1374, and 1381
+
+6. Execute
+
+cd ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test
+make -f STLDictionary_Makefile
+
+
+
+
+
+
+
+
+
+
+
+
+
+Running TauAnalyzer analysis jobs over data and MC
+
+1. Login to lxplus5.cern.ch
+
+2. Execute
+
+cd ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test
+./updateVersion.sh <version_number>
+./generateJobFiles.sh
+./submitAll.sh
+
+to launch the batch jobs.  The STDOUT files created by the batch jobs will be written to ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/v<version_number>/LSFJOB_XXXXXXXXX/STDOUT, where is XXXXXXXXX is the job number.  These files will tell you whether the jobs finished successfully or not.
+
+3. Once the batch jobs are finished, login to ucdavis.cern.ch and execute
+
+cd ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test
+cmsenv
+./copyAll.sh
+cd v<version_number>
+cmsRun tauanalyzer_Wh1_iso_cfg.py
+
+4. In ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/formatPlots.C, change the version tags in lines 333-342 to "_v<version_number>"
+
+5. Execute
+
+cd ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test
+cmsenv
+root -l -b -q formatPlots.C
+
+6. Check the output files:
+
+/data1/<your_username>/DYJetsToLL/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
+/data1/<your_username>/DYJetsToLL/analysis/muHadIsoAnalysis_DYJetsToLL_v<version_number>.root
+/data1/<your_username>/DYJetsToLL/analysis/muHadNonIsoAnalysis_DYJetsToLL_v<version_number>.root
+
+/data1/<your_username>/SingleTop/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
+/data1/<your_username>/SingleTop/analysis/muHadIsoAnalysis_T_v<version_number>.root
+/data1/<your_username>/SingleTop/analysis/muHadNonIsoAnalysis_T_v<version_number>.root
+
+/data1/<your_username>/TTJets/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
+/data1/<your_username>/TTJets/analysis/muHadIsoAnalysis_TTJets_v<version_number>.root
+/data1/<your_username>/TTJets/analysis/muHadNonIsoAnalysis_TTJets_v<version_number>.root
+
+/data1/<your_username>/WNJetsToLNu/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
+/data1/<your_username>/WNJetsToLNu/analysis/muHadIsoAnalysis_WNJetsToLNu_v<version_number>.root
+/data1/<your_username>/WNJetsToLNu/analysis/muHadNonIsoAnalysis_WNJetsToLNu_v<version_number>.root
+
+/data1/<your_username>/WZ/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
+/data1/<your_username>/WZ/analysis/muHadIsoAnalysis_WZ_v<version_number>.root
+/data1/<your_username>/WZ/analysis/muHadNonIsoAnalysis_WZ_v<version_number>.root
+
+/data1/<your_username>/Wh1_Medium/analysis/muHadIsoAnalysis_Wh1_v<version_number>.root
+
+/data1/<your_username>/ZZ/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
+/data1/<your_username>/ZZ/analysis/muHadIsoAnalysis_ZZ_v<version_number>.root
+/data1/<your_username>/ZZ/analysis/muHadNonIsoAnalysis_ZZ_v<version_number>.root
+
+/data1/<your_username>/data/analysis/muHadNonIsoAnalysis_SingleMu_v<version_number>.root
+
+/data1/<your_username>/results/dataVsMC_muHadNonIsoAnalysis_2p5fb-1_v<version_number>.root
+/data1/<your_username>/results/sigVsBkg_muHadIsoAnalysis_20fb-1_v<version_number>.root
+/data1/<your_username>/results/sigVsBkg_muHadIsoAnalysis_normalizedTo1_v<version_number>.root
+
+
+
+
+
+
+
+
+
+
+
+
+
+Skimming BACKGROUND MC SAMPLES ONLY with CRAB
+
+1. In ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test/multicrab.cfg:
+
+Comment out (with the # sign) all datasets and associated paramaters for datasets you DO NOT want to process, including, of course, the SingleMu datasets
+Increment the version number on the names of all the tasks in square brackets (e.g. v2 --> v3)
+
+2. Submit your jobs with multicrab from ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test as you normally would
+
+3. When your jobs complete, calculate the total number of events processed and the number of events passing each filter of the skim by executing, for example,
+
+cd ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test
+./combineResults.sh 1 200 --exclude=5,7,34 /afs/cern.ch/user/<first_letter_of_your_username>/<your_username>/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test/WJetsToLNuSkim
+
+where
+
+1 is the job number of the first job in the task WJetsToLNuSkim
+200 is the job number of the last job in the task WJetsToLNuSkim, or equivalently the number of jobs in the task
+--exclude=5,7,34 means exclude jobs 5, 7, and 34 from the sum because they failed
+/afs/cern.ch/user/<first_letter_of_your_username>/<your_username>/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test/WJetsToLNuSkim is the full path to the CRAB directory of the task WJetsToLNuSkim
+
+4. Use the information from step 3 to update the weights, if necessary, in ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/formatPlots.C
+
+5. Update the locations of the new MC skim files in
+
+~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/generateDYJetsToLLTauAnalyzerCfgs.sh
+~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/generateSingleTopTauAnalyzerCfgs.sh
+~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/generateTTJetsTauAnalyzerCfgs.sh
+~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/generateWNJetsToLNuTauAnalyzerCfgs.sh
+~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/generateWZTauAnalyzerCfgs.sh
+~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/generateZZTauAnalyzerCfgs.sh
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Skimming DATA SAMPLES ONLY with CRAB
+
+1. In ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test/multicrab.cfg:
+
+Comment out (with the # sign) all MC datasets and associated paramaters.  Note that the data samples end in "AOD" and the MC samples end in "AODSIM".
+Increment the version number on the names of all the tasks in square brackets (e.g. v2 --> v3)
+
+2. In ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test/crab.cfg:
+
+Comment out lines 19-20 (splitting by events)
+Uncomment lines 21-22 (splitting by lumi sections)
+Uncomment line 25 (JSON file)
+Uncomment line 59 (stage out to /store/user/<your_username>)
+
+3. Submit your jobs with multicrab from ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test as you normally would
+
+4. When your jobs complete, calculate the total number of events processed and the number of events passing each filter of the skim by executing, for example,
+
+cd ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test
+./combineResults.sh 1 200 --exclude=5,7,34 /afs/cern.ch/user/<first_letter_of_your_username>/<your_username>/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test/WJetsToLNuSkim
+
+where
+
+1 is the job number of the first job in the task WJetsToLNuSkim
+200 is the job number of the last job in the task WJetsToLNuSkim, or equivalently the number of jobs in the task
+--exclude=5,7,34 means exclude jobs 5, 7, and 34 from the sum because they failed
+/afs/cern.ch/user/<first_letter_of_your_username>/<your_username>/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test/WJetsToLNuSkim is the full path to the CRAB directory of the task WJetsToLNuSkim
+
+5. Run "multicrab -report" to get JSON files of the successfully processed lumi sections
+
+6. Execute
+
+cd ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test
+cmsenv
+pixelLumiCalc.py overview -i SingleMu_Run2012A-22Jan2013-v1_AOD_skim_v2/res/lumiSummary.json
+pixelLumiCalc.py overview -i SingleMu_Run2012B-22Jan2013-v1_AOD_skim_v2/res/lumiSummary.json
+pixelLumiCalc.py overview -i SingleMu_Run2012C-22Jan2013-v1_AOD_skim_v2/res/lumiSummary.json
+pixelLumiCalc.py overview -i SingleMu_Run2012D-22Jan2013-v1_AOD_skim_v2/res/lumiSummary.json
+
+to get the processed recorded luminosity per dataset
+
+7. Calculate the total processed recorded luminosity by adding the recorded luminosities for the 4 datasets in step 6
+
+8. Use the information from step 7 to update the weights in ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/formatPlots.C
+
+9. Update the locations of the new data skim files in
+
+~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/generateDataTauAnalyzerCfgs.sh
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Skimming SIGNAL MC SAMPLE ONLY
+
+1. Login to ucdavis.cern.ch
+
+2. Execute
+
+cd ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test
+cmsenv
+cmsRun tauSelectionSkim_Wh1.py >& tauSelectionSkim_Wh1.txt &
+
+Note that this will overwrite the previous skim.  If you do not want to do this, change the names of the files in lines 1368, 1374, and 1381 of ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test/tauSelectionSkim_Wh1.py to be unique
