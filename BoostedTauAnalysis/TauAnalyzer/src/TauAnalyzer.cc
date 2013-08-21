@@ -18,10 +18,13 @@
 //
 //
 
-
 // system include files
 #include <memory>
 #include <string>
+#include <vector>
+#include <sstream>
+#include <fstream>
+#include <iostream>
 
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
@@ -48,6 +51,19 @@
 #include "TH2F.h"
 #include "TCanvas.h"
 #include "TLegend.h"
+#include <fastjet/JetDefinition.hh>
+#include <fastjet/PseudoJet.hh>
+#include <fastjet/ClusterSequence.hh>
+#include <fastjet/GhostedAreaSpec.hh>
+#include <fastjet/ClusterSequenceArea.hh>
+#include "fastjet/tools/Pruner.hh"
+#include "BoostedTauAnalysis/NSJAnalyzer/interface/Nsubjettiness.h"
+#include "BoostedTauAnalysis/NSJAnalyzer/interface/Njettiness.hh"
+
+using namespace std;
+using namespace edm;
+using namespace reco;
+using namespace fastjet;
 
 //
 // class declaration
@@ -178,6 +194,12 @@ private:
   //PU reweighting scenario
   std::string PUScenario_;
 
+  //zCut for jet pruning
+  double zCut_;
+
+  //RcutFactor for jet pruning
+  double RcutFactor_;
+
   //MC flag
   bool MC_;
 
@@ -302,6 +324,12 @@ private:
   //histogram of mu+had multiplicity
   TH1F* muHadMultiplicity_;
 
+  //histogram of cleaned jet tau_3/tau1
+  TH1F* muHad_t3t1_;
+
+  //histogram of cleaned jet tau_2/tau1
+  TH1F* muHad_t2t1_;
+
   //histogram of mu+had mass vs. hadronic tau eta
   TH2F* muHadMassVsTauHadEta_;
 
@@ -401,7 +429,9 @@ TauAnalyzer::TauAnalyzer(const edm::ParameterSet& iConfig) :
   MC_(iConfig.getParameter<bool>("MC")),
   pTRankColors_(iConfig.getParameter<std::vector<unsigned int> >("pTRankColors")),
   pTRankStyles_(iConfig.getParameter<std::vector<unsigned int> >("pTRankStyles")),
-  pTRankEntries_(iConfig.getParameter<std::vector<std::string> >("pTRankEntries"))
+  pTRankEntries_(iConfig.getParameter<std::vector<std::string> >("pTRankEntries")),
+  zCut_(iConfig.getParameter<double>("zCut")),
+  RcutFactor_(iConfig.getParameter<double>("RcutFactor"))
 {
   //now do what ever initialization is needed
   reset(false);
@@ -1002,6 +1032,39 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       //plot uncleaned jet pT vs. cleaned tau pT
       uncleanedJetPTVsCleanedTauPT_->Fill((*iTau)->pt(), tauOldJetRef->pt(), PUWeight);
 
+      //calculate N-subjettiness of cleaned jet
+      
+      fastjet::Pruner pruner(fastjet::antikt_algorithm, zCut_, RcutFactor_);
+      vector<reco::PFCandidatePtr> pfCands = tauJetRef->getPFConstituents();
+      vector<const reco::PFCandidate*> all_particles;
+      for (unsigned j = 0; j < pfCands.size(); j++){
+	const reco::PFCandidate *thisPF = pfCands.at(j).get(); 
+	all_particles.push_back( thisPF );	
+      }
+      vector<fastjet::PseudoJet> FJparticles;
+      for (unsigned particle = 0; particle < all_particles.size(); particle++) {
+	const reco::PFCandidate *thisParticle = all_particles.at(particle);
+	FJparticles.push_back(fastjet::PseudoJet(thisParticle->px(),thisParticle->py(),thisParticle->pz(),thisParticle->energy()));
+      }
+      fastjet::JetDefinition jet_def(fastjet::kt_algorithm, 0.5);
+      fastjet::ClusterSequence thisClustering(FJparticles, jet_def);
+      vector<fastjet::PseudoJet> FJjet = thisClustering.inclusive_jets();
+      fastjet::PseudoJet thisMainJet = FJjet.at(0);
+      fastjet::PseudoJet thisGroomedJet = pruner(thisMainJet); // jet grooming
+      vector<fastjet::PseudoJet> FJparticles2 = thisGroomedJet.constituents();
+      NsubParameters paraNsub = NsubParameters(1.0, 0.8);
+      Nsubjettiness routine1(1, Njettiness::kt_axes, 1.0, 0.8, 10000.0);
+      Nsubjettiness routine2(2, Njettiness::kt_axes, 1.0, 0.8, 10000.0);
+      Nsubjettiness routine3(3, Njettiness::kt_axes, 1.0, 0.8, 10000.0);
+      Nsubjettiness routine4(4, Njettiness::kt_axes, 1.0, 0.8, 10000.0);
+      double tau1 = routine1.result(thisGroomedJet);
+      double tau2 = routine2.result(thisGroomedJet);
+      double tau3 = routine3.result(thisGroomedJet);
+      double tau4 = routine4.result(thisGroomedJet);
+
+      muHad_t3t1_->Fill(tau3/tau1, PUWeight);
+      muHad_t2t1_->Fill(tau2/tau1, PUWeight);
+
       //plot mu+had mass vs. dR(tagged soft muon, tau axis)
       const double dRSoftMuTau = 
 	reco::deltaR(*removedMuonRefs[removedMuonRefs.size() - 1], **iTau);
@@ -1255,6 +1318,12 @@ void TauAnalyzer::beginJob()
   jet_mass_etacut = new TH1F("jet_mass_etacut", "m (GeV)", 100, 0., 200.);
   jet_ptmj_etacut = new TH1F("jet_ptmj_etacut", "#frac{p_{T}}{m}", 80, 0., 80.);
 
+  muHad_t3t1_ =
+    new TH1F("muHad_t3t1", "{#tau}_{3}/{#tau}_{1} of cleaned parent jet", 500, 0.0, 10.0);
+
+  muHad_t2t1_ =
+    new TH1F("muHad_t2t1", "{#tau}_{2}/{#tau}_{1} of cleaned parent jet", 500, 0.0, 10.0);
+
   //set bin labels
   jetParentParton_->GetXaxis()->SetBinLabel(1, "g");
   jetParentParton_->GetXaxis()->SetBinLabel(2, "d");
@@ -1334,6 +1403,8 @@ void TauAnalyzer::beginJob()
   avgTauHadSoftMuPTOverMuHadMassVsTauHadIso_->Sumw2();
   muHadPTOverMuHadMassVsTauHadIso_->Sumw2();
   softMuPTVsTauHadPT_->Sumw2();
+  muHad_t3t1_->Sumw2();
+  muHad_t2t1_->Sumw2();
   muHadPTOverMuHadMassVsMWMuSoftMu_->Sumw2();
   jet_pt_etacut->Sumw2();
   jet_eta->Sumw2();
@@ -1407,6 +1478,8 @@ void TauAnalyzer::endJob()
   TCanvas 
     muHadPTOverMuHadMassVsTauHadIsoCanvas("muHadPTOverMuHadMassVsTauHadIsoCanvas", "", 600, 600);
   TCanvas softMuPTVsTauHadPTCanvas("softMuPTVsTauHadPTCanvas", "", 600, 600);
+  TCanvas muHad_t3t1Canvas("muHad_t3t1Canvas", "", 600, 600);
+  TCanvas muHad_t2t1Canvas("muHad_t2t1Canvas", "", 600, 600);
   TCanvas 
     muHadPTOverMuHadMassVsMWMuSoftMuCanvas("muHadPTOverMuHadMassVsMWMuSoftMuCanvas", "", 600, 600);
   TCanvas jet_pt_etacutCanvas("jet_pt_etacutCanvas", "", 600, 600);
@@ -1445,6 +1518,8 @@ void TauAnalyzer::endJob()
   Common::draw1DHistograms(muHadMultiplicityCanvas, muHadMultiplicity_);
   Common::draw1DHistograms(nGoodVtxCanvas, nGoodVtx_);
   Common::draw1DHistograms(mWMuTauMuCanvas, mWMuTauMu_);
+  Common::draw1DHistograms(muHad_t3t1Canvas, muHad_t3t1_);
+  Common::draw1DHistograms(muHad_t2t1Canvas, muHad_t2t1_);
   Common::draw1DHistograms(PDGIDNearestStatus1GenParticleToSoftMuCanvas, 
 			   PDGIDNearestStatus1GenParticleToSoftMu_);
   Common::draw1DHistograms(PDGIDMuSrcCanvas, PDGIDMuSrc_);
@@ -1535,6 +1610,8 @@ void TauAnalyzer::endJob()
   avgTauHadSoftMuPTOverMuHadMassVsTauHadIsoCanvas.Write();
   muHadPTOverMuHadMassVsTauHadIsoCanvas.Write();
   softMuPTVsTauHadPTCanvas.Write();
+  muHad_t3t1Canvas.Write();
+  muHad_t2t1Canvas.Write();
   muHadPTOverMuHadMassVsMWMuSoftMuCanvas.Write();
   jet_pt_etacutCanvas.Write();
   jet_etaCanvas.Write();
