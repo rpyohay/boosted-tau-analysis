@@ -5,7 +5,7 @@
 // 
 /**\class DelPhiFilter DelPhiFilter.cc BoostedTauAnalysis/DelPhiFilter/src/DelPhiFilter.cc
 
- Description: filter based on delphi between W decay muon and tau decay muon
+ Description: filter based on |delPhi| between W decay muon and tau decay muon
 
  Implementation:
      [Notes on implementation]
@@ -156,7 +156,7 @@ DelPhiFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
   while (deltaphi < -1.0*Pi)
     deltaphi += 2.0*Pi;
   
-  if (deltaphi > delPhiCut_)
+  if (fabs(deltaphi) > delPhiCut_)
     return true;
   else
     return false;
