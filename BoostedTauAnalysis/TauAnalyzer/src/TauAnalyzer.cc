@@ -330,6 +330,15 @@ private:
   //histogram of cleaned jet tau_2/tau1
   TH1F* muHad_t2t1_;
 
+  //histogram of no. of charged tracks in cleaned jet (pT > 0 GeV)
+  TH1F* muHad_Nchtrk_0_;
+
+  //histogram of no. of charged tracks in cleaned jet (pT > 1 GeV)
+  TH1F* muHad_Nchtrk_1_;
+
+  //histogram of no. of charged tracks in cleaned jet (pT > 30 GeV)
+  TH1F* muHad_Nchtrk_30_;
+
   //histogram of mu+had mass vs. hadronic tau eta
   TH2F* muHadMassVsTauHadEta_;
 
@@ -1065,6 +1074,31 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       muHad_t3t1_->Fill(tau3/tau1, PUWeight);
       muHad_t2t1_->Fill(tau2/tau1, PUWeight);
 
+      //plot number of charged tracks of cleaned jet
+
+      reco::TrackRefVector jetTracks = tauJetRef->getTrackRefs();
+      double Nchtrk_0 = 0.; // no cut on track pT
+      double Nchtrk_1 = 0.; // track pT > 1 GeV
+      double Nchtrk_30 = 0.; // track pT > 30 GeV
+      for (reco::TrackRefVector::const_iterator iTrack = jetTracks.begin(); iTrack != jetTracks.end(); ++iTrack)     
+	{
+	  if ((*iTrack)->charge() != 0.)
+	    {
+	      Nchtrk_0 += 1.;
+	      muHad_Nchtrk_0_->Fill(Nchtrk_0);
+	      if ((*iTrack)->pt() > 1.)
+		{
+		  Nchtrk_1 += 1.;
+		  muHad_Nchtrk_1_->Fill(Nchtrk_1);
+		}
+	      if ((*iTrack)->pt() > 30.)
+		{
+		  Nchtrk_30 += 1.;
+		  muHad_Nchtrk_30_->Fill(Nchtrk_30);
+		}
+	    }
+	}
+
       //plot mu+had mass vs. dR(tagged soft muon, tau axis)
       const double dRSoftMuTau = 
 	reco::deltaR(*removedMuonRefs[removedMuonRefs.size() - 1], **iTau);
@@ -1324,6 +1358,11 @@ void TauAnalyzer::beginJob()
   muHad_t2t1_ =
     new TH1F("muHad_t2t1", "{#tau}_{2}/{#tau}_{1} of cleaned parent jet", 500, 0.0, 10.0);
 
+  muHad_Nchtrk_0_ = new TH1F("muHad_Nchtrk_0", "charged track multiplicity of jet (pT > 0)", 40, -0.5, 39.5);
+  muHad_Nchtrk_1_ = new TH1F("muHad_Nchtrk_1", "charged track multiplicity of jet (pT > 1)", 40, -0.5, 39.5);
+  muHad_Nchtrk_30_ = new TH1F("muHad_Nchtrk_30", "charged track multiplicity of jet (pT > 30)", 40, -0.5, 39.5);
+
+
   //set bin labels
   jetParentParton_->GetXaxis()->SetBinLabel(1, "g");
   jetParentParton_->GetXaxis()->SetBinLabel(2, "d");
@@ -1411,6 +1450,9 @@ void TauAnalyzer::beginJob()
   jet_phi->Sumw2();
   jet_mass_etacut->Sumw2();
   jet_ptmj_etacut->Sumw2();
+  muHad_Nchtrk_0_->Sumw2();
+  muHad_Nchtrk_1_->Sumw2();
+  muHad_Nchtrk_30_->Sumw2();
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
@@ -1520,6 +1562,9 @@ void TauAnalyzer::endJob()
   Common::draw1DHistograms(mWMuTauMuCanvas, mWMuTauMu_);
   Common::draw1DHistograms(muHad_t3t1Canvas, muHad_t3t1_);
   Common::draw1DHistograms(muHad_t2t1Canvas, muHad_t2t1_);
+  Common::draw1DHistograms(muHad_Nchtrk_0_Canvas, muHad_Nchtrk_0_);
+  Common::draw1DHistograms(muHad_Nchtrk_1_Canvas, muHad_Nchtrk_1_);
+  Common::draw1DHistograms(muHad_Nchtrk_30_Canvas, muHad_Nchtrk_30_);
   Common::draw1DHistograms(PDGIDNearestStatus1GenParticleToSoftMuCanvas, 
 			   PDGIDNearestStatus1GenParticleToSoftMu_);
   Common::draw1DHistograms(PDGIDMuSrcCanvas, PDGIDMuSrc_);
@@ -1612,6 +1657,9 @@ void TauAnalyzer::endJob()
   softMuPTVsTauHadPTCanvas.Write();
   muHad_t3t1Canvas.Write();
   muHad_t2t1Canvas.Write();
+  muHad_Nchtrk_0_Canvas.Write();
+  muHad_Nchtrk_1_Canvas.Write();
+  muHad_Nchtrk_30_Canvas.Write();
   muHadPTOverMuHadMassVsMWMuSoftMuCanvas.Write();
   jet_pt_etacutCanvas.Write();
   jet_etaCanvas.Write();
