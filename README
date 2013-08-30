@@ -89,7 +89,11 @@ cmsRun tauanalyzer_Wh1_iso_cfg.py
 
 4. In ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/formatPlots.C, change the version tags in lines 333-342 to "_v<version_number>"
 
-5. Execute
+5. Make sure that in your rootlogon.C script, you DO NOT have the line
+
+AutoLibraryLoader::enable();
+
+Then execute
 
 cd ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test
 cmsenv

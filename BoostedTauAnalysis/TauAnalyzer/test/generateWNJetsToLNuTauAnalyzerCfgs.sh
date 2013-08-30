@@ -3,7 +3,7 @@
 ####STUFF TO CONFIGURE####
 
 #version
-version="v40"
+version="v43"
 infoTag=""
 dir=$version
 
@@ -88,7 +88,7 @@ done
 cat <<EOF > runWNJetsToLNuTauAnalyzerCfgs.sh
 #!/bin/bash
 
-for file in \`ls -alh *W*JetsToLNu*.py | awk '{ print \$9 }'\`
+for file in \`ls -alh *W[0-9]JetsToLNu*.py | awk '{ print \$9 }'\`
   do
   outFile=\`echo \$file | sed -e "s%\.py%.txt%"\`
   cmsRun \$file > \$outFile
@@ -102,7 +102,7 @@ chmod a+x runWNJetsToLNuTauAnalyzerCfgs.sh
 cat <<EOF > submitWNJetsToLNuTauAnalyzerJobs.sh
 #!/bin/bash
 
-for file in \`ls -alh tauanalyzer*W*JetsToLNu*.sh | awk '{ print \$9 }'\`
+for file in \`ls -alh tauanalyzer*W[0-9]JetsToLNu*.sh | awk '{ print \$9 }'\`
   do
   jobName=\`echo \$file | sed -e "s%\(.*\)\.sh%\1%"\`
   bsub -q 8nh -J \$jobName < \$file

@@ -725,14 +725,18 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 	if (histName == "jet_ptmj_etacut") {
 	  pHist->GetXaxis()->SetTitle("#frac{p_{T}}{m}");
 	}
-// 	if (string(pHist->GetName()) == "muHadPTOverMuHadMass") {
-// 	  cout << *iInputFile << endl;
-// 	  cout << "Integral(pT/m > 13): " << pHist->Integral(14, -1) << endl;
-// 	}
 // 	if (string(pHist->GetName()) == "tauHadIso") {
 // 	  cout << *iInputFile << endl;
 // 	  cout << "Integral: " << pHist->Integral(0, -1) << endl;
-// 	  cout << "Weight: " << weight << endl;
+// // 	  cout << "Weight: " << weight << endl;
+// 	}
+// 	if (string(pHist->GetName()) == "muHadPTOverMuHadMass") {
+// 	  cout << *iInputFile << endl;
+// 	  cout << "Integral: " << pHist->Integral(0, -1) << endl;
+// 	  cout << "Integral(pT/m > 13): " << pHist->Integral(14, -1) << endl;
+// 	}
+// 	if (string(pHist->GetName()) == "jet_ptmj_etacut") {
+// 	  cout << "Integral(second jet pT/m > 13): " << pHist->Integral(14, -1) << endl;
 // 	}
 	if (setLogY) pHist->GetYaxis()->SetRangeUser(0.1, 10000.0);
 	string legendStyle("l");
@@ -940,4 +944,68 @@ void mergePlotsIn1File(const char* inputFileName, const char* outputFileName)
 		    "Normalized to 1", legendEntries, false);
   in.Close();
   out.Close();
+}
+
+//test data-driven background estimation method with MC
+void makeMCClosurePlots()
+{
+  //get plots of signal and background MC, isolated tau sample, 20 fb^-1 normalization
+  TFile sigVsBkgIso20InvFbStream("/data1/yohay/results/sigVsBkg_muHadIsoAnalysis_20fb-1_v40.root");
+  TCanvas* muHadPTOverMuHadMassCanvasIso;
+  sigVsBkgIso20InvFbStream.GetObject("muHadPTOverMuHadMassCanvas", muHadPTOverMuHadMassCanvasIso);
+  TH1F* muHadPTOverMuHadMassSignal = (TH1F*)muHadPTOverMuHadMassCanvasIso->GetPrimitive("muHadPTOverMuHadMass");
+  cout << "err1\n";
+  setHistogramOptions(muHadPTOverMuHadMassSignal, kBlack, 0.7, 20, 1.0, "p_{T}/m", "");
+  THStack* muHadPTOverMuHadMassStackIso = (THStack*)muHadPTOverMuHadMassCanvasIso->GetPrimitive("muHadPTOverMuHadMassStack");
+  cout << "err2\n";
+  TList* stackedHistsIso = muHadPTOverMuHadMassStackIso->GetHists();
+  TH1F* muHadPTOverMuHadMassBkgIso = NULL;
+  for (Int_t i = 0; i < stackedHistsIso->GetEntries(); ++i) {
+    TH1F* stackHist = (TH1F*)stackedHistsIso->At(i)->Clone();
+    if (i == 0) muHadPTOverMuHadMassBkgIso = stackHist;
+    else muHadPTOverMuHadMassBkgIso->Add(stackHist);
+  }
+  setHistogramOptions(muHadPTOverMuHadMassBkgIso, kBlue, 0.7, 21, 1.0, "p_{T}/m", "");
+
+  //get plots of background MC, non-isolated tau sample, 2.5 fb^-1 normalization
+  TFile sigVsBkgNonIso20InvFbStream("/data1/yohay/results/dataVsMC_muHadNonIsoAnalysis_2p5fb-1_v40.root");
+  sigVsBkgNonIso20InvFbStream.cd();
+  TCanvas* muHadPTOverMuHadMassCanvasNonIso;
+  sigVsBkgNonIso20InvFbStream.GetObject("muHadPTOverMuHadMassCanvas", muHadPTOverMuHadMassCanvasNonIso);
+  cout << "err3\n";
+  muHadPTOverMuHadMassCanvasNonIso->cd(1);
+  cout << "fuck\n";
+  THStack* muHadPTOverMuHadMassStackNonIso = (THStack*)(muHadPTOverMuHadMassCanvasNonIso->cd(1))->GetPrimitive("muHadPTOverMuHadMassStack");
+  cout << muHadPTOverMuHadMassStackNonIso << "\n";
+  TList* stackedHistsNonIso = muHadPTOverMuHadMassStackNonIso->GetHists();
+  cout << "err5\n";
+  TH1F* muHadPTOverMuHadMassBkgNonIso = NULL;
+  for (Int_t i = 0; i < stackedHistsNonIso->GetEntries(); ++i) {
+    TH1F* stackHist = (TH1F*)stackedHistsNonIso->At(i)->Clone();
+    if (i == 0) muHadPTOverMuHadMassBkgNonIso = stackHist;
+    else muHadPTOverMuHadMassBkgNonIso->Add(stackHist);
+  }
+  muHadPTOverMuHadMassBkgNonIso->Scale(20.0/2.5);
+  cout << "err5\n";
+
+  //normalize non-isolated background MC histogram
+  muHadPTOverMuHadMassBkgNonIso->Scale(muHadPTOverMuHadMassBkgIso->Integral(0, 7)/muHadPTOverMuHadMassBkgNonIso->Integral(0, 7));
+  setHistogramOptions(muHadPTOverMuHadMassBkgNonIso, kRed, 0.7, 20, 1.0, "p_{T}/m", "");
+  cout << "err6\n";
+
+  //write to file
+  TFile outStream("MCClosureTest.root", "RECREATE");
+  TCanvas outCanvas("outCanvas", "", 600, 600);
+  setCanvasOptions(outCanvas, 1, 1, 0);
+  setCanvasMargins(outCanvas, 0.2, 0.2, 0.2, 0.2);
+  outCanvas.cd();
+  muHadPTOverMuHadMassSignal->Draw();
+  muHadPTOverMuHadMassBkgIso->Draw("SAME");
+  muHadPTOverMuHadMassBkgNonIso->Draw("SAME");
+  cout << "err7\n";
+  outCanvas.Write();
+  outStream.Write();
+  outStream.Close();
+  sigVsBkgIso20InvFbStream.Close();
+  cout << "err8\n";
 }

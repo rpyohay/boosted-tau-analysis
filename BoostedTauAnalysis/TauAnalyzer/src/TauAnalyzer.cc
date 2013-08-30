@@ -759,7 +759,7 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     Common::sortByPT(oldJetRefs);
 
     //impose pT and decay mode cut on tau
-    if (((*iTau)->pt() > tauPTMin_) && 
+    if (((*iTau)->pt() > tauPTMin_) && // (pMET->refAt(0)->et() > 70.0/*GeV*/) && 
 	((tauDecayMode_ == reco::PFTau::kNull) || ((*iTau)->decayMode() == tauDecayMode_))) {
 
       //plot multiplicity of muons associated to this tau

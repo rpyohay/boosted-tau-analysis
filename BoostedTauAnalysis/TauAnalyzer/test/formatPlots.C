@@ -132,6 +132,7 @@
     legendHeaders2p5InvFbWNJetsToLNu(canvasNames1D.size(), "W + jets normalized to 2.5 fb^{-1}");
   vector<string> legendHeaders2p5InvFbWZ(canvasNames1D.size(), "WZ normalized to 2.5 fb^{-1}");
   vector<string> legendHeaders2p5InvFbZZ(canvasNames1D.size(), "ZZ normalized to 2.5 fb^{-1}");
+  vector<string> legendHeaders2p5InvFbWW(canvasNames1D.size(), "WW normalized to 2.5 fb^{-1}");
   vector<string> legendHeaders1(canvasNames1D.size(), "Normalized to 1");
   vector<string> legendHeaders1DYJetsToLL(canvasNames1D.size(), 
 					  "Drell-Yan + jets normalized to 1");
@@ -140,6 +141,7 @@
   vector<string> legendHeaders1WNJetsToLNu(canvasNames1D.size(), "W + jets normalized to 1");
   vector<string> legendHeaders1WZ(canvasNames1D.size(), "WZ normalized to 1");
   vector<string> legendHeaders1ZZ(canvasNames1D.size(), "ZZ normalized to 1");
+  vector<string> legendHeaders1WW(canvasNames1D.size(), "WW normalized to 1");
   vector<Color_t> colors;
   colors.push_back(kBlack);
   colors.push_back(/*kRed*/kAzure + 1);
@@ -187,7 +189,7 @@
   legendEntriesSigBkgInd.push_back("W + 4 jets");
   legendEntriesSigBkgInd.push_back("WZ");
   legendEntriesSigBkgInd.push_back("ZZ");
-//   legendEntriesSigBkgInd.push_back("WW");
+  legendEntriesSigBkgInd.push_back("WW");
   std::reverse(legendEntriesSigBkgInd.begin() + 1, legendEntriesSigBkgInd.end());
   vector<string> legendEntriesMCDataInd(legendEntriesSigBkgInd);
   legendEntriesMCDataInd[0] = "Data 2.5 fb^{-1}";
@@ -199,7 +201,7 @@
   legendEntriesSigBkg.push_back("W + jets");
   legendEntriesSigBkg.push_back("WZ");
   legendEntriesSigBkg.push_back("ZZ");
-//   legendEntriesSigBkg.push_back("WW");
+  legendEntriesSigBkg.push_back("WW");
   std::reverse(legendEntriesSigBkg.begin() + 1, legendEntriesSigBkg.end());
   vector<string> legendEntriesMCData(legendEntriesSigBkg);
   legendEntriesMCData[0] = "Data 2.5 fb^{-1}";
@@ -214,108 +216,138 @@
   const bool sigBkg = false;
 
   //weights (sig. figs are probably wrong)
+  //first number in parentheses is the PREP weight
+  //second number in parentheses is the best available weight
   const float Wh1Weight20InvFb = 0.07208; /*(0.3604 pb(Pythia LO xs) * 20000 pb^-1)/
 					   100000(no. events processed)*/
   const float Wh1Weight2p5InvFb = 0.00901; //20 fb^-1 weight * (2.5/20)
   vector<float> weights1(15, 0.0);
   vector<float> weightsSigBkgInd;
   weightsSigBkgInd.push_back(Wh1Weight20InvFb);
-  weightsSigBkgInd.push_back(5.841109917/*1.18489425542698*/); /*Drell-Yan + jets (10 < ml+l- < 50) GeV weighted to 
-					     20 fb^-1*/
-  weightsSigBkgInd.push_back(1.936998118/*2.30056938223844*/); /*Drell-Yan + jets ml+l- > 50 GeV weighted to 
-					     20 fb^-1*/
-  weightsSigBkgInd.push_back(1.99738713/*3.60203783312072*/); //tt+jets weighted to 20 fb^-1
-  weightsSigBkgInd.push_back(0.2169556203/*0.291582198868292*/); /*t s-channel weighted to 20 fb^-1
-					      (2.82 pb(PREP xs) * 20000 pb^-1)/
-					      259961(no. events processed)*/
-  weightsSigBkgInd.push_back(0.314/*0.352*/); /*tbar s-channel weighted to 20 fb^-1
-				       (1.57 pb(PREP xs) * 20000 pb^-1)/
-				       100000(no. events processed)*/
-  weightsSigBkgInd.push_back(0.2718155864/*0.326178703711468*/); /*t t-channel weighted to 20 fb^-1
-					      (47 pb(PREP xs) * 20000 pb^-1)/
-					      3458227(no. events processed)*/
-  weightsSigBkgInd.push_back(0.2583883184/*0.317300854955268*/); /*tbar t-channel weighted to 20 fb^-1
-					      (25 pb(PREP xs) * 20000 pb^-1)/
-					      1935072(no. events processed)*/
-  weightsSigBkgInd.push_back(4.666920582/*3.38697439995285*/); /*W + 1 jet weighted to 20 fb^-1
-					     (5400 pb(PREP xs) * 20000 pb^-1)/
-					     23141598(no. events processed)*/
-  weightsSigBkgInd.push_back(1.034128577/*0.461044066257386*/); /*W + 2 jets weighted to 20 fb^-1
-					     (1750 pb(PREP xs) * 20000 pb^-1)/
-					     33844921(no. events processed)*/
-  weightsSigBkgInd.push_back(0.6811245747/*0.164178582464271*/); /*W + 3 jets weighted to 20 fb^-1
-					      (519 pb(PREP xs) * 20000 pb^-1)/
-					      15239503(no. events processed)*/
-  weightsSigBkgInd.push_back(0.3198134203/*0.0314134490360502*/); /*W + 4 jets weighted to 20 fb^-1
-					      (214 pb(PREP xs) * 20000 pb^-1)/
-					      13382803(no. events processed)*/
-  weightsSigBkgInd.push_back(0.0257747659); /*WZ weighted to 20 fb^-1
-					      (12.63 pb(PREP xs) * 20000 pb^-1)/
-					      9800283(no. events processed)*/
-  weightsSigBkgInd.push_back(0.0112802265); /*ZZ weighted to 20 fb^-1
-					      (5.196 pb(PREP xs) * 20000 pb^-1)/
-					      9212581(no. events processed)*/
-//   weightsSigBkgInd.push_back(); /*WW weighted to 20 fb^-1
-// 				  (pb(PREP xs) * 20000 pb^-1)/
-// 				  (no. events processed)*/
+  weightsSigBkgInd.push_back(/*5.841109917*/1.18489425542698); /*Drell-Yan + jets 
+								 (10 < ml+l- < 50) GeV weighted to 
+								 20 fb^-1*/
+  weightsSigBkgInd.push_back(/*1.936998118*/2.30056938223844); /*Drell-Yan + jets 
+								 ml+l- > 50 GeV weighted to 
+								 20 fb^-1*/
+  weightsSigBkgInd.push_back(/*1.99738713*/3.60203783312072); //tt+jets weighted to 20 fb^-1
+  weightsSigBkgInd.push_back(/*0.2169556203*/0.291582198868292); /*t s-channel weighted to 20 fb^-1
+								   (2.82 pb(PREP xs) * 
+								   20000 pb^-1)/
+								   259961(no. events processed)*/
+  weightsSigBkgInd.push_back(/*0.314*/0.352); /*tbar s-channel weighted to 20 fb^-1
+						(1.57 pb(PREP xs) * 20000 pb^-1)/
+						100000(no. events processed)*/
+  weightsSigBkgInd.push_back(/*0.2718155864*/0.326178703711468); /*t t-channel weighted to 20 fb^-1
+								   (47 pb(PREP xs) * 20000 pb^-1)/
+								   3458227(no. events processed)*/
+  weightsSigBkgInd.push_back(/*0.2583883184*/0.317300854955268); /*tbar t-channel weighted to 20 
+								   fb^-1
+								   (25 pb(PREP xs) * 20000 pb^-1)/
+								   1935072(no. events processed)*/
+  weightsSigBkgInd.push_back(/*4.666920582*/3.38697439995285); /*W + 1 jet weighted to 20 fb^-1
+								 (5400 pb(PREP xs) * 20000 pb^-1)/
+								 23141598(no. events processed)*/
+  weightsSigBkgInd.push_back(/*1.034128577*/0.461044066257386); /*W + 2 jets weighted to 20 fb^-1
+								  (1750 pb(PREP xs) * 20000 pb^-1)/
+								  33844921(no. events processed)*/
+  weightsSigBkgInd.push_back(/*0.6811245747*/0.164178582464271); /*W + 3 jets weighted to 20 fb^-1
+								   (519 pb(PREP xs) * 20000 pb^-1)/
+								   15239503(no. events processed)*/
+  weightsSigBkgInd.push_back(/*0.3198134203*/0.0314134490360502); /*W + 4 jets weighted to 20 fb^-1
+								    (214 pb(PREP xs) * 
+								    20000 pb^-1)/
+								    13382803(no. events 
+								    processed)*/
+  weightsSigBkgInd.push_back(/*0.0257747659*/0.067773553069845); /*WZ weighted to 20 fb^-1
+								   (12.63 pb(PREP xs) * 
+								   20000 pb^-1)/
+								   9800283(no. events processed)*/
+  weightsSigBkgInd.push_back(/*0.0112802265*/0.0383258502693219); /*ZZ weighted to 20 fb^-1
+								    (5.196 pb(PREP xs) * 
+								    20000 pb^-1)/
+								    9212581(no. events processed)*/
+  weightsSigBkgInd.push_back(/*0.0772605403111639*/0.126058122867706); /*WW weighted to 20 fb^-1
+									 (33.61 pb(PREP xs) * 
+									 20000 pb^-1)/
+									 (no. events processed)*/
   std::reverse(weightsSigBkgInd.begin() + 1, weightsSigBkgInd.end());
   vector<float> weightsMCDataInd;
   weightsMCDataInd.push_back(1.0); //data
-  weightsMCDataInd.push_back(0.7301387396/*0.148111781928372*/); /*Drell-Yan + jets (10 < ml+l- < 50) GeV weighted to 
-					      2.5 fb^-1
-					      11050 pb(PREP xs) * 2500 pb^-1/
-					      37835275(no. events processed)*/
-  weightsMCDataInd.push_back(0.2421247648/*0.287571172779805*/); /*Drell-Yan + jets ml+l- > 50 GeV weighted to 
-					      2.5 fb^-1
-					      2950 pb(PREP xs) * 2500 pb^-1/
-					      30459503(no. events processed)*/
-  weightsMCDataInd.push_back(0.2496733913/*0.45025472914009*/); //tt+jets weighted to 2.5 fb^-1
-  weightsMCDataInd.push_back(0.0271194525/*0.0364477748585365*/); //t s-channel weighted to 2.5 fb^-1
-  weightsMCDataInd.push_back(0.03925/*0.044*/); //tbar s-channel weighted to 2.5 fb^-1
-  weightsMCDataInd.push_back(0.0339769483/*0.0407723379639335*/); //t t-channel weighted to 2.5 fb^-1
-  weightsMCDataInd.push_back(0.0322985398/*0.0396626068694085*/); //tbar t-channel weighted to 2.5 fb^-1
-  weightsMCDataInd.push_back(0.5833650728/*0.423371799994106*/); //W + 1 jet weighted to 2.5 fb^-1
-  weightsMCDataInd.push_back(0.1292660721/*0.0576305082821733*/); //W + 2 jets weighted to 2.5 fb^-1
-  weightsMCDataInd.push_back(0.0851405718/*0.0205223228080338*/); //W + 3 jets weighted to 2.5 fb^-1
-  weightsMCDataInd.push_back(0.0399766775/*0.00392668112950628*/); //W + 4 jets weighted to 2.5 fb^-1
-  weightsMCDataInd.push_back(0.0032218457); //WZ weighted to 2.5 fb^-1
-  weightsMCDataInd.push_back(0.0014100283); //ZZ weighted to 2.5 fb^-1
-//   weightsMCDataInd.push_back(); //WW weighted to 2.5 fb^-1
+  weightsMCDataInd.push_back(/*0.7301387396*/0.148111781928372); /*Drell-Yan + jets 
+								   (10 < ml+l- < 50) GeV weighted 
+								   to 2.5 fb^-1
+								   11050 pb(PREP xs) * 2500 pb^-1/
+								   37835275(no. events processed)*/
+  weightsMCDataInd.push_back(/*0.2421247648*/0.287571172779805); /*Drell-Yan + jets 
+								   ml+l- > 50 GeV weighted 
+								   to 2.5 fb^-1
+								   2950 pb(PREP xs) * 2500 pb^-1/
+								   30459503(no. events processed)*/
+  weightsMCDataInd.push_back(/*0.2496733913*/0.45025472914009); //tt+jets weighted to 2.5 fb^-1
+  weightsMCDataInd.push_back(/*0.0271194525*/0.0364477748585365); /*t s-channel weighted to 
+								    2.5 fb^-1*/
+  weightsMCDataInd.push_back(/*0.03925*/0.044); //tbar s-channel weighted to 2.5 fb^-1
+  weightsMCDataInd.push_back(/*0.0339769483*/0.0407723379639335); /*t t-channel weighted to 
+								    2.5 fb^-1*/
+  weightsMCDataInd.push_back(/*0.0322985398*/0.0396626068694085); /*tbar t-channel weighted to 
+								    2.5 fb^-1*/
+  weightsMCDataInd.push_back(/*0.5833650728*/0.423371799994106); //W + 1 jet weighted to 2.5 fb^-1
+  weightsMCDataInd.push_back(/*0.1292660721*/0.0576305082821733); /*W + 2 jets weighted to 
+								    2.5 fb^-1*/
+  weightsMCDataInd.push_back(/*0.0851405718*/0.0205223228080338); /*W + 3 jets weighted to 
+								    2.5 fb^-1*/
+  weightsMCDataInd.push_back(/*0.0399766775*/0.00392668112950628); /*W + 4 jets weighted to 
+								     2.5 fb^-1*/
+  weightsMCDataInd.push_back(/*0.0032218457*/0.00847169413373063); //WZ weighted to 2.5 fb^-1
+  weightsMCDataInd.push_back(/*0.0014100283*/0.00479073128366524); //ZZ weighted to 2.5 fb^-1
+  weightsMCDataInd.push_back(/*0.00965756753889549*/0.0157572653584633); //WW weighted to 2.5 fb^-1
   std::reverse(weightsMCDataInd.begin() + 1, weightsMCDataInd.end());
   vector<float> weightsSigBkg;
   weightsSigBkg.push_back(Wh1Weight20InvFb);
   weightsSigBkg.push_back(8.0); /*DYJetsToLLRelXSecWeights already weighted to 2.5 fb^-1 ==> 
 				  multiply by 20/2.5 to get overall weight for 20 fb^-1*/
-  weightsSigBkg.push_back(1.99738713/*3.60203783312072*/); //tt+jets weighted to 20 fb^-1
+  weightsSigBkg.push_back(/*1.99738713*/3.60203783312072); //tt+jets weighted to 20 fb^-1
   weightsSigBkg.push_back(1.0); //t already weighted to 20 fb^-1
   weightsSigBkg.push_back(1.0); //W + jets already weighted to 20 fb^-1
-  weightsSigBkg.push_back(0.0257747659); //WZ weighted to 20 fb^-1
-  weightsSigBkg.push_back(0.0112802265); //ZZ weighted to 20 fb^-1
-//   weightsSigBkg.push_back(); //WW weighted to 20 fb^-1
+//   weightsSigBkg.push_back(33.055892185598); /*W + jets weighted to 20 fb^-1
+// 					      (30400 pb(PREP xs) * 20000 pb^-1)/
+// 					      18393090(no. events processed)*/
+  weightsSigBkg.push_back(/*0.0257747659*/0.067773553069845); //WZ weighted to 20 fb^-1
+  weightsSigBkg.push_back(/*0.0112802265*/0.0383258502693219); //ZZ weighted to 20 fb^-1
+  weightsSigBkg.push_back(/*0.0772605403111639*/0.126058122867706); //WW weighted to 20 fb^-1
   std::reverse(weightsSigBkg.begin() + 1, weightsSigBkg.end());
   vector<float> weightsMCData;
   weightsMCData.push_back(1.0); //data
   weightsMCData.push_back(1.0); /*DYJetsToLLRelXSecWeights already weighted to 2.5 fb^-1 ==> 
 				  multiply by 1.0 to get overall weight for 2.5 fb^-1*/
-  weightsMCData.push_back(0.2496733913/*0.45025472914009*/); /*tt+jets weighted to 2.5 fb^-1
-					   (136.3 pb(PREP xs) * 2500 pb^-1)/
-					   1364783(no. events processed)*/
+  weightsMCData.push_back(/*0.2496733913*/0.45025472914009); /*tt+jets weighted to 2.5 fb^-1
+							       (136.3 pb(PREP xs) * 2500 pb^-1)/
+							       1364783(no. events processed)*/
   weightsMCData.push_back(0.125); /*TRelXSecWeights already weighted to 20 fb^-1 ==> 
 				    multiply by 2.5/20 to get overall weight for 2.5 fb^-1*/
   weightsMCData.push_back(0.125); /*WNJetsToLNuRelXSecWeights already weighted to 20 fb^-1 ==> 
 				    multiply by 2.5/20 to get overall weight for 2.5 fb^-1*/
-  weightsMCData.push_back(0.0032218457); //WZ weighted to 2.5 fb^-1
-  weightsMCData.push_back(0.0014100283); //ZZ weighted to 2.5 fb^-1
-//   weightsMCData.push_back(); //WW weighted to 2.5 fb^-1
+//   weightsMCData.push_back(4.13198652319975); /*W+jets weighted to 2.5 fb^-1
+// 					       20 fb^-1 weight * (2.5/20)*/
+  weightsMCData.push_back(/*0.0032218457*/0.00847169413373063); //WZ weighted to 2.5 fb^-1
+  weightsMCData.push_back(/*0.0014100283*/0.00479073128366524); //ZZ weighted to 2.5 fb^-1
+  weightsMCData.push_back(/*0.00965756753889549*/0.0157572653584633); //WW weighted to 2.5 fb^-1
   std::reverse(weightsMCData.begin() + 1, weightsMCData.end());
   vector<float> WNJetsToLNuRelXSecWeights;
-  WNJetsToLNuRelXSecWeights.push_back(4.666920582/*3.38697439995285*/); //W + 1 jet weighted to 20 fb^-1
-  WNJetsToLNuRelXSecWeights.push_back(1.034128577/*0.461044066257386*/); //W + 2 jets weighted to 20 fb^-1
-  WNJetsToLNuRelXSecWeights.push_back(0.6811245747/*0.164178582464271*/); //W + 3 jets weighted to 20 fb^-1
-  WNJetsToLNuRelXSecWeights.push_back(0.3198134203/*0.0314134490360502*/); //W + 4 jets weighted to 20 fb^-1
+  WNJetsToLNuRelXSecWeights.push_back(/*4.666920582*/3.38697439995285); /*W + 1 jet weighted to 
+									  20 fb^-1*/
+  WNJetsToLNuRelXSecWeights.push_back(/*1.034128577*/0.461044066257386); /*W + 2 jets weighted to 
+									   20 fb^-1*/
+  WNJetsToLNuRelXSecWeights.push_back(/*0.6811245747*/0.164178582464271); /*W + 3 jets weighted to 
+									    20 fb^-1*/
+  WNJetsToLNuRelXSecWeights.push_back(/*0.3198134203*/0.0314134490360502); /*W + 4 jets weighted 
+									     to 20 fb^-1*/
   vector<float> DYJetsToLLRelXSecWeights;
-  DYJetsToLLRelXSecWeights.push_back(0.7301387396/*0.148111781928372*/); //(10 < m < 50) GeV weighted to 2.5 fb^-1
-  DYJetsToLLRelXSecWeights.push_back(0.2421247648/*0.287571172779805*/); //m > 50 GeV weighted to 2.5 fb^-1
+  DYJetsToLLRelXSecWeights.push_back(/*0.7301387396*/0.148111781928372); /*(10 < m < 50) GeV 
+									   weighted to 2.5 fb^-1*/
+  DYJetsToLLRelXSecWeights.push_back(/*0.2421247648*/0.287571172779805); /*m > 50 GeV 
+									   weighted to 2.5 fb^-1*/
   vector<float> TRelXSecWeights;
   TRelXSecWeights.push_back(0.2169556203); //t s-channel weighted to 20 fb^-1
   TRelXSecWeights.push_back(0.314); //tbar s-channel weighted to 20 fb^-1
@@ -330,16 +362,16 @@
   const string tag1("_normalizedTo1");
 
   //version tags
-  const string outputVTag("_test");
-  const string dataVTag("_v40");
-  const string sigVTag("_v40");
-  const string WNJetsToLNuVTag("_v40");
-  const string TTJetsVTag("_v40");
-  const string TVTag("_v40");
-  const string DYJetsToLLVTag("_v40");
-  const string WZVTag("_v40");
-  const string ZZVTag("_v40");
-  const string WWVTag("_v40");
+  const string outputVTag("_v42");
+  const string dataVTag("_v42");
+  const string sigVTag("_v42");
+  const string WNJetsToLNuVTag("_v42");
+  const string TTJetsVTag("_v42");
+  const string TVTag("_v42");
+  const string DYJetsToLLVTag("_v42");
+  const string WZVTag("_v42");
+  const string ZZVTag("_v42");
+  const string WWVTag("_v43");
 
   //hadd data samples from different eras
 //   string dataIsoPrefix(analysisFilePath + "data/analysis/muHadIsoAnalysis_SingleMu");
@@ -468,12 +500,15 @@
 			       TTJetsVTag + fileExt);
   sigVsBkgInputFiles.push_back(TIsoHaddOutputFile);
   sigVsBkgInputFiles.push_back(WNJetsToLNuIsoHaddOutputFile);
+//   sigVsBkgInputFiles.push_back(analysisFilePath + 
+// 			       "WJetsToLNu/analysis/muHadIsoAnalysis_WJetsToLNu" + 
+// 			       WNJetsToLNuVTag + fileExt);
   sigVsBkgInputFiles.push_back(analysisFilePath + "WZ/analysis/muHadIsoAnalysis_WZ" + WZVTag + 
 			       fileExt);
   sigVsBkgInputFiles.push_back(analysisFilePath + "ZZ/analysis/muHadIsoAnalysis_ZZ" + ZZVTag + 
 			       fileExt);
-//   sigVsBkgInputFiles.push_back(analysisFilePath + "WW/analysis/muHadIsoAnalysis_WW" + WWVTag + 
-// 			       fileExt);
+  sigVsBkgInputFiles.push_back(analysisFilePath + "WW/analysis/muHadIsoAnalysis_WW" + WWVTag + 
+			       fileExt);
   std::reverse(sigVsBkgInputFiles.begin() + 1, sigVsBkgInputFiles.end());
   drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgOutputFile20InvFb, sigVsBkgInputFiles, 
 					canvasNames1D, graphNames1D, legendHeaders20InvFb, 
@@ -494,12 +529,15 @@
 			       TTJetsVTag + fileExt);
   dataVsMCInputFiles.push_back(TNonIsoHaddOutputFile);
   dataVsMCInputFiles.push_back(WNJetsToLNuNonIsoHaddOutputFile);
+//   dataVsMCInputFiles.push_back(analysisFilePath + 
+// 			       "WJetsToLNu/analysis/muHadNonIsoAnalysis_WJetsToLNu" + 
+// 			       WNJetsToLNuVTag + fileExt);
   dataVsMCInputFiles.push_back(analysisFilePath + "WZ/analysis/muHadNonIsoAnalysis_WZ" + WZVTag + 
 			       fileExt);
   dataVsMCInputFiles.push_back(analysisFilePath + "ZZ/analysis/muHadNonIsoAnalysis_ZZ" + ZZVTag + 
 			       fileExt);
-//   dataVsMCInputFiles.push_back(analysisFilePath + "WW/analysis/muHadNonIsoAnalysis_WW" + WWVTag + 
-// 			       fileExt);
+  dataVsMCInputFiles.push_back(analysisFilePath + "WW/analysis/muHadNonIsoAnalysis_WW" + WWVTag + 
+			       fileExt);
   std::reverse(dataVsMCInputFiles.begin() + 1, dataVsMCInputFiles.end());
   drawMultipleEfficiencyGraphsOn1Canvas(dataVsMCOutputFile2p5InvFb, dataVsMCInputFiles, 
 					canvasNames1D, graphNames1D, legendHeaders2p5InvFb, 
@@ -593,10 +631,12 @@
 					WWVTag + fileExt);
   WWSearchVsControlInputFiles.push_back(analysisFilePath + "WW/analysis/muHadNonIsoAnalysis_WW" + 
 					WWVTag + fileExt);
-//   drawMultipleEfficiencyGraphsOn1Canvas(WWSearchVsControlOutputFile, WWSearchVsControlInputFiles, 
-// 					canvasNames1D, graphNames1D, legendHeaders1WW, colors, 
-// 					styles, legendEntriesSearchVsControl, weights1, setLinY, 
-// 					drawSame, sigBkg);
+  drawMultipleEfficiencyGraphsOn1Canvas(WWSearchVsControlOutputFile, WWSearchVsControlInputFiles, 
+					canvasNames1D, graphNames1D, legendHeaders1WW, colors, 
+					styles, legendEntriesSearchVsControl, weights1, setLinY, 
+					drawSame, sigBkg);
+
+//   makeMCClosurePlots();
 
 //   //unit strings
 //   string unitPTTau("Reco #tau p_{T} (GeV)");
