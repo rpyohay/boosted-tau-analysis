@@ -7,6 +7,7 @@
 <use name="BoostedTauAnalysis/Common"/>
 <use name="JetMETCorrections/Objects"/>
 <use name="PhysicsTools/Utilities"/>
+<use name="fastjet"/>
 <use name="root"/>
 <use name="rootgraphics"/>
 <flags EDM_PLUGIN="1"/>

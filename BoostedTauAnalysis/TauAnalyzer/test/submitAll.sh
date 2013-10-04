@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd v43
+cd v51
 ./submitDYJetsToLLTauAnalyzerJobs.sh
 ./submitDataTauAnalyzerJobs.sh
 ./submitTTJetsTauAnalyzerJobs.sh

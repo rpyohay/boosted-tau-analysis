@@ -604,12 +604,13 @@ void draw(const vector<string>& canvasNames, TFile& outStream, vector<TCanvas*>&
     outputCanvases[canvasIndex]->SetLogz();
     if (hists[canvasIndex] != NULL) {
       setHistogramOptions(hists[canvasIndex], kBlack, 0.7/*4.2*/, 20, 1.6, 1.0);
-      hists[canvasIndex]->GetZaxis()->SetRangeUser(0.00001, 1.0);
+//       hists[canvasIndex]->GetZaxis()->SetRangeUser(0.00001, 1.0);
+      hists[canvasIndex]->GetZaxis()->SetRangeUser(0.1, 10000.0);
       hists[canvasIndex]->Draw("COLZ");
-      TProfile* profileX = 
-	hists[canvasIndex]->ProfileX((string(hists[canvasIndex]->GetName()) + "_pfx").c_str());
-      profileX->SetLineWidth(3);
-      profileX->Draw("HISTSAME");
+//       TProfile* profileX = 
+// 	hists[canvasIndex]->ProfileX((string(hists[canvasIndex]->GetName()) + "_pfx").c_str());
+//       profileX->SetLineWidth(3);
+//       profileX->Draw("HISTSAME");
     }
   }
 }
@@ -730,10 +731,13 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 // 	  cout << "Integral: " << pHist->Integral(0, -1) << endl;
 // // 	  cout << "Weight: " << weight << endl;
 // 	}
-// 	if (string(pHist->GetName()) == "muHadPTOverMuHadMass") {
+// 	if (string(pHist->GetName()) == "WMuMT") {
 // 	  cout << *iInputFile << endl;
 // 	  cout << "Integral: " << pHist->Integral(0, -1) << endl;
-// 	  cout << "Integral(pT/m > 13): " << pHist->Integral(14, -1) << endl;
+// 	  cout << "Integral(MT > 80 GeV): " << pHist->Integral(21, -1) << endl;
+// 	  cout << "Integral(MT > 100 GeV): " << pHist->Integral(26, -1) << endl;
+// 	  cout << "Integral(MT > 120 GeV): " << pHist->Integral(31, -1) << endl;
+// 	  cout << "Integral(MT > 140 GeV): " << pHist->Integral(36, -1) << endl;
 // 	}
 // 	if (string(pHist->GetName()) == "jet_ptmj_etacut") {
 // 	  cout << "Integral(second jet pT/m > 13): " << pHist->Integral(14, -1) << endl;
@@ -946,66 +950,140 @@ void mergePlotsIn1File(const char* inputFileName, const char* outputFileName)
   out.Close();
 }
 
-//test data-driven background estimation method with MC
-void makeMCClosurePlots()
+//test data-driven background estimation method with MC on a given variable
+void addClosurePlot(TFile& sigVsBkgIso20InvFbStream, const string& var, const string& unit, 
+		    TFile& bkgNonIsoStream, const float nonIsoScale, 
+		    const int normRegionLowerBin, const int normRegionUpperBin, TFile& outStream)
 {
+  //top level declarations
+  string canvasName(var + "Canvas");
+  string stackName(var + "Stack");
+
   //get plots of signal and background MC, isolated tau sample, 20 fb^-1 normalization
-  TFile sigVsBkgIso20InvFbStream("/data1/yohay/results/sigVsBkg_muHadIsoAnalysis_20fb-1_v40.root");
-  TCanvas* muHadPTOverMuHadMassCanvasIso;
-  sigVsBkgIso20InvFbStream.GetObject("muHadPTOverMuHadMassCanvas", muHadPTOverMuHadMassCanvasIso);
-  TH1F* muHadPTOverMuHadMassSignal = (TH1F*)muHadPTOverMuHadMassCanvasIso->GetPrimitive("muHadPTOverMuHadMass");
-  cout << "err1\n";
-  setHistogramOptions(muHadPTOverMuHadMassSignal, kBlack, 0.7, 20, 1.0, "p_{T}/m", "");
-  THStack* muHadPTOverMuHadMassStackIso = (THStack*)muHadPTOverMuHadMassCanvasIso->GetPrimitive("muHadPTOverMuHadMassStack");
-  cout << "err2\n";
-  TList* stackedHistsIso = muHadPTOverMuHadMassStackIso->GetHists();
-  TH1F* muHadPTOverMuHadMassBkgIso = NULL;
-  for (Int_t i = 0; i < stackedHistsIso->GetEntries(); ++i) {
-    TH1F* stackHist = (TH1F*)stackedHistsIso->At(i)->Clone();
-    if (i == 0) muHadPTOverMuHadMassBkgIso = stackHist;
-    else muHadPTOverMuHadMassBkgIso->Add(stackHist);
+  TCanvas* canvasIso = NULL;
+  sigVsBkgIso20InvFbStream.GetObject(canvasName.c_str(), canvasIso);
+
+  //get the signal histogram
+  TH1F* histSig = NULL;
+  THStack* stackBkgIso = NULL;
+  if (canvasIso != NULL) {
+    histSig = (TH1F*)canvasIso->GetPrimitive(var.c_str());
+    setHistogramOptions(histSig, kBlack, 0.7, 20, 1.0, unit.c_str(), "");
+    histSig->GetYaxis()->SetRangeUser(0.1, 10000.0);
+
+    /*get the background stack histogram in the signal region (isolated taus) and convert it to a 
+      TH1*/
+    stackBkgIso = (THStack*)canvasIso->GetPrimitive(stackName.c_str());
   }
-  setHistogramOptions(muHadPTOverMuHadMassBkgIso, kBlue, 0.7, 21, 1.0, "p_{T}/m", "");
+  else {
+    cerr << "Error opening canvas " << canvasName << " from file ";
+    cerr << sigVsBkgIso20InvFbStream.GetName() << ".\n";
+    return;
+  }
+  TList* stackedHistsIso = NULL;
+  if (stackBkgIso != NULL) stackedHistsIso = stackBkgIso->GetHists();
+  else {
+    cerr << "Error opening stack " << stackName << " from canvas " << canvasName << " from file ";
+    cerr << sigVsBkgIso20InvFbStream.GetName() << ".\n";
+    return;
+  }
+  TH1F* histBkgIso = NULL;
+  if (stackedHistsIso != NULL) {
+    for (Int_t i = 0; i < stackedHistsIso->GetEntries(); ++i) {
+      TH1F* stackHist = (TH1F*)stackedHistsIso->At(i)->Clone();
+      if (i == 0) histBkgIso = stackHist;
+      else histBkgIso->Add(stackHist);
+    }
+    setHistogramOptions(histBkgIso, kBlue, 0.7, 21, 1.0, unit.c_str(), "");
+    histBkgIso->GetYaxis()->SetRangeUser(0.1, 10000.0);
+  }
+  else {
+    cerr << "Error opening histogram list from stack " << stackName << " from canvas ";
+    cerr << canvasName << " from file " << sigVsBkgIso20InvFbStream.GetName() << ".\n";
+    return;
+  }
 
   //get plots of background MC, non-isolated tau sample, 2.5 fb^-1 normalization
-  TFile sigVsBkgNonIso20InvFbStream("/data1/yohay/results/dataVsMC_muHadNonIsoAnalysis_2p5fb-1_v40.root");
-  sigVsBkgNonIso20InvFbStream.cd();
-  TCanvas* muHadPTOverMuHadMassCanvasNonIso;
-  sigVsBkgNonIso20InvFbStream.GetObject("muHadPTOverMuHadMassCanvas", muHadPTOverMuHadMassCanvasNonIso);
-  cout << "err3\n";
-  muHadPTOverMuHadMassCanvasNonIso->cd(1);
-  cout << "fuck\n";
-  THStack* muHadPTOverMuHadMassStackNonIso = (THStack*)(muHadPTOverMuHadMassCanvasNonIso->cd(1))->GetPrimitive("muHadPTOverMuHadMassStack");
-  cout << muHadPTOverMuHadMassStackNonIso << "\n";
-  TList* stackedHistsNonIso = muHadPTOverMuHadMassStackNonIso->GetHists();
-  cout << "err5\n";
-  TH1F* muHadPTOverMuHadMassBkgNonIso = NULL;
-  for (Int_t i = 0; i < stackedHistsNonIso->GetEntries(); ++i) {
-    TH1F* stackHist = (TH1F*)stackedHistsNonIso->At(i)->Clone();
-    if (i == 0) muHadPTOverMuHadMassBkgNonIso = stackHist;
-    else muHadPTOverMuHadMassBkgNonIso->Add(stackHist);
+  TCanvas* canvasNonIso = NULL;
+  bkgNonIsoStream.GetObject(canvasName.c_str(), canvasNonIso);
+  THStack* stackBkgNonIso = NULL;
+  if (canvasNonIso != NULL) {
+    canvasNonIso->Draw();
+    stackBkgNonIso = (THStack*)canvasNonIso->cd(1)->GetPrimitive(stackName.c_str());
   }
-  muHadPTOverMuHadMassBkgNonIso->Scale(20.0/2.5);
-  cout << "err5\n";
+  else {
+    cerr << "Error opening canvas " << canvasName << " from file " << bkgNonIsoStream.GetName();
+    cerr << ".\n";
+    return;
+  }
+  TList* stackedHistsNonIso = NULL;
+  if (stackBkgNonIso != NULL) stackedHistsNonIso = stackBkgNonIso->GetHists();
+  else {
+    cerr << "Error opening stack " << stackName << " from canvas " << canvasName << " from file ";
+    cerr << bkgNonIsoStream.GetName() << ".\n";
+    return;
+  }
+  TH1F* histBkgNonIso = NULL;
+  if (stackedHistsNonIso != NULL) {
+    for (Int_t i = 0; i < stackedHistsNonIso->GetEntries(); ++i) {
+      TH1F* stackHist = (TH1F*)stackedHistsNonIso->At(i)->Clone();
+      if (i == 0) histBkgNonIso = stackHist;
+      else histBkgNonIso->Add(stackHist);
+    }
+    histBkgNonIso->Scale(nonIsoScale);
+  }
+  else {
+    cerr << "Error opening histogram list from stack " << stackName << " from canvas ";
+    cerr << canvasName << " from file " << bkgNonIsoStream.GetName() << ".\n";
+    return;
+  }
 
-  //normalize non-isolated background MC histogram
-  muHadPTOverMuHadMassBkgNonIso->Scale(muHadPTOverMuHadMassBkgIso->Integral(0, 7)/muHadPTOverMuHadMassBkgNonIso->Integral(0, 7));
-  setHistogramOptions(muHadPTOverMuHadMassBkgNonIso, kRed, 0.7, 20, 1.0, "p_{T}/m", "");
-  cout << "err6\n";
+  /*normalize non-isolated background MC histogram to isolated background MC in signal-depleted 
+    region*/
+  histBkgNonIso->Scale(histBkgIso->Integral(normRegionLowerBin, normRegionUpperBin)/
+		       histBkgNonIso->Integral(normRegionLowerBin, normRegionUpperBin));
+  setHistogramOptions(histBkgNonIso, kRed, 0.7, 20, 1.0, unit.c_str(), "");
+  histBkgNonIso->GetYaxis()->SetRangeUser(0.1, 10000.0);
 
   //write to file
-  TFile outStream("MCClosureTest.root", "RECREATE");
-  TCanvas outCanvas("outCanvas", "", 600, 600);
+  outStream.cd();
+  TCanvas outCanvas(canvasName.c_str(), "", 600, 600);
   setCanvasOptions(outCanvas, 1, 1, 0);
   setCanvasMargins(outCanvas, 0.2, 0.2, 0.2, 0.2);
   outCanvas.cd();
-  muHadPTOverMuHadMassSignal->Draw();
-  muHadPTOverMuHadMassBkgIso->Draw("SAME");
-  muHadPTOverMuHadMassBkgNonIso->Draw("SAME");
-  cout << "err7\n";
+  histSig->Draw();
+  histBkgIso->Draw("SAME");
+  histBkgNonIso->Draw("SAME");
   outCanvas.Write();
+}
+
+//test data-driven background estimation method with MC
+void makeMCClosurePlots(const string& sigVsBkgIso20InvFbFileName, const vector<string>& vars, 
+			const vector<string>& units, const string& bkgNonIsoFileName, 
+			const float nonIsoScale, const vector<int>& normRegionLowerBins, 
+			const vector<int>& normRegionUpperBins, const string& outputFileName)
+{
+  //open files
+  TFile sigVsBkgIso20InvFbStream(sigVsBkgIso20InvFbFileName.c_str());
+  TFile bkgNonIsoStream(bkgNonIsoFileName.c_str());
+  TFile outStream(outputFileName.c_str(), "RECREATE");
+  if (sigVsBkgIso20InvFbStream.IsOpen() && bkgNonIsoStream.IsOpen() && outStream.IsOpen()) {
+    for (vector<string>::const_iterator iVar = vars.begin(); iVar != vars.end(); ++iVar) {
+      const unsigned int varIndex = iVar - vars.begin();
+      addClosurePlot(sigVsBkgIso20InvFbStream, *iVar, units[varIndex], bkgNonIsoStream, 
+		     nonIsoScale, normRegionLowerBins[varIndex], normRegionUpperBins[varIndex], 
+		     outStream);
+    }
+  }
+  else {
+    cerr << "Error opening files " << sigVsBkgIso20InvFbFileName << " or " << bkgNonIsoFileName;
+    cerr << " or " << outputFileName << ".\n";
+    return;
+  }
+
+  //write to file
   outStream.Write();
   outStream.Close();
   sigVsBkgIso20InvFbStream.Close();
-  cout << "err8\n";
+  bkgNonIsoStream.Close();
 }

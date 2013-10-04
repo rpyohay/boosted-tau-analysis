@@ -74,9 +74,9 @@ for iJob in `seq $minJob $maxJob`
       nWMuonIso=`grep WIsoMuonSelector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*[0-9]*[ ]*\([0-9]*\).*%\1%"`
 #      nJet=`grep jetSelector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*[0-9]*[ ]*\([0-9]*\).*%\1%"`
 #      nTauMuonPT=`grep tauMuonPTSelector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*[0-9]*[ ]*\([0-9]*\).*%\1%"`
-      nTauMuonSoft=`grep tauMuonSelector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*[0-9]*[ ]*\([0-9]*\).*%\1%"`
+#      nTauMuonSoft=`grep tauMuonSelector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*[0-9]*[ ]*\([0-9]*\).*%\1%"`
 #      nMuHadIso=`grep muHadIsoTauSelector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*[0-9]*[ ]*\([0-9]*\).*%\1%"`
-      nMuHad=`grep muHadTauSelector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*[0-9]*[ ]*\([0-9]*\).*%\1%"`
+#      nMuHad=`grep muHadTauSelector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*[0-9]*[ ]*\([0-9]*\).*%\1%"`
 
       #increment totals
       nProcessedTot=`expr $nProcessedTot + $nProcessed`
@@ -86,9 +86,9 @@ for iJob in `seq $minJob $maxJob`
       nWMuonIsoTot=`expr $nWMuonIsoTot + $nWMuonIso`
 #  nJetTot=`expr $nJetTot + $nJet`
 #      nTauMuonPTTot=`expr $nTauMuonPTTot + $nTauMuonPT`
-      nTauMuonSoftTot=`expr $nTauMuonSoftTot + $nTauMuonSoft`
+#      nTauMuonSoftTot=`expr $nTauMuonSoftTot + $nTauMuonSoft`
 #  nMuHadIsoTot=`expr $nMuHadIsoTot + $nMuHadIso`
-      nMuHadTot=`expr $nMuHadTot + $nMuHad`
+#      nMuHadTot=`expr $nMuHadTot + $nMuHad`
   fi
 done
 
@@ -100,8 +100,8 @@ echo "nWMuonPTTot = $nWMuonPTTot"
 echo "nWMuonIsoTot = $nWMuonIsoTot"
 #echo "nJetTot = $nJetTot"
 #echo "nTauMuonPTTot = $nTauMuonPTTot"
-echo "nTauMuonSoftTot = $nTauMuonSoftTot"
+#echo "nTauMuonSoftTot = $nTauMuonSoftTot"
 #echo "nMuHadIsoTot = $nMuHadIsoTot"
-echo "nMuHadTot = $nMuHadTot"
+#echo "nMuHadTot = $nMuHadTot"
 
 exit 0
