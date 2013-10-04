@@ -689,9 +689,11 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
   vector<vector<TH1F*> > hists;
   setup(canvasNames, outputCanvases, setLogY, legends, stacks, legendHeaders, hists, 
 	inputFiles.size(), dataMC);
+  bool data = true;
   for (vector<string>::const_iterator iInputFile = inputFiles.begin(); 
        iInputFile != inputFiles.end(); ++iInputFile) {
     const unsigned int fileIndex = iInputFile - inputFiles.begin();
+    if ((fileIndex == 0) && (iInputFile->find("Wh1") != string::npos)) data = false;
     inputStreams.push_back(new TFile(iInputFile->c_str()));
     for (vector<string>::const_iterator iCanvasName = canvasNames.begin(); 
 	 iCanvasName != canvasNames.end(); ++iCanvasName) {
@@ -748,8 +750,12 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 // 	  pHist->SetFillStyle(0);
 // 	  pHist->SetFillColor(0);
 	  pHist->SetFillStyle(1001);
-	  pHist->SetFillColor(colors[fileIndex]);
-	  if (fileIndex == 0) legendStyle = "lp";
+	  if ((fileIndex == 0) && !data) pHist->SetFillColor(0);
+	  else pHist->SetFillColor(colors[fileIndex]);
+	  if (fileIndex == 0) {
+	    if (data) legendStyle = "lp";
+	    else legendStyle = "l";
+	  }
 	  else legendStyle = "f";
 	}
 	hists[canvasIndex][fileIndex] = pHist;
@@ -815,7 +821,9 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
       TH1F* hist = (TH1F*)stackedHists->First();
       stacks[canvasIndex]->GetXaxis()->SetTitle(hist->GetXaxis()->GetTitle());
       stacks[canvasIndex]->GetYaxis()->SetTitle(hist->GetYaxis()->GetTitle());
-      hists[canvasIndex][0]->Draw("SAME");
+      string drawOpt("SAME");
+      if (!data) drawOpt = "HISTSAME";
+      hists[canvasIndex][0]->Draw(drawOpt.c_str());
       TH1F* stackSumHist = NULL;
       for (Int_t i = 0; i < stackedHists->GetEntries(); ++i) {
 	TH1F* stackHist = (TH1F*)stackedHists->At(i)->Clone();
