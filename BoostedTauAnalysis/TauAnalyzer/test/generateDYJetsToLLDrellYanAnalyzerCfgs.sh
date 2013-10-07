@@ -95,7 +95,7 @@ EOF
 chmod a+x submitDYJetsToLLDrellYanAnalyzerJobs.sh
 
 #generate script that copies all files locally from EOS
-cat <<EOF > copyDYJetsToLLFromEOS.sh
+cat <<EOF > copyDrellYanEnrichedDYJetsToLLFromEOS.sh
 #!/bin/bash
 
 eval \`scramv1 runtime -sh\`
@@ -106,6 +106,6 @@ done
 
 exit 0
 EOF
-chmod a+x copyDYJetsToLLFromEOS.sh
+chmod a+x copyDrellYanEnrichedDYJetsToLLFromEOS.sh
 
 exit 0

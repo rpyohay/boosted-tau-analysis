@@ -95,7 +95,7 @@ EOF
 chmod a+x submitDataDrellYanAnalyzerJobs.sh
 
 #generate script that copies all files locally from EOS
-cat <<EOF > copyDataFromEOS.sh
+cat <<EOF > copyDrellYanEnrichedDataFromEOS.sh
 #!/bin/bash
 
 eval \`scramv1 runtime -sh\`
@@ -106,6 +106,6 @@ done
 
 exit 0
 EOF
-chmod a+x copyDataFromEOS.sh
+chmod a+x copyDrellYanEnrichedDataFromEOS.sh
 
 exit 0
