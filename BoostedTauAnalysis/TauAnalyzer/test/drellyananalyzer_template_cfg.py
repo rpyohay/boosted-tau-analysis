@@ -36,7 +36,8 @@ process.DrellYanAnalyzer = cms.EDAnalyzer(
     vtxTag = cms.InputTag('offlinePrimaryVertices'),
     PUSubtractionCoeff = cms.double(0.5),
     PUScenario = cms.string("PUSCENARIO"),
-    MC = cms.bool(MCFLAG)
+    MC = cms.bool(MCFLAG),
+    minMDimuon = cms.double(50.0)
     )
 
 #path

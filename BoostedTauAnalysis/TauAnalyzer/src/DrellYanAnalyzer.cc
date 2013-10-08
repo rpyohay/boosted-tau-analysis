@@ -131,6 +131,9 @@ private:
   //MC flag
   bool MC_;
 
+  //minimum dimuon invariant mass
+  double minMDimuon_;
+
   //histogram of first muon pT
   TH1F* mu1PT_;
 
@@ -223,7 +226,8 @@ DrellYanAnalyzer::DrellYanAnalyzer(const edm::ParameterSet& iConfig) :
   vtxTag_(iConfig.getParameter<edm::InputTag>("vtxTag")),
   PUSubtractionCoeff_(iConfig.getParameter<double>("PUSubtractionCoeff")),
   PUScenario_(iConfig.getParameter<std::string>("PUScenario")),
-  MC_(iConfig.getParameter<bool>("MC"))
+  MC_(iConfig.getParameter<bool>("MC")),
+  minMDimuon_(iConfig.getParameter<double>("minMDimuon"))
 {
   //now do what ever initialization is needed
   reset(false);
@@ -362,75 +366,79 @@ void DrellYanAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
   std::reverse(muonRefs.begin(), muonRefs.end());
   reco::LeafCandidate::LorentzVector dimuonSystem = muonRefs[0]->p4() + muonRefs[1]->p4();
 
-  //plot first muon pT
-  mu1PT_->Fill(muonRefs[0]->pt(), PUWeight);
+  //apply cuts
+  if (dimuonSystem.M() > minMDimuon_) {
 
-  //plot second muon pT
-  mu2PT_->Fill(muonRefs[1]->pt(), PUWeight);
+    //plot first muon pT
+    mu1PT_->Fill(muonRefs[0]->pt(), PUWeight);
 
-  //plot dimuon system pT
-  dimuonPT_->Fill(dimuonSystem.Pt(), PUWeight);
+    //plot second muon pT
+    mu2PT_->Fill(muonRefs[1]->pt(), PUWeight);
 
-  //plot first muon eta
-  mu1Eta_->Fill(muonRefs[0]->eta(), PUWeight);
+    //plot dimuon system pT
+    dimuonPT_->Fill(dimuonSystem.Pt(), PUWeight);
 
-  //plot second muon eta
-  mu2Eta_->Fill(muonRefs[1]->eta(), PUWeight);
+    //plot first muon eta
+    mu1Eta_->Fill(muonRefs[0]->eta(), PUWeight);
 
-  //plot dimuon system eta
-  dimuonEta_->Fill(dimuonSystem.Eta(), PUWeight);
+    //plot second muon eta
+    mu2Eta_->Fill(muonRefs[1]->eta(), PUWeight);
 
-  //plot first muon phi
-  mu1Phi_->Fill(muonRefs[0]->phi(), PUWeight);
+    //plot dimuon system eta
+    dimuonEta_->Fill(dimuonSystem.Eta(), PUWeight);
 
-  //plot second muon phi
-  mu2Phi_->Fill(muonRefs[1]->phi(), PUWeight);
+    //plot first muon phi
+    mu1Phi_->Fill(muonRefs[0]->phi(), PUWeight);
 
-  //plot dimuon system phi
-  dimuonPhi_->Fill(dimuonSystem.Phi(), PUWeight);
+    //plot second muon phi
+    mu2Phi_->Fill(muonRefs[1]->phi(), PUWeight);
 
-  //plot transverse mass of first muon and MET
-  reco::LeafCandidate::LorentzVector MET = pMET->refAt(0)->p4();
-  mu1METMT_->Fill(MT(muonRefs[0]->p4(), MET), PUWeight);
+    //plot dimuon system phi
+    dimuonPhi_->Fill(dimuonSystem.Phi(), PUWeight);
 
-  //plot transverse mass of second muon and MET
-  mu2METMT_->Fill(MT(muonRefs[1]->p4(), MET), PUWeight);
+    //plot transverse mass of first muon and MET
+    reco::LeafCandidate::LorentzVector MET = pMET->refAt(0)->p4();
+    mu1METMT_->Fill(MT(muonRefs[0]->p4(), MET), PUWeight);
 
-  //plot transverse mass of dimuon system and MET
-  dimuonMETMT_->Fill(MT(dimuonSystem, MET), PUWeight);
+    //plot transverse mass of second muon and MET
+    mu2METMT_->Fill(MT(muonRefs[1]->p4(), MET), PUWeight);
 
-  //plot dPhi(first muon, MET)
-  dPhiMu1MET_->Fill(fabs(reco::deltaPhi(muonRefs[0]->phi(), MET.Phi())), PUWeight);
+    //plot transverse mass of dimuon system and MET
+    dimuonMETMT_->Fill(MT(dimuonSystem, MET), PUWeight);
 
-  //plot dPhi(second muon, MET)
-  dPhiMu2MET_->Fill(fabs(reco::deltaPhi(muonRefs[1]->phi(), MET.Phi())), PUWeight);
+    //plot dPhi(first muon, MET)
+    dPhiMu1MET_->Fill(fabs(reco::deltaPhi(muonRefs[0]->phi(), MET.Phi())), PUWeight);
 
-  //plot dPhi(dimuon system, MET)
-  dPhiDimuonMET_->Fill(fabs(reco::deltaPhi(dimuonSystem.Phi(), MET.Phi())), PUWeight);
+    //plot dPhi(second muon, MET)
+    dPhiMu2MET_->Fill(fabs(reco::deltaPhi(muonRefs[1]->phi(), MET.Phi())), PUWeight);
 
-  //plot first muon isolation (PF, combined, PU-subtracted)
-  mu1Iso_->Fill(Common::getMuonCombPFIso(*muonRefs[0], PUSubtractionCoeff_), PUWeight);
+    //plot dPhi(dimuon system, MET)
+    dPhiDimuonMET_->Fill(fabs(reco::deltaPhi(dimuonSystem.Phi(), MET.Phi())), PUWeight);
 
-  //plot second muon isolation (PF, combined, PU-subtracted)
-  mu2Iso_->Fill(Common::getMuonCombPFIso(*muonRefs[1], PUSubtractionCoeff_), PUWeight);
+    //plot first muon isolation (PF, combined, PU-subtracted)
+    mu1Iso_->Fill(Common::getMuonCombPFIso(*muonRefs[0], PUSubtractionCoeff_), PUWeight);
 
-  //plot dEta(first muon, second muon)
-  dEtaMu1Mu2_->Fill(muonRefs[0]->eta() - muonRefs[1]->eta(), PUWeight);
+    //plot second muon isolation (PF, combined, PU-subtracted)
+    mu2Iso_->Fill(Common::getMuonCombPFIso(*muonRefs[1], PUSubtractionCoeff_), PUWeight);
 
-  //plot dPhi(first muon, second muon)
-  dPhiMu1Mu2_->Fill(fabs(reco::deltaPhi(muonRefs[0]->phi(), muonRefs[1]->phi())), PUWeight);
+    //plot dEta(first muon, second muon)
+    dEtaMu1Mu2_->Fill(muonRefs[0]->eta() - muonRefs[1]->eta(), PUWeight);
 
-  //plot dR(first muon, second muon)
-  dRMu1Mu2_->Fill(reco::deltaR(*muonRefs[0], *muonRefs[1]), PUWeight);
+    //plot dPhi(first muon, second muon)
+    dPhiMu1Mu2_->Fill(fabs(reco::deltaPhi(muonRefs[0]->phi(), muonRefs[1]->phi())), PUWeight);
 
-  //plot MET distribution
-  fillETHistogram(pMET, MET_, PUWeight);  
+    //plot dR(first muon, second muon)
+    dRMu1Mu2_->Fill(reco::deltaR(*muonRefs[0], *muonRefs[1]), PUWeight);
 
-  //plot the number of good vertices
-  nGoodVtx_->Fill(Common::numGoodVertices(pVtx), PUWeight);
+    //plot MET distribution
+    fillETHistogram(pMET, MET_, PUWeight);  
 
-  //plot dimuon invariant mass
-  mDimuon_->Fill(dimuonSystem.M());
+    //plot the number of good vertices
+    nGoodVtx_->Fill(Common::numGoodVertices(pVtx), PUWeight);
+
+    //plot dimuon invariant mass
+    mDimuon_->Fill(dimuonSystem.M());
+  }
 }
 
 
