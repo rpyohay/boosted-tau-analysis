@@ -241,26 +241,26 @@ DrellYanAnalyzer::DrellYanAnalyzer(const edm::ParameterSet& iConfig) :
 				   2.840e+04, 1.549e+04, 8.845e+03, 5.236e+03, 3.180e+03, 
 				   1.964e+03, 1.225e+03, 7.678e+02, 4.813e+02, 3.006e+02, 
 				   1.866e+02, 1.147e+02, 6.969e+01, 4.179e+01, 2.470e+01};
-  float Data20122p5InvFbPUDistArray[60] = {6.633e-03, 7.767e-02, 9.649e+02, 1.449e+05, 
-					   3.185e+05, 5.658e+05, 4.224e+06, 1.779e+07, 
-					   4.045e+07, 6.108e+07, 8.996e+07, 1.319e+08, 
-					   1.670e+08, 1.925e+08, 2.075e+08, 2.081e+08, 
-					   1.960e+08, 1.755e+08, 1.537e+08, 1.349e+08, 
-					   1.186e+08, 1.054e+08, 9.523e+07, 8.614e+07, 
-					   7.637e+07, 6.542e+07, 5.384e+07, 4.252e+07, 
-					   3.212e+07, 2.310e+07, 1.580e+07, 1.035e+07, 
-					   6.544e+06, 4.001e+06, 2.354e+06, 1.320e+06, 
-					   6.986e+05, 3.473e+05, 1.620e+05, 7.126e+04, 
-					   2.994e+04, 1.232e+04, 5.175e+03, 2.318e+03, 
-					   1.136e+03, 6.016e+02, 3.322e+02, 1.849e+02, 
-					   1.015e+02, 5.438e+01, 2.826e+01, 1.422e+01, 
-					   6.923e+00, 3.258e+00, 1.482e+00, 6.517e-01, 
-					   2.770e-01, 1.138e-01, 4.518e-02, 1.734e-02};
+  float Data201219p7InvFbPUDistArray[60] = {1.353e+04, 5.161e+04, 2.116e+06, 3.323e+05, 
+					    5.569e+05, 3.645e+06, 2.024e+07, 6.093e+07, 
+					    1.430e+08, 2.762e+08, 4.717e+08, 7.054e+08, 
+					    8.867e+08, 9.951e+08, 1.068e+09, 1.120e+09, 
+					    1.148e+09, 1.153e+09, 1.149e+09, 1.135e+09, 
+					    1.111e+09, 1.082e+09, 1.050e+09, 1.009e+09, 
+					    9.496e+08, 8.655e+08, 7.598e+08, 6.420e+08, 
+					    5.221e+08, 4.084e+08, 3.072e+08, 2.223e+08, 
+					    1.547e+08, 1.033e+08, 6.614e+07, 4.073e+07, 
+					    2.438e+07, 1.450e+07, 8.859e+06, 5.779e+06, 
+					    4.131e+06, 3.233e+06, 2.706e+06, 2.356e+06, 
+					    2.092e+06, 1.871e+06, 1.674e+06, 1.492e+06, 
+					    1.324e+06, 1.168e+06, 1.022e+06, 8.887e+05, 
+					    7.663e+05, 6.553e+05, 5.556e+05, 4.668e+05, 
+					    3.887e+05, 3.207e+05, 2.623e+05, 2.129e+05};
   std::vector<float> Data2012PUDist(Data2012PUDistArray, Data2012PUDistArray + 
 				    sizeof(Data2012PUDistArray)/sizeof(float));
   std::vector<float> 
-    Data20122p5InvFbPUDist(Data20122p5InvFbPUDistArray, Data20122p5InvFbPUDistArray + 
-			   sizeof(Data20122p5InvFbPUDistArray)/sizeof(float));
+    Data201219p7InvFbPUDist(Data201219p7InvFbPUDistArray, Data201219p7InvFbPUDistArray + 
+			   sizeof(Data201219p7InvFbPUDistArray)/sizeof(float));
   if (PUScenario_ == "S7") {
 //     float S7PUDistArray[60] = {2.344E-05, 2.344E-05, 2.344E-05, 2.344E-05, 4.687E-04, 4.687E-04, 
 // 			       7.032E-04, 9.414E-04, 1.234E-03, 1.603E-03, 2.464E-03, 3.250E-03, 
@@ -285,7 +285,7 @@ DrellYanAnalyzer::DrellYanAnalyzer(const edm::ParameterSet& iConfig) :
     std::vector<float> S7PUDist(S7PUDistArray, S7PUDistArray + 
 				sizeof(S7PUDistArray)/sizeof(float));
 //     PUReweight_ = edm::LumiReWeighting(S7PUDist, Data2012PUDist);
-    PUReweight_ = edm::LumiReWeighting(S7PUDist, Data20122p5InvFbPUDist);
+    PUReweight_ = edm::LumiReWeighting(S7PUDist, Data201219p7InvFbPUDist);
   }
   else if (PUScenario_ == "S10") {
     float S10PUDistArray[60] = {2.560E-06, 5.239E-06, 1.420E-05, 5.005E-05, 1.001E-04, 2.705E-04, 
@@ -301,7 +301,7 @@ DrellYanAnalyzer::DrellYanAnalyzer(const edm::ParameterSet& iConfig) :
     std::vector<float> S10PUDist(S10PUDistArray, S10PUDistArray + 
 				 sizeof(S10PUDistArray)/sizeof(float));
 //     PUReweight_ = edm::LumiReWeighting(S10PUDist, Data2012PUDist);
-    PUReweight_ = edm::LumiReWeighting(S10PUDist, Data20122p5InvFbPUDist);
+    PUReweight_ = edm::LumiReWeighting(S10PUDist, Data201219p7InvFbPUDist);
   }
 }
 
