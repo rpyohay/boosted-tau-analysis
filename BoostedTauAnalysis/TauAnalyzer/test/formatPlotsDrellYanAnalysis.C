@@ -111,7 +111,7 @@
   vector<string> legendEntriesSigBkg;
   legendEntriesSigBkg.push_back("Drell-Yan + jets");
   vector<string> legendEntriesMCData(legendEntriesSigBkg);
-  legendEntriesMCData.insert(legendEntriesMCDataInd.begin(), "Data 19.7 fb^{-1}");
+  legendEntriesMCData.insert(legendEntriesMCData.begin(), "Data 19.7 fb^{-1}");
   const bool setLogY = true;
   const bool setLinY = false;
   const bool drawStack = true;
@@ -133,8 +133,8 @@
   vector<float> weightsMCDataInd;
   weightsMCDataInd.push_back(1.0); //data
   weightsMCDataInd.push_back(/*6.84634685357454*/1.38881088924538); /*Drell-Yan + jets 
-								      (10 < ml+l- < 50) GeV weighted 
-								      to 19.7 fb^-1*/
+								      (10 < ml+l- < 50) GeV 
+								      weighted to 19.7 fb^-1*/
   weightsMCDataInd.push_back(/*1.9085242461113*/2.26675101231954); /*Drell-Yan + jets 
 								     ml+l- > 50 GeV weighted 
 								     to 19.7 fb^-1*/
@@ -161,9 +161,9 @@
   const string tag1("_normalizedTo1");
 
   //version tags
-  const string outputVTag("_v48");
-  const string dataVTag("_v48");
-  const string DYJetsToLLVTag("_v48");
+  const string outputVTag("_v52");
+  const string dataVTag("_v52");
+  const string DYJetsToLLVTag("_v52");
 
   //hadd data samples from different eras
   string dataPrefix(analysisFilePath + "data/analysis/DrellYanAnalysis_SingleMu");
@@ -208,14 +208,14 @@
 			     outputVTag + fileExt);
   vector<string> sigVsBkgInputFiles;
   sigVsBkgInputFiles.push_back(DYJetsToLLHaddOutputFile);
-  drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgOutputFile20InvFb, sigVsBkgInputFiles, 
-					canvasNames1D, graphNames1D, legendHeaders20InvFb, 
-					colors, styles, legendEntriesSigBkg, weightsSigBkg, 
-					setLogY, drawStack, sigBkg);
-  drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgOutputFile1, sigVsBkgInputFiles, 
-					canvasNames1D, graphNames1D, legendHeaders1, colors, 
-					styles, legendEntriesSigBkg, weights1, setLinY, drawSame, 
-					sigBkg);
+//   drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgOutputFile20InvFb, sigVsBkgInputFiles, 
+// 					canvasNames1D, graphNames1D, legendHeaders20InvFb, 
+// 					colors, styles, legendEntriesSigBkg, weightsSigBkg, 
+// 					setLogY, drawStack, sigBkg);
+//   drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgOutputFile1, sigVsBkgInputFiles, 
+// 					canvasNames1D, graphNames1D, legendHeaders1, colors, 
+// 					styles, legendEntriesSigBkg, weights1, setLinY, drawSame, 
+// 					sigBkg);
 
   //compare data to MC in control region
   string dataVsMCOutputFile19p7InvFb(analysisFilePath + "results/dataVsMC_DrellYanAnalysis" + 
