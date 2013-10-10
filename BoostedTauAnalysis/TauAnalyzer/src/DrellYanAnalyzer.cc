@@ -134,6 +134,9 @@ private:
   //minimum dimuon invariant mass
   double minMDimuon_;
 
+  //minimum muon pT
+  double minPTMuon_;
+
   //histogram of first muon pT
   TH1F* mu1PT_;
 
@@ -227,7 +230,8 @@ DrellYanAnalyzer::DrellYanAnalyzer(const edm::ParameterSet& iConfig) :
   PUSubtractionCoeff_(iConfig.getParameter<double>("PUSubtractionCoeff")),
   PUScenario_(iConfig.getParameter<std::string>("PUScenario")),
   MC_(iConfig.getParameter<bool>("MC")),
-  minMDimuon_(iConfig.getParameter<double>("minMDimuon"))
+  minMDimuon_(iConfig.getParameter<double>("minMDimuon")),
+  minPTMuon_(iConfig.getParameter<double>("minPTMuon"))
 {
   //now do what ever initialization is needed
   reset(false);
@@ -367,7 +371,8 @@ void DrellYanAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
   reco::LeafCandidate::LorentzVector dimuonSystem = muonRefs[0]->p4() + muonRefs[1]->p4();
 
   //apply cuts
-  if (dimuonSystem.M() > minMDimuon_) {
+  if ((dimuonSystem.M() > minMDimuon_) && 
+      (muonRefs[0]->pt() > minPTMuon_) && (muonRefs[1]->pt() > minPTMuon_)) {
 
     //plot first muon pT
     mu1PT_->Fill(muonRefs[0]->pt(), PUWeight);
