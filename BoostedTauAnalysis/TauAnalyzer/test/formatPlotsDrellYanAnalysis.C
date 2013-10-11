@@ -64,13 +64,9 @@
   vector<string> graphNames2D;
 
   //set up plot style options
-  vector<string> legendHeaders20InvFb(canvasNames1D.size(), "Normalized to 20 fb^{-1}");
   vector<string> legendHeaders19p7InvFb(canvasNames1D.size(), "Normalized to 19.7 fb^{-1}");
   vector<string> legendHeaders19p7InvFbDYJetsToLL(canvasNames1D.size(), 
 						  "Drell-Yan + jets normalized to 19.7 fb^{-1}");
-  vector<string> legendHeaders1(canvasNames1D.size(), "Normalized to 1");
-  vector<string> legendHeaders1DYJetsToLL(canvasNames1D.size(), 
-					  "Drell-Yan + jets normalized to 1");
   vector<Color_t> colors;
   colors.push_back(kBlack);
   colors.push_back(/*kRed*/kAzure + 1);
@@ -103,15 +99,11 @@
   styles.push_back(32);
   styles.push_back(33);
   styles.push_back(34);
-  vector<string> legendEntriesSigBkgInd;
-  legendEntriesSigBkgInd.push_back("Drell-Yan + jets (10 < m_{l^{+}l^{-}} < 50) GeV");
-  legendEntriesSigBkgInd.push_back("Drell-Yan + jets m_{l^{+}l^{-}} > 50 GeV");
-  vector<string> legendEntriesMCDataInd(legendEntriesSigBkgInd);
-  legendEntriesMCDataInd.insert(legendEntriesMCDataInd.begin(), "Data 19.7 fb^{-1}");
-  vector<string> legendEntriesSigBkg;
-  legendEntriesSigBkg.push_back("Drell-Yan + jets");
-  vector<string> legendEntriesMCData(legendEntriesSigBkg);
-  legendEntriesMCData.insert(legendEntriesMCData.begin(), "Data 19.7 fb^{-1}");
+  vector<string> legendEntriesMCData;
+  legendEntriesMCData.push_back("Data 19.7 fb^{-1}");
+  legendEntriesMCData.push_back("W + jets");
+  legendEntriesMCData.push_back("t#bar{t} + jets");
+  legendEntriesMCData.push_back("Drell-Yan + jets");
   const bool setLogY = true;
   const bool setLinY = false;
   const bool drawStack = true;
@@ -122,48 +114,29 @@
   //weights (sig. figs are probably wrong)
   //first number in parentheses is the PREP weight
   //second number in parentheses is the best available weight
-  vector<float> weights1(15, 0.0);
-  vector<float> weightsSigBkgInd;
-  weightsSigBkgInd.push_back(/*6.94848965145087*/1.40953099486997); /*Drell-Yan + jets 
-								      (10 < ml+l- < 50) GeV 
-								      weighted to 20 fb^-1*/
-  weightsSigBkgInd.push_back(/*1.93699811845256*/2.30056938223844); /*Drell-Yan + jets 
-								      ml+l- > 50 GeV weighted to 
-								      20 fb^-1*/
-  vector<float> weightsMCDataInd;
-  weightsMCDataInd.push_back(1.0); //data
-  weightsMCDataInd.push_back(/*6.84634685357454*/1.38881088924538); /*Drell-Yan + jets 
-								      (10 < ml+l- < 50) GeV 
-								      weighted to 19.7 fb^-1*/
-  weightsMCDataInd.push_back(/*1.9085242461113*/2.26675101231954); /*Drell-Yan + jets 
-								     ml+l- > 50 GeV weighted 
-								     to 19.7 fb^-1*/
-  vector<float> weightsSigBkg;
-  weightsSigBkg.push_back(1.0); /*DYJetsToLLRelXSecWeights already weighted to 20 fb^-1 ==> 
-				  multiply by 1 to get overall weight for 20 fb^-1*/
   vector<float> weightsMCData;
   weightsMCData.push_back(1.0); //data
-  weightsMCData.push_back(19.7/20.0); /*DYJetsToLLRelXSecWeights already weighted to 20 fb^-1 ==> 
-					multiply by 19.7/20 to get overall weight for 19.7 fb^-1*/
+  weightsMCData.push_back(/*32.5699705704697*/40.1864153331496); //W+jets weighted to 19.7 fb^-1
+  weightsMCData.push_back(/*1.96802553959128*/3.54908787697385); //tt+jets weighted to 19.7 fb^-1
+  weightsMCData.push_back(1.0); //DYJetsToLLRelXSecWeights already weighted to 19.7 fb^-1
   vector<float> DYJetsToLLRelXSecWeights;
-  DYJetsToLLRelXSecWeights.push_back(/*6.94848965145087*/1.40953099486997); /*(10 < m < 50) GeV 
+  DYJetsToLLRelXSecWeights.push_back(/*6.84634685357454*/1.38881088924538); /*(10 < m < 50) GeV 
 									      weighted to 20 
 									      fb^-1*/
-  DYJetsToLLRelXSecWeights.push_back(/*1.93699811845256*/2.30056938223844); /*m > 50 GeV 
-									      weighted to 20 
-									      fb^-1*/
+  DYJetsToLLRelXSecWeights.push_back(/*1.9085242461113*/2.26675101231954); /*m > 50 GeV weighted 
+									     to 20 fb^-1*/
 
   //space-saving constant definitions
   const string analysisFilePath("/data1/yohay/");
   const string fileExt(".root");
-  const string tag20InvFb("_20fb-1");
   const string tag19p7InvFb("_19p7fb-1");
-  const string tag1("_normalizedTo1");
 
   //version tags
-  const string outputVTag("_v52");
-  const string dataVTag("_v52");
-  const string DYJetsToLLVTag("_v52");
+  const string outputVTag("_v56");
+  const string dataVTag("_v56");
+  const string WJetsToLNuVTag("_v56");
+  const string TTJetsVTag("_v56");
+  const string DYJetsToLLVTag("_v56");
 
   //hadd data samples from different eras
   string dataPrefix(analysisFilePath + "data/analysis/DrellYanAnalysis_SingleMu");
@@ -201,27 +174,16 @@
   haddCanvases(DYJetsToLLHaddOutputFile, DYJetsToLLHaddInputFiles, 
 	       DYJetsToLLRelXSecWeights, canvasNames1D, graphNames1D, canvasNames2D, graphNames2D);
 
-  //compare MC signal to background
-  string sigVsBkgOutputFile20InvFb(analysisFilePath + "results/sigVsBkg_DrellYanAnalysis" + 
-				   tag20InvFb + outputVTag + fileExt);
-  string sigVsBkgOutputFile1(analysisFilePath + "results/sigVsBkg_DrellYanAnalysis" + tag1 + 
-			     outputVTag + fileExt);
-  vector<string> sigVsBkgInputFiles;
-  sigVsBkgInputFiles.push_back(DYJetsToLLHaddOutputFile);
-//   drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgOutputFile20InvFb, sigVsBkgInputFiles, 
-// 					canvasNames1D, graphNames1D, legendHeaders20InvFb, 
-// 					colors, styles, legendEntriesSigBkg, weightsSigBkg, 
-// 					setLogY, drawStack, sigBkg);
-//   drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgOutputFile1, sigVsBkgInputFiles, 
-// 					canvasNames1D, graphNames1D, legendHeaders1, colors, 
-// 					styles, legendEntriesSigBkg, weights1, setLinY, drawSame, 
-// 					sigBkg);
-
   //compare data to MC in control region
   string dataVsMCOutputFile19p7InvFb(analysisFilePath + "results/dataVsMC_DrellYanAnalysis" + 
 				     tag19p7InvFb + outputVTag + fileExt);
   vector<string> dataVsMCInputFiles;
   dataVsMCInputFiles.push_back(dataHaddOutputFile);
+  dataVsMCInputFiles.push_back(analysisFilePath + 
+			       "WJetsToLNu/analysis/DrellYanAnalysis_WJetsToLNu" + 
+			       WJetsToLNuVTag + fileExt);
+  dataVsMCInputFiles.push_back(analysisFilePath + "TTJets/analysis/DrellYanAnalysis_TTJets" + 
+			       TTJetsVTag + fileExt);
   dataVsMCInputFiles.push_back(DYJetsToLLHaddOutputFile);
   drawMultipleEfficiencyGraphsOn1Canvas(dataVsMCOutputFile19p7InvFb, dataVsMCInputFiles, 
 					canvasNames1D, graphNames1D, legendHeaders19p7InvFb, 
