@@ -327,6 +327,9 @@ private:
   //histogram of the number of additional jets with pT > 40 GeV in the event
   TH1F* nAddlJetsPTGeq40_;
 
+  //histogram of hadronic tau decay mode
+  TH1F* tauHadDecayMode_;
+
   //histogram of cleaned jet pT vs. cleaned tau pT
   TH2F* cleanedJetPTVsCleanedTauPT_;
 
@@ -1154,6 +1157,30 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	- not overlapping W muon and mu+had*/
       nAddlJetsPTGeq40_->Fill(addlJetsHBHEPTGeq40.size(), PUWeight);
 
+      //plot hadronic tau decay mode
+      int mode = -1;
+      switch ((*iTau)->decayMode()) {
+      case reco::PFTau::kOneProng0PiZero:
+	mode = 0;
+	break;
+      case reco::PFTau::kOneProng1PiZero:
+	mode = 1;
+	break;
+      case reco::PFTau::kOneProng2PiZero:
+	mode = 2;
+	break;
+      case reco::PFTau::kThreeProng0PiZero:
+	mode = 3;
+	break;
+      case reco::PFTau::kNull:
+	mode = -1;
+	break;
+      default:
+	mode = 4;
+	break;
+      }
+      tauHadDecayMode_->Fill(mode, PUWeight);
+
       //plot cleaned jet pT vs. cleaned tau pT
       cleanedJetPTVsCleanedTauPT_->Fill((*iTau)->pt(), tauJetRef->pt(), PUWeight);
 
@@ -1423,6 +1450,7 @@ void TauAnalyzer::beginJob()
   nAddlJetsPTGeq0_ = new TH1F("nAddlJetsPTGeq0", ";N_{j}(p_{T} > 0 GeV);", 76, -0.5, 75.5);
   nAddlJetsPTGeq20_ = new TH1F("nAddlJetsPTGeq20", ";N_{j}(p_{T} > 20 GeV);", 16, -0.5, 15.5);
   nAddlJetsPTGeq40_ = new TH1F("nAddlJetsPTGeq40", ";N_{j}(p_{T} > 40 GeV);", 16, -0.5, 15.5);
+  tauHadDecayMode_ = new TH1F("tauHadDecayMode", ";Decay mode;", 5, -0.5, 4.5);
   cleanedJetPTVsCleanedTauPT_ = 
     new TH2F("cleanedJetPTVsCleanedTauPT", ";#tau p_{T} (GeV);Jet p_{T} (GeV)", 
 	     50, 0.0, 100.0, 50, 0.0, 100.0);
@@ -1541,6 +1569,11 @@ void TauAnalyzer::beginJob()
   PDGIDMuSrc_->GetXaxis()->SetBinLabel(2, "Other");
   muHadUncleanedJetPTRank_->GetXaxis()->SetBinLabel(1, "1 or 2");
   muHadUncleanedJetPTRank_->GetXaxis()->SetBinLabel(2, ">3");
+  tauHadDecayMode_->GetXaxis()->SetBinLabel(1, "1-prong");
+  tauHadDecayMode_->GetXaxis()->SetBinLabel(2, "1-prong + 1 #pi^{0}");
+  tauHadDecayMode_->GetXaxis()->SetBinLabel(3, "1-prong + 2 #pi^{0}");
+  tauHadDecayMode_->GetXaxis()->SetBinLabel(4, "3-prong");
+  tauHadDecayMode_->GetXaxis()->SetBinLabel(5, "Other");
 
   //set sumw2
   MET_->Sumw2();
@@ -1581,6 +1614,7 @@ void TauAnalyzer::beginJob()
   nAddlJetsPTGeq0_->Sumw2();
   nAddlJetsPTGeq20_->Sumw2();
   nAddlJetsPTGeq40_->Sumw2();
+  tauHadDecayMode_->Sumw2();
   cleanedJetPTVsCleanedTauPT_->Sumw2();
   uncleanedJetPTVsCleanedTauPT_->Sumw2();
   muHadMassVsDRSoftMuTau_->Sumw2();
@@ -1662,6 +1696,7 @@ void TauAnalyzer::endJob()
   TCanvas nAddlJetsPTGeq0Canvas("nAddlJetsPTGeq0Canvas", "", 600, 600);
   TCanvas nAddlJetsPTGeq20Canvas("nAddlJetsPTGeq20Canvas", "", 600, 600);
   TCanvas nAddlJetsPTGeq40Canvas("nAddlJetsPTGeq40Canvas", "", 600, 600);
+  TCanvas tauHadDecayModeCanvas("tauHadDecayModeCanvas", "", 600, 600);
   TCanvas cleanedJetPTVsCleanedTauPTCanvas("cleanedJetPTVsCleanedTauPTCanvas", "", 600, 600);
   TCanvas uncleanedJetPTVsCleanedTauPTCanvas("uncleanedJetPTVsCleanedTauPTCanvas", "", 600, 600);
   TCanvas muHadMassVsDRSoftMuTauCanvas("muHadMassVsDRSoftMuTauCanvas", "", 600, 600);
@@ -1753,6 +1788,7 @@ void TauAnalyzer::endJob()
   Common::draw1DHistograms(nAddlJetsPTGeq0Canvas, nAddlJetsPTGeq0_);
   Common::draw1DHistograms(nAddlJetsPTGeq20Canvas, nAddlJetsPTGeq20_);
   Common::draw1DHistograms(nAddlJetsPTGeq40Canvas, nAddlJetsPTGeq40_);
+  Common::draw1DHistograms(tauHadDecayModeCanvas, tauHadDecayMode_);
 
   //format and draw 2D plots
   Common::draw2DHistograms(cleanedJetPTVsCleanedTauPTCanvas, cleanedJetPTVsCleanedTauPT_);
@@ -1831,6 +1867,7 @@ void TauAnalyzer::endJob()
   nAddlJetsPTGeq0Canvas.Write();
   nAddlJetsPTGeq20Canvas.Write();
   nAddlJetsPTGeq40Canvas.Write();
+  tauHadDecayModeCanvas.Write();
   cleanedJetPTVsCleanedTauPTCanvas.Write();
   uncleanedJetPTVsCleanedTauPTCanvas.Write();
   muHadMassVsDRSoftMuTauCanvas.Write();
@@ -2055,6 +2092,8 @@ void TauAnalyzer::reset(const bool doDelete)
   nAddlJetsPTGeq20_ = NULL;
   if (doDelete && (nAddlJetsPTGeq40_ != NULL)) delete nAddlJetsPTGeq40_;
   nAddlJetsPTGeq40_ = NULL;
+  if (doDelete && (tauHadDecayMode_ != NULL)) delete tauHadDecayMode_;
+  tauHadDecayMode_ = NULL;
   if (doDelete && (cleanedJetPTVsCleanedTauPT_ != NULL)) delete cleanedJetPTVsCleanedTauPT_;
   cleanedJetPTVsCleanedTauPT_ = NULL;
   if (doDelete && (uncleanedJetPTVsCleanedTauPT_ != NULL)) delete uncleanedJetPTVsCleanedTauPT_;

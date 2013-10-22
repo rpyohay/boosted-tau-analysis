@@ -47,6 +47,7 @@
   canvasNames1D.push_back("nAddlJetsPTGeq0Canvas");
   canvasNames1D.push_back("nAddlJetsPTGeq20Canvas");
   canvasNames1D.push_back("nAddlJetsPTGeq40Canvas");
+  canvasNames1D.push_back("tauHadDecayModeCanvas");
   canvasNames1D.push_back("jet_pt_etacutCanvas");
   canvasNames1D.push_back("jet_etaCanvas");
   canvasNames1D.push_back("jet_phiCanvas");
@@ -78,6 +79,7 @@
   canvasNames2D.push_back("muHadMassVsSecondJetMassCanvas");
   canvasNames2D.push_back("muHadPTOverMVsSecondJetPTOverMCanvas");
   canvasNames2D.push_back("muHadMassVsSecondJetPTOverMCanvas");
+  canvasNames2D.push_back("tauMuTauHadJetWMuHTVsMETCanvas");
   vector<string> graphNames1D;
   graphNames1D.push_back("hadTauAssociatedMuMultiplicity");
   graphNames1D.push_back("muHadMass");
@@ -113,6 +115,7 @@
   graphNames1D.push_back("nAddlJetsPTGeq0");
   graphNames1D.push_back("nAddlJetsPTGeq20");
   graphNames1D.push_back("nAddlJetsPTGeq40");
+  graphNames1D.push_back("tauHadDecayMode");
   graphNames1D.push_back("jet_pt_etacut");
   graphNames1D.push_back("jet_eta");
   graphNames1D.push_back("jet_phi");
@@ -144,6 +147,7 @@
   graphNames2D.push_back("muHadMassVsSecondJetMass");
   graphNames2D.push_back("muHadPTOverMVsSecondJetPTOverM");
   graphNames2D.push_back("muHadMassVsSecondJetPTOverM");
+  graphNames2D.push_back("tauMuTauHadJetWMuHTVsMET");
 
   //set up plot style options
   vector<string> legendHeaders20InvFb(canvasNames1D.size(), "Normalized to 20 fb^{-1}");
@@ -370,7 +374,7 @@
   WNJetsToLNuRelXSecWeights.push_back(/*0.3198134203*/0.0314134490360502); /*W + 4 jets weighted 
 									     to 20 fb^-1*/
   vector<float> DYJetsToLLRelXSecWeights;
-  DYJetsToLLRelXSecWeights.push_back(/*5.841109917*/1.18489425542698); /*(10 < m < 50) GeV 
+  DYJetsToLLRelXSecWeights.push_back(/*5.841109917*//*1.18489425542698*/9.24494976069056); /*(10 < m < 50) GeV 
 									 weighted to 20 fb^-1*/
   DYJetsToLLRelXSecWeights.push_back(/*1.936998118*/2.30056938223844); /*m > 50 GeV 
 									 weighted to 20 fb^-1*/
@@ -388,16 +392,16 @@
   const string tag1("_normalizedTo1");
 
   //version tags
-  const string outputVTag("_v48");
-  const string dataVTag("_v48");
-  const string sigVTag("_v48");
-  const string WNJetsToLNuVTag("_v48");
-  const string TTJetsVTag("_v48");
-  const string TVTag("_v48");
-  const string DYJetsToLLVTag("_v48");
-  const string WZVTag("_v48");
-  const string ZZVTag("_v48");
-  const string WWVTag("_v48");
+  const string outputVTag("_v57");
+  const string dataVTag("_v57");
+  const string sigVTag("_v57");
+  const string WNJetsToLNuVTag("_v57");
+  const string TTJetsVTag("_v57");
+  const string TVTag("_v57");
+  const string DYJetsToLLVTag("_v57");
+  const string WZVTag("_v57");
+  const string ZZVTag("_v57");
+  const string WWVTag("_v57");
 
   //hadd data samples from different eras
 //   string dataIsoPrefix(analysisFilePath + "data/analysis/muHadIsoAnalysis_SingleMu");
@@ -635,10 +639,10 @@
 					canvasNames1D, graphNames1D, legendHeaders20InvFb, 
 					colors, styles, legendEntriesSigBkg, weightsSigBkg, 
 					setLogY, drawStack, sigBkg);
-//   drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgOutputFile1, sigVsBkgInputFiles, 
-// 					canvasNames1D, graphNames1D, legendHeaders1, colors, 
-// 					styles, legendEntriesSigBkg, weights1, setLinY, drawSame, 
-// 					sigBkg);
+  drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgOutputFile1, sigVsBkgInputFiles, 
+					canvasNames1D, graphNames1D, legendHeaders1, colors, 
+					styles, legendEntriesSigBkg, weights1, setLinY, drawSame, 
+					sigBkg);
 
   //compare data to MC in control region
   string dataVsMCOutputFile2p5InvFb(analysisFilePath + "results/dataVsMC_muHadNonIsoAnalysis" + 
