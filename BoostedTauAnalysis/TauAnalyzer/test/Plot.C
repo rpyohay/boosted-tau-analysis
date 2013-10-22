@@ -778,7 +778,7 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
       outStream.cd();
       outputCanvases[canvasIndex]->cd(dataMC ? 1 : 0);
       TH1F* pHistWithMaxMaxBin = histWithLargestBinContent(hists[canvasIndex]);
-      if (pHistWithMaxMaxBin != NULL) pHistWithMaxMaxBin->Draw();
+      if (pHistWithMaxMaxBin != NULL) pHistWithMaxMaxBin->Draw("HIST");
     }
   }
   for (vector<string>::const_iterator iCanvasName = canvasNames.begin(); 
@@ -790,7 +790,7 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
       for (vector<string>::const_iterator iInputFile = inputFiles.begin(); 
 	   iInputFile != inputFiles.end(); ++iInputFile) {
 	const unsigned int fileIndex = iInputFile - inputFiles.begin();
-	if (hists[canvasIndex][fileIndex] != NULL) hists[canvasIndex][fileIndex]->Draw("SAME");
+	if (hists[canvasIndex][fileIndex] != NULL) hists[canvasIndex][fileIndex]->Draw("HISTSAME");
       }
     }
     else {
@@ -813,8 +813,10 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 	  for (int i = 0; i < exponent; ++i) { axisMin/=10; }
 	}
 	else for (int i = 0; i < exponent; ++i) { axisMin*=10; }
-	stacks[canvasIndex]->SetMinimum(/*axisMin == 0.0 ? */0.1/* : axisMin*/);
-	stacks[canvasIndex]->SetMaximum(10000.0);
+// 	stacks[canvasIndex]->SetMinimum(/*axisMin == 0.0 ? */0.1/* : axisMin*/);
+// 	stacks[canvasIndex]->SetMaximum(10000.0);
+	stacks[canvasIndex]->SetMinimum(1.0);
+	stacks[canvasIndex]->SetMaximum(10000000.0);
       }
       stacks[canvasIndex]->Draw();
       TList* stackedHists = stacks[canvasIndex]->GetHists();
