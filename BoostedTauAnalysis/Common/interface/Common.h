@@ -228,6 +228,9 @@ class Common {
 				    const edm::Handle<reco::GenParticleCollection>&, 
 				    const unsigned int);
 
+  //determine if a particle with a given PDG ID is an ancestor of the given particle
+  static bool hasAncestor(const reco::GenParticleRef&, const std::vector<int>&);
+
  private:
 
   static bool compareCandidatePT(reco::Candidate*, reco::Candidate*);

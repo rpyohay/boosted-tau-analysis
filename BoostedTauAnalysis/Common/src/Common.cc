@@ -536,3 +536,17 @@ Common::getTightIsolatedRecoMuons(const edm::Handle<reco::MuonRefVector>& pMuons
   }
   return tightMuons;
 }
+
+bool Common::hasAncestor(const reco::GenParticleRef& genParticle, const std::vector<int>& momPDGIDs)
+{
+  bool hasMother = genParticle->numberOfMothers() > 0;
+  bool foundMother = false;
+  std::vector<int>::const_iterator iMomPDGID = momPDGIDs.begin();
+  while ((iMomPDGID != momPDGIDs.end()) && !foundMother) {
+    foundMother = hasMother && (fabs(genParticle->mother()->pdgId()) == fabs(*iMomPDGID));
+    ++iMomPDGID;
+  }
+  bool retVal = (foundMother || (genParticle->numberOfMothers() < 1)) ? 
+    (hasMother && foundMother) : hasAncestor(genParticle->motherRef(), momPDGIDs);
+  return retVal;
+}
