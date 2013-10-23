@@ -733,14 +733,6 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 // 	  cout << "Integral: " << pHist->Integral(0, -1) << endl;
 // // 	  cout << "Weight: " << weight << endl;
 // 	}
-// 	if (string(pHist->GetName()) == "WMuMT") {
-// 	  cout << *iInputFile << endl;
-// 	  cout << "Integral: " << pHist->Integral(0, -1) << endl;
-// 	  cout << "Integral(MT > 80 GeV): " << pHist->Integral(21, -1) << endl;
-// 	  cout << "Integral(MT > 100 GeV): " << pHist->Integral(26, -1) << endl;
-// 	  cout << "Integral(MT > 120 GeV): " << pHist->Integral(31, -1) << endl;
-// 	  cout << "Integral(MT > 140 GeV): " << pHist->Integral(36, -1) << endl;
-// 	}
 // 	if (string(pHist->GetName()) == "jet_ptmj_etacut") {
 // 	  cout << "Integral(second jet pT/m > 13): " << pHist->Integral(14, -1) << endl;
 // 	}
