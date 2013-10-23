@@ -48,6 +48,8 @@
   canvasNames1D.push_back("nAddlJetsPTGeq20Canvas");
   canvasNames1D.push_back("nAddlJetsPTGeq40Canvas");
   canvasNames1D.push_back("tauHadDecayModeCanvas");
+  canvasNames1D.push_back("dRSoftMuNearestGenZMuCanvas");
+  canvasNames1D.push_back("dRSoftMuNearestGenZMuFSRCanvas");
   canvasNames1D.push_back("jet_pt_etacutCanvas");
   canvasNames1D.push_back("jet_etaCanvas");
   canvasNames1D.push_back("jet_phiCanvas");
@@ -80,6 +82,7 @@
   canvasNames2D.push_back("muHadPTOverMVsSecondJetPTOverMCanvas");
   canvasNames2D.push_back("muHadMassVsSecondJetPTOverMCanvas");
   canvasNames2D.push_back("tauMuTauHadJetWMuHTVsMETCanvas");
+  canvasNames2D.push_back("mWMuTauMuVsMWMuTauMuTauHadCanvas");
   vector<string> graphNames1D;
   graphNames1D.push_back("hadTauAssociatedMuMultiplicity");
   graphNames1D.push_back("muHadMass");
@@ -116,6 +119,8 @@
   graphNames1D.push_back("nAddlJetsPTGeq20");
   graphNames1D.push_back("nAddlJetsPTGeq40");
   graphNames1D.push_back("tauHadDecayMode");
+  graphNames1D.push_back("dRSoftMuNearestGenZMu");
+  graphNames1D.push_back("dRSoftMuNearestGenZMuFSR");
   graphNames1D.push_back("jet_pt_etacut");
   graphNames1D.push_back("jet_eta");
   graphNames1D.push_back("jet_phi");
@@ -148,6 +153,7 @@
   graphNames2D.push_back("muHadPTOverMVsSecondJetPTOverM");
   graphNames2D.push_back("muHadMassVsSecondJetPTOverM");
   graphNames2D.push_back("tauMuTauHadJetWMuHTVsMET");
+  graphNames2D.push_back("mWMuTauMuVsMWMuTauMuTauHad");
 
   //set up plot style options
   vector<string> legendHeaders20InvFb(canvasNames1D.size(), "Normalized to 20 fb^{-1}");
@@ -392,16 +398,16 @@
   const string tag1("_normalizedTo1");
 
   //version tags
-  const string outputVTag("_v57");
-  const string dataVTag("_v57");
-  const string sigVTag("_v57");
-  const string WNJetsToLNuVTag("_v57");
-  const string TTJetsVTag("_v57");
-  const string TVTag("_v57");
-  const string DYJetsToLLVTag("_v57");
-  const string WZVTag("_v57");
-  const string ZZVTag("_v57");
-  const string WWVTag("_v57");
+  const string outputVTag("_v60");
+  const string dataVTag("_v60");
+  const string sigVTag("_v60");
+  const string WNJetsToLNuVTag("_v60");
+  const string TTJetsVTag("_v60");
+  const string TVTag("_v60");
+  const string DYJetsToLLVTag("_v60");
+  const string WZVTag("_v60");
+  const string ZZVTag("_v60");
+  const string WWVTag("_v60");
 
   //hadd data samples from different eras
 //   string dataIsoPrefix(analysisFilePath + "data/analysis/muHadIsoAnalysis_SingleMu");
