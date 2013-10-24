@@ -696,12 +696,6 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     PUWeight = PUReweight_.weight(trueNInt);
   }
 
-  //plot the number of good vertices
-  nGoodVtx_->Fill(Common::numGoodVertices(pVtx)/*trueNInt*/, PUWeight);
-
-  //plot MET distribution
-  fillETHistogram(pMET, MET_, PUWeight);  
-
   //find the highest pT W muon
   std::vector<reco::MuonRef> WMuonRefs;
   for (reco::MuonRefVector::const_iterator iMuon = pMuons->begin(); iMuon != pMuons->end(); 
@@ -710,9 +704,6 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
   //plot dPhi(highest pT W muon, MET)
   plotDPhiMuMet(WMuonRefs[WMuonRefs.size() - 1], pMET, dPhiWMuMET_, PUWeight);
-
-  //plot the transverse mass for the highest pT W muon
-  plotMT(WMuonRefs[WMuonRefs.size() - 1], pMET, WMuMT_, PUWeight);
 
   //fill STL containers of pointers to the gen particles
   std::vector<reco::GenParticle*> genParticlePtrs;
@@ -883,10 +874,31 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     }
     Common::sortByPT(oldJetRefs);
 
+    /*calculate invariant mass of W muon, tau muon, and hadronic tau (sensitive to Z-->mumugamma 
+      FSR)*/
+    const double mWMuTauMuTauHad = (WMuonRefs[WMuonRefs.size() - 1]->p4() + 
+				    removedMuonRefs[removedMuonRefs.size() - 1]->p4() + 
+				    (*iTau)->p4()).M();
+
+    //calculate invariant mass of W muon and tau muon (sensitive to Z-->mumu)
+    const double mWMuTauMu = (WMuonRefs[WMuonRefs.size() - 1]->p4() + 
+			      removedMuonRefs[removedMuonRefs.size() - 1]->p4()).M();
+
     //impose pT and decay mode cut on tau
     if (((*iTau)->pt() > tauPTMin_) && // (pMET->refAt(0)->et() > 70.0/*GeV*/) && 
 	((removedMuonRefs[removedMuonRefs.size() - 1]->charge() + (*iTau)->charge()) == 0) && 
+	((mWMuTauMuTauHad < 80.0/*GeV*/) || (mWMuTauMuTauHad >= 100.0/*GeV*/)) && 
+	((mWMuTauMu < 80.0/*GeV*/) || (mWMuTauMu >= 100.0/*GeV*/)) && 
 	((tauDecayMode_ == reco::PFTau::kNull) || ((*iTau)->decayMode() == tauDecayMode_))) {
+
+      //plot the number of good vertices
+      nGoodVtx_->Fill(Common::numGoodVertices(pVtx)/*trueNInt*/, PUWeight);
+
+      //plot MET distribution
+      fillETHistogram(pMET, MET_, PUWeight);
+
+      //plot the transverse mass for the highest pT W muon
+      plotMT(WMuonRefs[WMuonRefs.size() - 1], pMET, WMuMT_, PUWeight);
 
       //plot multiplicity of muons associated to this tau
       hadTauAssociatedMuMultiplicity_->Fill(removedMuons.size(), PUWeight);
@@ -1083,8 +1095,6 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       muHadPT_->Fill(muHadPT, PUWeight);
 
       //plot invariant mass of W muon and tau muon
-      const double mWMuTauMu = (WMuonRefs[WMuonRefs.size() - 1]->p4() + 
-				removedMuonRefs[removedMuonRefs.size() - 1]->p4()).M();
       mWMuTauMu_->Fill(mWMuTauMu, PUWeight);
 
       /*plot the PDG ID of the nearest status 1 particle to the soft muon and the PDG ID of the 
@@ -1376,14 +1386,10 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       tauMuTauHadJetWMuHTVsMET_->Fill(pMET->refAt(0)->et(), HT(tauMuTauHadJet), PUWeight);
 
       //plot dimuon invariant mass vs. mumutau invariant mass
-      mWMuTauMuVsMWMuTauMuTauHad_->Fill((WMuonRefs[WMuonRefs.size() - 1]->p4() + 
-					 removedMuonRefs[removedMuonRefs.size() - 1]->p4() + 
-					 (*iTau)->p4()).M(), mWMuTauMu, PUWeight);
+      mWMuTauMuVsMWMuTauMuTauHad_->Fill(mWMuTauMuTauHad, mWMuTauMu, PUWeight);
 
       //plot mu+had mass vs. mumutau invariant mass
-      muHadMassVsMWMuTauMuTauHad_->Fill((WMuonRefs[WMuonRefs.size() - 1]->p4() + 
-					 removedMuonRefs[removedMuonRefs.size() - 1]->p4() + 
-					 (*iTau)->p4()).M(), muHadMass, PUWeight);
+      muHadMassVsMWMuTauMuTauHad_->Fill(mWMuTauMuTauHad, muHadMass, PUWeight);
 
       //increment mu+had multiplicity counter
       ++nMuHad;
