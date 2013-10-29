@@ -236,10 +236,10 @@ ErrorCode plotEfficiency(TFile& in, TFile& out, const map<string, pair<string, s
     numeratorHist->GetYaxis()->SetRangeUser(0.0, 1.1);
     denominatorHist->GetYaxis()->SetRangeUser(0.0, 1.1);
 
-    //rebin
-    cerr << "Rebinning\n";
-    numeratorHist->Rebin(2);
-    denominatorHist->Rebin(2);
+//     //rebin
+//     cerr << "Rebinning\n";
+//     numeratorHist->Rebin(2);
+//     denominatorHist->Rebin(2);
 
     //make efficiency histogram
     TGraphAsymmErrors effGraph(numeratorHist, denominatorHist);
@@ -710,16 +710,16 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
       }
       else {
 	pHist = (TH1F*)pCanvas->GetPrimitive(graphNames[canvasIndex].c_str());
-// 	if (string(pHist->GetName()) == "tauHadIso") {
-// 	  cout << *iInputFile << endl;
-// 	  cout << "Integral: " << pHist->Integral(0, -1) << endl;
-// 	}
 	float weight = weights[fileIndex] == 0.0 ? 1.0/pHist->Integral(0, -1) : weights[fileIndex];
 	setHistogramOptions(pHist, colors[fileIndex], 0.7, styles[fileIndex], 
 			    weight, 
 			    string(pHist->GetName()) == "muHadPTOverMuHadMass" ? 
 			    "p_{T}/m" : pHist->GetXaxis()->GetTitle(), 
 			    pHist->GetYaxis()->GetTitle());
+// 	if (string(pHist->GetName()) == "muHadMass") {
+// 	  cout << *iInputFile << endl;
+// 	  cout << "Integral: " << pHist->Integral(5, -1) << endl;
+// 	}
 	string histName(pHist->GetName());
 	if (histName == "jet_pt_etacut") pHist->GetXaxis()->SetTitle("p_{T} (GeV)");
 	if (histName == "jet_eta") pHist->GetXaxis()->SetTitle("#eta");
@@ -728,11 +728,6 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 	if (histName == "jet_ptmj_etacut") {
 	  pHist->GetXaxis()->SetTitle("#frac{p_{T}}{m}");
 	}
-// 	if (string(pHist->GetName()) == "tauHadIso") {
-// 	  cout << *iInputFile << endl;
-// 	  cout << "Integral: " << pHist->Integral(0, -1) << endl;
-// // 	  cout << "Weight: " << weight << endl;
-// 	}
 // 	if (string(pHist->GetName()) == "jet_ptmj_etacut") {
 // 	  cout << "Integral(second jet pT/m > 13): " << pHist->Integral(14, -1) << endl;
 // 	}
@@ -1046,6 +1041,17 @@ void addClosurePlot(TFile& sigVsBkgIso20InvFbStream, const string& var, const st
 		       histBkgNonIso->Integral(normRegionLowerBin, normRegionUpperBin));
   setHistogramOptions(histBkgNonIso, kRed, 0.7, 20, 1.0, unit.c_str(), "");
   histBkgNonIso->GetYaxis()->SetRangeUser(0.1, 10000.0);
+
+  //calculate weights
+  TH1F* histBkgIsoNorm1 = (TH1F*)histBkgIso->Clone();
+  histBkgIsoNorm1->Scale(1.0/histBkgIsoNorm1->Integral(0, -1));
+  TH1F* histBkgNonIsoNorm1 = (TH1F*)histBkgNonIso->Clone();
+  histBkgNonIsoNorm1->Scale(1.0/histBkgNonIsoNorm1->Integral(0, -1));
+  histBkgIsoNorm1->Divide(histBkgNonIsoNorm1);
+  for (Int_t iBin = 1; iBin <= histBkgIsoNorm1->GetNbinsX(); ++iBin) {
+    cout << iBin << " " << histBkgIsoNorm1->GetBinContent(iBin) << endl;
+  }
+  cout << "------------\n";
 
   //write to file
   outStream.cd();
