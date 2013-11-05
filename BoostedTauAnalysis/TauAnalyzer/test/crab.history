@@ -1,0 +1,24 @@
+131031_162443: /afs/cern.ch/cms/ccs/wm/scripts/Crab/CRAB_2_9_1/python/crab.py -create
+131031_162601: /afs/cern.ch/cms/ccs/wm/scripts/Crab/CRAB_2_9_1/python/crab.py -create
+131031_162631: /afs/cern.ch/cms/ccs/wm/scripts/Crab/CRAB_2_9_1/python/crab.py -create
+131031_162958: /afs/cern.ch/cms/ccs/wm/scripts/Crab/CRAB_2_9_1/python/crab.py -create
+131031_163210: /afs/cern.ch/cms/ccs/wm/scripts/Crab/CRAB_2_9_1/python/crab.py -create
+131031_163613: /afs/cern.ch/cms/ccs/wm/scripts/Crab/CRAB_2_9_1/python/crab.py -submit 1-16
+131031_164237: /afs/cern.ch/cms/ccs/wm/scripts/Crab/CRAB_2_9_1/python/crab.py -status
+131031_170127: /afs/cern.ch/cms/ccs/wm/scripts/Crab/CRAB_2_9_1/python/crab.py -status
+131031_170806: /afs/cern.ch/cms/ccs/wm/scripts/Crab/CRAB_2_9_1/python/crab.py -resubmit 9
+131031_172429: /afs/cern.ch/cms/ccs/wm/scripts/Crab/CRAB_2_9_1/python/crab.py -status
+131031_180506: /afs/cern.ch/cms/ccs/wm/scripts/Crab/CRAB_2_9_1/python/crab.py -status
+131031_182313: /afs/cern.ch/cms/ccs/wm/scripts/Crab/CRAB_2_9_1/python/crab.py -status
+131031_215702: /afs/cern.ch/cms/ccs/wm/scripts/Crab/CRAB_2_9_1/python/crab.py -status
+131031_215815: /afs/cern.ch/cms/ccs/wm/scripts/Crab/CRAB_2_9_1/python/crab.py -resubmit https://twiki.cern.ch/twiki/bin/view/CMS/JobExitCodes
+131031_215841: /afs/cern.ch/cms/ccs/wm/scripts/Crab/CRAB_2_9_1/python/crab.py -resubmit 4,6,10,12-13,15
+131031_222635: /afs/cern.ch/cms/ccs/wm/scripts/Crab/CRAB_2_9_1/python/crab.py -getoutput 4,6,10,12-13,15
+131031_222642: /afs/cern.ch/cms/ccs/wm/scripts/Crab/CRAB_2_9_1/python/crab.py -resubmit 4,6,10,12-13,15
+131031_223946: /afs/cern.ch/cms/ccs/wm/scripts/Crab/CRAB_2_9_1/python/crab.py -status
+131101_090940: /afs/cern.ch/cms/ccs/wm/scripts/Crab/CRAB_2_9_1/python/crab.py -status
+131101_091556: /afs/cern.ch/cms/ccs/wm/scripts/Crab/CRAB_2_9_1/python/crab.py -getoutput
+131101_091610: /afs/cern.ch/cms/ccs/wm/scripts/Crab/CRAB_2_9_1/python/crab.py -resubmit 1-16
+131101_100028: /afs/cern.ch/cms/ccs/wm/scripts/Crab/CRAB_2_9_1/python/crab.py -status
+131101_100041: /afs/cern.ch/cms/ccs/wm/scripts/Crab/CRAB_2_9_1/python/crab.py -kill
+131101_100048: /afs/cern.ch/cms/ccs/wm/scripts/Crab/CRAB_2_9_1/python/crab.py -kill all
