@@ -38,7 +38,7 @@ process.DrellYanAnalyzer = cms.EDAnalyzer(
     PUScenario = cms.string("PUSCENARIO"),
     MC = cms.bool(MCFLAG),
     minMDimuon = cms.double(0.0),
-    minPTMuon = cms.double(30.0)
+    minPTMuon = cms.double(0.0)
     )
 
 #path
