@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd v51
+cd v67
 ./copyDYJetsToLLFromEOS.sh
 ./copyDataFromEOS.sh
 ./copyTTJetsFromEOS.sh
