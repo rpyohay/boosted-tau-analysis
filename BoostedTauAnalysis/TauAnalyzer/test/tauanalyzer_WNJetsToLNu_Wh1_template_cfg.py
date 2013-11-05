@@ -9,6 +9,7 @@ W_PDGID = 24
 TAU_PDGID = 15
 MU_PDGID = 13
 NUMU_PDGID = 14
+NUTAU_PDGID = 16
 D_PDGID = 1
 U_PDGID = 2
 S_PDGID = 3
@@ -115,9 +116,15 @@ process.genWMuNuSelector = cms.EDFilter(
     countSister = cms.bool(False),
     applyPTCuts = cms.bool(False),
     countKShort = cms.bool(True),
-    minNumGenObjectsToPassFilter = cms.uint32(1),
+    minNumGenObjectsToPassFilter = cms.uint32(0),
     makeAllCollections = cms.bool(False)
     )
+
+#produce a collection of muons from W-->tau(-->mu)nu
+process.genWTauNuSelector = process.genWMuNuSelector.clone()
+process.genWTauNuSelector.absMatchPDGIDs = cms.vuint32(TAU_PDGID)
+process.genWTauNuSelector.sisterAbsMatchPDGID = cms.uint32(NUTAU_PDGID)
+process.genWTauNuSelector.primaryTauDecayType = cms.uint32(TAU_MU)
 
 #require event to fire IsoMu24_eta2p1
 process.IsoMu24eta2p1Selector = process.hltHighLevel.clone()
@@ -189,6 +196,27 @@ process.genPartonSelector = cms.EDFilter(
 process.genMuSelector = cms.EDFilter('PdgIdCandViewSelector',
                                      src = cms.InputTag('genParticles'),
                                      pdgId = cms.vint32(-13, 13))
+
+#produce collection of gen muons from a1-->tau(-->mu)tau(-->had) decay
+process.genTauMuSelector = cms.EDFilter(
+    'GenObjectProducer',
+    genParticleTag = cms.InputTag('genParticles'),
+    absMatchPDGIDs = cms.vuint32(TAU_PDGID),
+    sisterAbsMatchPDGID = cms.uint32(TAU_PDGID),
+    genTauDecayIDPSet = commonGenTauDecayIDPSet,
+    primaryTauDecayType = cms.uint32(TAU_MU),
+    sisterTauDecayType = cms.uint32(TAU_HAD),
+    primaryTauPTRank = cms.int32(ANY_PT_RANK),
+    primaryTauHadronicDecayType = cms.int32(TAU_ALL_HAD),
+    sisterHadronicDecayType = cms.int32(TAU_ALL_HAD),
+    primaryTauAbsEtaMax = cms.double(-1.0),
+    primaryTauPTMin = cms.double(-1.0),
+    countSister = cms.bool(False),
+    applyPTCuts = cms.bool(False),
+    countKShort = cms.bool(True),
+    minNumGenObjectsToPassFilter = cms.uint32(0),
+    makeAllCollections = cms.bool(False)
+    )
 
 #clean the jets of soft muons, then rebuild the taus
 process.CleanJets.muonSrc = cms.InputTag('tauMuonSelector')
@@ -269,7 +297,9 @@ process.muHadIsoTauAnalyzer = cms.EDAnalyzer(
     newJetTag = cms.InputTag('CleanJets', 'ak5PFJetsNoMu', 'SKIM'),
     jetMuonMapTag = cms.InputTag('CleanJets', '', 'SKIM'),
     oldNewJetMapTag = cms.InputTag('CleanJets', '', 'SKIM'),
-    genParticleTag = cms.InputTag('genPartonSelector'),
+    genParticleTag = cms.InputTag('genWMuNuSelector'),
+    genTauMuTag = cms.InputTag('genTauMuSelector'),
+    genWTauMuTag = cms.InputTag('genWTauNuSelector'),
     tauHadIsoTag = cms.InputTag('hpsPFTauDiscriminationByRawCombinedIsolationDBSumPtCorr', '',
                                 'SKIM'),
     allMuonTag = cms.InputTag('muons'),
@@ -316,7 +346,9 @@ process.output = cms.OutputModule(
     )
 
 #sequences
-process.beginSequence = cms.Sequence(process.genPartonSelector*process.genMuSelector)
+process.beginSequence = cms.Sequence(process.genWMuNuSelector*process.genWTauNuSelector*
+                                     process.genPartonSelector*process.genMuSelector*
+                                     process.genTauMuSelector)
 process.isoTauAnalysisSequence = cms.Sequence(process.muHadIsoTauSelector*
                                               process.muHadIsoTauAnalyzer)
 process.signalIsoTauAnalysisSequence = cms.Sequence(process.genWMuNuSelector*
