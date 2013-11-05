@@ -1,0 +1,718 @@
+multicrab running on Thu Oct  3 17:23:01 2013
+  working directory   /afs/cern.ch/user/f/friccita/myOtherOther533Area/CMSSW_
+crab:  Version 2.9.1 running on Thu Oct  3 17:23:02 2013 CET (15:23:02 UTC)
+
+crab. Working options:
+	scheduler           remoteGlidein
+	job type            CMSSW
+	server              OFF
+	working directory   /afs/cern.ch/user/f/friccita/myOtherOther533Area/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test/QCD_Pt-470to600_MuEnrichedPt5_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1/
+
+crab:  Checking the status of all jobs: please wait
+crab:  contacting remote host submit-4.t2.ucsd.edu
+crab:  
+ID    END STATUS            ACTION       ExeExitCode JobExitCode E_HOST
+----- --- ----------------- ------------  ---------- ----------- ---------
+1     N   Done              Terminated    0          0           cream02.iihe.ac.be
+2     N   Done              Terminated    0          0           sbgce2.in2p3.fr
+3     N   Done              Terminated    0          0           sbgce2.in2p3.fr
+4     N   Done              Terminated    0          0           sbgce2.in2p3.fr
+5     N   Done              Terminated    0          0           sbgce2.in2p3.fr
+6     N   Running           SubSuccess                           sbgce2.in2p3.fr
+7     N   Done              Terminated    0          0           cream02.iihe.ac.be
+8     N   Done              Terminated    0          0           red-gw2.unl.edu
+9     N   Done              Terminated    0          0           cream02.iihe.ac.be
+10    N   Done              Terminated    0          0           cream02.iihe.ac.be
+--------------------------------------------------------------------------------
+11    N   Done              Terminated    0          0           cream02.iihe.ac.be
+12    N   Done              Terminated    0          0           cream02.iihe.ac.be
+13    N   Running           SubSuccess                           tusker-gw1.unl.edu
+14    N   Running           SubSuccess                           tusker-gw1.unl.edu
+15    N   Done              Terminated    0          0           tusker-gw1.unl.edu
+16    N   Done              Terminated    0          0           red-gw1.unl.edu
+17    N   Done              Terminated    0          0           red-gw1.unl.edu
+
+crab:  ExitCodes Summary
+ >>>>>>>>> 14 Jobs with Wrapper Exit Code : 0 
+	 List of jobs: 1-5,7-12,15-17 
+	See https://twiki.cern.ch/twiki/bin/view/CMS/JobExitCodes for Exit Code meaning
+
+crab:   17 Total Jobs 
+ >>>>>>>>> 3 Jobs Running 
+	List of jobs Running: 6,13-14 
+ >>>>>>>>> 14 Jobs Done
+	Jobs terminated: retrieve them with: crab -getoutput <List of jobs>
+	List of jobs: 1-5,7-12,15-17 
+
+crab:  You can also follow the status of this task on :
+	CMS Dashboard: http://dashb-cms-job-task.cern.ch/taskmon.html#task=friccita_Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1_9f87se
+	Your task name is: friccita_Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1_9f87se 
+
+Log file is /afs/cern.ch/user/f/friccita/myOtherOther533Area/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test/QCD_Pt-470to600_MuEnrichedPt5_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1/log/crab.log
+crab:  Version 2.9.1 running on Thu Oct  3 17:23:08 2013 CET (15:23:08 UTC)
+
+crab. Working options:
+	scheduler           remoteGlidein
+	job type            CMSSW
+	server              OFF
+	working directory   /afs/cern.ch/user/f/friccita/myOtherOther533Area/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test/QCD_Pt-600to800_MuEnrichedPt5_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1/
+
+crab:  Checking the status of all jobs: please wait
+crab:  contacting remote host vocms20.cern.ch
+crab:  
+ID    END STATUS            ACTION       ExeExitCode JobExitCode E_HOST
+----- --- ----------------- ------------  ---------- ----------- ---------
+1     N   Done              Terminated    0          0           sbgce2.in2p3.fr
+2     N   Done              Terminated    0          0           sbgce2.in2p3.fr
+3     N   Running           SubSuccess                           sbgce2.in2p3.fr
+4     N   Done              Terminated    0          0           sbgce2.in2p3.fr
+5     N   Running           SubSuccess                           sbgce2.in2p3.fr
+6     N   Done              Terminated    0          0           cream02.iihe.ac.be
+7     N   Done              Terminated    0          0           cream02.iihe.ac.be
+8     N   Done              Terminated    0          0           red-gw1.unl.edu
+9     N   Done              Terminated    0          0           red-gw2.unl.edu
+10    N   Done              Terminated    0          0           red-gw1.unl.edu
+--------------------------------------------------------------------------------
+11    N   Done              Terminated    0          0           red-gw2.unl.edu
+12    N   Done              Terminated    0          0           red-gw2.unl.edu
+13    N   Done              Terminated    0          0           red-gw1.unl.edu
+14    N   Done              Terminated    0          0           red-gw2.unl.edu
+15    N   Done              Terminated    0          0           red-gw2.unl.edu
+16    N   Done              Terminated    0          0           cream02.iihe.ac.be
+17    N   Done              Terminated    0          0           red-gw2.unl.edu
+18    N   Done              Terminated    0          0           red.unl.edu
+19    N   Done              Terminated    0          0           red-gw2.unl.edu
+20    N   Done              Terminated    0          0           red-gw2.unl.edu
+
+crab:  ExitCodes Summary
+ >>>>>>>>> 18 Jobs with Wrapper Exit Code : 0 
+	 List of jobs: 1-2,4,6-20 
+	See https://twiki.cern.ch/twiki/bin/view/CMS/JobExitCodes for Exit Code meaning
+
+crab:   20 Total Jobs 
+ >>>>>>>>> 2 Jobs Running 
+	List of jobs Running: 3,5 
+ >>>>>>>>> 18 Jobs Done
+	Jobs terminated: retrieve them with: crab -getoutput <List of jobs>
+	List of jobs: 1-2,4,6-20 
+
+crab:  You can also follow the status of this task on :
+	CMS Dashboard: http://dashb-cms-job-task.cern.ch/taskmon.html#task=friccita_Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1_57xgj1
+	Your task name is: friccita_Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1_57xgj1 
+
+Log file is /afs/cern.ch/user/f/friccita/myOtherOther533Area/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test/QCD_Pt-600to800_MuEnrichedPt5_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1/log/crab.log
+crab:  Version 2.9.1 running on Thu Oct  3 17:23:12 2013 CET (15:23:12 UTC)
+
+crab. Working options:
+	scheduler           remoteGlidein
+	job type            CMSSW
+	server              OFF
+	working directory   /afs/cern.ch/user/f/friccita/myOtherOther533Area/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test/QCD_Pt-20to30_MuEnrichedPt5_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1/
+
+crab:  Checking the status of all jobs: please wait
+crab:  contacting remote host submit-4.t2.ucsd.edu
+crab:  
+ID    END STATUS            ACTION       ExeExitCode JobExitCode E_HOST
+----- --- ----------------- ------------  ---------- ----------- ---------
+1     N   Done              Terminated    0          0           sbgce2.in2p3.fr
+2     N   Running           SubSuccess                           grid-cr0.desy.de
+3     N   Done              Terminated    0          0           grid-cr0.desy.de
+4     N   Done              Terminated    0          0           grid-cr0.desy.de
+5     N   Done              Terminated    0          0           sbgce2.in2p3.fr
+6     N   Done              Terminated    0          0           grid-cr0.desy.de
+7     N   Done              Terminated    0          0           grid-cr2.desy.de
+8     N   Done              Terminated    0          0           sbgce2.in2p3.fr
+9     N   Done              Terminated    0          0           sbgce2.in2p3.fr
+10    N   Done              Terminated    0          0           grid-cr2.desy.de
+--------------------------------------------------------------------------------
+11    N   Done              Terminated    0          0           grid-cr0.desy.de
+12    N   Done              Terminated    0          0           grid-cr2.desy.de
+13    N   Done              Terminated    0          0           grid-cr3.desy.de
+14    N   Done              Terminated    0          0           sbgce2.in2p3.fr
+15    N   Done              Terminated    0          0           grid-cr3.desy.de
+16    N   Done              Terminated    0          0           grid-cr2.desy.de
+17    N   Running           SubSuccess                           grid-cr0.desy.de
+18    N   Done              Terminated    0          0           grid-cr3.desy.de
+19    N   Done              Terminated    0          0           grid-cr3.desy.de
+20    N   Done              Terminated    0          0           grid-cr2.desy.de
+--------------------------------------------------------------------------------
+21    N   Running           SubSuccess                           grid-cr0.desy.de
+22    N   Running           SubSuccess                           grid-cr0.desy.de
+23    N   Running           SubSuccess                           grid-cr3.desy.de
+24    N   Done              Terminated    0          0           red-gw1.unl.edu
+25    N   Done              Terminated    0          0           grid-cr3.desy.de
+26    N   Done              Terminated    0          0           grid-cr0.desy.de
+27    N   Running           SubSuccess                           grid-cr0.desy.de
+28    N   Done              Terminated    0          0           grid-cr2.desy.de
+29    N   Done              Terminated    0          0           grid-cr2.desy.de
+30    N   Running           SubSuccess                           cream02.iihe.ac.be
+--------------------------------------------------------------------------------
+31    N   Running           SubSuccess                           cream02.iihe.ac.be
+32    N   Running           SubSuccess                           cream02.iihe.ac.be
+33    N   Done              Terminated    0          0           red-gw1.unl.edu
+34    N   Done              Terminated    0          0           cream02.iihe.ac.be
+35    N   Done              Terminated    0          0           cream02.iihe.ac.be
+36    N   Done              Terminated    0          0           cream02.iihe.ac.be
+
+crab:  ExitCodes Summary
+ >>>>>>>>> 27 Jobs with Wrapper Exit Code : 0 
+	 List of jobs: 1,3-16,18-20,24-26,28-29,33-36 
+	See https://twiki.cern.ch/twiki/bin/view/CMS/JobExitCodes for Exit Code meaning
+
+crab:   36 Total Jobs 
+ >>>>>>>>> 9 Jobs Running 
+	List of jobs Running: 2,17,21-23,27,30-32 
+ >>>>>>>>> 27 Jobs Done
+	Jobs terminated: retrieve them with: crab -getoutput <List of jobs>
+	List of jobs: 1,3-16,18-20,24-26,28-29,33-36 
+
+crab:  You can also follow the status of this task on :
+	CMS Dashboard: http://dashb-cms-job-task.cern.ch/taskmon.html#task=friccita_Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1_q5r3n1
+	Your task name is: friccita_Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1_q5r3n1 
+
+Log file is /afs/cern.ch/user/f/friccita/myOtherOther533Area/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test/QCD_Pt-20to30_MuEnrichedPt5_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1/log/crab.log
+crab:  Version 2.9.1 running on Thu Oct  3 17:23:17 2013 CET (15:23:17 UTC)
+
+crab. Working options:
+	scheduler           remoteGlidein
+	job type            CMSSW
+	server              OFF
+	working directory   /afs/cern.ch/user/f/friccita/myOtherOther533Area/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test/QCD_Pt-1000_MuEnrichedPt5_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1/
+
+crab:  Checking the status of all jobs: please wait
+crab:  contacting remote host submit-4.t2.ucsd.edu
+crab:  
+ID    END STATUS            ACTION       ExeExitCode JobExitCode E_HOST
+----- --- ----------------- ------------  ---------- ----------- ---------
+1     N   Done              Terminated    0          0           cream02.iihe.ac.be
+2     N   Done              Terminated    0          0           cream02.iihe.ac.be
+3     N   Done              Terminated    0          0           cream02.iihe.ac.be
+4     N   Done              Terminated    0          0           cream02.iihe.ac.be
+5     N   Done              Terminated    0          0           red.unl.edu
+6     N   Done              Terminated    0          0           tusker-gw1.unl.edu
+7     N   Done              Terminated    0          0           red-gw2.unl.edu
+8     N   Done              Terminated    0          0           red.unl.edu
+9     N   Done              Terminated    0          0           red.unl.edu
+10    N   Running           SubSuccess                           tusker-gw1.unl.edu
+--------------------------------------------------------------------------------
+11    N   Done              Terminated    0          0           red.unl.edu
+12    N   Done              Terminated    0          0           red-gw1.unl.edu
+13    N   Done              Terminated    0          0           red-gw1.unl.edu
+14    N   Done              Terminated    0          0           red-gw1.unl.edu
+15    N   Done              Terminated    0          0           red-gw1.unl.edu
+16    N   Done              Terminated    0          0           red-gw1.unl.edu
+17    N   Done              Terminated    0          0           red-gw2.unl.edu
+18    N   Done              Terminated    0          0           tusker-gw1.unl.edu
+
+crab:  ExitCodes Summary
+ >>>>>>>>> 17 Jobs with Wrapper Exit Code : 0 
+	 List of jobs: 1-9,11-18 
+	See https://twiki.cern.ch/twiki/bin/view/CMS/JobExitCodes for Exit Code meaning
+
+crab:   18 Total Jobs 
+ >>>>>>>>> 1 Jobs Running 
+	List of jobs Running: 10 
+ >>>>>>>>> 17 Jobs Done
+	Jobs terminated: retrieve them with: crab -getoutput <List of jobs>
+	List of jobs: 1-9,11-18 
+
+crab:  You can also follow the status of this task on :
+	CMS Dashboard: http://dashb-cms-job-task.cern.ch/taskmon.html#task=friccita_Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1_w59a1c
+	Your task name is: friccita_Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1_w59a1c 
+
+Log file is /afs/cern.ch/user/f/friccita/myOtherOther533Area/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test/QCD_Pt-1000_MuEnrichedPt5_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1/log/crab.log
+crab:  Version 2.9.1 running on Thu Oct  3 17:23:22 2013 CET (15:23:22 UTC)
+
+crab. Working options:
+	scheduler           remoteGlidein
+	job type            CMSSW
+	server              OFF
+	working directory   /afs/cern.ch/user/f/friccita/myOtherOther533Area/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test/QCD_Pt-30to50_MuEnrichedPt5_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1/
+
+crab:  Checking the status of all jobs: please wait
+crab:  contacting remote host vocms20.cern.ch
+crab:  
+ID    END STATUS            ACTION       ExeExitCode JobExitCode E_HOST
+----- --- ----------------- ------------  ---------- ----------- ---------
+1     N   Done              Terminated    0          0           cream02.iihe.ac.be
+2     N   Running           SubSuccess                           grid-cr2.desy.de
+3     N   Done              Terminated    0          0           grid-cr3.desy.de
+4     N   Done              Terminated    0          0           grid-cr2.desy.de
+5     N   Done              Terminated    0          0           grid-cr3.desy.de
+6     N   Done              Terminated    0          0           grid-cr3.desy.de
+7     N   Done              Terminated    0          0           grid-cr3.desy.de
+8     N   Done              Terminated    0          0           grid-cr3.desy.de
+9     N   Done              Terminated    0          0           grid-cr0.desy.de
+10    N   Running           SubSuccess                           grid-cr0.desy.de
+--------------------------------------------------------------------------------
+11    N   Done              Terminated    0          0           red-gw2.unl.edu
+12    N   Done              Terminated    0          60307       red-gw2.unl.edu
+13    N   Done              Terminated    0          0           red-gw2.unl.edu
+14    N   Done              Terminated    0          60307       red-gw2.unl.edu
+15    N   Done              Terminated    0          0           cream02.iihe.ac.be
+16    N   Done              Terminated    0          0           grid-cr3.desy.de
+17    N   Running           SubSuccess                           grid-cr2.desy.de
+18    N   Done              Terminated    0          0           grid-cr0.desy.de
+19    N   Done              Terminated    0          0           grid-cr2.desy.de
+20    N   Running           SubSuccess                           grid-cr3.desy.de
+--------------------------------------------------------------------------------
+21    N   Done              Terminated    0          0           grid-cr0.desy.de
+22    N   Done              Terminated    0          0           grid-cr3.desy.de
+23    N   Done              Terminated    0          0           grid-cr2.desy.de
+24    N   Done              Terminated    0          0           cream02.iihe.ac.be
+25    N   Done              Terminated    0          0           cream02.iihe.ac.be
+26    N   Done              Terminated    0          0           cream02.iihe.ac.be
+27    N   Done              Terminated    0          0           cream02.iihe.ac.be
+28    N   Done              Terminated    0          0           red.unl.edu
+29    N   Done              Terminated    0          0           cream02.iihe.ac.be
+30    N   Done              Terminated    0          0           red-gw1.unl.edu
+--------------------------------------------------------------------------------
+31    N   Done              Terminated    0          0           red.unl.edu
+32    N   Done              Terminated    0          0           cream02.iihe.ac.be
+33    N   Done              Terminated    0          0           red.unl.edu
+34    N   Done              Terminated    0          60307       red.unl.edu
+35    N   Done              Terminated    0          0           red.unl.edu
+36    N   Done              Terminated    0          0           red.unl.edu
+37    N   Done              Terminated    0          0           red-gw1.unl.edu
+38    N   Done              Terminated    0          0           red.unl.edu
+39    N   Done              Terminated    0          60307       red.unl.edu
+40    N   Done              Terminated    0          0           red-gw2.unl.edu
+
+crab:  ExitCodes Summary
+ >>>>>>>>> 32 Jobs with Wrapper Exit Code : 0 
+	 List of jobs: 1,3-9,11,13,15-16,18-19,21-33,35-38,40 
+	See https://twiki.cern.ch/twiki/bin/view/CMS/JobExitCodes for Exit Code meaning
+
+crab:  ExitCodes Summary
+ >>>>>>>>> 4 Jobs with Wrapper Exit Code : 60307 
+	 List of jobs: 12,14,34,39 
+	See https://twiki.cern.ch/twiki/bin/view/CMS/JobExitCodes for Exit Code meaning
+
+crab:   40 Total Jobs 
+ >>>>>>>>> 4 Jobs Running 
+	List of jobs Running: 2,10,17,20 
+ >>>>>>>>> 36 Jobs Done
+	Jobs terminated: retrieve them with: crab -getoutput <List of jobs>
+	List of jobs: 1,3-9,11-16,18-19,21-40 
+
+crab:  You can also follow the status of this task on :
+	CMS Dashboard: http://dashb-cms-job-task.cern.ch/taskmon.html#task=friccita_Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1_ah9x83
+	Your task name is: friccita_Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1_ah9x83 
+
+Log file is /afs/cern.ch/user/f/friccita/myOtherOther533Area/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test/QCD_Pt-30to50_MuEnrichedPt5_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1/log/crab.log
+crab:  Version 2.9.1 running on Thu Oct  3 17:23:27 2013 CET (15:23:27 UTC)
+
+crab. Working options:
+	scheduler           remoteGlidein
+	job type            CMSSW
+	server              OFF
+	working directory   /afs/cern.ch/user/f/friccita/myOtherOther533Area/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test/QCD_Pt-50to80_MuEnrichedPt5_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1/
+
+crab:  Checking the status of all jobs: please wait
+crab:  contacting remote host hcc-crabserver.unl.edu
+crab:  
+ID    END STATUS            ACTION       ExeExitCode JobExitCode E_HOST
+----- --- ----------------- ------------  ---------- ----------- ---------
+1     N   Done              Terminated    0          0           grid-cr2.desy.de
+2     N   Running           SubSuccess                           grid-cr0.desy.de
+3     N   Done              Terminated    0          0           grid-cr0.desy.de
+4     N   Done              Terminated    0          0           grid-cr2.desy.de
+5     N   Done              Terminated    0          0           grid-cr0.desy.de
+6     N   Done              Terminated    0          0           red.unl.edu
+7     N   Done              Terminated    0          0           grid-cr2.desy.de
+8     N   Running           SubSuccess                           grid-cr0.desy.de
+9     N   Done              Terminated    0          0           cream02.iihe.ac.be
+10    N   Submitted         SubSuccess                           
+--------------------------------------------------------------------------------
+11    N   Submitted         SubSuccess                           
+12    N   Submitted         SubSuccess                           
+13    N   Submitted         SubSuccess                           
+14    N   Submitted         SubSuccess                           
+15    N   Running           SubSuccess                           tusker-gw1.unl.edu
+16    N   Submitted         SubSuccess                           
+17    N   Running           SubSuccess                           grid-cr0.desy.de
+18    N   Running           SubSuccess                           grid-cr3.desy.de
+19    N   Done              Terminated    0          0           grid-cr0.desy.de
+20    N   Submitted         SubSuccess                           
+--------------------------------------------------------------------------------
+21    N   Done              Terminated    0          0           grid-cr0.desy.de
+22    N   Done              Terminated    0          0           sbgce2.in2p3.fr
+23    N   Done              Terminated    0          0           sbgce2.in2p3.fr
+24    N   Running           SubSuccess                           sbgce2.in2p3.fr
+25    N   Running           SubSuccess                           sbgce2.in2p3.fr
+26    N   Done              Terminated    0          0           sbgce2.in2p3.fr
+27    N   Running           SubSuccess                           sbgce2.in2p3.fr
+28    N   Running           SubSuccess                           sbgce2.in2p3.fr
+29    N   Running           SubSuccess                           sbgce2.in2p3.fr
+30    N   Running           SubSuccess                           sbgce2.in2p3.fr
+--------------------------------------------------------------------------------
+31    N   Done              Terminated    0          0           grid-cr0.desy.de
+32    N   Done              Terminated    0          0           grid-cr2.desy.de
+33    N   Done              Terminated    0          0           grid-cr2.desy.de
+34    N   Done              Terminated    0          0           grid-cr3.desy.de
+35    N   Running           SubSuccess                           grid-cr2.desy.de
+36    N   Done              Terminated    0          0           cream02.iihe.ac.be
+37    N   Done              Terminated    0          0           cream02.iihe.ac.be
+38    N   Done              Terminated    0          0           cream02.iihe.ac.be
+39    N   Running           SubSuccess                           cream02.iihe.ac.be
+40    N   Running           SubSuccess                           cream02.iihe.ac.be
+--------------------------------------------------------------------------------
+41    N   Done              Terminated    0          0           cream02.iihe.ac.be
+42    N   Done              Terminated    0          0           sbgce2.in2p3.fr
+43    N   Done              Terminated    0          0           red-gw1.unl.edu
+
+crab:  ExitCodes Summary
+ >>>>>>>>> 22 Jobs with Wrapper Exit Code : 0 
+	 List of jobs: 1,3-7,9,19,21-23,26,31-34,36-38,41-43 
+	See https://twiki.cern.ch/twiki/bin/view/CMS/JobExitCodes for Exit Code meaning
+
+crab:   43 Total Jobs 
+ >>>>>>>>> 7 Jobs Submitted 
+	List of jobs Submitted: 10-14,16,20 
+ >>>>>>>>> 14 Jobs Running 
+	List of jobs Running: 2,8,15,17-18,24-25,27-30,35,39-40 
+ >>>>>>>>> 22 Jobs Done
+	Jobs terminated: retrieve them with: crab -getoutput <List of jobs>
+	List of jobs: 1,3-7,9,19,21-23,26,31-34,36-38,41-43 
+
+crab:  You can also follow the status of this task on :
+	CMS Dashboard: http://dashb-cms-job-task.cern.ch/taskmon.html#task=friccita_Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1_15nkd9
+	Your task name is: friccita_Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1_15nkd9 
+
+Log file is /afs/cern.ch/user/f/friccita/myOtherOther533Area/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test/QCD_Pt-50to80_MuEnrichedPt5_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1/log/crab.log
+crab:  Version 2.9.1 running on Thu Oct  3 17:23:32 2013 CET (15:23:32 UTC)
+
+crab. Working options:
+	scheduler           remoteGlidein
+	job type            CMSSW
+	server              OFF
+	working directory   /afs/cern.ch/user/f/friccita/myOtherOther533Area/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test/QCD_Pt-80to120_MuEnrichedPt5_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1/
+
+crab:  Checking the status of all jobs: please wait
+crab:  contacting remote host hcc-crabserver.unl.edu
+crab:  
+ID    END STATUS            ACTION       ExeExitCode JobExitCode E_HOST
+----- --- ----------------- ------------  ---------- ----------- ---------
+1     N   Running           SubSuccess                           cream4.hep.kbfi.ee
+2     N   Running           SubSuccess                           cream3.hep.kbfi.ee
+3     N   Running           SubSuccess                           cream3.hep.kbfi.ee
+4     N   Running           SubSuccess                           cream3.hep.kbfi.ee
+5     N   Running           SubSuccess                           cream3.hep.kbfi.ee
+6     N   Done              Terminated    0          60307       red-gw2.unl.edu
+7     N   Running           SubSuccess                           cream3.hep.kbfi.ee
+8     N   Running           SubSuccess                           cream3.hep.kbfi.ee
+9     N   Submitted         SubSuccess                           
+10    N   Submitted         SubSuccess                           
+--------------------------------------------------------------------------------
+11    N   Running           SubSuccess                           cream3.hep.kbfi.ee
+12    N   Running           SubSuccess                           cream3.hep.kbfi.ee
+13    N   Running           SubSuccess                           cream3.hep.kbfi.ee
+14    N   Running           SubSuccess                           grid-cr0.desy.de
+15    N   Running           SubSuccess                           grid-cr3.desy.de
+16    N   Running           SubSuccess                           grid-cr3.desy.de
+17    N   Running           SubSuccess                           cream4.hep.kbfi.ee
+18    N   Running           SubSuccess                           cream4.hep.kbfi.ee
+19    N   Running           SubSuccess                           cream4.hep.kbfi.ee
+20    N   Running           SubSuccess                           cream4.hep.kbfi.ee
+--------------------------------------------------------------------------------
+21    N   Running           SubSuccess                           cream3.hep.kbfi.ee
+22    N   Running           SubSuccess                           cream4.hep.kbfi.ee
+23    N   Running           SubSuccess                           cream4.hep.kbfi.ee
+24    N   Running           SubSuccess                           cream4.hep.kbfi.ee
+25    N   Running           SubSuccess                           cream4.hep.kbfi.ee
+26    N   Running           SubSuccess                           cream3.hep.kbfi.ee
+27    N   Done              Terminated    0          0           grid-cr2.desy.de
+28    N   Running           SubSuccess                           cream4.hep.kbfi.ee
+29    N   Running           SubSuccess                           cream3.hep.kbfi.ee
+30    N   Running           SubSuccess                           cream3.hep.kbfi.ee
+--------------------------------------------------------------------------------
+31    N   Running           SubSuccess                           cream3.hep.kbfi.ee
+32    N   Running           SubSuccess                           cream3.hep.kbfi.ee
+33    N   Running           SubSuccess                           cream3.hep.kbfi.ee
+34    N   Running           SubSuccess                           cream3.hep.kbfi.ee
+35    N   Done              Terminated    0          0           cream4.hep.kbfi.ee
+36    N   Done              Terminated    0          0           red-gw1.unl.edu
+37    N   Done              Terminated    0          0           sbgce2.in2p3.fr
+38    N   Done              Terminated    0          0           sbgce2.in2p3.fr
+39    N   Done              Terminated    0          0           grid-cr0.desy.de
+
+crab:  ExitCodes Summary
+ >>>>>>>>> 6 Jobs with Wrapper Exit Code : 0 
+	 List of jobs: 27,35-39 
+	See https://twiki.cern.ch/twiki/bin/view/CMS/JobExitCodes for Exit Code meaning
+
+crab:  ExitCodes Summary
+ >>>>>>>>> 1 Jobs with Wrapper Exit Code : 60307 
+	 List of jobs: 6 
+	See https://twiki.cern.ch/twiki/bin/view/CMS/JobExitCodes for Exit Code meaning
+
+crab:   39 Total Jobs 
+ >>>>>>>>> 2 Jobs Submitted 
+	List of jobs Submitted: 9-10 
+ >>>>>>>>> 30 Jobs Running 
+	List of jobs Running: 1-5,7-8,11-26,28-34 
+ >>>>>>>>> 7 Jobs Done
+	Jobs terminated: retrieve them with: crab -getoutput <List of jobs>
+	List of jobs: 6,27,35-39 
+
+crab:  You can also follow the status of this task on :
+	CMS Dashboard: http://dashb-cms-job-task.cern.ch/taskmon.html#task=friccita_Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1_23ga9u
+	Your task name is: friccita_Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1_23ga9u 
+
+Log file is /afs/cern.ch/user/f/friccita/myOtherOther533Area/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test/QCD_Pt-80to120_MuEnrichedPt5_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1/log/crab.log
+crab:  Version 2.9.1 running on Thu Oct  3 17:23:36 2013 CET (15:23:36 UTC)
+
+crab. Working options:
+	scheduler           remoteGlidein
+	job type            CMSSW
+	server              OFF
+	working directory   /afs/cern.ch/user/f/friccita/myOtherOther533Area/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test/QCD_Pt-170to300_MuEnrichedPt5_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1/
+
+crab:  Checking the status of all jobs: please wait
+crab:  contacting remote host vocms20.cern.ch
+crab:  
+ID    END STATUS            ACTION       ExeExitCode JobExitCode E_HOST
+----- --- ----------------- ------------  ---------- ----------- ---------
+1     N   Done              Terminated    0          0           cream02.iihe.ac.be
+2     N   Done              Terminated    0          0           cream02.iihe.ac.be
+3     N   Done              Terminated    0          0           cream02.iihe.ac.be
+4     N   Running           SubSuccess                           cream02.iihe.ac.be
+5     N   Done              Terminated    0          0           cream02.iihe.ac.be
+6     N   Running           SubSuccess                           cream02.iihe.ac.be
+7     N   Done              Terminated    0          0           cream02.iihe.ac.be
+8     N   Running           SubSuccess                           sbgce2.in2p3.fr
+9     N   Done              Terminated    0          0           sbgce2.in2p3.fr
+10    N   Running           SubSuccess                           sbgce2.in2p3.fr
+--------------------------------------------------------------------------------
+11    N   Done              Terminated    0          0           red-gw2.unl.edu
+12    N   Done              Terminated    0          0           cream02.iihe.ac.be
+13    N   Done              Terminated    0          0           cream02.iihe.ac.be
+14    N   Done              Terminated    0          0           cream02.iihe.ac.be
+15    N   Done              Terminated    0          0           cream02.iihe.ac.be
+16    N   Done              Terminated    0          0           cream02.iihe.ac.be
+17    N   Running           SubSuccess                           cream02.iihe.ac.be
+18    N   Done              Terminated    0          0           red-gw2.unl.edu
+19    N   Running           SubSuccess                           sbgce2.in2p3.fr
+20    N   Done              Terminated    0          0           red-gw1.unl.edu
+--------------------------------------------------------------------------------
+21    N   Done              Terminated    0          0           red-gw1.unl.edu
+22    N   Done              Terminated    0          0           red-gw2.unl.edu
+23    N   Done              Terminated    0          0           red-gw1.unl.edu
+24    N   Done              Terminated    0          0           red-gw1.unl.edu
+25    N   Done              Terminated    0          0           red.unl.edu
+26    N   Running           SubSuccess                           red.unl.edu
+27    N   Running           SubSuccess                           red-gw1.unl.edu
+28    N   Done              Terminated    0          0           red.unl.edu
+29    N   Done              Terminated    0          0           red-gw2.unl.edu
+30    N   Done              Terminated    0          0           red-gw1.unl.edu
+--------------------------------------------------------------------------------
+31    N   Done              Terminated    0          0           red-gw2.unl.edu
+32    N   Done              Terminated    0          0           red.unl.edu
+
+crab:  ExitCodes Summary
+ >>>>>>>>> 24 Jobs with Wrapper Exit Code : 0 
+	 List of jobs: 1-3,5,7,9,11-16,18,20-25,28-32 
+	See https://twiki.cern.ch/twiki/bin/view/CMS/JobExitCodes for Exit Code meaning
+
+crab:   32 Total Jobs 
+ >>>>>>>>> 8 Jobs Running 
+	List of jobs Running: 4,6,8,10,17,19,26-27 
+ >>>>>>>>> 24 Jobs Done
+	Jobs terminated: retrieve them with: crab -getoutput <List of jobs>
+	List of jobs: 1-3,5,7,9,11-16,18,20-25,28-32 
+
+crab:  You can also follow the status of this task on :
+	CMS Dashboard: http://dashb-cms-job-task.cern.ch/taskmon.html#task=friccita_Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1_s352hc
+	Your task name is: friccita_Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1_s352hc 
+
+Log file is /afs/cern.ch/user/f/friccita/myOtherOther533Area/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test/QCD_Pt-170to300_MuEnrichedPt5_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1/log/crab.log
+crab:  Version 2.9.1 running on Thu Oct  3 17:23:40 2013 CET (15:23:40 UTC)
+
+crab. Working options:
+	scheduler           remoteGlidein
+	job type            CMSSW
+	server              OFF
+	working directory   /afs/cern.ch/user/f/friccita/myOtherOther533Area/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test/QCD_Pt-800to1000_MuEnrichedPt5_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1/
+
+crab:  Checking the status of all jobs: please wait
+crab:  contacting remote host vocms20.cern.ch
+crab:  
+ID    END STATUS            ACTION       ExeExitCode JobExitCode E_HOST
+----- --- ----------------- ------------  ---------- ----------- ---------
+1     N   Done              Terminated    0          0           ingrid.cism.ucl.ac.be
+2     N   Done              Terminated    0          0           ingrid.cism.ucl.ac.be
+3     N   Done              Terminated    0          0           ingrid.cism.ucl.ac.be
+4     N   Done              Terminated    0          0           ingrid.cism.ucl.ac.be
+5     N   Done              Terminated    0          0           ingrid.cism.ucl.ac.be
+6     N   Done              Terminated    0          0           ingrid.cism.ucl.ac.be
+7     N   Done              Terminated    0          0           ingrid.cism.ucl.ac.be
+8     N   Done              Terminated    0          0           ingrid.cism.ucl.ac.be
+9     N   Done              Terminated    0          0           ingrid.cism.ucl.ac.be
+10    N   Done              Terminated    0          0           ingrid.cism.ucl.ac.be
+--------------------------------------------------------------------------------
+11    N   Done              Terminated    0          0           ingrid.cism.ucl.ac.be
+12    N   Done              Terminated    0          0           ingrid.cism.ucl.ac.be
+13    N   Done              Terminated    0          0           ingrid.cism.ucl.ac.be
+14    N   Done              Terminated    0          0           ingrid.cism.ucl.ac.be
+15    N   Running           SubSuccess                           ingrid.cism.ucl.ac.be
+16    N   Done              Terminated    0          0           ingrid.cism.ucl.ac.be
+17    N   Done              Terminated    0          0           ingrid.cism.ucl.ac.be
+
+crab:  ExitCodes Summary
+ >>>>>>>>> 16 Jobs with Wrapper Exit Code : 0 
+	 List of jobs: 1-14,16-17 
+	See https://twiki.cern.ch/twiki/bin/view/CMS/JobExitCodes for Exit Code meaning
+
+crab:   17 Total Jobs 
+ >>>>>>>>> 1 Jobs Running 
+	List of jobs Running: 15 
+ >>>>>>>>> 16 Jobs Done
+	Jobs terminated: retrieve them with: crab -getoutput <List of jobs>
+	List of jobs: 1-14,16-17 
+
+crab:  You can also follow the status of this task on :
+	CMS Dashboard: http://dashb-cms-job-task.cern.ch/taskmon.html#task=friccita_Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1_vj39z4
+	Your task name is: friccita_Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1_vj39z4 
+
+Log file is /afs/cern.ch/user/f/friccita/myOtherOther533Area/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test/QCD_Pt-800to1000_MuEnrichedPt5_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1/log/crab.log
+crab:  Version 2.9.1 running on Thu Oct  3 17:23:43 2013 CET (15:23:43 UTC)
+
+crab. Working options:
+	scheduler           remoteGlidein
+	job type            CMSSW
+	server              OFF
+	working directory   /afs/cern.ch/user/f/friccita/myOtherOther533Area/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test/QCD_Pt-300to470_MuEnrichedPt5_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1/
+
+crab:  Checking the status of all jobs: please wait
+crab:  contacting remote host vocms20.cern.ch
+crab:  
+ID    END STATUS            ACTION       ExeExitCode JobExitCode E_HOST
+----- --- ----------------- ------------  ---------- ----------- ---------
+1     N   Done              Terminated    0          0           red.unl.edu
+2     N   Running           SubSuccess                           sbgce2.in2p3.fr
+3     N   Running           SubSuccess                           sbgce2.in2p3.fr
+4     N   Done              Terminated    0          0           red.unl.edu
+5     N   Done              Terminated    0          0           red-gw1.unl.edu
+6     N   Done              Terminated    0          0           red-gw1.unl.edu
+7     N   Running           SubSuccess                           sbgce2.in2p3.fr
+8     N   Done              Terminated    0          0           red-gw1.unl.edu
+9     N   Running           SubSuccess                           sbgce2.in2p3.fr
+10    N   Running           SubSuccess                           cream02.iihe.ac.be
+--------------------------------------------------------------------------------
+11    N   Running           SubSuccess                           cream02.iihe.ac.be
+12    N   Running           SubSuccess                           cream02.iihe.ac.be
+13    N   Running           SubSuccess                           cream02.iihe.ac.be
+14    N   Done              Terminated    0          0           sbgce2.in2p3.fr
+15    N   Running           SubSuccess                           cream02.iihe.ac.be
+16    N   Running           SubSuccess                           cream02.iihe.ac.be
+17    N   Running           SubSuccess                           cream02.iihe.ac.be
+18    N   Running           SubSuccess                           cream02.iihe.ac.be
+19    N   Running           SubSuccess                           cream02.iihe.ac.be
+20    N   Running           SubSuccess                           cream02.iihe.ac.be
+--------------------------------------------------------------------------------
+21    N   Running           SubSuccess                           cream02.iihe.ac.be
+22    N   Running           SubSuccess                           cream02.iihe.ac.be
+23    N   Running           SubSuccess                           sbgce2.in2p3.fr
+24    N   Running           SubSuccess                           sbgce2.in2p3.fr
+25    N   Running           SubSuccess                           cream02.iihe.ac.be
+26    N   Running           SubSuccess                           cream02.iihe.ac.be
+27    N   Running           SubSuccess                           cream02.iihe.ac.be
+28    N   Running           SubSuccess                           cream02.iihe.ac.be
+29    N   Running           SubSuccess                           cream02.iihe.ac.be
+30    N   Running           SubSuccess                           cream02.iihe.ac.be
+--------------------------------------------------------------------------------
+31    N   Running           SubSuccess                           sbgce2.in2p3.fr
+32    N   Running           SubSuccess                           sbgce2.in2p3.fr
+33    N   Done              Terminated    0          0           sbgce2.in2p3.fr
+
+crab:  ExitCodes Summary
+ >>>>>>>>> 7 Jobs with Wrapper Exit Code : 0 
+	 List of jobs: 1,4-6,8,14,33 
+	See https://twiki.cern.ch/twiki/bin/view/CMS/JobExitCodes for Exit Code meaning
+
+crab:   33 Total Jobs 
+ >>>>>>>>> 26 Jobs Running 
+	List of jobs Running: 2-3,7,9-13,15-32 
+ >>>>>>>>> 7 Jobs Done
+	Jobs terminated: retrieve them with: crab -getoutput <List of jobs>
+	List of jobs: 1,4-6,8,14,33 
+
+crab:  You can also follow the status of this task on :
+	CMS Dashboard: http://dashb-cms-job-task.cern.ch/taskmon.html#task=friccita_Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1_k13gr9
+	Your task name is: friccita_Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1_k13gr9 
+
+Log file is /afs/cern.ch/user/f/friccita/myOtherOther533Area/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test/QCD_Pt-300to470_MuEnrichedPt5_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1/log/crab.log
+crab:  Version 2.9.1 running on Thu Oct  3 17:23:47 2013 CET (15:23:47 UTC)
+
+crab. Working options:
+	scheduler           remoteGlidein
+	job type            CMSSW
+	server              OFF
+	working directory   /afs/cern.ch/user/f/friccita/myOtherOther533Area/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test/QCD_Pt-120to170_MuEnrichedPt5_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1/
+
+crab:  Checking the status of all jobs: please wait
+crab:  contacting remote host hcc-crabserver.unl.edu
+crab:  
+ID    END STATUS            ACTION       ExeExitCode JobExitCode E_HOST
+----- --- ----------------- ------------  ---------- ----------- ---------
+1     N   Done              Terminated    0          0           grid-cr2.desy.de
+2     N   Running           SubSuccess                           grid-cr2.desy.de
+3     N   Done              Terminated    0          0           grid-cr2.desy.de
+4     N   Done              Terminated    0          0           grid-cr3.desy.de
+5     N   Done              Terminated    0          0           grid-cr0.desy.de
+6     N   Done              Terminated    0          0           grid-cr2.desy.de
+7     N   Done              Terminated    0          0           grid-cr3.desy.de
+8     N   Running           SubSuccess                           grid-cr2.desy.de
+9     N   Done              Terminated    0          0           grid-cr0.desy.de
+10    N   Done              Terminated    0          0           grid-cr3.desy.de
+--------------------------------------------------------------------------------
+11    N   Done              Terminated    0          0           grid-cr2.desy.de
+12    N   Done              Terminated    0          0           grid-cr3.desy.de
+13    N   Done              Terminated    0          0           grid-cr2.desy.de
+14    N   Done              Terminated    0          0           grid-cr0.desy.de
+15    N   Done              Terminated    0          0           grid-cr3.desy.de
+16    N   Done              Terminated    0          0           grid-cr3.desy.de
+17    N   Running           SubSuccess                           grid-cr2.desy.de
+18    N   Done              Terminated    0          0           red-gw2.unl.edu
+19    N   Done              Terminated    0          0           red-gw2.unl.edu
+20    N   Running           SubSuccess                           cream3.hep.kbfi.ee
+--------------------------------------------------------------------------------
+21    N   Done              Terminated    0          0           red-gw2.unl.edu
+22    N   Done              Terminated    0          0           red-gw2.unl.edu
+23    N   Done              Terminated    0          0           red-gw1.unl.edu
+24    N   Done              Terminated    0          0           red-gw2.unl.edu
+25    N   Done              Terminated    0          0           red-gw2.unl.edu
+26    N   Done              Terminated    0          0           red-gw1.unl.edu
+27    N   Running           SubSuccess                           cream4.hep.kbfi.ee
+28    N   Done              Terminated    0          60307       red-gw2.unl.edu
+29    N   Done              Terminated    0          0           red-gw2.unl.edu
+30    N   Done              Terminated    0          0           red-gw1.unl.edu
+--------------------------------------------------------------------------------
+31    N   Running           SubSuccess                           cream4.hep.kbfi.ee
+32    N   Running           SubSuccess                           cream4.hep.kbfi.ee
+33    N   Done              Terminated    0          0           red-gw2.unl.edu
+34    N   Done              Terminated    0          0           red-gw2.unl.edu
+35    N   Running           SubSuccess                           cream4.hep.kbfi.ee
+
+crab:  ExitCodes Summary
+ >>>>>>>>> 26 Jobs with Wrapper Exit Code : 0 
+	 List of jobs: 1,3-7,9-16,18-19,21-26,29-30,33-34 
+	See https://twiki.cern.ch/twiki/bin/view/CMS/JobExitCodes for Exit Code meaning
+
+crab:  ExitCodes Summary
+ >>>>>>>>> 1 Jobs with Wrapper Exit Code : 60307 
+	 List of jobs: 28 
+	See https://twiki.cern.ch/twiki/bin/view/CMS/JobExitCodes for Exit Code meaning
+
+crab:   35 Total Jobs 
+ >>>>>>>>> 8 Jobs Running 
+	List of jobs Running: 2,8,17,20,27,31-32,35 
+ >>>>>>>>> 27 Jobs Done
+	Jobs terminated: retrieve them with: crab -getoutput <List of jobs>
+	List of jobs: 1,3-7,9-16,18-19,21-26,28-30,33-34 
+
+crab:  You can also follow the status of this task on :
+	CMS Dashboard: http://dashb-cms-job-task.cern.ch/taskmon.html#task=friccita_Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1_z81er5
+	Your task name is: friccita_Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1_z81er5 
+
+Log file is /afs/cern.ch/user/f/friccita/myOtherOther533Area/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test/QCD_Pt-120to170_MuEnrichedPt5_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v1/log/crab.log
