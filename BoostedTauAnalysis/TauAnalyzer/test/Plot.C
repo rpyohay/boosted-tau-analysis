@@ -1,6 +1,7 @@
 #include <string>
 #include <map>
 #include <iostream>
+#include <sstream>
 #include "TFile.h"
 #include "TH1F.h"
 #include "TH2F.h"
@@ -1062,6 +1063,10 @@ void addClosurePlot(TFile& sigVsBkgIso20InvFbStream, const string& var, const st
   histSig->Draw();
   histBkgIso->Draw("SAME");
   histBkgNonIso->Draw("SAME");
+  cout << histSig->GetName() << endl;
+  cout << histSig->Integral(5, -1) << endl;
+  cout << histBkgIso->Integral(5, -1) << endl;
+  cout << histBkgNonIso->Integral(5, -1) << endl;
   outCanvas.Write();
 }
 
@@ -1094,4 +1099,90 @@ void makeMCClosurePlots(const string& sigVsBkgIso20InvFbFileName, const vector<s
   outStream.Close();
   sigVsBkgIso20InvFbStream.Close();
   bkgNonIsoStream.Close();
+}
+
+TH2F* twoDimTotalBackgroundHistogram(const vector<string>& files, const string& histName)
+{
+  //set canvas name
+  string canvasName(histName + "Canvas");
+
+  //set total background histogram pointer
+  TH2F* bkgTotHist = NULL;
+
+  //loop over files
+  for (vector<string>::const_iterator iFile = files.begin(); iFile != files.end(); ++iFile) {
+    const unsigned int fileIndex = iFile - files.begin();
+    TFile* file = new TFile(iFile->c_str());
+    TCanvas* canvas = NULL;
+    TH2F* hist = NULL;
+    if (file->IsOpen()) {
+
+      //add  histogram to running tally
+      file->GetObject(canvasName.c_str(), canvas);
+      if (canvas != NULL) {
+	hist = (TH2F*)canvas->GetPrimitive(histName.c_str());
+	if (hist != NULL) {
+	  if (fileIndex == 0) bkgTotHist = (TH2F*)hist->Clone();
+	  else bkgTotHist->Add(hist);
+	}
+	else cerr << "Error: could not get " << histName << " from " << canvasName << endl;
+      }
+      else cerr << "Error: could not get " << canvasName << " from " << *iFile << endl;
+    }
+    else cerr << "Error: could not open " << *iFile << endl;
+
+//     //close  file
+//     file->Close();
+//     delete file;
+  }
+
+  //return
+  return bkgTotHist;
+}
+
+void print2DWeights(const vector<string>& isoFiles, const vector<string>& nonIsoFiles, 
+		    const string& hist)
+{
+  //sanity check
+  const unsigned int isoFilesSize = isoFiles.size();
+  const unsigned int nonIsoFilesSize = nonIsoFiles.size();
+  if (isoFilesSize > nonIsoFilesSize) {
+    cerr << "Error: size of isoFiles (" << isoFilesSize << ") > size of nonIsoFiles (";
+    cerr << nonIsoFilesSize << ")\n";
+    return;
+  }
+
+  //fill total background histograms
+  TH2F* isoBkgTot = twoDimTotalBackgroundHistogram(isoFiles, hist);
+  TH2F* nonIsoBkgTot = twoDimTotalBackgroundHistogram(nonIsoFiles, hist);
+
+  /*normalize both histograms, then divide iso histogram by non-iso histogram and print result bin 
+    by bin*/
+  isoBkgTot->Scale(1.0/isoBkgTot->Integral(0, -1, 0, -1));
+  nonIsoBkgTot->Scale(1.0/nonIsoBkgTot->Integral(0, -1, 0, -1));
+  isoBkgTot->Divide(nonIsoBkgTot);
+  TAxis* xAxis = isoBkgTot->GetXaxis();
+  TAxis* yAxis = isoBkgTot->GetYaxis();
+  cout.width(15);
+  cout << left << "Tau pT (GeV)";
+  cout.width(15);
+  cout << left << "Muon pT (GeV)";
+  cout << endl;
+  for (Int_t iBinX = 1; iBinX <= isoBkgTot->GetNbinsX(); ++iBinX) {
+    Double_t xBinLowEdge = xAxis->GetBinLowEdge(iBinX);
+    stringstream xStream;
+    xStream << xBinLowEdge << "-" << (xBinLowEdge + xAxis->GetBinWidth(iBinX));
+    for (Int_t iBinY = 1; iBinY <= isoBkgTot->GetNbinsY(); ++iBinY) {
+      Double_t yBinLowEdge = yAxis->GetBinLowEdge(iBinY);
+      stringstream yStream;
+      yStream << yBinLowEdge << "-" << (yBinLowEdge + yAxis->GetBinWidth(iBinY));
+      cout.width(12);
+      cout << right << xStream.str();
+      cout.width(15);
+      cout << right << yStream.str();
+      cout.precision(3);
+      cout << scientific << left << ": " << isoBkgTot->GetBinContent(iBinX, iBinY);
+      cout << endl;
+    }
+  }
 }

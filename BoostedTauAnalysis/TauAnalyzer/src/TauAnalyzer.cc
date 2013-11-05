@@ -161,6 +161,12 @@ private:
   //gen particle tag
   edm::InputTag genParticleTag_;
 
+  //gen tau-->mu tag
+  edm::InputTag genTauMuTag_;
+
+  //gen W-->tau-->mu tag
+  edm::InputTag genWTauMuTag_;
+
   //hadronic tau deltaBeta-corrected isolation energy tag
   edm::InputTag tauHadIsoTag_;
 
@@ -336,6 +342,9 @@ private:
   //histogram of dR(soft muon, nearest gen Z decay muon that radiated)
   TH1F* dRSoftMuNearestGenZMuFSR_;
 
+  //histogram of gen muon information
+  TH1F* genMuInfo_;
+
   //histogram of cleaned jet pT vs. cleaned tau pT
   TH2F* cleanedJetPTVsCleanedTauPT_;
 
@@ -433,6 +442,12 @@ private:
   //PU reweighting object
   edm::LumiReWeighting PUReweight_;
 
+  //hadronic tau pT weights
+  std::vector<double> tauHadPTWeights_;
+
+  //hadronic tau and soft muon pT weights
+  std::vector<double> tauHadSoftMuPTWeights_;
+
   /*second jet pT for |eta| < 2.4, second jet is highest pT jet in the event excluding W muon and 
     mu+had*/
   TH1F *jet_pt_etacut;
@@ -474,6 +489,8 @@ TauAnalyzer::TauAnalyzer(const edm::ParameterSet& iConfig) :
   jetMuonMapTag_(iConfig.getParameter<edm::InputTag>("jetMuonMapTag")),
   oldNewJetMapTag_(iConfig.getParameter<edm::InputTag>("oldNewJetMapTag")),
   genParticleTag_(iConfig.getParameter<edm::InputTag>("genParticleTag")),
+  genTauMuTag_(iConfig.getParameter<edm::InputTag>("genTauMuTag")),
+  genWTauMuTag_(iConfig.getParameter<edm::InputTag>("genWTauMuTag")),
   tauHadIsoTag_(iConfig.getParameter<edm::InputTag>("tauHadIsoTag")),
   allMuonTag_(iConfig.getParameter<edm::InputTag>("allMuonTag")),
   muonGenParticleTag_(iConfig.getParameter<edm::InputTag>("muonGenParticleTag")),
@@ -583,6 +600,430 @@ TauAnalyzer::TauAnalyzer(const edm::ParameterSet& iConfig) :
 //     PUReweight_ = edm::LumiReWeighting(S10PUDist, Data2012PUDist);
     PUReweight_ = edm::LumiReWeighting(S10PUDist, Data20122p5InvFbPUDist);
   }
+
+  //instantiate the vector of weights based on hadronic tau pT bin
+  tauHadPTWeights_.push_back(0.0);
+  tauHadPTWeights_.push_back(0.0);
+  tauHadPTWeights_.push_back(1.76912);
+  tauHadPTWeights_.push_back(1.16616);
+  tauHadPTWeights_.push_back(0.842367);
+  tauHadPTWeights_.push_back(0.73826);
+  tauHadPTWeights_.push_back(0.623941);
+  tauHadPTWeights_.push_back(0.678008);
+  tauHadPTWeights_.push_back(0.329102);
+  tauHadPTWeights_.push_back(0.408652);
+  tauHadPTWeights_.push_back(0.43762);
+  tauHadPTWeights_.push_back(0.353551);
+  tauHadPTWeights_.push_back(0.10494);
+  tauHadPTWeights_.push_back(0.291949);
+  tauHadPTWeights_.push_back(0.0420042);
+  tauHadPTWeights_.push_back(0.0360133);
+  tauHadPTWeights_.push_back(0.173267);
+  tauHadPTWeights_.push_back(0.259737);
+  tauHadPTWeights_.push_back(0.206386);
+  tauHadPTWeights_.push_back(0.209804);
+
+  //instantiate the vector of weights based on hadronic tau and soft muon pT bin
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(1.756e+00);
+  tauHadSoftMuPTWeights_.push_back(1.871e+00);
+  tauHadSoftMuPTWeights_.push_back(2.042e+00);
+  tauHadSoftMuPTWeights_.push_back(1.427e+00);
+  tauHadSoftMuPTWeights_.push_back(1.421e+00);
+  tauHadSoftMuPTWeights_.push_back(4.911e-01);
+  tauHadSoftMuPTWeights_.push_back(9.388e-01);
+  tauHadSoftMuPTWeights_.push_back(3.347e+00);
+  tauHadSoftMuPTWeights_.push_back(3.977e+00);
+  tauHadSoftMuPTWeights_.push_back(2.641e+00);
+  tauHadSoftMuPTWeights_.push_back(1.877e-02);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(8.096e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(5.758e-02);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(1.134e+00);
+  tauHadSoftMuPTWeights_.push_back(1.468e+00);
+  tauHadSoftMuPTWeights_.push_back(1.089e+00);
+  tauHadSoftMuPTWeights_.push_back(9.435e-01);
+  tauHadSoftMuPTWeights_.push_back(9.741e-01);
+  tauHadSoftMuPTWeights_.push_back(3.836e-01);
+  tauHadSoftMuPTWeights_.push_back(2.139e+00);
+  tauHadSoftMuPTWeights_.push_back(2.214e+00);
+  tauHadSoftMuPTWeights_.push_back(4.958e-01);
+  tauHadSoftMuPTWeights_.push_back(1.709e-01);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(9.908e-02);
+  tauHadSoftMuPTWeights_.push_back(2.791e-01);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(2.285e-01);
+  tauHadSoftMuPTWeights_.push_back(1.841e-01);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(6.986e-01);
+  tauHadSoftMuPTWeights_.push_back(6.501e-01);
+  tauHadSoftMuPTWeights_.push_back(1.102e+00);
+  tauHadSoftMuPTWeights_.push_back(1.730e+00);
+  tauHadSoftMuPTWeights_.push_back(1.193e+00);
+  tauHadSoftMuPTWeights_.push_back(6.234e-01);
+  tauHadSoftMuPTWeights_.push_back(1.553e-01);
+  tauHadSoftMuPTWeights_.push_back(1.572e+00);
+  tauHadSoftMuPTWeights_.push_back(6.176e-02);
+  tauHadSoftMuPTWeights_.push_back(7.056e-01);
+  tauHadSoftMuPTWeights_.push_back(8.686e-02);
+  tauHadSoftMuPTWeights_.push_back(4.141e+00);
+  tauHadSoftMuPTWeights_.push_back(6.706e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(8.315e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(6.818e-01);
+  tauHadSoftMuPTWeights_.push_back(7.770e-01);
+  tauHadSoftMuPTWeights_.push_back(7.706e-01);
+  tauHadSoftMuPTWeights_.push_back(1.145e+00);
+  tauHadSoftMuPTWeights_.push_back(1.060e+00);
+  tauHadSoftMuPTWeights_.push_back(3.158e-01);
+  tauHadSoftMuPTWeights_.push_back(1.702e-01);
+  tauHadSoftMuPTWeights_.push_back(2.862e-01);
+  tauHadSoftMuPTWeights_.push_back(1.062e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(4.953e-02);
+  tauHadSoftMuPTWeights_.push_back(2.325e+01);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(3.144e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(5.110e-01);
+  tauHadSoftMuPTWeights_.push_back(5.918e-01);
+  tauHadSoftMuPTWeights_.push_back(1.104e+00);
+  tauHadSoftMuPTWeights_.push_back(8.104e-01);
+  tauHadSoftMuPTWeights_.push_back(7.310e-01);
+  tauHadSoftMuPTWeights_.push_back(5.542e-03);
+  tauHadSoftMuPTWeights_.push_back(1.367e-02);
+  tauHadSoftMuPTWeights_.push_back(1.998e+00);
+  tauHadSoftMuPTWeights_.push_back(2.836e+00);
+  tauHadSoftMuPTWeights_.push_back(1.439e-02);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(1.224e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(7.314e-01);
+  tauHadSoftMuPTWeights_.push_back(3.176e-01);
+  tauHadSoftMuPTWeights_.push_back(1.173e+00);
+  tauHadSoftMuPTWeights_.push_back(5.409e-01);
+  tauHadSoftMuPTWeights_.push_back(8.052e-01);
+  tauHadSoftMuPTWeights_.push_back(8.409e-02);
+  tauHadSoftMuPTWeights_.push_back(1.528e-02);
+  tauHadSoftMuPTWeights_.push_back(1.462e-01);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(2.361e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(8.120e-02);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(2.038e-01);
+  tauHadSoftMuPTWeights_.push_back(1.075e-01);
+  tauHadSoftMuPTWeights_.push_back(7.087e-01);
+  tauHadSoftMuPTWeights_.push_back(1.008e+00);
+  tauHadSoftMuPTWeights_.push_back(1.376e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(5.458e-02);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(2.352e-02);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(4.794e-01);
+  tauHadSoftMuPTWeights_.push_back(4.494e-01);
+  tauHadSoftMuPTWeights_.push_back(5.458e-02);
+  tauHadSoftMuPTWeights_.push_back(1.467e-01);
+  tauHadSoftMuPTWeights_.push_back(4.538e-01);
+  tauHadSoftMuPTWeights_.push_back(8.687e-01);
+  tauHadSoftMuPTWeights_.push_back(8.027e-01);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(8.417e-02);
+  tauHadSoftMuPTWeights_.push_back(1.284e-01);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(1.379e-01);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(4.969e-01);
+  tauHadSoftMuPTWeights_.push_back(8.439e-01);
+  tauHadSoftMuPTWeights_.push_back(3.234e-02);
+  tauHadSoftMuPTWeights_.push_back(8.811e-02);
+  tauHadSoftMuPTWeights_.push_back(7.870e-03);
+  tauHadSoftMuPTWeights_.push_back(1.248e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(1.380e-01);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(6.030e-02);
+  tauHadSoftMuPTWeights_.push_back(5.083e-01);
+  tauHadSoftMuPTWeights_.push_back(1.268e-01);
+  tauHadSoftMuPTWeights_.push_back(6.003e-01);
+  tauHadSoftMuPTWeights_.push_back(1.610e+00);
+  tauHadSoftMuPTWeights_.push_back(3.703e-02);
+  tauHadSoftMuPTWeights_.push_back(1.986e+00);
+  tauHadSoftMuPTWeights_.push_back(2.544e-01);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(2.333e-01);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(1.886e-01);
+  tauHadSoftMuPTWeights_.push_back(1.067e-01);
+  tauHadSoftMuPTWeights_.push_back(2.161e-02);
+  tauHadSoftMuPTWeights_.push_back(1.176e-01);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(2.000e-02);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(5.135e-02);
+  tauHadSoftMuPTWeights_.push_back(3.749e-01);
+  tauHadSoftMuPTWeights_.push_back(2.954e-02);
+  tauHadSoftMuPTWeights_.push_back(1.542e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(2.354e-01);
+  tauHadSoftMuPTWeights_.push_back(3.003e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(5.182e-02);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(1.656e-01);
+  tauHadSoftMuPTWeights_.push_back(1.090e-01);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(3.807e-02);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(3.097e-02);
+  tauHadSoftMuPTWeights_.push_back(1.884e-02);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(1.076e-01);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(1.931e-01);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(4.453e-01);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(7.753e+01);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(8.772e-02);
+  tauHadSoftMuPTWeights_.push_back(2.057e-02);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(3.525e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(3.348e-01);
+  tauHadSoftMuPTWeights_.push_back(7.236e-02);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(2.101e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(6.455e-01);
+  tauHadSoftMuPTWeights_.push_back(6.421e-02);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
+  tauHadSoftMuPTWeights_.push_back(0.000e+00);
 }
 
 TauAnalyzer::~TauAnalyzer()
@@ -636,6 +1077,14 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   //get gen particles
   edm::Handle<reco::GenParticleRefVector> pGenParticles;
   if (MC_) iEvent.getByLabel(genParticleTag_, pGenParticles);
+
+  //get gen tau-->mu muons
+  edm::Handle<reco::GenParticleRefVector> pGenTauMus;
+  if (MC_) iEvent.getByLabel(genTauMuTag_, pGenTauMus);
+
+  //get gen W-->tau-->mu muons
+  edm::Handle<reco::GenParticleRefVector> pGenWTauMus;
+  if (MC_) iEvent.getByLabel(genWTauMuTag_, pGenWTauMus);
 
   //get hadronic tau deltaBeta-corrected isolation
   edm::Handle<reco::PFTauDiscriminator> pTauHadIso;
@@ -707,6 +1156,8 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
   //fill STL containers of pointers to the gen particles
   std::vector<reco::GenParticle*> genParticlePtrs;
+  std::vector<reco::GenParticle*> genTauMuPtrs;
+  std::vector<reco::GenParticle*> genWTauMuPtrs;
   std::vector<reco::GenParticle*> status1GenParticlePtrs;
   std::vector<reco::GenParticle*> ZMuGenParticlePtrs;
   std::vector<reco::GenParticle*> ZMuFSRGenParticlePtrs;
@@ -717,6 +1168,14 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     for (reco::GenParticleRefVector::const_iterator iGenParticle = pGenParticles->begin(); 
 	 iGenParticle != pGenParticles->end(); ++iGenParticle) {
       genParticlePtrs.push_back(const_cast<reco::GenParticle*>((*iGenParticle).get()));
+    }
+    for (reco::GenParticleRefVector::const_iterator iGenParticle = pGenWTauMus->begin(); 
+	 iGenParticle != pGenWTauMus->end(); ++iGenParticle) {
+      genParticlePtrs.push_back(const_cast<reco::GenParticle*>((*iGenParticle).get()));
+    }
+    for (reco::GenParticleRefVector::const_iterator iGenParticle = pGenTauMus->begin(); 
+	 iGenParticle != pGenTauMus->end(); ++iGenParticle) {
+      genTauMuPtrs.push_back(const_cast<reco::GenParticle*>((*iGenParticle).get()));
     }
     for (reco::GenParticleCollection::const_iterator iGenParticle = pAllGenParticles->begin(); 
 	 iGenParticle != pAllGenParticles->end(); ++iGenParticle) {
@@ -830,11 +1289,23 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     const reco::PFJetRef& tauOldJetRef = (*pOldNewJetMap)[tauJetRef];
     const reco::MuonRefVector& removedMuons = (*pMuonJetMap)[tauJetRef];
 
+    //get weight based on hadronic tau pT
+    const unsigned int tauHadPTBin = (int)((*iTau)->pt()/5.0);
+    double tauHadPTWeight = 0.0;
+//     if (tauHadPTBin < 20) tauHadPTWeight = tauHadPTWeights_[tauHadPTBin];
+    tauHadPTWeight = 1.0;
+
     //find the highest pT associated muon
     std::vector<reco::MuonRef> removedMuonRefs;
     for (reco::MuonRefVector::const_iterator iMuon = removedMuons.begin(); 
 	 iMuon != removedMuons.end(); ++iMuon) { removedMuonRefs.push_back(*iMuon); }
     Common::sortByPT(removedMuonRefs);
+
+    //get weight based on hadronic tau and soft muon pT
+    const unsigned int softMuPTBin = (int)(removedMuonRefs[removedMuonRefs.size() - 1]->pt()/5.0);
+    double tauHadSoftMuPTWeight = 0.0;
+    unsigned int hashedIndex = tauHadPTBin*20 + softMuPTBin;
+    if (hashedIndex < 400) tauHadSoftMuPTWeight = tauHadSoftMuPTWeights_[hashedIndex];
 
     /*fill collections of
       - corrected jets excluding the jet associated to the hadronic tau
@@ -906,7 +1377,7 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       //plot the mu + tau invariant mass for the highest pT muon
       const double muHadMass = 
 	(removedMuonRefs[removedMuonRefs.size() - 1]->p4() + (*iTau)->p4()).M();
-      muHadMass_->Fill(muHadMass, PUWeight);
+      muHadMass_->Fill(muHadMass, PUWeight*tauHadSoftMuPTWeight);
 
       //plot the mu + tau charge for the highest pT muon
       muHadCharge_->
@@ -967,10 +1438,14 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       plotHT(jetTauJet, jetTauJetWMuHT_, PUWeight);
 
       //plot the parent parton of the tau jet
+      /*update 29-Oct-13: genParticlePtrs now refers to gen W decay muons so this plot no longer 
+	makes sense*/
       int nearestPartonIndex = -1;
       const reco::GenParticle* nearestParton = NULL;
       if (MC_) {
-	nearestParton = Common::nearestObject(tauOldJetRef, genParticlePtrs, nearestPartonIndex);
+// 	nearestParton = Common::nearestObject(tauOldJetRef, genParticlePtrs, nearestPartonIndex);
+	nearestParton = Common::nearestObject(WMuonRefs[WMuonRefs.size() - 1], genParticlePtrs, 
+					      nearestPartonIndex);
       }
       if (nearestParton != NULL) {
 	if (reco::deltaR(*nearestParton, *tauOldJetRef) < dR_) {
@@ -981,6 +1456,59 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	else jetParentParton_->Fill(-1, PUWeight);
       }
       else if (MC_) jetParentParton_->Fill(7, PUWeight);
+
+      //get the nearest gen muon from a1-->tau(-->mu)tau(-->had) decay to the soft muon
+      int iNearestGenTauMu = -1;
+      const reco::GenParticle* nearestGenTauMu = NULL;
+      if (MC_) {
+	nearestGenTauMu = Common::nearestObject(removedMuonRefs[removedMuonRefs.size() - 1], 
+						genTauMuPtrs, iNearestGenTauMu);
+      }
+
+      //categorize based on the gen matches to the W and tau muons
+      int genMuInfoVal = -1;
+      if ((iNearestGenTauMu != -1) && (nearestPartonIndex != -1)) {
+	const double dRWMuNearestGenWMu = 
+	  reco::deltaR(*nearestParton, *WMuonRefs[WMuonRefs.size() - 1]);
+	const double dRTauMuNearestGenTauMu = 
+	  reco::deltaR(*nearestGenTauMu, *removedMuonRefs[removedMuonRefs.size() - 1]);
+	if (dRWMuNearestGenWMu < dR_) {
+	  if (dRTauMuNearestGenTauMu < dR_) genMuInfoVal = 0; //correct assignment
+	  else genMuInfoVal = 1; //W muon correct, gen tau muon not reconstructed
+	}
+	else if (dRTauMuNearestGenTauMu < dR_) genMuInfoVal = 2; /*tau muon correct, gen W muon 
+								   not reconstructed*/
+	else { //incorrect assignment
+	  int iNearestGenTauMuToWMu = -1;
+	  int iNearestGenWMuToTauMu = -1;
+	  const reco::GenParticle* nearestGenTauMuToWMu = 
+	    Common::nearestObject(WMuonRefs[WMuonRefs.size() - 1], genTauMuPtrs, 
+				  iNearestGenTauMuToWMu);
+	  const reco::GenParticle* nearestGenWMuToTauMu = 
+	    Common::nearestObject(removedMuonRefs[removedMuonRefs.size() - 1], genParticlePtrs, 
+				  iNearestGenWMuToTauMu);
+	  const double dRWMuNearestGenTauMu = 
+	    reco::deltaR(*nearestGenTauMuToWMu, *WMuonRefs[WMuonRefs.size() - 1]);
+	  const double dRTauMuNearestGenWMu = 
+	    reco::deltaR(*nearestGenWMuToTauMu, *removedMuonRefs[removedMuonRefs.size() - 1]);
+	  if (dRWMuNearestGenTauMu < dR_) {
+	    if (dRTauMuNearestGenWMu < dR_) genMuInfoVal = 3; //switched assignment
+	    else genMuInfoVal = 4; //tau-->mu reconstructed as W muon, W muon not reconstructed
+	  }
+	  else if (dRTauMuNearestGenWMu < dR_) genMuInfoVal = 5; /*W muon reconstructed as tau 
+								   muon, tau muon not 
+								   reconstructed*/
+	  else genMuInfoVal = 6; //neither lepton reconstructed
+	}
+      }
+//       else {
+// 	std::cerr << "Not a W-->tau(-->mu)nu or W-->munu event\n";
+// 	std::cerr << "genParticlePtrs.size() = " << genParticlePtrs.size() << std::endl;
+// 	std::cerr << "genTauMuPtrs.size() = " << genTauMuPtrs.size() << std::endl;
+//       }
+
+      //plot information about muon gen matching
+      genMuInfo_->Fill(genMuInfoVal/*, PUWeight*/);
 
       //plot dR(W muon, leading soft muon per jet) when mu+had mass > 2 GeV
       if (muHadMass > 2.0/*GeV*/) {
@@ -1545,6 +2073,7 @@ void TauAnalyzer::beginJob()
   dRSoftMuNearestGenZMuFSR_ = new TH1F("dRSoftMuNearestGenZMuFSR", 
 				       ";#DeltaR(soft #mu, nearest gen Z #mu from FSR);", 
 				       40, 0.0, 2.0);
+  genMuInfo_ = new TH1F("genMuInfo", ";;", 7, -0.5, 6.5);
   cleanedJetPTVsCleanedTauPT_ = 
     new TH2F("cleanedJetPTVsCleanedTauPT", ";#tau p_{T} (GeV);Jet p_{T} (GeV)", 
 	     50, 0.0, 100.0, 50, 0.0, 100.0);
@@ -1674,6 +2203,13 @@ void TauAnalyzer::beginJob()
   tauHadDecayMode_->GetXaxis()->SetBinLabel(3, "1-prong + 2 #pi^{0}");
   tauHadDecayMode_->GetXaxis()->SetBinLabel(4, "3-prong");
   tauHadDecayMode_->GetXaxis()->SetBinLabel(5, "Other");
+  genMuInfo_->GetXaxis()->SetBinLabel(1, "Correct");
+  genMuInfo_->GetXaxis()->SetBinLabel(2, "W muon correct");
+  genMuInfo_->GetXaxis()->SetBinLabel(3, "#tau muon correct");
+  genMuInfo_->GetXaxis()->SetBinLabel(4, "Switched");
+  genMuInfo_->GetXaxis()->SetBinLabel(5, "#tau muon #rightarrow W muon");
+  genMuInfo_->GetXaxis()->SetBinLabel(6, "W muon #rightarrow #tau muon");
+  genMuInfo_->GetXaxis()->SetBinLabel(7, "Neither");
 
   //set sumw2
   MET_->Sumw2();
@@ -1717,6 +2253,7 @@ void TauAnalyzer::beginJob()
   tauHadDecayMode_->Sumw2();
   dRSoftMuNearestGenZMu_->Sumw2();
   dRSoftMuNearestGenZMuFSR_->Sumw2();
+  genMuInfo_->Sumw2();
   cleanedJetPTVsCleanedTauPT_->Sumw2();
   uncleanedJetPTVsCleanedTauPT_->Sumw2();
   muHadMassVsDRSoftMuTau_->Sumw2();
@@ -1803,6 +2340,7 @@ void TauAnalyzer::endJob()
   TCanvas tauHadDecayModeCanvas("tauHadDecayModeCanvas", "", 600, 600);
   TCanvas dRSoftMuNearestGenZMuCanvas("dRSoftMuNearestGenZMuCanvas", "", 600, 600);
   TCanvas dRSoftMuNearestGenZMuFSRCanvas("dRSoftMuNearestGenZMuFSRCanvas", "", 600, 600);
+  TCanvas genMuInfoCanvas("genMuInfoCanvas", "", 600, 600);
   TCanvas cleanedJetPTVsCleanedTauPTCanvas("cleanedJetPTVsCleanedTauPTCanvas", "", 600, 600);
   TCanvas uncleanedJetPTVsCleanedTauPTCanvas("uncleanedJetPTVsCleanedTauPTCanvas", "", 600, 600);
   TCanvas muHadMassVsDRSoftMuTauCanvas("muHadMassVsDRSoftMuTauCanvas", "", 600, 600);
@@ -1899,6 +2437,7 @@ void TauAnalyzer::endJob()
   Common::draw1DHistograms(tauHadDecayModeCanvas, tauHadDecayMode_);
   Common::draw1DHistograms(dRSoftMuNearestGenZMuCanvas, dRSoftMuNearestGenZMu_);
   Common::draw1DHistograms(dRSoftMuNearestGenZMuFSRCanvas, dRSoftMuNearestGenZMuFSR_);
+  Common::draw1DHistograms(genMuInfoCanvas, genMuInfo_);
 
   //format and draw 2D plots
   Common::draw2DHistograms(cleanedJetPTVsCleanedTauPTCanvas, cleanedJetPTVsCleanedTauPT_);
@@ -1982,6 +2521,7 @@ void TauAnalyzer::endJob()
   tauHadDecayModeCanvas.Write();
   dRSoftMuNearestGenZMuCanvas.Write();
   dRSoftMuNearestGenZMuFSRCanvas.Write();
+  genMuInfoCanvas.Write();
   cleanedJetPTVsCleanedTauPTCanvas.Write();
   uncleanedJetPTVsCleanedTauPTCanvas.Write();
   muHadMassVsDRSoftMuTauCanvas.Write();
@@ -2214,6 +2754,8 @@ void TauAnalyzer::reset(const bool doDelete)
   dRSoftMuNearestGenZMu_ = NULL;
   if (doDelete && (dRSoftMuNearestGenZMuFSR_ != NULL)) delete dRSoftMuNearestGenZMuFSR_;
   dRSoftMuNearestGenZMuFSR_ = NULL;
+  if (doDelete && (genMuInfo_ != NULL)) delete genMuInfo_;
+  genMuInfo_ = NULL;
   if (doDelete && (cleanedJetPTVsCleanedTauPT_ != NULL)) delete cleanedJetPTVsCleanedTauPT_;
   cleanedJetPTVsCleanedTauPT_ = NULL;
   if (doDelete && (uncleanedJetPTVsCleanedTauPT_ != NULL)) delete uncleanedJetPTVsCleanedTauPT_;
