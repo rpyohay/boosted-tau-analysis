@@ -87,7 +87,11 @@ for iJob in `seq $minJob $maxJob`
 #  nJetTot=`expr $nJetTot + $nJet`
 #      nTauMuonPTTot=`expr $nTauMuonPTTot + $nTauMuonPT`
       nTauMuonSoftTot=`expr $nTauMuonSoftTot + $nTauMuonSoft`
+<<<<<<< HEAD
 #      nMuHadIsoTot=`expr $nMuHadIsoTot + $nMuHadIso`
+=======
+#  nMuHadIsoTot=`expr $nMuHadIsoTot + $nMuHadIso`
+>>>>>>> 46247d24eb20eea62a68284a461b2dc6bfa58c65
       nMuHadTot=`expr $nMuHadTot + $nMuHad`
   fi
 done
@@ -101,7 +105,11 @@ echo "nWMuonIsoTot = $nWMuonIsoTot"
 #echo "nJetTot = $nJetTot"
 #echo "nTauMuonPTTot = $nTauMuonPTTot"
 echo "nTauMuonSoftTot = $nTauMuonSoftTot"
+<<<<<<< HEAD
 echo "nMuHadIsoTot = $nMuHadIsoTot"
+=======
+#echo "nMuHadIsoTot = $nMuHadIsoTot"
+>>>>>>> 46247d24eb20eea62a68284a461b2dc6bfa58c65
 echo "nMuHadTot = $nMuHadTot"
 
 exit 0

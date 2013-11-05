@@ -1365,20 +1365,32 @@ process.selectedOutput = cms.OutputModule(
     "PoolOutputModule",
     SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring('p')),
     outputCommands = skimEventContent.outputCommands,
+<<<<<<< HEAD
     fileName = cms.untracked.string('/data1/friccita/Wh1_Medium/EDM_files/data_selected.root')
+=======
+    fileName = cms.untracked.string('/data1/yohay/Wh1_Medium/EDM_files/data_selected.root')
+>>>>>>> 46247d24eb20eea62a68284a461b2dc6bfa58c65
     )
 process.antiSelectedOutput = cms.OutputModule(
     "PoolOutputModule",
     SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring('p')),
     outputCommands = skimEventContent.outputCommands,
+<<<<<<< HEAD
     fileName = cms.untracked.string('/data1/friccita/Wh1_Medium/EDM_files/data_anti-selected.root')
+=======
+    fileName = cms.untracked.string('/data1/yohay/Wh1_Medium/EDM_files/data_anti-selected.root')
+>>>>>>> 46247d24eb20eea62a68284a461b2dc6bfa58c65
     )
 process.noSelectedOutput = cms.OutputModule(
     "PoolOutputModule",
     SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring('p')),
     outputCommands = skimEventContent.outputCommands,
     fileName = cms.untracked.string(
+<<<<<<< HEAD
     '/data1/friccita/Wh1_Medium/EDM_files/data_no_selection.root'
+=======
+    '/data1/yohay/Wh1_Medium/EDM_files/data_no_selection.root'
+>>>>>>> 46247d24eb20eea62a68284a461b2dc6bfa58c65
     )
     )
 

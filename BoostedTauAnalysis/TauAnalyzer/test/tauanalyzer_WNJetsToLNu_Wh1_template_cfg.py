@@ -47,7 +47,11 @@ TAU_RARE = 15
 ANY_PT_RANK = -1
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
+<<<<<<< HEAD
 process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(1)
+=======
+process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(1000)
+>>>>>>> 46247d24eb20eea62a68284a461b2dc6bfa58c65
 
 process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
 
@@ -77,7 +81,10 @@ process.load("Configuration.Geometry.GeometryRecoDB_cff")
 process.load("RecoTauTag.Configuration.RecoPFTauTag_cff")
 process.load("RecoTauTag.RecoTau.RecoTauPiZeroProducer_cfi")
 process.load('BoostedTauAnalysis/CleanJets/cleanjets_cfi')
+<<<<<<< HEAD
 process.load('BoostedTauAnalysis/TauAnalyzer/tauanalyzer_cfi')
+=======
+>>>>>>> 46247d24eb20eea62a68284a461b2dc6bfa58c65
 
 ## #for jet charged hadron subtraction
 ## process.load("CommonTools.ParticleFlow.PF2PAT_cff")
@@ -288,9 +295,13 @@ process.muHadIsoTauAnalyzer = cms.EDAnalyzer(
     pTRankColors = cms.vuint32(1, 2, 4, 6),
     pTRankStyles = cms.vuint32(20, 21, 22, 23),
     pTRankEntries = cms.vstring('Highest p_{T}', 'Second highest p_{T}', 'Third highest p_{T}',
+<<<<<<< HEAD
                                 'Lowest p_{T}'),
     zCut = cms.double(0.1),
     RcutFactor = cms.double(0.5)
+=======
+                                'Lowest p_{T}')
+>>>>>>> 46247d24eb20eea62a68284a461b2dc6bfa58c65
     )
 
 #analyze non-isolated taus
@@ -316,6 +327,7 @@ process.output = cms.OutputModule(
     )
     )
 
+<<<<<<< HEAD
 #MET filter
 process.METFilter.minMET = cms.double(40.)
 
@@ -351,6 +363,11 @@ process.beginSequence = cms.Sequence(process.genPartonSelector*process.genMuSele
 process.isoTauAnalysisSequence = cms.Sequence(process.muHadIsoTauSelector*
                                               process.TriggerObjectFilter*
 #                                              process.METFilter*
+=======
+#sequences
+process.beginSequence = cms.Sequence(process.genPartonSelector*process.genMuSelector)
+process.isoTauAnalysisSequence = cms.Sequence(process.muHadIsoTauSelector*
+>>>>>>> 46247d24eb20eea62a68284a461b2dc6bfa58c65
                                               process.muHadIsoTauAnalyzer)
 process.signalIsoTauAnalysisSequence = cms.Sequence(process.genWMuNuSelector*
                                                     process.IsoMu24eta2p1Selector*
@@ -359,6 +376,7 @@ process.signalIsoTauAnalysisSequence = cms.Sequence(process.genWMuNuSelector*
                                                     process.tauMuonPTSelector*
                                                     process.tauMuonSelector*process.PFTau*
                                                     process.muHadIsoTauSelector*
+<<<<<<< HEAD
                                                     process.TriggerObjectFilter*
 #                                                    process.METFilter*
                                                     process.muHadIsoTauAnalyzer)
@@ -366,6 +384,11 @@ process.nonIsoTauAnalysisSequence = cms.Sequence(process.muHadTauSelector*
                                                  process.muHadNonIsoTauSelector*
                                                  process.TriggerObjectFilter*
 #                                                 process.METFilter*
+=======
+                                                    process.muHadIsoTauAnalyzer)
+process.nonIsoTauAnalysisSequence = cms.Sequence(process.muHadTauSelector*
+                                                 process.muHadNonIsoTauSelector*
+>>>>>>> 46247d24eb20eea62a68284a461b2dc6bfa58c65
                                                  process.muHadNonIsoTauAnalyzer)
 process.tauAnalysisSequence = cms.Sequence(process.muHadTauSelector*
                                            process.muHadTauAnalyzer)

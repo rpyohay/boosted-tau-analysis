@@ -604,12 +604,20 @@ void draw(const vector<string>& canvasNames, TFile& outStream, vector<TCanvas*>&
     outputCanvases[canvasIndex]->SetLogz();
     if (hists[canvasIndex] != NULL) {
       setHistogramOptions(hists[canvasIndex], kBlack, 0.7/*4.2*/, 20, 1.6, 1.0);
+<<<<<<< HEAD
       hists[canvasIndex]->GetZaxis()->SetRangeUser(0.1, 10000.0);
+=======
+      hists[canvasIndex]->GetZaxis()->SetRangeUser(0.00001, 1.0);
+>>>>>>> 46247d24eb20eea62a68284a461b2dc6bfa58c65
       hists[canvasIndex]->Draw("COLZ");
       TProfile* profileX = 
 	hists[canvasIndex]->ProfileX((string(hists[canvasIndex]->GetName()) + "_pfx").c_str());
       profileX->SetLineWidth(3);
+<<<<<<< HEAD
       // profileX->Draw("HISTSAME");
+=======
+      profileX->Draw("HISTSAME");
+>>>>>>> 46247d24eb20eea62a68284a461b2dc6bfa58c65
     }
   }
 }

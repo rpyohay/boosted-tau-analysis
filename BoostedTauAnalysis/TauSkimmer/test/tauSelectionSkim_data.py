@@ -245,8 +245,12 @@ process.WIsoMuonSelector = cms.EDFilter('CustomMuonSelector',
                                         detectorIsoMax = cms.double(-1.0),
                                         PUSubtractionCoeff = cms.double(0.5),
                                         usePFIso = cms.bool(True),
+<<<<<<< HEAD
 #                                        passIso = cms.bool(True),
                                         passIso = cms.bool(False),
+=======
+                                        passIso = cms.bool(True),
+>>>>>>> 46247d24eb20eea62a68284a461b2dc6bfa58c65
                                         etaMax = cms.double(2.1),
                                         minNumObjsToPassFilter = cms.uint32(1)
                                         )

@@ -493,6 +493,7 @@ TauAnalyzer::TauAnalyzer(const edm::ParameterSet& iConfig) :
 {
   //now do what ever initialization is needed
   reset(false);
+
   //check that tau arbitration method is valid
   if ((tauArbitrationMethod_ != "pT") && (tauArbitrationMethod_ != "m") && 
       (tauArbitrationMethod_ != "none")) {
@@ -596,8 +597,7 @@ TauAnalyzer::~TauAnalyzer()
 
 // ------------ method called for each event  ------------
 void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
-{
-  cout << "analyzer" << endl;
+{ // analyzer
   //get taus
   edm::Handle<reco::PFTauRefVector> pTaus;
   iEvent.getByLabel(tauTag_, pTaus);
@@ -972,7 +972,7 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 						    *removedMuonRefs[removedMuonRefs.size() - 1]), 
 				       PUWeight);
       }
-
+    
       //plot tau muon pT
       const double tauMuPT = removedMuonRefs[removedMuonRefs.size() - 1]->pt();
       tauMuPT_->Fill(tauMuPT, PUWeight);
@@ -1139,7 +1139,7 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	const reco::PFCandidate *thisParticle = all_particles.at(particle);
 	FJparticles.push_back(fastjet::PseudoJet(thisParticle->px(),thisParticle->py(),thisParticle->pz(),thisParticle->energy()));
       }
-      fastjet::JetDefinition jet_def(fastjet::antikt_algorithm, 0.5);
+      fastjet::JetDefinition jet_def(fastjet::kt_algorithm, 0.5);
       fastjet::ClusterSequence thisClustering(FJparticles, jet_def);
       vector<fastjet::PseudoJet> FJjet = thisClustering.inclusive_jets();
       fastjet::PseudoJet thisMainJet = FJjet.at(0);
@@ -1219,6 +1219,8 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	    } // if tau3/tau1 < 0.02
 	  muHad_t3t1VsDecayMode_->Fill((*iTau)->decayMode(), tau3/tau1, PUWeight);
 	}
+      muHad_t3t1_->Fill(tau3/tau1, PUWeight);
+      muHad_t2t1_->Fill(tau2/tau1, PUWeight);
 
       //plot number of charged tracks of cleaned jet
 
@@ -1429,7 +1431,6 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	    } // |eta| < 2.4    
 	} // if the jet doesn't overlap with the tau
     }
-
     //increment tau iterator
     ++iTau;
   }
@@ -1480,13 +1481,12 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 			      removedMuonRefs[removedMuonRefs.size() - 1]->p4()).M();
       if (Mass_WMuTauMu > 20.)
 	dPhiWMuSoftMu_withCut_->Fill(dPhi, PUWeight);
-
     }
   }
 
   //plot mu+had multiplicity
   muHadMultiplicity_->Fill(nMuHad, PUWeight);
-}
+} // analyzer
 
 
 // ------------ method called once each job just before starting event loop  ------------
