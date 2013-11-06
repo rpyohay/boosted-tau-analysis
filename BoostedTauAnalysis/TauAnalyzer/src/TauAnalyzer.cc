@@ -1305,7 +1305,8 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     const unsigned int softMuPTBin = (int)(removedMuonRefs[removedMuonRefs.size() - 1]->pt()/5.0);
     double tauHadSoftMuPTWeight = 0.0;
     unsigned int hashedIndex = tauHadPTBin*20 + softMuPTBin;
-    if (hashedIndex < 400) tauHadSoftMuPTWeight = tauHadSoftMuPTWeights_[hashedIndex];
+//     if (hashedIndex < 400) tauHadSoftMuPTWeight = tauHadSoftMuPTWeights_[hashedIndex];
+    tauHadSoftMuPTWeight = 1.0;
 
     /*fill collections of
       - corrected jets excluding the jet associated to the hadronic tau
@@ -1356,10 +1357,12 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 			      removedMuonRefs[removedMuonRefs.size() - 1]->p4()).M();
 
     //impose pT and decay mode cut on tau
-    if (((*iTau)->pt() > tauPTMin_) && // (pMET->refAt(0)->et() > 70.0/*GeV*/) && 
+    if (((*iTau)->pt() > tauPTMin_) && 
 	((removedMuonRefs[removedMuonRefs.size() - 1]->charge() + (*iTau)->charge()) == 0) && 
-	((mWMuTauMuTauHad < 80.0/*GeV*/) || (mWMuTauMuTauHad >= 100.0/*GeV*/)) && 
-	((mWMuTauMu < 80.0/*GeV*/) || (mWMuTauMu >= 100.0/*GeV*/)) && 
+	((removedMuonRefs[removedMuonRefs.size() - 1]->charge()*
+	  WMuonRefs[WMuonRefs.size() - 1]->charge()) > 0) && 
+// 	((mWMuTauMuTauHad < 80.0/*GeV*/) || (mWMuTauMuTauHad >= 100.0/*GeV*/)) && 
+// 	((mWMuTauMu < 80.0/*GeV*/) || (mWMuTauMu >= 100.0/*GeV*/)) && 
 	((tauDecayMode_ == reco::PFTau::kNull) || ((*iTau)->decayMode() == tauDecayMode_))) {
 
       //plot the number of good vertices
