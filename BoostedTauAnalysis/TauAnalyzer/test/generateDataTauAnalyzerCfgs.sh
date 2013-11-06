@@ -3,7 +3,7 @@
 ####STUFF TO CONFIGURE####
 
 #version
-version="v67"
+version="v68"
 infoTag=""
 dir=$version
 
@@ -61,7 +61,10 @@ for i in `seq $iBeg $iEnd`
   #generate cfg file for the non-isolated sample
   sed -e "s%FILES%${inputFileBlocks[${i}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${i}]}%" -e "s%NONISOTAUANALYZEROUTFILE%${nonIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%ALLTAUANALYZEROUTFILE%${allTauAnalyzerOutputFiles[${i}]}%" -e "s%ISOTAUANALYZEROUTFILE%${isoTauAnalyzerOutputFiles[${i}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${i}]}%" -e "s%SEQUENCE%process.nonIsoTauAnalysisSequence%" -e "s%PUSCENARIO%S10%" ../tauanalyzer_data_template_cfg.py > tauanalyzer_${samples[${i}]}_nonIso_cfg.py
 
-  #generate job submission script for LSF
+  #generate cfg file for the sample with no isolation cut
+  sed -e "s%FILES%${inputFileBlocks[${i}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${i}]}%" -e "s%NONISOTAUANALYZEROUTFILE%${nonIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%ALLTAUANALYZEROUTFILE%${allTauAnalyzerOutputFiles[${i}]}%" -e "s%ISOTAUANALYZEROUTFILE%${isoTauAnalyzerOutputFiles[${i}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${i}]}%" -e "s%SEQUENCE%process.tauAnalysisSequence%" -e "s%PUSCENARIO%S10%" ../tauanalyzer_data_template_cfg.py > tauanalyzer_${samples[${i}]}_all_cfg.py
+
+  #generate iso+nonIso job submission script for LSF
   cat <<EOF > tauanalyzer_${samples[${i}]}_cfg.sh
 #!/bin/bash
 
@@ -82,6 +85,25 @@ rm ${nonIsoTauAnalyzerOutputFiles[${i}]}
 exit 0
 EOF
   chmod a+x tauanalyzer_${samples[${i}]}_cfg.sh
+
+  #generate noIsoCut job submission script for LSF
+  cat <<EOF > tauanalyzer_${samples[${i}]}_all_cfg.sh
+#!/bin/bash
+
+jobDir="`pwd`"
+fileNamePrefix="tauanalyzer_${samples[${i}]}"
+
+cd \$jobDir
+eval \`scramv1 runtime -sh\`
+cd -
+cp \$jobDir/\${fileNamePrefix}_all_cfg.py .
+cmsRun \${fileNamePrefix}_all_cfg.py
+cmsStage -f ${allTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/
+rm ${allTauAnalyzerOutputFiles[${i}]}
+
+exit 0
+EOF
+  chmod a+x tauanalyzer_${samples[${i}]}_all_cfg.sh
 done
 
 #generate run cfg that runs all files in the directory
@@ -104,11 +126,11 @@ exit 0
 EOF
 chmod a+x runDataTauAnalyzerCfgs.sh
 
-#generate script that submits all jobs to LSF
+#generate script that submits all iso+nonIso jobs to LSF
 cat <<EOF > submitDataTauAnalyzerJobs.sh
 #!/bin/bash
 
-for file in \`ls -alh tauanalyzer*SingleMu*.sh | awk '{ print \$9 }'\`
+for file in \`ls -alh tauanalyzer*SingleMu*.sh | grep -v all | awk '{ print \$9 }'\`
   do
   jobName=\`echo \$file | sed -e "s%\(.*\)\.sh%\1%"\`
   bsub -q 8nh -J \$jobName < \$file
@@ -118,7 +140,21 @@ exit 0
 EOF
 chmod a+x submitDataTauAnalyzerJobs.sh
 
-#generate script that copies all files locally from EOS
+#generate script that submits all noIsoCut jobs to LSF
+cat <<EOF > submitDataAllTauAnalyzerJobs.sh
+#!/bin/bash
+
+for file in \`ls -alh tauanalyzer*SingleMu*all*.sh | awk '{ print \$9 }'\`
+  do
+  jobName=\`echo \$file | sed -e "s%\(.*\)\.sh%\1%"\`
+  bsub -q 8nh -J \$jobName < \$file
+done
+
+exit 0
+EOF
+chmod a+x submitDataAllTauAnalyzerJobs.sh
+
+#generate script that copies all iso+nonIso files locally from EOS
 cat <<EOF > copyDataFromEOS.sh
 #!/bin/bash
 
@@ -136,5 +172,20 @@ done
 exit 0
 EOF
 chmod a+x copyDataFromEOS.sh
+
+#generate script that copies all noIsoCut files locally from EOS
+cat <<EOF > copyAllDataFromEOS.sh
+#!/bin/bash
+
+eval \`scramv1 runtime -sh\`
+for sample in "A" "B" "C" "D"
+  do
+  #cmsStage -f /store/user/`whoami`/muHadAnalysis_SingleMu_Run2012\${sample}_${version}.root /data1/`whoami`/data/analysis/ #BLINDED!!!
+  #cmsRm /store/user/`whoami`/muHadAnalysis_SingleMu_Run2012\${sample}_${version}.root #BLINDED!!!
+done
+
+exit 0
+EOF
+chmod a+x copyAllDataFromEOS.sh
 
 exit 0

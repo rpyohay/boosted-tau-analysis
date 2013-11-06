@@ -3,7 +3,7 @@
 ####STUFF TO CONFIGURE####
 
 #version
-version="v67"
+version="v68"
 infoTag=""
 dir=$version
 
@@ -158,6 +158,7 @@ for sample in "_s" "bar_s" "_t" "bar_t"
   for cut in Iso NonIso
     do
     cmsStage -f /store/user/`whoami`/muHad\${cut}Analysis_T\${sample}-channel_${version}.root /data1/`whoami`/SingleTop/analysis/
+    cmsRm /store/user/`whoami`/muHad\${cut}Analysis_T\${sample}-channel_${version}.root
   done
 done
 

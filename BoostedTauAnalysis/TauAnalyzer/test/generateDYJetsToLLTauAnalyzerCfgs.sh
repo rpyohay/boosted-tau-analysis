@@ -3,7 +3,7 @@
 ####STUFF TO CONFIGURE####
 
 #version
-version="v67"
+version="v68"
 infoTag=""
 dir=$version
 
@@ -160,6 +160,7 @@ for sample in "10To50" "50"
   for cut in Iso NonIso
     do
     cmsStage -f /store/user/`whoami`/muHad\${cut}Analysis_DYJetsToLL_M-\${sample}_${version}.root /data1/`whoami`/DYJetsToLL/analysis/
+    cmsRm /store/user/`whoami`/muHad\${cut}Analysis_DYJetsToLL_M-\${sample}_${version}.root
   done
 done
 
