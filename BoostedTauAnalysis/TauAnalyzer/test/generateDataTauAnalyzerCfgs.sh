@@ -3,7 +3,7 @@
 ####STUFF TO CONFIGURE####
 
 #version
-version="v51"
+version="v67"
 infoTag=""
 dir=$version
 
@@ -129,6 +129,7 @@ for sample in "A" "B" "C" "D"
   for cut in NonIso
     do
     cmsStage -f /store/user/`whoami`/muHad\${cut}Analysis_SingleMu_Run2012\${sample}_${version}.root /data1/`whoami`/data/analysis/
+    cmsRm /store/user/`whoami`/muHad\${cut}Analysis_SingleMu_Run2012\${sample}_${version}.root
   done
 done
 

@@ -3,7 +3,7 @@
 ####STUFF TO CONFIGURE####
 
 #version
-version="v52"
+version="v56"
 infoTag=""
 dir=$version
 
@@ -102,6 +102,7 @@ eval \`scramv1 runtime -sh\`
 for sample in "A" "B" "C" "D"
   do
   cmsStage -f /store/user/`whoami`/DrellYanAnalysis_SingleMu_Run2012\${sample}_${version}.root /data1/`whoami`/data/analysis/
+  cmsRm /store/user/`whoami`/DrellYanAnalysis_SingleMu_Run2012\${sample}_${version}.root
 done
 
 exit 0

@@ -102,6 +102,7 @@ eval \`scramv1 runtime -sh\`
 for sample in \`seq `expr $iBeg + 1` `expr $iEnd + 1`\`
   do
   cmsStage -f /store/user/`whoami`/DrellYanAnalysis_WJetsToLNu_${version}.root /data1/`whoami`/WJetsToLNu/analysis/
+  cmsRm /store/user/`whoami`/DrellYanAnalysis_WJetsToLNu_${version}.root
 done
 
 exit 0

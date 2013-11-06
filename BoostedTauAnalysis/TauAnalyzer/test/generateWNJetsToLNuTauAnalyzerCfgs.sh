@@ -3,7 +3,7 @@
 ####STUFF TO CONFIGURE####
 
 #version
-version="v51"
+version="v67"
 infoTag=""
 dir=$version
 
@@ -122,6 +122,7 @@ for sample in \`seq 1 4\`
   for cut in Iso NonIso
     do
     cmsStage -f /store/user/`whoami`/muHad\${cut}Analysis_W\${sample}JetsToLNu_${version}.root /data1/`whoami`/WNJetsToLNu/analysis/
+    cmsRm /store/user/`whoami`/muHad\${cut}Analysis_W\${sample}JetsToLNu_${version}.root
   done
 done
 
