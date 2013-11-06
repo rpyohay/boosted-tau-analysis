@@ -270,6 +270,8 @@ process.muHadIsoTauAnalyzer = cms.EDAnalyzer(
     jetMuonMapTag = cms.InputTag('CleanJets', '', 'SKIM'),
     oldNewJetMapTag = cms.InputTag('CleanJets', '', 'SKIM'),
     genParticleTag = cms.InputTag('genPartonSelector'),
+    genTauMuTag = cms.InputTag('genTauMuSelector'),
+    genWTauMuTag = cms.InputTag('genWTauNuSelector'),
     tauHadIsoTag = cms.InputTag('hpsPFTauDiscriminationByRawCombinedIsolationDBSumPtCorr', '',
                                 'SKIM'),
     allMuonTag = cms.InputTag('muons'),
