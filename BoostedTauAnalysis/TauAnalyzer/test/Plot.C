@@ -717,10 +717,10 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 			    string(pHist->GetName()) == "muHadPTOverMuHadMass" ? 
 			    "p_{T}/m" : pHist->GetXaxis()->GetTitle(), 
 			    pHist->GetYaxis()->GetTitle());
-// 	if (string(pHist->GetName()) == "muHadMass") {
-// 	  cout << *iInputFile << endl;
-// 	  cout << "Integral: " << pHist->Integral(5, -1) << endl;
-// 	}
+	if (string(pHist->GetName()) == "muHadMass"/*"tauHadIso"*/) {
+	  cout << *iInputFile << endl;
+	  cout << "Integral: " << pHist->Integral(5, -1)/*pHist->Integral(0, -1)*/ << endl;
+	}
 	string histName(pHist->GetName());
 	if (histName == "jet_pt_etacut") pHist->GetXaxis()->SetTitle("p_{T} (GeV)");
 	if (histName == "jet_eta") pHist->GetXaxis()->SetTitle("#eta");
@@ -1060,13 +1060,17 @@ void addClosurePlot(TFile& sigVsBkgIso20InvFbStream, const string& var, const st
   setCanvasOptions(outCanvas, 1, 1, 0);
   setCanvasMargins(outCanvas, 0.2, 0.2, 0.2, 0.2);
   outCanvas.cd();
-  histSig->Draw();
-  histBkgIso->Draw("SAME");
-  histBkgNonIso->Draw("SAME");
+  histSig->Draw("HIST");
+  histBkgIso->Draw("HISTESAME");
+  histBkgNonIso->Draw("HISTESAME");
+  Double_t histBkgIsoErr = -1.0;
+  Double_t histBkgNonIsoErr = -1.0;
   cout << histSig->GetName() << endl;
   cout << histSig->Integral(5, -1) << endl;
-  cout << histBkgIso->Integral(5, -1) << endl;
-  cout << histBkgNonIso->Integral(5, -1) << endl;
+  cout << histBkgIso->IntegralAndError(5, -1, histBkgIsoErr) << "+/-";
+  cout << histBkgIsoErr << endl;
+  cout << histBkgNonIso->IntegralAndError(5, -1, histBkgNonIsoErr) << "+/-";
+  cout << histBkgNonIsoErr << endl;
   outCanvas.Write();
 }
 
