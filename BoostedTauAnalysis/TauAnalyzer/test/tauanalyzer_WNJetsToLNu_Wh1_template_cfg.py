@@ -316,6 +316,7 @@ process.muHadIsoTauAnalyzer = cms.EDAnalyzer(
     zCut = cms.double(0.1),
     RcutFactor = cms.double(0.5),
     MC = cms.bool(True),
+    reweight = cms.bool(False),
     pTRankColors = cms.vuint32(1, 2, 4, 6),
     pTRankStyles = cms.vuint32(20, 21, 22, 23),
     pTRankEntries = cms.vstring('Highest p_{T}', 'Second highest p_{T}', 'Third highest p_{T}',
@@ -328,6 +329,7 @@ process.muHadNonIsoTauAnalyzer.outFileName = cms.string(
     'NONISOTAUANALYZEROUTFILE'
     )
 process.muHadNonIsoTauAnalyzer.tauTag = cms.InputTag('muHadNonIsoTauSelector')
+process.muHadNonIsoTauAnalyzer.reweight = cms.bool(REWEIGHT)
 
 #analyze all taus
 process.muHadTauAnalyzer = process.muHadIsoTauAnalyzer.clone()
