@@ -3,7 +3,7 @@
 ####STUFF TO CONFIGURE####
 
 #version
-version="v68"
+version="v71"
 infoTag=""
 dir=$version
 
