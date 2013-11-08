@@ -449,8 +449,12 @@
 				"DYJetsToLL/analysis/muHadNonIsoAnalysis_DYJetsToLL");
   string DYJetsToLLNonIsoSuffix(DYJetsToLLVTag + fileExt);
   string DYJetsToLLNonIsoHaddOutputFile(DYJetsToLLNonIsoPrefix + DYJetsToLLNonIsoSuffix);
+  string DYJetsToLLAllPrefix(analysisFilePath + "DYJetsToLL/analysis/muHadAnalysis_DYJetsToLL");
+  string DYJetsToLLAllSuffix(DYJetsToLLVTag + fileExt);
+  string DYJetsToLLAllHaddOutputFile(DYJetsToLLAllPrefix + DYJetsToLLAllSuffix);
   vector<string> DYJetsToLLIsoHaddInputFiles;
   vector<string> DYJetsToLLNonIsoHaddInputFiles;
+  vector<string> DYJetsToLLAllHaddInputFiles;
   vector<string> massBins;
   massBins.push_back("_M-10To50");
   massBins.push_back("_M-50");
@@ -462,10 +466,15 @@
     stringstream DYJetsToLLNonIsoName;
     DYJetsToLLNonIsoName << DYJetsToLLNonIsoPrefix << *iMassBin << DYJetsToLLNonIsoSuffix;
     DYJetsToLLNonIsoHaddInputFiles.push_back(DYJetsToLLNonIsoName.str());
+    stringstream DYJetsToLLAllName;
+    DYJetsToLLAllName << DYJetsToLLAllPrefix << *iMassBin << DYJetsToLLAllSuffix;
+    DYJetsToLLAllHaddInputFiles.push_back(DYJetsToLLAllName.str());
   }
   haddCanvases(DYJetsToLLIsoHaddOutputFile, DYJetsToLLIsoHaddInputFiles, DYJetsToLLRelXSecWeights, 
 	       canvasNames1D, graphNames1D, canvasNames2D, graphNames2D);
   haddCanvases(DYJetsToLLNonIsoHaddOutputFile, DYJetsToLLNonIsoHaddInputFiles, 
+	       DYJetsToLLRelXSecWeights, canvasNames1D, graphNames1D, canvasNames2D, graphNames2D);
+  haddCanvases(DYJetsToLLAllHaddOutputFile, DYJetsToLLAllHaddInputFiles, 
 	       DYJetsToLLRelXSecWeights, canvasNames1D, graphNames1D, canvasNames2D, graphNames2D);
 
   //hadd W+jets Njets binned samples
@@ -496,18 +505,21 @@
   haddCanvases(WNJetsToLNuNonIsoHaddOutputFile, WNJetsToLNuNonIsoHaddInputFiles, 
 	       WNJetsToLNuRelXSecWeights, canvasNames1D, graphNames1D, canvasNames2D, 
 	       graphNames2D);
-//   haddCanvases(WNJetsToLNuAllTauHaddOutputFile, WNJetsToLNuAllTauHaddInputFiles, 
-// 	       WNJetsToLNuRelXSecWeights, canvasNames1D, graphNames1D, canvasNames2D, 
-// 	       graphNames2D);
+  haddCanvases(WNJetsToLNuAllTauHaddOutputFile, WNJetsToLNuAllTauHaddInputFiles, 
+	       WNJetsToLNuRelXSecWeights, canvasNames1D, graphNames1D, canvasNames2D, 
+	       graphNames2D);
 
   //hadd single top samples
   string TIsoPrefix(analysisFilePath + "SingleTop/analysis/muHadIsoAnalysis_T");
   string TNonIsoPrefix(analysisFilePath + "SingleTop/analysis/muHadNonIsoAnalysis_T");
+  string TAllPrefix(analysisFilePath + "SingleTop/analysis/muHadAnalysis_T");
   string TSuffix(TVTag + fileExt);
   string TIsoHaddOutputFile(TIsoPrefix + TSuffix);
   string TNonIsoHaddOutputFile(TNonIsoPrefix + TSuffix);
+  string TAllHaddOutputFile(TAllPrefix + TSuffix);
   vector<string> TIsoHaddInputFiles;
   vector<string> TNonIsoHaddInputFiles;
+  vector<string> TAllHaddInputFiles;
   vector<string> singleTopSamples;
   singleTopSamples.push_back("_s-channel");
   singleTopSamples.push_back("bar_s-channel");
@@ -521,10 +533,15 @@
     stringstream TNonIsoName;
     TNonIsoName << TNonIsoPrefix << *iSample << TSuffix;
     TNonIsoHaddInputFiles.push_back(TNonIsoName.str());
+    stringstream TAllName;
+    TAllName << TAllPrefix << *iSample << TSuffix;
+    TAllHaddInputFiles.push_back(TAllName.str());
   }
   haddCanvases(TIsoHaddOutputFile, TIsoHaddInputFiles, TRelXSecWeights, canvasNames1D, 
 	       graphNames1D, canvasNames2D, graphNames2D);
   haddCanvases(TNonIsoHaddOutputFile, TNonIsoHaddInputFiles, TRelXSecWeights, canvasNames1D, 
+	       graphNames1D, canvasNames2D, graphNames2D);
+  haddCanvases(TAllHaddOutputFile, TAllHaddInputFiles, TRelXSecWeights, canvasNames1D, 
 	       graphNames1D, canvasNames2D, graphNames2D);
 
   //"hadd" Wh1 sample just to get the formatting of the 2D plots the same
@@ -627,6 +644,10 @@
 				   tag20InvFb + outputVTag + fileExt);
   string sigVsBkgOutputFile1(analysisFilePath + "results/sigVsBkg_muHadIsoAnalysis" + tag1 + 
 			     outputVTag + fileExt);
+  string sigVsBkgOutputFileNoHPSIsoCut(analysisFilePath + "results/sigVsBkg_muHadAnalysis" + 
+				       tag20InvFb + outputVTag + fileExt);
+  string sigVsBkgOutputFileNoHPSIsoCutNorm1(analysisFilePath + "results/sigVsBkg_muHadAnalysis" + 
+					    tag1 + outputVTag + fileExt);
   vector<string> sigVsBkgInputFiles;
   sigVsBkgInputFiles.push_back(analysisFilePath + "Wh1_Medium/muHadIsoAnalysis_Wh1" + sigVTag + 
 			       fileExt);
@@ -645,6 +666,25 @@
   sigVsBkgInputFiles.push_back(analysisFilePath + "WW/analysis/muHadIsoAnalysis_WW" + WWVTag + 
 			       fileExt);
   std::reverse(sigVsBkgInputFiles.begin() + 1, sigVsBkgInputFiles.end());
+  vector<string> sigVsBkgNoHPSIsoCutInputFiles;
+  sigVsBkgNoHPSIsoCutInputFiles.push_back(analysisFilePath + "Wh1_Medium/muHadAnalysis_Wh1" + 
+					  sigVTag + fileExt);
+  sigVsBkgNoHPSIsoCutInputFiles.push_back(DYJetsToLLAllHaddOutputFile);
+  sigVsBkgNoHPSIsoCutInputFiles.push_back(analysisFilePath + 
+					  "TTJets/analysis/muHadAnalysis_TTJets" + TTJetsVTag + 
+					  fileExt);
+  sigVsBkgNoHPSIsoCutInputFiles.push_back(TAllHaddOutputFile);
+  sigVsBkgNoHPSIsoCutInputFiles.push_back(WNJetsToLNuAllTauHaddOutputFile);
+//   sigVsBkgNoHPSIsoCutInputFiles.push_back(analysisFilePath + 
+// 			       "WJetsToLNu/analysis/muHadAnalysis_WJetsToLNu" + 
+// 			       WNJetsToLNuVTag + fileExt);
+  sigVsBkgNoHPSIsoCutInputFiles.push_back(analysisFilePath + "WZ/analysis/muHadAnalysis_WZ" + 
+					  WZVTag + fileExt);
+  sigVsBkgNoHPSIsoCutInputFiles.push_back(analysisFilePath + "ZZ/analysis/muHadAnalysis_ZZ" + 
+					  ZZVTag + fileExt);
+  sigVsBkgNoHPSIsoCutInputFiles.push_back(analysisFilePath + "WW/analysis/muHadAnalysis_WW" + 
+					  WWVTag + fileExt);
+  std::reverse(sigVsBkgNoHPSIsoCutInputFiles.begin() + 1, sigVsBkgNoHPSIsoCutInputFiles.end());
   drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgOutputFile20InvFb, sigVsBkgInputFiles, 
 					canvasNames1D, graphNames1D, legendHeaders20InvFb, 
 					colors, styles, legendEntriesSigBkg, weightsSigBkg, 
@@ -652,6 +692,16 @@
   drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgOutputFile1, sigVsBkgInputFiles, 
 					canvasNames1D, graphNames1D, legendHeaders1, colors, 
 					styles, legendEntriesSigBkg, weights1, setLinY, drawSame, 
+					sigBkg);
+  drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgOutputFileNoHPSIsoCut, 
+					sigVsBkgNoHPSIsoCutInputFiles, canvasNames1D, 
+					graphNames1D, legendHeaders20InvFb, colors, styles, 
+					legendEntriesSigBkg, weightsSigBkg, setLogY, drawStack, 
+					sigBkg);
+  drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgOutputFileNoHPSIsoCutNorm1, 
+					sigVsBkgNoHPSIsoCutInputFiles, canvasNames1D, 
+					graphNames1D, legendHeaders1, colors, styles, 
+					legendEntriesSigBkg, weights1, setLinY, drawSame, 
 					sigBkg);
 
   //compare data to MC in control region
