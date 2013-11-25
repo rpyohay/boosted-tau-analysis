@@ -1006,6 +1006,7 @@ void addClosurePlot(TFile& sigVsBkgIso20InvFbStream, const string& var, const st
   bkgNonIsoStream.GetObject(canvasName.c_str(), canvasNonIso);
   THStack* stackBkgNonIso = NULL;
   if (canvasNonIso != NULL) {
+//     histBkgNonIso = (TH1F*)canvasNonIso->GetPrimitive(var.c_str());
     canvasNonIso->Draw();
     stackBkgNonIso = (THStack*)canvasNonIso->cd(1)->GetPrimitive(stackName.c_str());
   }
@@ -1049,6 +1050,7 @@ void addClosurePlot(TFile& sigVsBkgIso20InvFbStream, const string& var, const st
   TH1F* histBkgNonIsoNorm1 = (TH1F*)histBkgNonIso->Clone();
   histBkgNonIsoNorm1->Scale(1.0/histBkgNonIsoNorm1->Integral(0, -1));
   histBkgIsoNorm1->Divide(histBkgNonIsoNorm1);
+  cout << histSig->GetName() << endl;
   for (Int_t iBin = 1; iBin <= histBkgIsoNorm1->GetNbinsX(); ++iBin) {
     cout << iBin << " " << histBkgIsoNorm1->GetBinContent(iBin) << endl;
   }
@@ -1060,15 +1062,14 @@ void addClosurePlot(TFile& sigVsBkgIso20InvFbStream, const string& var, const st
   setCanvasOptions(outCanvas, 1, 1, 0);
   setCanvasMargins(outCanvas, 0.2, 0.2, 0.2, 0.2);
   outCanvas.cd();
-  histSig->Draw("HIST");
-  histBkgIso->Draw("HISTESAME");
-  histBkgNonIso->Draw("HISTESAME");
   Double_t histBkgIsoErr = -1.0;
   Double_t histBkgNonIsoErr = -1.0;
-  cout << histSig->GetName() << endl;
+  histSig->Draw("HIST");
   cout << histSig->Integral(5, -1) << endl;
+  histBkgIso->Draw("HISTE");
   cout << histBkgIso->IntegralAndError(5, -1, histBkgIsoErr) << "+/-";
   cout << histBkgIsoErr << endl;
+  histBkgNonIso->Draw("HISTESAME");
   cout << histBkgNonIso->IntegralAndError(5, -1, histBkgNonIsoErr) << "+/-";
   cout << histBkgNonIsoErr << endl;
   outCanvas.Write();

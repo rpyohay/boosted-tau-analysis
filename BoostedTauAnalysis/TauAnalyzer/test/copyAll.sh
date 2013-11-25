@@ -1,6 +1,20 @@
 #!/bin/bash
 
-cd v71
+if [ $# -ne 1 ]
+    then
+    echo "Usage: ./copyAll.sh <version>"
+    exit 0
+fi
+
+version=$1
+
+if [ ! -d $version ]
+    then
+    echo "Run ./generateJobFiles.sh before this script."
+    exit 0
+fi
+
+cd $version
 ./copyDYJetsToLLFromEOS.sh
 ./copyDataFromEOS.sh
 ./copyTTJetsFromEOS.sh
@@ -10,6 +24,9 @@ cd v71
 ./copyWZFromEOS.sh
 ./copyWWFromEOS.sh
 ./copyZZFromEOS.sh
+./copyQCDFromEOS.sh
+./copyQCDBFromEOS.sh
+./copyQCDBMuFromEOS.sh
 cd ..
 
 exit 0

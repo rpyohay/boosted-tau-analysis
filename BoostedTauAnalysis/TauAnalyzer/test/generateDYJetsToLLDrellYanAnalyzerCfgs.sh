@@ -1,9 +1,15 @@
 #!/bin/bash
 
+if [ $# -ne 1 ]
+    then
+    echo "Usage: ./generateDYJetsToLLDrellYanAnalyzerCfgs.sh <version>"
+    exit 0
+fi
+
 ####STUFF TO CONFIGURE####
 
 #version
-version="v56"
+version=$1
 infoTag=""
 dir=$version
 

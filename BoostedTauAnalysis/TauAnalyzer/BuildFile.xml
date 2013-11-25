@@ -4,10 +4,13 @@
 <use name="DataFormats/MuonReco"/>
 <use name="DataFormats/TauReco"/>
 <use name="DataFormats/METReco"/>
+<use name="DataFormats/HLTReco"/>
+<use name="DataFormats/Common"/>
 <use name="BoostedTauAnalysis/Common"/>
 <use name="JetMETCorrections/Objects"/>
 <use name="PhysicsTools/Utilities"/>
-<use name="fastjet"/>
+<use name="HLTrigger/HLTcore"/>
 <use name="root"/>
 <use name="rootgraphics"/>
+<use name="fastjet"/>
 <flags EDM_PLUGIN="1"/>

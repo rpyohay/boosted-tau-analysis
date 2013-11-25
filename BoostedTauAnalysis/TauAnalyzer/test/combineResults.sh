@@ -66,42 +66,38 @@ for iJob in `seq $minJob $maxJob`
   #get the numbers of events passing each cut
   if [ $skip -eq 0 ]
       then
-#      nProcessed=`grep genWMuNuSelector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*\([0-9]*\)[ ]*[0-9]*.*%\1%"`
       nProcessed=`grep IsoMu24eta2p1Selector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*\([0-9]*\)[ ]*[0-9]*.*%\1%"`
-#      nWMuNu=`grep genWMuNuSelector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*[0-9]*[ ]*\([0-9]*\).*%\1%"`
       nHLT=`grep IsoMu24eta2p1Selector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*[0-9]*[ ]*\([0-9]*\).*%\1%"`
       nWMuonPT=`grep WMuonPTSelector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*[0-9]*[ ]*\([0-9]*\).*%\1%"`
       nWMuonIso=`grep WIsoMuonSelector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*[0-9]*[ ]*\([0-9]*\).*%\1%"`
-#      nJet=`grep jetSelector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*[0-9]*[ ]*\([0-9]*\).*%\1%"`
-#      nTauMuonPT=`grep tauMuonPTSelector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*[0-9]*[ ]*\([0-9]*\).*%\1%"`
-#      nTauMuonSoft=`grep tauMuonSelector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*[0-9]*[ ]*\([0-9]*\).*%\1%"`
-#      nMuHadIso=`grep muHadIsoTauSelector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*[0-9]*[ ]*\([0-9]*\).*%\1%"`
-#      nMuHad=`grep muHadTauSelector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*[0-9]*[ ]*\([0-9]*\).*%\1%"`
+      nJet=`grep jetSelector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*[0-9]*[ ]*\([0-9]*\).*%\1%"`
+      nTauMuonPT=`grep tauMuonPTSelector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*[0-9]*[ ]*\([0-9]*\).*%\1%"`
+      nTauMuonSoft=`grep tauMuonSelector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*[0-9]*[ ]*\([0-9]*\).*%\1%"`
+      nMuHadIso=`grep muHadIsoTauSelector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*[0-9]*[ ]*\([0-9]*\).*%\1%"`
+      nMuHad=`grep muHadTauSelector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*[0-9]*[ ]*\([0-9]*\).*%\1%"`
 
       #increment totals
       nProcessedTot=`expr $nProcessedTot + $nProcessed`
-#      nWMuNuTot=`expr $nWMuNuTot + $nWMuNu`
       nHLTTot=`expr $nHLTTot + $nHLT`
       nWMuonPTTot=`expr $nWMuonPTTot + $nWMuonPT`
       nWMuonIsoTot=`expr $nWMuonIsoTot + $nWMuonIso`
-#  nJetTot=`expr $nJetTot + $nJet`
-#      nTauMuonPTTot=`expr $nTauMuonPTTot + $nTauMuonPT`
-#      nTauMuonSoftTot=`expr $nTauMuonSoftTot + $nTauMuonSoft`
-#  nMuHadIsoTot=`expr $nMuHadIsoTot + $nMuHadIso`
-#      nMuHadTot=`expr $nMuHadTot + $nMuHad`
+      nJetTot=`expr $nJetTot + $nJet`
+      nTauMuonPTTot=`expr $nTauMuonPTTot + $nTauMuonPT`
+      nTauMuonSoftTot=`expr $nTauMuonSoftTot + $nTauMuonSoft`
+      nMuHadIsoTot=`expr $nMuHadIsoTot + $nMuHadIso`
+      nMuHadTot=`expr $nMuHadTot + $nMuHad`
   fi
 done
 
 #print totals
 echo "nProcessedTot = $nProcessedTot"
-#echo "nWMuNuTot = $nWMuNuTot"
 echo "nHLTTot = $nHLTTot"
 echo "nWMuonPTTot = $nWMuonPTTot"
 echo "nWMuonIsoTot = $nWMuonIsoTot"
-#echo "nJetTot = $nJetTot"
-#echo "nTauMuonPTTot = $nTauMuonPTTot"
-#echo "nTauMuonSoftTot = $nTauMuonSoftTot"
-#echo "nMuHadIsoTot = $nMuHadIsoTot"
-#echo "nMuHadTot = $nMuHadTot"
+echo "nJetTot = $nJetTot"
+echo "nTauMuonPTTot = $nTauMuonPTTot"
+echo "nTauMuonSoftTot = $nTauMuonSoftTot"
+echo "nMuHadIsoTot = $nMuHadIsoTot"
+echo "nMuHadTot = $nMuHadTot"
 
 exit 0

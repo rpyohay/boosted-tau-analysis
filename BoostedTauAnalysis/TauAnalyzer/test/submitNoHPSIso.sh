@@ -1,6 +1,20 @@
 #!/bin/bash
 
-cd v70
+if [ $# -ne 1 ]
+    then
+    echo "Usage: ./submitAll.sh <version>"
+    exit 0
+fi
+
+version=$1
+
+if [ ! -d $version ]
+    then
+    echo "Run ./generateJobFiles.sh before this script."
+    exit 0
+fi
+
+cd $version
 ./submitDYJetsToLLAllTauAnalyzerJobs.sh
 ./submitDataAllTauAnalyzerJobs.sh
 ./submitTTJetsAllTauAnalyzerJobs.sh
@@ -10,6 +24,9 @@ cd v70
 ./submitWZAllTauAnalyzerJobs.sh
 ./submitWWAllTauAnalyzerJobs.sh
 ./submitZZAllTauAnalyzerJobs.sh
+./submitQCDAllTauAnalyzerJobs.sh
+./submitQCDBAllTauAnalyzerJobs.sh
+./submitQCDBMuAllTauAnalyzerJobs.sh
 cd ..
 
 exit 0

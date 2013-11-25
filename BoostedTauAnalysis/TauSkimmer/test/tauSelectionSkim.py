@@ -51,12 +51,11 @@ process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(10000)
 
 process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
 
 process.source = cms.Source(
     "PoolSource",
-    fileNames = cms.untracked.vstring(
-    ),
+    fileNames = cms.untracked.vstring('file:/data1/yohay/NMSSMHiggs_WH_files1-250_24Sep12.root'),
     skipEvents = cms.untracked.uint32(0)
     )
 
