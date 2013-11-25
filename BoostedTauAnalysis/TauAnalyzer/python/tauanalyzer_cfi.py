@@ -18,5 +18,26 @@ TauAnalyzer = cms.EDAnalyzer(
     momPDGID = cms.int32(36), #a for signal
     genMuTauPTMin = cms.double(0.0), #GeV
     genMuPTMin = cms.double(0.0), #GeV
-    effVsEtaPTMin = cms.double(10.0) #GeV
+    effVsEtaPTMin = cms.double(10.0), #GeV
+    zCut = cms.double(0.1),
+    RcutFactor = cms.double(0.5)
+    )
+
+OSSFFilter = cms.EDFilter(
+    'OSSFFilter',
+    WMuonTag = cms.InputTag("WIsoMuonSelector"),
+    tauMuonTag = cms.InputTag("tauMuonSelector")
+    )
+
+METFilter = cms.EDFilter(
+    'METFilter',
+    minMET = cms.double(40.),
+    METTag = cms.InputTag("pfMet")
+    )
+
+DelPhiFilter = cms.EDFilter(
+    'DelPhiFilter',
+    delPhiCut = cms.double(0.5),
+    WMuonTag = cms.InputTag("WIsoMuonSelector"),
+    tauMuonTag = cms.InputTag("tauMuonSelector")
     )

@@ -1,6 +1,20 @@
 #!/bin/bash
 
-cd v70
+if [ $# -ne 1 ]
+    then
+    echo "Usage: ./copyNoHPSIso.sh <version>"
+    exit 0
+fi
+
+version=$1
+
+if [ ! -d $version ]
+    then
+    echo "Run ./generateJobFiles.sh before this script."
+    exit 0
+fi
+
+cd $version
 ./copyAllDYJetsToLLFromEOS.sh
 ./copyAllDataFromEOS.sh
 ./copyAllTTJetsFromEOS.sh
@@ -10,6 +24,9 @@ cd v70
 ./copyAllWZFromEOS.sh
 ./copyAllWWFromEOS.sh
 ./copyAllZZFromEOS.sh
+./copyAllQCDFromEOS.sh
+./copyAllQCDBFromEOS.sh
+./copyAllQCDBMuFromEOS.sh
 cd ..
 
 exit 0

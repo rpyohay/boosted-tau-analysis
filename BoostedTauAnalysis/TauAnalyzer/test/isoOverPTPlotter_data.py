@@ -56,6 +56,8 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 process.source = cms.Source(
     "PoolSource",
     fileNames = cms.untracked.vstring(
+#    'root://eoscms//eos/cms/store/data/Run2012A/SingleMu/AOD/22Jan2013-v1/20000/002F5062-346F-E211-BF00-1CC1DE04DF20.root'
+    'root://eoscms//eos/cms/store/user/friccita/isoTest/0012AB48-AA02-E211-ACF7-001E67398043.root'
     ),
     skipEvents = cms.untracked.uint32(0)
     )
@@ -64,8 +66,7 @@ process.source.inputCommands = cms.untracked.vstring("keep *", "drop *_MEtoEDMCo
 
 #for L1GtStableParametersRcd
 process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
-process.GlobalTag.globaltag = cms.string('START53_V7F::All') #MC
-## process.GlobalTag.globaltag = cms.string('FT_53_V21_AN4::All') #data
+process.GlobalTag.globaltag = cms.string('FT_53_V21_AN4::All')
 
 #for HLT selection
 process.load('HLTrigger/HLTfilters/hltHighLevel_cfi')
@@ -91,30 +92,6 @@ WMuNuPSet.momPDGID = cms.vint32(W_PDGID)
 #define a parameter set for background W+jet jet-parton matching
 WRecoilJetPSet = commonGenTauDecayIDPSet.clone()
 WRecoilJetPSet.momPDGID = cms.vint32(ANY_PDGID)
-
-#output commands
-skimEventContent = cms.PSet(
-    outputCommands = cms.untracked.vstring(
-    "drop *",
-    "keep *_kt6PFJets_rho_*",
-    "keep *_TriggerResults_*_*",
-    "keep *_addPileupInfo_*_*",
-    "keep recoGenParticles_genParticles_*_*",
-    "keep recoMuons_muons_*_*",
-    "keep recoPFJets_ak5PFJets_*_*",
-    "keep *_pfMet_*_*",
-    "keep *_WIsoMuonSelector_*_*",
-    "keep recoPFJets_CleanJets_ak5PFJetsNoMu_*",
-    "keep recoPFJetsrecoPFJetrecoPFJetsrecoPFJetedmrefhelperFindUsingAdvanceedmRefedmValueMap_CleanJets_*_*",
-    "keep recoMuonsRefsedmValueMap_CleanJets_*_*",
-    "keep booledmValueMap_CleanJets_*_*",
-    "keep *_hpsPFTauDiscriminationByDecayModeFinding_*_SKIM",
-    "keep *_hpsPFTauDiscriminationByMediumCombinedIsolationDBSumPtCorr_*_SKIM",
-    "keep *_hpsPFTauDiscriminationByRawCombinedIsolationDBSumPtCorr_*_SKIM",
-    "keep recoPFTaus_hpsPFTauProducer_*_SKIM",
-    "keep *_offlinePrimaryVertices_*_*"
-    )
-    )
 
 #only proceed if event is a true W-->munu event
 process.genWMuNuSelector = cms.EDFilter(
@@ -156,13 +133,25 @@ process.IsoMu24eta2p1Selector.HLTPaths = cms.vstring('HLT_IsoMu24_eta2p1_v1',
                                                      'HLT_IsoMu24_eta2p1_v15')
 process.IsoMu24eta2p1Selector.throw = cms.bool(False)
 
-#search for a muon with pT > 25 GeV as in WHbb CMS AN-2012/349 and proceed if one can be found
+#search for a muon with pT > 20 GeV as in WHbb CMS AN-2012/349 and proceed if one can be found
 #this will produce a ref to the original muon collection
 process.WMuonPTSelector = cms.EDFilter('MuonRefSelector',
                                        src = cms.InputTag('muons'),
                                        cut = cms.string('pt > 25.0'),
                                        filter = cms.bool(True)
                                        )
+
+process.MuonIsolationAnalyzer = cms.EDAnalyzer('MuonIsolationAnalyzer',
+                                               outFileName = cms.string('isoOverPT.root'),
+                                               muonTag = cms.InputTag('WMuonPTSelector'),
+                                               muonPFIsoPUSubtractionCoeff = cms.double(0.5)
+                                               )
+
+process.IsolationAnalyzer = cms.EDAnalyzer('IsolationAnalyzer',
+                                           outFileName = cms.string('isoVsPT.root'),
+                                           muonTag = cms.InputTag('WMuonPTSelector'),
+                                           muonPFIsoPUSubtractionCoeff = cms.double(0.5)
+                                           )
 
 #search for a loose PF isolated tight muon in |eta| < 2.1 with pT > 25 GeV
 #(see https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Muon_Isolation_AN1 for
@@ -177,9 +166,10 @@ process.WIsoMuonSelector = cms.EDFilter('CustomMuonSelector',
                                         detectorIsoMax = cms.double(-1.0),
                                         PUSubtractionCoeff = cms.double(0.5),
                                         usePFIso = cms.bool(True),
-                                        passIso = cms.bool(True),
+#                                        passIso = cms.bool(True),
+                                        passIso = cms.bool(False),
                                         etaMax = cms.double(2.1),
-                                        minNumObjsToPassFilter = cms.uint32(2)
+                                        minNumObjsToPassFilter = cms.uint32(1)
                                         )
 
 #search for a muon with pT > 5 GeV as in HZZ4l analysis and proceed if one can be found
@@ -285,46 +275,17 @@ process.muHadNonIsoTauSelector = cms.EDFilter(
     )
 
 #output
-process.selectedOutput = cms.OutputModule(
-    "PoolOutputModule",
-    SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring('p')),
-    outputCommands = skimEventContent.outputCommands,
-    fileName = cms.untracked.string('data_selected.root')
-    )
-process.antiSelectedOutput = cms.OutputModule(
-    "PoolOutputModule",
-    SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring('p')),
-    outputCommands = skimEventContent.outputCommands,
-    fileName = cms.untracked.string('data_anti-selected.root')
-    )
-process.noSelectedOutput = cms.OutputModule(
-    "PoolOutputModule",
-    SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring('p')),
-    outputCommands = skimEventContent.outputCommands,
-    fileName = cms.untracked.string('data_no_selection.root')
-    )
+#process.noSelectedOutput = cms.OutputModule(
+#    "PoolOutputModule",
+#    SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring('p')),
+#    outputCommands = skimEventContent.outputCommands,
+#    fileName = cms.untracked.string('isoOverPT.root')
+#    )
 
 #sequences
-process.antiSelectionSequence = cms.Sequence(process.IsoMu24eta2p1Selector*process.WMuonPTSelector*
-                                             process.WIsoMuonSelector*process.tauMuonPTSelector*
-                                             process.tauMuonSelector*process.PFTau*
-                                             process.muHadTauSelector*
-                                             process.muHadNonIsoTauSelector)
-process.selectionSequence = cms.Sequence(process.IsoMu24eta2p1Selector*process.WMuonPTSelector*
-                                         process.WIsoMuonSelector*process.tauMuonPTSelector*
-                                         process.tauMuonSelector*process.PFTau*
-                                         process.muHadIsoTauSelector)
 process.noSelectionSequence = cms.Sequence(process.IsoMu24eta2p1Selector*process.WMuonPTSelector*
-                                           process.WIsoMuonSelector)
-
-## #selection path
-## process.p = cms.Path(process.selectionSequence)
-## process.e = cms.EndPath(process.selectedOutput)
-
-#anti-selection path
-## process.p = cms.Path(process.antiSelectionSequence)
-## process.e = cms.EndPath(process.antiSelectedOutput)
+                                           process.MuonIsolationAnalyzer*process.IsolationAnalyzer)
 
 #no selection path
 process.p = cms.Path(process.noSelectionSequence)
-process.e = cms.EndPath(process.noSelectedOutput)
+#process.e = cms.EndPath(process.noSelectedOutput)

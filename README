@@ -24,6 +24,12 @@ scram b
 
 3. Execute
 
+mkdir -p /data1/`whoami`/QCD/analysis
+mkdir -p /data1/`whoami`/QCD/EDM_files
+mkdir -p /data1/`whoami`/QCDB/analysis
+mkdir -p /data1/`whoami`/QCDB/EDM_files
+mkdir -p /data1/`whoami`/QCDBMu/analysis
+mkdir -p /data1/`whoami`/QCDBMu/EDM_files
 mkdir -p /data1/`whoami`/DYJetsToLL/analysis
 mkdir -p /data1/`whoami`/DYJetsToLL/EDM_files
 mkdir -p /data1/`whoami`/SingleTop/analysis
@@ -32,6 +38,10 @@ mkdir -p /data1/`whoami`/TTJets/analysis
 mkdir -p /data1/`whoami`/TTJets/EDM_files
 mkdir -p /data1/`whoami`/WNJetsToLNu/analysis
 mkdir -p /data1/`whoami`/WNJetsToLNu/EDM_files
+mkdir -p /data1/`whoami`/WJetsToLNu/analysis
+mkdir -p /data1/`whoami`/WJetsToLNu/EDM_files
+mkdir -p /data1/`whoami`/WW/analysis
+mkdir -p /data1/`whoami`/WW/EDM_files
 mkdir -p /data1/`whoami`/WZ/analysis
 mkdir -p /data1/`whoami`/WZ/EDM_files
 mkdir -p /data1/`whoami`/Wh1_Medium/EDM_files
@@ -39,17 +49,11 @@ mkdir -p /data1/`whoami`/ZZ/analysis
 mkdir -p /data1/`whoami`/ZZ/EDM_files
 mkdir -p /data1/`whoami`/data/analysis
 mkdir -p /data1/`whoami`/data/EDM_files
+mkdir -p /data1/`whoami`/nonIsoWData/analysis
+mkdir -p /data1/`whoami`/nonIsoWData/EDM_files
 mkdir -p /data1/`whoami`/results
 
-4. In ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/formatPlots.C:
-
-Change the path in lines 5-6 to "/afs/cern.ch/user/<first_letter_of_your_username>/<your_username>/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/"
-
-Change the path in line 326 to "/data1/<your_username>/"
-
-5. In ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test/tauSelectionSkim_Wh1.py, replace "yohay" with your username in lines 1368, 1374, and 1381
-
-6. Execute
+4. Execute
 
 cd ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test
 make -f STLDictionary_Makefile
@@ -73,9 +77,8 @@ Running TauAnalyzer analysis jobs over data and MC
 2. Execute
 
 cd ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test
-./updateVersion.sh <version_number>
-./generateJobFiles.sh
-./submitAll.sh
+./generateJobFiles.sh v<version_number>
+./submitAll.sh v<version_number>
 
 to launch the batch jobs.  The STDOUT files created by the batch jobs will be written to ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/v<version_number>/LSFJOB_XXXXXXXXX/STDOUT, where is XXXXXXXXX is the job number.  These files will tell you whether the jobs finished successfully or not.
 
@@ -83,13 +86,11 @@ to launch the batch jobs.  The STDOUT files created by the batch jobs will be wr
 
 cd ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test
 cmsenv
-./copyAll.sh
+./copyAll.sh v<version_number>
 cd v<version_number>
 cmsRun tauanalyzer_Wh1_iso_cfg.py
 
-4. In ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/formatPlots.C, change the version tags in lines 333-342 to "_v<version_number>"
-
-5. Make sure that in your rootlogon.C script, you DO NOT have the line
+4. Make sure that in your rootlogon.C script, you DO NOT have the line
 
 AutoLibraryLoader::enable();
 
@@ -97,9 +98,30 @@ Then execute
 
 cd ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test
 cmsenv
-root -l -b -q formatPlots.C
+root -l -b -q 'formatPlots.C("v<input_version>", "v<output_version>", "v<raw_version>", "v<reweight_version>")'
 
-6. Check the output files:
+where
+
+<input_version> is the integer version number associated to the input files you want to analyze
+<output_version> is the version number that will be assigned to the output files you create (typically it's the same as the input version but there might be special cases where you'd like them to be different)
+<raw_version> is the version number of the non-reweighted signal vs. background output file
+<reweight_version> is the version number of the reweighted data vs. MC output file
+
+"Reweighting" above refers to hadronic tau pT reweighting, which is used on the data control sample for measuring the background in the plot of mu+had invariant mass.  You have to execute step 2 with reweighting turned on to get the reweighted data vs. MC files.
+
+5. Check the output files:
+
+/data1/<your_username>/QCD/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
+/data1/<your_username>/QCD/analysis/muHadIsoAnalysis_QCD_v<version_number>.root
+/data1/<your_username>/QCD/analysis/muHadNonIsoAnalysis_QCD_v<version_number>.root
+
+/data1/<your_username>/QCDB/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
+/data1/<your_username>/QCDB/analysis/muHadIsoAnalysis_QCDB_v<version_number>.root
+/data1/<your_username>/QCDB/analysis/muHadNonIsoAnalysis_QCDB_v<version_number>.root
+
+/data1/<your_username>/QCDBMu/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
+/data1/<your_username>/QCDBMu/analysis/muHadIsoAnalysis_QCDBMu_v<version_number>.root
+/data1/<your_username>/QCDBMu/analysis/muHadNonIsoAnalysis_QCDBMu_v<version_number>.root
 
 /data1/<your_username>/DYJetsToLL/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
 /data1/<your_username>/DYJetsToLL/analysis/muHadIsoAnalysis_DYJetsToLL_v<version_number>.root
@@ -117,6 +139,14 @@ root -l -b -q formatPlots.C
 /data1/<your_username>/WNJetsToLNu/analysis/muHadIsoAnalysis_WNJetsToLNu_v<version_number>.root
 /data1/<your_username>/WNJetsToLNu/analysis/muHadNonIsoAnalysis_WNJetsToLNu_v<version_number>.root
 
+/data1/<your_username>/WJetsToLNu/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
+/data1/<your_username>/WJetsToLNu/analysis/muHadIsoAnalysis_WJetsToLNu_v<version_number>.root
+/data1/<your_username>/WJetsToLNu/analysis/muHadNonIsoAnalysis_WJetsToLNu_v<version_number>.root
+
+/data1/<your_username>/WW/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
+/data1/<your_username>/WW/analysis/muHadIsoAnalysis_WW_v<version_number>.root
+/data1/<your_username>/WW/analysis/muHadNonIsoAnalysis_WW_v<version_number>.root
+
 /data1/<your_username>/WZ/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
 /data1/<your_username>/WZ/analysis/muHadIsoAnalysis_WZ_v<version_number>.root
 /data1/<your_username>/WZ/analysis/muHadNonIsoAnalysis_WZ_v<version_number>.root
@@ -132,6 +162,9 @@ root -l -b -q formatPlots.C
 /data1/<your_username>/results/dataVsMC_muHadNonIsoAnalysis_2p5fb-1_v<version_number>.root
 /data1/<your_username>/results/sigVsBkg_muHadIsoAnalysis_20fb-1_v<version_number>.root
 /data1/<your_username>/results/sigVsBkg_muHadIsoAnalysis_normalizedTo1_v<version_number>.root
+/data1/<your_username>/results/sigVsBkg_muHadAnalysis_20fb-1_v<version_number>.root
+/data1/<your_username>/results/sigVsBkg_muHadAnalysis_normalizedTo1_v<version_number>.root
+/data1/<your_username>/results/MC_closure_v<reweight_version>.root
 
 
 
@@ -170,10 +203,15 @@ where
 
 5. Update the locations of the new MC skim files in
 
+~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/generateQCDTauAnalyzerCfgs.sh
+~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/generateQCDBTauAnalyzerCfgs.sh
+~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/generateQCDBMuTauAnalyzerCfgs.sh
 ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/generateDYJetsToLLTauAnalyzerCfgs.sh
 ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/generateSingleTopTauAnalyzerCfgs.sh
 ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/generateTTJetsTauAnalyzerCfgs.sh
 ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/generateWNJetsToLNuTauAnalyzerCfgs.sh
+~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/generateWJetsToLNuTauAnalyzerCfgs.sh
+~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/generateWWTauAnalyzerCfgs.sh
 ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/generateWZTauAnalyzerCfgs.sh
 ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/generateZZTauAnalyzerCfgs.sh
 
@@ -202,7 +240,6 @@ Increment the version number on the names of all the tasks in square brackets (e
 Comment out lines 19-20 (splitting by events)
 Uncomment lines 21-22 (splitting by lumi sections)
 Uncomment line 25 (JSON file)
-Uncomment line 59 (stage out to /store/user/<your_username>)
 
 3. Submit your jobs with multicrab from ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test as you normally would
 

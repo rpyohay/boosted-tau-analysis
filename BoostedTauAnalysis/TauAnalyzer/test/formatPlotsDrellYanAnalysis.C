@@ -1,9 +1,20 @@
+void formatPlots(const string& inputVersion, const string& outputVersion)
 {
-  //load
+  //initial
   gROOT->Reset();
+
+  //get CMSSW path
+  const char* CMSSWPathCString = gSystem->Getenv("CMSSW_BASE");
+  if (!CMSSWPathCString) {
+    CMSSWPathCString = "";
+    cout << "Error: environment variable CMSSW_BASE is not set.  ";
+    cout << "Please run cmsenv from within your CMSSW project area.\n";
+  }
+  string CMSSWPathCPPString(CMSSWPathCString);
+
+  //load
+  string macroPath(CMSSWPathCPPString + "/src/BoostedTauAnalysis/TauAnalyzer/test/");
   gROOT->ProcessLine("#include <utility>");
-  string macroPath("/afs/cern.ch/user/y/yohay/CMSSW_5_3_3_Git/src/BoostedTauAnalysis/");
-  macroPath+="TauAnalyzer/test/";
   gSystem->Load((macroPath + "STLDictionary.so").c_str());
   gROOT->LoadMacro((macroPath + "Plot.C++").c_str());
 //   gSystem->Load((macroPath + "Plot_C.so").c_str());
@@ -111,33 +122,28 @@
   const bool dataMC = true;
   const bool sigBkg = false;
 
-  //weights (sig. figs are probably wrong)
-  //first number in parentheses is the PREP weight
-  //second number in parentheses is the best available weight
-  //third number is the weight used by ttH (AN-2013/145)
+  //best available weights according to Dropbox spreadsheet
   vector<float> weightsMCData;
-  weightsMCData.push_back(1.0); //data
-  weightsMCData.push_back(/*32.5699705704697*/40.1864153331496); //W+jets weighted to 19.7 fb^-1
-  weightsMCData.push_back(/*1.96802553959128*/3.54908787697385); //tt+jets weighted to 19.7 fb^-1
+  weightsMCData.push_back(1.0); //data (int. lumi. = 19.7 fb^-1)
+  weightsMCData.push_back(40.1864153331496); //W+jets
+  weightsMCData.push_back(3.54908787697385); //tt+jets
   weightsMCData.push_back(1.0); //DYJetsToLLRelXSecWeights already weighted to 19.7 fb^-1
-  vector<float> DYJetsToLLRelXSecWeights;
-  DYJetsToLLRelXSecWeights.push_back(/*6.84634685357454*//*1.38881088924538*/9.10904899920841); /*(10 < m < 50) GeV 
-									      weighted to 19.7 
-									      fb^-1*/
-  DYJetsToLLRelXSecWeights.push_back(/*1.9085242461113*/2.26675101231954); /*m > 50 GeV weighted 
-									     to 19.7 fb^-1*/
+  vector<float> DYJetsToLLRelXSecWeights; //weighted to 19.7 fb^-1
+  DYJetsToLLRelXSecWeights.push_back(9.10904899920841); //(10 < m < 50) GeV using ttH cross section
+  DYJetsToLLRelXSecWeights.push_back(2.26675101231954); //m > 50 GeV using SM@8TeV Twiki
 
   //space-saving constant definitions
-  const string analysisFilePath("/data1/yohay/");
+  string user(gSystem->GetFromPipe("whoami").Data());
+  const string analysisFilePath("/data1/" + user + "/");
   const string fileExt(".root");
   const string tag19p7InvFb("_19p7fb-1");
 
   //version tags
-  const string outputVTag("_v56_ttHLowMassDrellYanXSec");
-  const string dataVTag("_v56");
-  const string WJetsToLNuVTag("_v56");
-  const string TTJetsVTag("_v56");
-  const string DYJetsToLLVTag("_v56");
+  const string outputVTag("_" + outputVersion);
+  const string dataVTag("_" + inputVersion);
+  const string WJetsToLNuVTag("_" + inputVersion);
+  const string TTJetsVTag("_" + inputVersion);
+  const string DYJetsToLLVTag("_" + inputVersion);
 
   //hadd data samples from different eras
   string dataPrefix(analysisFilePath + "data/analysis/DrellYanAnalysis_SingleMu");

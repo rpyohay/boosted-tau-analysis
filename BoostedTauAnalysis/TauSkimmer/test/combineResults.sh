@@ -21,11 +21,11 @@ nHLTTot=0
 nWMuonPTTot=0
 nWMuonIsoTot=0
 nJetTot=0
-nNsubjTot=0
+#nNsubjTot=0
 nTauMuonPTTot=0
 nTauMuonSoftTot=0
 nMuHadIsoTot=0
-nSecondJetTot=0
+#nSecondJetTot=0
 
 #loop over job outputs
 for iJob in `seq $minJob $maxJob`

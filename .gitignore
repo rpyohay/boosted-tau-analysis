@@ -8,6 +8,7 @@
 *.so
 *.log
 *.history
+*.__afs*
 NMSSM_Higgs_a9_H1115_H2125_H3500_H2SMLike_WH_Summer12_DR53X/
 v[0-9]*/
 NMSSMSignal_MuProperties.root

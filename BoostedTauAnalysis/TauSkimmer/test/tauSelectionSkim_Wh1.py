@@ -1,6 +1,10 @@
 import FWCore.ParameterSet.Config as cms
+from subprocess import *
 
 process = cms.Process("SKIM")
+
+#user
+USER = Popen("whoami", stdout=PIPE, shell=True).stdout.read().strip('\n')
 
 #PDG IDs
 A_PDGID = 36
@@ -1365,20 +1369,22 @@ process.selectedOutput = cms.OutputModule(
     "PoolOutputModule",
     SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring('p')),
     outputCommands = skimEventContent.outputCommands,
-    fileName = cms.untracked.string('/data1/yohay/Wh1_Medium/EDM_files/data_selected.root')
+    fileName = cms.untracked.string('/data1/' + USER + '/Wh1_Medium/EDM_files/data_selected.root')
     )
 process.antiSelectedOutput = cms.OutputModule(
     "PoolOutputModule",
     SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring('p')),
     outputCommands = skimEventContent.outputCommands,
-    fileName = cms.untracked.string('/data1/yohay/Wh1_Medium/EDM_files/data_anti-selected.root')
+    fileName = cms.untracked.string(
+    '/data1/' + USER + '/Wh1_Medium/EDM_files/data_anti-selected.root'
+    )
     )
 process.noSelectedOutput = cms.OutputModule(
     "PoolOutputModule",
     SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring('p')),
     outputCommands = skimEventContent.outputCommands,
     fileName = cms.untracked.string(
-    '/data1/yohay/Wh1_Medium/EDM_files/data_no_selection.root'
+    '/data1/' + USER + '/Wh1_Medium/EDM_files/data_no_selection.root'
     )
     )
 

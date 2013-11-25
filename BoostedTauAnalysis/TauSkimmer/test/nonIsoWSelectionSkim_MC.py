@@ -64,8 +64,7 @@ process.source.inputCommands = cms.untracked.vstring("keep *", "drop *_MEtoEDMCo
 
 #for L1GtStableParametersRcd
 process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
-process.GlobalTag.globaltag = cms.string('START53_V7F::All') #MC
-## process.GlobalTag.globaltag = cms.string('FT_53_V21_AN4::All') #data
+process.GlobalTag.globaltag = cms.string('START53_V7F::All')
 
 #for HLT selection
 process.load('HLTrigger/HLTfilters/hltHighLevel_cfi')
@@ -95,24 +94,93 @@ WRecoilJetPSet.momPDGID = cms.vint32(ANY_PDGID)
 #output commands
 skimEventContent = cms.PSet(
     outputCommands = cms.untracked.vstring(
-    "drop *",
-    "keep *_kt6PFJets_rho_*",
-    "keep *_TriggerResults_*_*",
-    "keep *_addPileupInfo_*_*",
-    "keep recoGenParticles_genParticles_*_*",
-    "keep recoMuons_muons_*_*",
-    "keep recoPFJets_ak5PFJets_*_*",
-    "keep *_pfMet_*_*",
-    "keep *_WIsoMuonSelector_*_*",
-    "keep recoPFJets_CleanJets_ak5PFJetsNoMu_*",
-    "keep recoPFJetsrecoPFJetrecoPFJetsrecoPFJetedmrefhelperFindUsingAdvanceedmRefedmValueMap_CleanJets_*_*",
-    "keep recoMuonsRefsedmValueMap_CleanJets_*_*",
-    "keep booledmValueMap_CleanJets_*_*",
-    "keep *_hpsPFTauDiscriminationByDecayModeFinding_*_SKIM",
-    "keep *_hpsPFTauDiscriminationByMediumCombinedIsolationDBSumPtCorr_*_SKIM",
-    "keep *_hpsPFTauDiscriminationByRawCombinedIsolationDBSumPtCorr_*_SKIM",
-    "keep recoPFTaus_hpsPFTauProducer_*_SKIM",
-    "keep *_offlinePrimaryVertices_*_*"
+    "keep *",
+    "drop *_*ak7*_*_*",
+    "drop *_*kt4*_*_*",
+    "drop *_kt6GenJets_*_*",
+    "drop *_kt6CaloJets*_*_*",
+    "drop *_kt6PFJetsCentral*_*_*",
+    "drop *_kt6PFJets_sigma*_*",
+    "drop *_kt6JetID_*_*",
+    "drop *_kt6PFJets_rhos_*",
+    "drop recoPFJets_kt6PFJets_*_*",
+    "drop *_fixedGridRho*_*_*",
+    "drop *_hfEMClusters_*_*",
+    "drop *_eid*_*_*",
+    "drop *_muonMETValueMapProducer_muCorrData_*",
+    "drop *_muons_muonShowerInformation_*",
+    "drop *_muons_combined_*",
+    "drop *_muons_csc_*",
+    "drop *_muons_dt_*",
+    "drop l1extraL1HFRingss_*_*_*",
+    "drop *_muonsFromCosmics*_*_*",
+    "drop recoCaloClusters_*_*_*",
+    "drop recoPreshowerCluster*_*_*_*",
+    "drop *_hfRecoEcalCandidate_*_*",
+    "drop *_generalV0Candidates_*_*",
+    "drop *_selectDigi_*_*",
+    "drop *_*BJetTags*_*_*",
+    "drop *_castorreco_*_*",
+    "drop *_reduced*RecHits*_*_*",
+    "drop *_PhotonIDProd_*_*",
+    "drop *_*_*photons*_*",
+    "drop *_dedx*_*_*",
+    "drop *_*_cosmicsVeto_*",
+    "drop *_muonTCMETValueMapProducer_*_*",
+    "drop *_BeamHaloSummary_*_*",
+    "drop *_caloRecoTau*_*_*",
+    "drop *_GlobalHaloData_*_*",
+    "drop *_hpsTancTau*_*_*",
+    "drop *_shrinkingConePFTau*_*_*",
+    "drop *_ak5CaloJets_*_*",
+    "drop *_ak5TrackJets_*_*",
+    "drop *_*_uncleanOnly*_*",
+    "drop recoCaloMETs_*_*_*",
+    "drop recoConversions_*_*_*",
+    "drop *_CastorTowerReco_*_*",
+    "drop *_uncleanedOnlyGsfElectron*_*_*",
+    "drop recoJPTJets_*_*_*",
+    "drop recoMETs_*_*_*",
+    "drop *_photons_*_*",
+    "drop *_photonCore_*_*",
+    "drop *_ak5PFJetsRecoTauPiZeros_*_RECO",
+    "drop *_ak5PFJetsRecoTauPiZeros_*_HLT",
+    "drop *_hpsPFTauDiscrimination*_*_RECO",
+    "drop *_hpsPFTauDiscrimination*_*_HLT",
+    "drop *_hpsPFTauProducer_*_RECO",
+    "drop *_hpsPFTauProducer_*_HLT",
+    "drop *_recoTauAK5PFJets08Region_*_SKIM",
+    "drop *_ak5PFJetTracksAssociatorAtVertex_*_SKIM",
+    "drop *_ak5PFJetsLegacyHPSPiZeros_*_SKIM",
+    "drop *_combinatoricRecoTausDiscriminationByLeadingPionPtCut_*_SKIM",
+    "drop *_combinatoricRecoTausHPSSelector_*_SKIM",
+    "drop *_hpsSelectionDiscriminator_*_SKIM",
+    "drop *_combinatoricRecoTaus_*_SKIM",
+    "drop *_hpsPFTauProducerSansRefs_*_SKIM",
+    "drop *_pfRecoTauTagInfoProducer_*_SKIM",
+    "drop *_recoTauPileUpVertices_*_SKIM",
+    "drop *_towerMaker_*_*",
+    "drop *_particleFlowClusterHF*_*_*",
+    "drop *_pfPhotonTranslator_*_*",
+    "drop *_pfElectronTranslator_*_*",
+    "drop *_correctedHybridSuperClusters_*_*",
+    "drop *_correctedMulti5x5SuperClustersWithPreshower_*_*",
+    "drop *_*Voronoi*_*_*",
+    #added 2-Jul-13 after estimating data skim size
+##     "drop *_clusterSummaryProducer_*_*",
+##     "drop *_hcalnoise_*_*",
+##     "drop *_castorDigis_*_*",
+##     "drop *_hcalDigis_*_*",
+##     "drop double_ak5PFJets_rho*_*",
+##     "drop double_ak5PFJets_sigma*_*",
+##     "drop *_tevMuons_*_*",
+##     "drop recoIsoDepositedmValueMap_*_*_*",
+##     "drop *_logErrorHarvester_*_*",
+##     "drop *_l1extraParticles_*_*",
+##     "drop *_particleFlowTmp_*_*",
+##     "drop *_particleFlowCluster*_*_*",
+##     "drop *_particleFlowRecHit*_*_*",
+##     "drop recoPFCandidates_CleanJets_*_SKIM"
     )
     )
 
@@ -177,9 +245,9 @@ process.WIsoMuonSelector = cms.EDFilter('CustomMuonSelector',
                                         detectorIsoMax = cms.double(-1.0),
                                         PUSubtractionCoeff = cms.double(0.5),
                                         usePFIso = cms.bool(True),
-                                        passIso = cms.bool(True),
+                                        passIso = cms.bool(False),
                                         etaMax = cms.double(2.1),
-                                        minNumObjsToPassFilter = cms.uint32(2)
+                                        minNumObjsToPassFilter = cms.uint32(1)
                                         )
 
 #search for a muon with pT > 5 GeV as in HZZ4l analysis and proceed if one can be found
@@ -315,7 +383,9 @@ process.selectionSequence = cms.Sequence(process.IsoMu24eta2p1Selector*process.W
                                          process.tauMuonSelector*process.PFTau*
                                          process.muHadIsoTauSelector)
 process.noSelectionSequence = cms.Sequence(process.IsoMu24eta2p1Selector*process.WMuonPTSelector*
-                                           process.WIsoMuonSelector)
+                                           process.WIsoMuonSelector*process.tauMuonPTSelector*
+                                           process.tauMuonSelector*process.PFTau*
+                                           process.muHadTauSelector)
 
 ## #selection path
 ## process.p = cms.Path(process.selectionSequence)
