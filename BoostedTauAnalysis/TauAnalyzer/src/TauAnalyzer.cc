@@ -504,6 +504,9 @@ private:
   //hadronic tau pT weights
   std::vector<double> tauHadPTWeights_;
 
+  //hadronic tau pT bins
+  std::vector<double> tauHadPTBins_;
+
   /*second jet pT for |eta| < 2.4, second jet is highest pT jet in the event excluding W muon and 
     mu+had*/
   TH1F *jet_pt_etacut;
@@ -524,6 +527,9 @@ private:
 
   // dPhi between W muon and second jet (highest pT jet in the event excluding W muon)
   TH1F *dPhiWMuSecJet_;
+
+  //maximum hadronic tau pT
+  double maxTauHadPT_;
 };
 
 //
@@ -662,26 +668,102 @@ TauAnalyzer::TauAnalyzer(const edm::ParameterSet& iConfig) :
   }
 
   //instantiate the vector of weights based on hadronic tau pT bin
+//   tauHadPTWeights_.push_back(0);
+//   tauHadPTWeights_.push_back(0);
+//   tauHadPTWeights_.push_back(1.92104);
+//   tauHadPTWeights_.push_back(1.2739);
+//   tauHadPTWeights_.push_back(0.588595);
+//   tauHadPTWeights_.push_back(0.926218);
+//   tauHadPTWeights_.push_back(0.526632);
+//   tauHadPTWeights_.push_back(0.870165);
+//   tauHadPTWeights_.push_back(0.271711);
+//   tauHadPTWeights_.push_back(0.267905);
+//   tauHadPTWeights_.push_back(0.437444);
+//   tauHadPTWeights_.push_back(0.0413015);
+//   tauHadPTWeights_.push_back(0.13013);
+//   tauHadPTWeights_.push_back(0.425225);
+//   tauHadPTWeights_.push_back(0);
+//   tauHadPTWeights_.push_back(0.1472);
+//   tauHadPTWeights_.push_back(1.8152);
+//   tauHadPTWeights_.push_back(0.418199);
+//   tauHadPTWeights_.push_back(0);
+//   tauHadPTWeights_.push_back(0.321613);
+//   tauHadPTWeights_.push_back(0);
+//   tauHadPTWeights_.push_back(0);
+//   tauHadPTWeights_.push_back(0);
+//   tauHadPTWeights_.push_back(0);
+//   tauHadPTWeights_.push_back(1.92104);
+//   tauHadPTWeights_.push_back(1.2739);
+//   tauHadPTWeights_.push_back(0.588595);
+//   tauHadPTWeights_.push_back(0.926218);
+//   tauHadPTWeights_.push_back(0.526632);
+//   tauHadPTWeights_.push_back(0.870165);
+//   tauHadPTWeights_.push_back(0.271711);
+//   tauHadPTWeights_.push_back(0.267905);
+//   tauHadPTWeights_.push_back(0.437444);
+//   tauHadPTWeights_.push_back(0.0413015);
+//   tauHadPTWeights_.push_back(0.13013);
+//   tauHadPTWeights_.push_back(0.425225);
+//   tauHadPTWeights_.push_back(0.406535);
+//   tauHadPTWeights_.push_back(0);
+//   tauHadPTWeights_.push_back(0);
+//   tauHadPTWeights_.push_back(1.77044);
+//   tauHadPTWeights_.push_back(1.40081);
+//   tauHadPTWeights_.push_back(0.929384);
+//   tauHadPTWeights_.push_back(0.73791);
+//   tauHadPTWeights_.push_back(0.613288);
+//   tauHadPTWeights_.push_back(0.402148);
+//   tauHadPTWeights_.push_back(0.332301);
+//   tauHadPTWeights_.push_back(0.280916);
+//   tauHadPTWeights_.push_back(0.270815);
+//   tauHadPTWeights_.push_back(0.20075);
+//   tauHadPTWeights_.push_back(0.160553);
+//   tauHadPTWeights_.push_back(0);
+//   tauHadPTWeights_.push_back(0.221906);
   tauHadPTWeights_.push_back(0);
   tauHadPTWeights_.push_back(0);
-  tauHadPTWeights_.push_back(1.91454);
-  tauHadPTWeights_.push_back(1.25302);
-  tauHadPTWeights_.push_back(0.612118);
-  tauHadPTWeights_.push_back(0.880021);
-  tauHadPTWeights_.push_back(0.566202);
-  tauHadPTWeights_.push_back(0.941313);
-  tauHadPTWeights_.push_back(0.189181);
-  tauHadPTWeights_.push_back(0.353865);
-  tauHadPTWeights_.push_back(0.267725);
-  tauHadPTWeights_.push_back(0.19831);
-  tauHadPTWeights_.push_back(0.250086);
-  tauHadPTWeights_.push_back(0.573083);
-  tauHadPTWeights_.push_back(0.0261099);
-  tauHadPTWeights_.push_back(0.0345392);
-  tauHadPTWeights_.push_back(0.0422686);
-  tauHadPTWeights_.push_back(0.111832);
-  tauHadPTWeights_.push_back(0.129779);
-  tauHadPTWeights_.push_back(0.41499);
+  tauHadPTWeights_.push_back(1.51893);
+  tauHadPTWeights_.push_back(1.25836);
+  tauHadPTWeights_.push_back(0.941484);
+  tauHadPTWeights_.push_back(0.816431);
+  tauHadPTWeights_.push_back(0.647238);
+  tauHadPTWeights_.push_back(0.447136);
+  tauHadPTWeights_.push_back(0.418871);
+  tauHadPTWeights_.push_back(0.322999);
+  tauHadPTWeights_.push_back(0.299415);
+  tauHadPTWeights_.push_back(0.227085);
+  tauHadPTWeights_.push_back(0.202105);
+  tauHadPTWeights_.push_back(0);
+  tauHadPTWeights_.push_back(0.381331);
+
+  //fill hadronic tau pT bins
+  tauHadPTBins_.push_back(0.0);
+  tauHadPTBins_.push_back(5.0);
+  tauHadPTBins_.push_back(10.0);
+  tauHadPTBins_.push_back(15.0);
+  tauHadPTBins_.push_back(20.0);
+  tauHadPTBins_.push_back(25.0);
+  tauHadPTBins_.push_back(30.0);
+  tauHadPTBins_.push_back(35.0);
+
+  tauHadPTBins_.push_back(40.0);
+  tauHadPTBins_.push_back(50.0);
+  tauHadPTBins_.push_back(60.0);
+  tauHadPTBins_.push_back(70.0);
+  tauHadPTBins_.push_back(80.0);
+  tauHadPTBins_.push_back(90.0);
+  tauHadPTBins_.push_back(100.0);
+//   tauHadPTBins_.push_back(110.0);
+//   tauHadPTBins_.push_back(120.0);
+
+//   tauHadPTBins_.push_back(140.0);
+//   tauHadPTBins_.push_back(160.0);
+//   tauHadPTBins_.push_back(180.0);
+
+//   tauHadPTBins_.push_back(220.0);
+//   tauHadPTBins_.push_back(260.0);
+
+  tauHadPTBins_.push_back(600.0);
 }
 
 TauAnalyzer::~TauAnalyzer()
@@ -700,6 +782,11 @@ TauAnalyzer::~TauAnalyzer()
 // ------------ method called for each event  ------------
 void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 { // analyzer
+
+//   //print event number
+//   std::cerr << "Run " << iEvent.run() << ", event " << iEvent.id().event() << ", lumi ";
+//   std::cerr << iEvent.luminosityBlock() << std::endl;
+
   //get taus
   edm::Handle<reco::PFTauRefVector> pTaus;
   iEvent.getByLabel(tauTag_, pTaus);
@@ -932,9 +1019,6 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   //mu+had object counter
   unsigned int nMuHad = 0;
 
-  //maximum hadronic tau PT
-  double maxTauHadPT = 0.0;
-
   //loop over selected taus
   std::vector<reco::PFTauRef>::const_iterator iTau = taus.begin();
   std::vector<reco::PFTauRef>::const_iterator endTau = taus.end();
@@ -952,10 +1036,18 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     const reco::MuonRefVector& removedMuons = (*pMuonJetMap)[tauJetRef];
 
     //get weight based on hadronic tau pT
-    const int tauHadPTBin = (int)((*iTau)->pt()/tauHadPT_->GetBinWidth(1));
+    bool foundBin = false;
+    std::vector<double>::const_iterator iBinEdge = tauHadPTBins_.begin();
+    while ((iBinEdge != tauHadPTBins_.end()) && !foundBin) {
+      if (((*iTau)->pt() >= *iBinEdge) && ((*iTau)->pt() < *(iBinEdge + 1))) {
+	foundBin = true;
+      }
+      else ++iBinEdge;
+    }
+    const int tauHadPTBin = (int)(iBinEdge - tauHadPTBins_.begin());
     double tauHadPTWeight = 1.0;
-    if (reweight_ && (tauHadPTBin < tauHadPT_->GetNbinsX())) {
-      tauHadPTWeight = tauHadPTWeights_[tauHadPTBin];
+    if (reweight_) {
+      if (foundBin) tauHadPTWeight = tauHadPTWeights_[tauHadPTBin];
     }
 
     //find the highest pT associated muon
@@ -1199,7 +1291,7 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       tauHadPT_->Fill((*iTau)->pt(), PUWeight);
 
       //track maximum hadronic tau pT
-      if ((*iTau)->pt() > maxTauHadPT) maxTauHadPT = (*iTau)->pt();
+      if ((*iTau)->pt() > maxTauHadPT_) maxTauHadPT_ = (*iTau)->pt();
 
       //plot hadronic tau deltaBeta-corrected isolation energy
       tauHadIso_->Fill((*pTauHadIso)[*iTau], PUWeight);
@@ -1913,7 +2005,8 @@ void TauAnalyzer::beginJob()
   dRWMuSoftMuMuHadMassGe2_ = 
     new TH1F("dRWMuSoftMuMuHadMassGe2", ";#DeltaR(W muon, soft muon);", 30, 0.0, 3.0);
   tauMuPT_ = new TH1F("tauMuPT", ";p_{T} (GeV);", 20, 0.0, 100.0);
-  tauHadPT_ = new TH1F("tauHadPT", ";p_{T} (GeV);", 20, 0.0, 100.0);
+//   tauHadPT_ = new TH1F("tauHadPT", ";p_{T} (GeV);", 40, 0.0, 200.0);
+  tauHadPT_ = new TH1F("tauHadPT", ";p_{T} (GeV);", tauHadPTBins_.size() - 1, &tauHadPTBins_[0]);
   tauHadIso_ = new TH1F("tauHadIso", ";Isolation energy (GeV);", 20, 0.0, 20.0);
   tauHadEta_ = new TH1F("tauHadEta", ";#eta;", 46, -2.3, 2.3);
   softMuPTOverMuHadMass_ = 
@@ -2220,6 +2313,9 @@ void TauAnalyzer::beginJob()
   second_Nchtrk_10_->Sumw2();
   second_Nchtrk_30_->Sumw2();
   dPhiWMuSecJet_->Sumw2();
+
+  //maximum hadronic tau PT
+  maxTauHadPT_ = 0.0;
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
@@ -2571,7 +2667,7 @@ void TauAnalyzer::endJob()
   out_->Close();
 
   //print maximum hadronic tau PT
-  cout << "Maximum HPS tau pT: " << maxTauHadPT << " GeV\n\n";
+  cout << "Maximum HPS tau pT: " << maxTauHadPT_ << " GeV\n\n";
 }
 
 // ------------ method called when starting to processes a run  ------------
