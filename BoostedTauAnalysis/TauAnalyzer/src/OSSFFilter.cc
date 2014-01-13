@@ -67,7 +67,8 @@ class OSSFFilter : public edm::EDFilter {
       // ----------member data ---------------------------
 
   edm::InputTag WMuonTag_;
-  edm::InputTag tauMuonTag_;
+  edm::InputTag tauTag_;
+  edm::InputTag jetMuonMapTag_;
 
 };
 
@@ -86,7 +87,8 @@ OSSFFilter::OSSFFilter(const edm::ParameterSet& iConfig)
 {
    //now do what ever initialization is needed
   WMuonTag_ = iConfig.getParameter<edm::InputTag>("WMuonTag");
-  tauMuonTag_ = iConfig.getParameter<edm::InputTag>("tauMuonTag");
+  tauTag_ = iConfig.getParameter<edm::InputTag>("tauTag");
+  jetMuonMapTag_ = iConfig.getParameter<edm::InputTag>("jetMuonMapTag");
 }
 
 
@@ -107,52 +109,55 @@ OSSFFilter::~OSSFFilter()
 bool
 OSSFFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
+  bool SignSelector = false; 
+  
   //get W muons
-  edm::Handle<reco::MuonRefVector> WMuons;
-  iEvent.getByLabel(WMuonTag_, WMuons);
+  edm::Handle<reco::MuonRefVector> pMuons;
+  iEvent.getByLabel(WMuonTag_, pMuons);
+  
+  //find the highest pT W muon
+  std::vector<reco::MuonRef> WMuonRefs;
+  for (reco::MuonRefVector::const_iterator iMuon = pMuons->begin(); iMuon != pMuons->end(); 
+       ++iMuon) { WMuonRefs.push_back(*iMuon); }
+  Common::sortByPT(WMuonRefs);  
+  double chargeWMuon = WMuonRefs[WMuonRefs.size() - 1]->charge();
 
-  //get tau muons
-  edm::Handle<reco::MuonRefVector> tauMuons;
-  iEvent.getByLabel(tauMuonTag_, tauMuons);
+  //get jet-muon map
+  edm::Handle<edm::ValueMap<reco::MuonRefVector> > pMuonJetMap;
+  iEvent.getByLabel(jetMuonMapTag_, pMuonJetMap);
 
-  double Wmu_pt = -9999.;
-  double taumu_pt = -9999.;
-  double chargeW = 0.;
-  double chargetau = 0.;
+  //get taus
+  edm::Handle<reco::PFTauRefVector> pTaus;
+  iEvent.getByLabel(tauTag_, pTaus);
 
-  if (WMuons->size() == 1)
-    chargeW = WMuons->at(0)->charge();
-  else
-    { // if >1 W muons
-      for (reco::MuonRefVector::const_iterator iMuon = WMuons->begin(); iMuon != WMuons->end(); ++iMuon)
-	{ // loop to find highest-pT
-	  if ((*iMuon)->pt() > Wmu_pt)
-	    {
-	      Wmu_pt = (*iMuon)->pt();
-	      chargeW = (*iMuon)->charge();
-	    }
-	} // loop to find highest-pT
-    } // if >1 W muons
+  //sort selected taus by descending order in mu+had mass
+  std::vector<reco::PFTauRef> muHadMassSortedTaus;
+  for (reco::PFTauRefVector::const_iterator iTau = pTaus->begin(); iTau != pTaus->end(); 
+       ++iTau) { muHadMassSortedTaus.push_back(*iTau); }
+  Common::sortByMass(pMuonJetMap, muHadMassSortedTaus);
 
-  if (tauMuons->size() == 1)
-    chargetau = tauMuons->at(0)->charge();
-  else
-    { // if >1 tau muons
-      for (reco::MuonRefVector::const_iterator iMuon = tauMuons->begin(); iMuon != tauMuons->end(); ++iMuon)
-	{ // loop to find highest-pT
-	  if ((*iMuon)->pt() > Wmu_pt)
-	    {
-	      taumu_pt = (*iMuon)->pt();
-	      chargetau = (*iMuon)->charge();
-	    }
-	} // loop to find highest-pT
-    } // if >1 tau muons
+  //loop over selected taus
+  std::vector<reco::PFTauRef>::const_iterator iTau = muHadMassSortedTaus.begin();
+  std::vector<reco::PFTauRef>::const_iterator endTau = iTau + 1;
 
-  double charge_product = chargetau*chargeW;
-  if (charge_product > 0)
-    return true;
-  else
-    return false;
+  while (iTau != endTau) {
+    const reco::PFJetRef& tauJetRef = (*iTau)->jetRef();
+    const reco::MuonRefVector& removedMuons = (*pMuonJetMap)[tauJetRef];
+    
+    //find the highest pT associated muon
+    std::vector<reco::MuonRef> removedMuonRefs;
+    for (reco::MuonRefVector::const_iterator iMuon = removedMuons.begin(); 
+	 iMuon != removedMuons.end(); ++iMuon) { removedMuonRefs.push_back(*iMuon); }
+    Common::sortByPT(removedMuonRefs);
+    double chargeTauMuon = removedMuonRefs[removedMuonRefs.size() - 1]->charge();
+    if (chargeTauMuon*chargeWMuon > 0)
+      SignSelector = true;
+    
+    ++iTau; 
+  }
+
+  return SignSelector;
+
 }
 
 // ------------ method called once each job just before starting event loop  ------------

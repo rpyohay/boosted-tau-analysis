@@ -3,11 +3,7 @@
 ####STUFF TO CONFIGURE####
 
 #version
-<<<<<<< HEAD
-version="v9"
-=======
-version="v40"
->>>>>>> 46247d24eb20eea62a68284a461b2dc6bfa58c65
+version="v12"
 infoTag=""
 dir=$version
 
