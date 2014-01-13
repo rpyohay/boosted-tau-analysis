@@ -21,5 +21,7 @@ version=$1
 ./generateQCDBTauAnalyzerCfgs.sh $version
 ./generateQCDBMuTauAnalyzerCfgs.sh $version
 ./generateWh1TauAnalyzerCfg.sh $version
+./generateggTauAnalyzerCfg.sh $version
+./generateNonIsoWDataTauAnalyzerCfgs.sh $version
 
 exit 0
