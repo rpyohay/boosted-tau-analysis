@@ -27,6 +27,7 @@ cd $version
 ./copyQCDFromEOS.sh
 ./copyQCDBFromEOS.sh
 ./copyQCDBMuFromEOS.sh
+./copyNonIsoWDataFromEOS.sh
 cd ..
 
 exit 0
