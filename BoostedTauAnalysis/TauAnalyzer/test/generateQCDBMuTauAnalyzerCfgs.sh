@@ -197,7 +197,7 @@ cat <<EOF > copyAllQCDBMuFromEOS.sh
 #!/bin/bash
 
 eval \`scramv1 runtime -sh\`
-for sample in "10To50" "50"
+for sample in "15to30" "30to50" "50to150" "150"
   do
   cmsStage -f /store/user/`whoami`/muHadAnalysis_QCDBMu_pt\${sample}_${version}.root /data1/`whoami`/QCDBMu/analysis/
   cmsRm /store/user/`whoami`/muHadAnalysis_QCDBMu_pt\${sample}_${version}.root
