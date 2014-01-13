@@ -51,6 +51,8 @@ mkdir -p /data1/`whoami`/data/analysis
 mkdir -p /data1/`whoami`/data/EDM_files
 mkdir -p /data1/`whoami`/nonIsoWData/analysis
 mkdir -p /data1/`whoami`/nonIsoWData/EDM_files
+mkdir -p /data1/`whoami`/nonIsoWQCD/analysis
+mkdir -p /data1/`whoami`/nonIsoWQCD/EDM_files
 mkdir -p /data1/`whoami`/results
 
 4. Execute
