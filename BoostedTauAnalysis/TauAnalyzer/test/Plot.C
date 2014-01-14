@@ -706,22 +706,11 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 	legends[canvasIndex]->AddEntry(pGraph, legendEntries[fileIndex].c_str(), "l");
       }
       else {
-	string currentfilename = iInputFile->c_str();
-	if (currentfilename.find("RegionA") != string::npos)
-	  {
- 	    string otherCanvasName(iCanvasName->c_str());
-	    otherCanvasName+="_1";
-	    TCanvas* pCanvas2 = (TCanvas*)pCanvas->GetPrimitive(otherCanvasName.c_str());
-	    pHist = (TH1F*)pCanvas2->GetPrimitive(graphNames[canvasIndex].c_str());
-	  }
-	else
-	  {
-	    pHist = (TH1F*)pCanvas->GetPrimitive(graphNames[canvasIndex].c_str());
-	  }
-// 	if (string(pHist->GetName()) == "tauHadIso") {
-// 	  cout << *iInputFile << endl;
-// 	  cout << "Integral: " << pHist->Integral(0, -1) << endl;
-// 	}
+	pHist = (TH1F*)pCanvas->GetPrimitive(graphNames[canvasIndex].c_str());
+	// 	if (string(pHist->GetName()) == "tauHadIso") {
+	// 	  cout << *iInputFile << endl;
+	// 	  cout << "Integral: " << pHist->Integral(0, -1) << endl;
+	// 	}
 	float weight = weights[fileIndex] == 0.0 ? 1.0/pHist->Integral(0, -1) : weights[fileIndex];
 	setHistogramOptions(pHist, colors[fileIndex], 0.7, styles[fileIndex], 
 			    weight, 
@@ -1073,13 +1062,6 @@ void drawDifferenceGraphsOn1Canvas(const string& outputFileName,
 	  if (fileIndex == 0)
 	    { // if data
 	      histDiff[canvasIndex] = (TH1F*)hists[canvasIndex][fileIndex]->Clone();
-	      if (graphNames[canvasIndex].find("muHadMass") != string::npos)
-		{
-		  double integral = hists[canvasIndex][fileIndex]->Integral();
-		  //cout << "Integrated number of events for " << graphNames[canvasIndex];//.c_str;
-		  //cout << " in sample " << inputFiles[fileIndex];//.c_str;
-		  //cout << " = " << integral << endl;
-		}
 	    } // if data
 	  else
 	    { // if MC
@@ -1180,10 +1162,10 @@ void drawQCDRegionAHistograms(const string& outputFileA,
     TH1F* pHistB = NULL;
     TH1F* pHistC = NULL;
     TH1F* pHistD = NULL;
-    string canvasNameB(iCanvasName->c_str());
-    canvasNameB+="_1";
-    TCanvas* pCanvasB1 = (TCanvas*)pCanvasB->GetPrimitive(canvasNameB.c_str());
-    pHistB = (TH1F*)pCanvasB1->GetPrimitive(graphNames[canvasIndex].c_str())->Clone();
+    //string canvasNameB(iCanvasName->c_str());
+    //canvasNameB+="_1";
+    //TCanvas* pCanvasB1 = (TCanvas*)pCanvasB->GetPrimitive(canvasNameB.c_str());
+    pHistB = (TH1F*)pCanvasB->GetPrimitive(graphNames[canvasIndex].c_str())->Clone();
     pHistC = (TH1F*)pCanvasC->GetPrimitive(graphNames[canvasIndex].c_str())->Clone();
     pHistD = (TH1F*)pCanvasD->GetPrimitive(graphNames[canvasIndex].c_str())->Clone();
     //cout << "graph: " << graphNames[canvasIndex].c_str() << endl;

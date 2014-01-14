@@ -673,7 +673,7 @@
   drawDifferenceGraphsOn1Canvas(dataVsMCOutputDiff2p5InvFb,dataVsMCInputFiles,
 				canvasNames1D, graphNames1D, legendHeaders2p5InvFb,
 				colors, styles, legendEntriesMCData,
-				weightsMCData, setLogY, dataMC);
+				weightsMCData, setLogY, sigBkg);
 
 
   string outputFileNameA = "/data1/friccita/results/dataVsMC_RegionAQCDEstimate";
@@ -685,7 +685,7 @@
   drawQCDRegionAHistograms(outputFileNameA,inputFileNameB,inputFileNameC,
 			   inputFileNameD,canvasNames1D, graphNames1D,
 			   legendHeaders2p5InvFb,colors, styles, legendEntriesMCData,
-			   weightsMCData, setLogY, dataMC);
+			   weightsMCData, setLogY, sigBkg);
   
   //compare QCD search sample to control sample
   string QCDSearchVsControlOutputFile(analysisFilePath + 
