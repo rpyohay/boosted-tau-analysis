@@ -242,6 +242,9 @@ private:
   //histogram of tau muon transverse mass
   TH1F* tauMuMT_;
 
+  //histogram of hadronic tau transverse mass
+  TH1F* tauHadMT_;
+
   //histogram of dPhi(W muon, MET)
   TH1F* dPhiWMuMET_;
 
@@ -896,9 +899,6 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
        ++iMuon) { WMuonRefs.push_back(*iMuon); }
   Common::sortByPT(WMuonRefs);
 
-  //plot dPhi(highest pT W muon, MET)
-  plotDPhiMuMet(WMuonRefs[WMuonRefs.size() - 1], pMET, dPhiWMuMET_, PUWeight);
-
   //fill STL containers of pointers to the gen particles
   std::vector<reco::GenParticle*> genParticlePtrs;
   std::vector<reco::GenParticle*> genTauMuPtrs;
@@ -1139,6 +1139,9 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       //plot MET distribution
       fillETHistogram(pMET, MET_, PUWeight);
 
+      //plot dPhi(highest pT W muon, MET)
+      plotDPhiMuMet(WMuonRefs[WMuonRefs.size() - 1], pMET, dPhiWMuMET_, PUWeight);
+
       //plot the transverse mass for the highest pT W muon
       plotMT(WMuonRefs[WMuonRefs.size() - 1], pMET, WMuMT_, PUWeight);
 
@@ -1159,6 +1162,12 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
       //plot the transverse mass for the highest pT muon
       plotMT(removedMuonRefs[removedMuonRefs.size() - 1], pMET, tauMuMT_, PUWeight);
+
+      //plot the transverse mass for the hadronic tau
+      edm::RefToBase<reco::PFMET> METRefToBase = pMET->refAt(0);
+      double tauHad_TransverseMass = sqrt(2*(*iTau)->pt()*METRefToBase->et()*
+					  (1.0 - cos(reco::deltaPhi((*iTau)->phi(), METRefToBase->phi()))));
+      tauHadMT_->Fill(tauHad_TransverseMass, PUWeight);
 
       //plot HT (tau muon + hadronic tau + leading distinct corrected jet)
       std::vector<reco::Candidate*> tauMuTauHadJet;
@@ -1584,6 +1593,7 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       fastjet::PseudoJet thisMainJet = FJjet.at(0);
       fastjet::PseudoJet thisGroomedJet = pruner(thisMainJet); // jet grooming
       vector<fastjet::PseudoJet> FJparticles2 = thisGroomedJet.constituents();
+      //vector<fastjet::PseudoJet> FJparticles2 = thisMainJet.constituents(); // if you don't want to prune
       NsubParameters paraNsub = NsubParameters(1.0, 0.8);
       Nsubjettiness routine1(1, Njettiness::kt_axes, 1.0, 0.8, 10000.0);
       Nsubjettiness routine2(2, Njettiness::kt_axes, 1.0, 0.8, 10000.0);
@@ -1593,6 +1603,10 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       double tau2 = routine2.result(thisGroomedJet);
       double tau3 = routine3.result(thisGroomedJet);
       double tau4 = routine4.result(thisGroomedJet);
+      //double tau1 = routine1.result(thisMainJet); // if you don't want to prune
+      //double tau2 = routine2.result(thisMainJet); // if you don't want to prune
+      //double tau3 = routine3.result(thisMainJet); // if you don't want to prune
+      //double tau4 = routine4.result(thisMainJet); // if you don't want to prune
 
       if (tau1 != 0.)
 	{
@@ -1987,6 +2001,7 @@ void TauAnalyzer::beginJob()
   muHadCharge_ = new TH1F("muHadCharge", ";q_{#mu} + q_{had};", 5, -2.5, 2.5);
   WMuMT_ = new TH1F("WMuMT", ";W muon M_{T} (GeV);", 100, 0.0, 400.0);
   tauMuMT_ = new TH1F("tauMuMT", ";#tau muon M_{T} (GeV);", 50, 0.0, 200.0);
+  tauHadMT_ = new TH1F("tauHadMT", ";#tau_{had} M_{T} (GeV);", 50, 0.0, 200.0);
   dPhiWMuMET_ = new TH1F("dPhiWMuMET", ";#Delta#phi(W muon, #slash{E}_{T});", 63, 0.0, 3.15);
   dPhiTauMuMET_ = 
     new TH1F("dPhiTauMuMET", ";#Delta#phi(#tau muon, #slash{E}_{T});", 63, 0.0, 3.15);
@@ -2130,36 +2145,36 @@ void TauAnalyzer::beginJob()
   jet_ptmj_etacut = new TH1F("jet_ptmj_etacut", "#frac{p_{T}}{m}", 80, 0., 80.);
 
   muHad_t3t1_ =
-    new TH1F("muHad_t3t1", "{#tau}_{3}/{#tau}_{1} of cleaned parent jet", 500, 0.0, 2.0);
+    new TH1F("muHad_t3t1", "{#tau}_{3}/{#tau}_{1} of cleaned parent jet", 50, 0.0, 2.0);
 
   muHad_t2t1_ =
-    new TH1F("muHad_t2t1", "{#tau}_{2}/{#tau}_{1} of cleaned parent jet", 500, 0.0, 2.0);
+    new TH1F("muHad_t2t1", "{#tau}_{2}/{#tau}_{1} of cleaned parent jet", 50, 0.0, 2.0);
 
   muHad_t3t1_pT1020_ =
-    new TH1F("muHad_t3t1_pT1020", "{#tau}_{3}/{#tau}_{1} of cleaned parent jet with pT between 10 and 20", 500, 0.0, 2.0);
+    new TH1F("muHad_t3t1_pT1020", "{#tau}_{3}/{#tau}_{1} of cleaned parent jet with pT between 10 and 20", 50, 0.0, 2.0);
   muHad_t3t1_pT2030_ =
-    new TH1F("muHad_t3t1_pT2030", "{#tau}_{3}/{#tau}_{1} of cleaned parent jet with pT between 20 and 30", 500, 0.0, 2.0);
+    new TH1F("muHad_t3t1_pT2030", "{#tau}_{3}/{#tau}_{1} of cleaned parent jet with pT between 20 and 30", 50, 0.0, 2.0);
   muHad_t3t1_pT3040_ =
-    new TH1F("muHad_t3t1_pT3040", "{#tau}_{3}/{#tau}_{1} of cleaned parent jet with pT between 30 and 40", 500, 0.0, 2.0);
+    new TH1F("muHad_t3t1_pT3040", "{#tau}_{3}/{#tau}_{1} of cleaned parent jet with pT between 30 and 40", 50, 0.0, 2.0);
   muHad_t3t1_pT4050_ =
-    new TH1F("muHad_t3t1_pT4050", "{#tau}_{3}/{#tau}_{1} of cleaned parent jet with pT between 40 and 50", 500, 0.0, 2.0);
+    new TH1F("muHad_t3t1_pT4050", "{#tau}_{3}/{#tau}_{1} of cleaned parent jet with pT between 40 and 50", 50, 0.0, 2.0);
   muHad_t3t1_pT50Up_ =
-    new TH1F("muHad_t3t1_pT50Up", "{#tau}_{3}/{#tau}_{1} of cleaned parent jet with pT above 50", 500, 0.0, 2.0);
+    new TH1F("muHad_t3t1_pT50Up", "{#tau}_{3}/{#tau}_{1} of cleaned parent jet with pT above 50", 50, 0.0, 2.0);
 
   muHad_t3t1_0Jets_ =
-    new TH1F("muHad_t3t1_0Jets", "{#tau}_{3}/{#tau}_{1} of cleaned parent jet with NJets = 0", 500, 0.0, 2.0);
+    new TH1F("muHad_t3t1_0Jets", "{#tau}_{3}/{#tau}_{1} of cleaned parent jet with NJets = 0", 50, 0.0, 2.0);
   muHad_t3t1_1Jets_ =
-    new TH1F("muHad_t3t1_1Jets", "{#tau}_{3}/{#tau}_{1} of cleaned parent jet with NJets = 1", 500, 0.0, 2.0);
+    new TH1F("muHad_t3t1_1Jets", "{#tau}_{3}/{#tau}_{1} of cleaned parent jet with NJets = 1", 50, 0.0, 2.0);
   muHad_t3t1_2Jets_ =
-    new TH1F("muHad_t3t1_2Jets", "{#tau}_{3}/{#tau}_{1} of cleaned parent jet with NJets = 2", 500, 0.0, 2.0);
+    new TH1F("muHad_t3t1_2Jets", "{#tau}_{3}/{#tau}_{1} of cleaned parent jet with NJets = 2", 50, 0.0, 2.0);
   muHad_t3t1_3Jets_ =
-    new TH1F("muHad_t3t1_3Jets", "{#tau}_{3}/{#tau}_{1} of cleaned parent jet with NJets = 3", 500, 0.0, 2.0);
+    new TH1F("muHad_t3t1_3Jets", "{#tau}_{3}/{#tau}_{1} of cleaned parent jet with NJets = 3", 50, 0.0, 2.0);
   muHad_t3t1_4Jets_ =
-    new TH1F("muHad_t3t1_4Jets", "{#tau}_{3}/{#tau}_{1} of cleaned parent jet with NJets = 4", 500, 0.0, 2.0);
+    new TH1F("muHad_t3t1_4Jets", "{#tau}_{3}/{#tau}_{1} of cleaned parent jet with NJets = 4", 50, 0.0, 2.0);
   muHad_t3t1_5Jets_ =
-    new TH1F("muHad_t3t1_5Jets", "{#tau}_{3}/{#tau}_{1} of cleaned parent jet with NJets = 5", 500, 0.0, 2.0);
+    new TH1F("muHad_t3t1_5Jets", "{#tau}_{3}/{#tau}_{1} of cleaned parent jet with NJets = 5", 50, 0.0, 2.0);
   muHad_t3t1_MoreJets_ =
-    new TH1F("muHad_t3t1_MoreJets", "{#tau}_{3}/{#tau}_{1} of cleaned parent jet with NJets > 5", 500, 0.0, 2.0);
+    new TH1F("muHad_t3t1_MoreJets", "{#tau}_{3}/{#tau}_{1} of cleaned parent jet with NJets > 5", 50, 0.0, 2.0);
 
 
 
@@ -2216,6 +2231,7 @@ void TauAnalyzer::beginJob()
   muHadCharge_->Sumw2();
   WMuMT_->Sumw2();
   tauMuMT_->Sumw2();
+  tauHadMT_->Sumw2();
   dPhiWMuMET_->Sumw2();
   dPhiTauMuMET_->Sumw2();
   tauMuTauHadJetHT_->Sumw2();
@@ -2330,6 +2346,7 @@ void TauAnalyzer::endJob()
   TCanvas muHadChargeCanvas("muHadChargeCanvas", "", 600, 600);
   TCanvas WMuMTCanvas("WMuMTCanvas", "", 600, 600);
   TCanvas tauMuMTCanvas("tauMuMTCanvas", "", 600, 600);
+  TCanvas tauHadMTCanvas("tauHadMTCanvas", "", 600, 600);
   TCanvas dPhiWMuMETCanvas("dPhiWMuMETCanvas", "", 600, 600);
   TCanvas dPhiTauMuMETCanvas("dPhiTauMuMETCanvas", "", 600, 600);
   TCanvas tauMuTauHadJetHTCanvas("tauMuTauHadJetHTCanvas", "", 600, 600);
@@ -2448,6 +2465,7 @@ void TauAnalyzer::endJob()
   Common::draw1DHistograms(muHadChargeCanvas, muHadCharge_);
   Common::draw1DHistograms(WMuMTCanvas, WMuMT_);
   Common::draw1DHistograms(tauMuMTCanvas, tauMuMT_);
+  Common::draw1DHistograms(tauHadMTCanvas, tauHadMT_);
   Common::draw1DHistograms(dPhiWMuMETCanvas, dPhiWMuMET_);
   Common::draw1DHistograms(dPhiTauMuMETCanvas, dPhiTauMuMET_);
   Common::draw1DHistograms(tauMuTauHadJetHTCanvas, tauMuTauHadJetHT_);
@@ -2566,6 +2584,7 @@ void TauAnalyzer::endJob()
   muHadChargeCanvas.Write();
   WMuMTCanvas.Write();
   tauMuMTCanvas.Write();
+  tauHadMTCanvas.Write();
   dPhiWMuMETCanvas.Write();
   dPhiTauMuMETCanvas.Write();
   tauMuTauHadJetHTCanvas.Write();

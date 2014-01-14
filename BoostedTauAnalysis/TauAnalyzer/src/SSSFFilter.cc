@@ -1,11 +1,11 @@
 // -*- C++ -*-
 //
-// Package:    OSSFFilter
-// Class:      OSSFFilter
+// Package:    SSSFFilter
+// Class:      SSSFFilter
 // 
-/**\class OSSFFilter OSSFFilter.cc BoostedTauAnalysis/OSSFFilter/src/OSSFFilter.cc
+/**\class SSSFFilter SSSFFilter.cc BoostedTauAnalysis/SSSFFilter/src/SSSFFilter.cc
 
- Description: OS/SF veto for charges of W decay muon and tau decay muon
+ Description: SS/SF veto for charges of tau_mu and tau_had
 
  Implementation:
      [Notes on implementation]
@@ -47,10 +47,10 @@ using namespace reco;
 // class declaration
 //
 
-class OSSFFilter : public edm::EDFilter {
+class SSSFFilter : public edm::EDFilter {
    public:
-      explicit OSSFFilter(const edm::ParameterSet&);
-      ~OSSFFilter();
+      explicit SSSFFilter(const edm::ParameterSet&);
+      ~SSSFFilter();
 
       static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
@@ -83,7 +83,7 @@ class OSSFFilter : public edm::EDFilter {
 //
 // constructors and destructor
 //
-OSSFFilter::OSSFFilter(const edm::ParameterSet& iConfig)
+SSSFFilter::SSSFFilter(const edm::ParameterSet& iConfig)
 {
    //now do what ever initialization is needed
   WMuonTag_ = iConfig.getParameter<edm::InputTag>("WMuonTag");
@@ -92,7 +92,7 @@ OSSFFilter::OSSFFilter(const edm::ParameterSet& iConfig)
 }
 
 
-OSSFFilter::~OSSFFilter()
+SSSFFilter::~SSSFFilter()
 {
  
    // do anything here that needs to be done at desctruction time
@@ -107,7 +107,7 @@ OSSFFilter::~OSSFFilter()
 
 // ------------ method called on each new Event  ------------
 bool
-OSSFFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
+SSSFFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   bool SignSelector = false; 
   
@@ -143,65 +143,65 @@ OSSFFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
   while (iTau != endTau) {
     const reco::PFJetRef& tauJetRef = (*iTau)->jetRef();
     const reco::MuonRefVector& removedMuons = (*pMuonJetMap)[tauJetRef];
-    
+    double chargeTauHad = (*iTau)->charge();
     //find the highest pT associated muon
     std::vector<reco::MuonRef> removedMuonRefs;
     for (reco::MuonRefVector::const_iterator iMuon = removedMuons.begin(); 
 	 iMuon != removedMuons.end(); ++iMuon) { removedMuonRefs.push_back(*iMuon); }
     Common::sortByPT(removedMuonRefs);
     double chargeTauMuon = removedMuonRefs[removedMuonRefs.size() - 1]->charge();
-    if (chargeTauMuon*chargeWMuon > 0)
+    if (chargeTauMuon*chargeTauHad < 0)
       SignSelector = true;
     
     ++iTau; 
   }
-
+  
   return SignSelector;
 
 }
 
 // ------------ method called once each job just before starting event loop  ------------
 void 
-OSSFFilter::beginJob()
+SSSFFilter::beginJob()
 {
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
 void 
-OSSFFilter::endJob() {
+SSSFFilter::endJob() {
 }
 
 // ------------ method called when starting to processes a run  ------------
 bool 
-OSSFFilter::beginRun(edm::Run&, edm::EventSetup const&)
+SSSFFilter::beginRun(edm::Run&, edm::EventSetup const&)
 { 
   return true;
 }
 
 // ------------ method called when ending the processing of a run  ------------
 bool 
-OSSFFilter::endRun(edm::Run&, edm::EventSetup const&)
+SSSFFilter::endRun(edm::Run&, edm::EventSetup const&)
 {
   return true;
 }
 
 // ------------ method called when starting to processes a luminosity block  ------------
 bool 
-OSSFFilter::beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
+SSSFFilter::beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
 {
   return true;
 }
 
 // ------------ method called when ending the processing of a luminosity block  ------------
 bool 
-OSSFFilter::endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
+SSSFFilter::endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
 {
   return true;
 }
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
 void
-OSSFFilter::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+SSSFFilter::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   //The following says we do not know what parameters are allowed so do no validation
   // Please change this to state exactly what you do use, even if it is no parameters
   edm::ParameterSetDescription desc;
@@ -209,4 +209,4 @@ OSSFFilter::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   descriptions.addDefault(desc);
 }
 //define this as a plug-in
-DEFINE_FWK_MODULE(OSSFFilter);
+DEFINE_FWK_MODULE(SSSFFilter);
