@@ -305,6 +305,8 @@ void EfficiencyAnalyzer<T>::reset(const bool doDelete)
 typedef EfficiencyAnalyzer<reco::GenParticle> GenParticleEfficiencyAnalyzer;
 typedef EfficiencyAnalyzer<reco::Muon> MuonEfficiencyAnalyzer;
 typedef EfficiencyAnalyzer<reco::PFTau> TauEfficiencyAnalyzer;
+typedef EfficiencyAnalyzer<reco::Candidate> CandidateEfficiencyAnalyzer;
 DEFINE_FWK_MODULE(GenParticleEfficiencyAnalyzer);
 DEFINE_FWK_MODULE(MuonEfficiencyAnalyzer);
 DEFINE_FWK_MODULE(TauEfficiencyAnalyzer);
+DEFINE_FWK_MODULE(CandidateEfficiencyAnalyzer);

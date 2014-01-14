@@ -14,7 +14,7 @@ process.GlobalTag.globaltag = cms.string('START53_V7F::All')
 
 process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
-    'file:/data1/yohay/W1JetsToLNu_TuneZ2Star_8TeV-madgraph-Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM.root'
+    'root://eoscms//eos/cms/store/user/yohay/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball-Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_DYEnriched/data_no_selection_100_1_tAb.root'
     )
                             )
 process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1))

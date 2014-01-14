@@ -47,7 +47,7 @@ TAU_RARE = 15
 ANY_PT_RANK = -1
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
-process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(1)
+process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(1000)
 
 process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
 
@@ -78,6 +78,7 @@ process.load("RecoTauTag.Configuration.RecoPFTauTag_cff")
 process.load("RecoTauTag.RecoTau.RecoTauPiZeroProducer_cfi")
 process.load('BoostedTauAnalysis/CleanJets/cleanjets_cfi')
 process.load('BoostedTauAnalysis/TauAnalyzer/tauanalyzer_cfi')
+
 ## #for jet charged hadron subtraction
 ## process.load("CommonTools.ParticleFlow.PF2PAT_cff")
 ## from CommonTools.ParticleFlow.Tools.enablePileUpCorrection import enablePileUpCorrectionInPF2PAT
@@ -270,6 +271,8 @@ process.muHadIsoTauAnalyzer = cms.EDAnalyzer(
     jetMuonMapTag = cms.InputTag('CleanJets', '', 'SKIM'),
     oldNewJetMapTag = cms.InputTag('CleanJets', '', 'SKIM'),
     genParticleTag = cms.InputTag('genPartonSelector'),
+    genTauMuTag = cms.InputTag('genTauMuSelector'),
+    genWTauMuTag = cms.InputTag('genWTauNuSelector'),
     tauHadIsoTag = cms.InputTag('hpsPFTauDiscriminationByRawCombinedIsolationDBSumPtCorr', '',
                                 'SKIM'),
     allMuonTag = cms.InputTag('muons'),
@@ -283,13 +286,14 @@ process.muHadIsoTauAnalyzer = cms.EDAnalyzer(
     uncorrJetPTMin = cms.double(0.0), #GeV
     tauArbitrationMethod = cms.string("m"),
     PUScenario = cms.string("PUSCENARIO"),
+    zCut = cms.double(0.1),
+    RcutFactor = cms.double(0.5),
     MC = cms.bool(False),
+    reweight = cms.bool(False),
     pTRankColors = cms.vuint32(1, 2, 4, 6),
     pTRankStyles = cms.vuint32(20, 21, 22, 23),
     pTRankEntries = cms.vstring('Highest p_{T}', 'Second highest p_{T}', 'Third highest p_{T}',
-                                'Lowest p_{T}'),
-    zCut = cms.double(0.1),
-    RcutFactor = cms.double(0.5)
+                                'Lowest p_{T}')
     )
 
 #analyze non-isolated taus
@@ -298,6 +302,7 @@ process.muHadNonIsoTauAnalyzer.outFileName = cms.string(
     'NONISOTAUANALYZEROUTFILE'
     )
 process.muHadNonIsoTauAnalyzer.tauTag = cms.InputTag('muHadNonIsoTauSelector')
+process.muHadNonIsoTauAnalyzer.reweight = cms.bool(REWEIGHT)
 
 #analyze all taus
 process.muHadTauAnalyzer = process.muHadIsoTauAnalyzer.clone()
@@ -338,31 +343,32 @@ process.SSSFFilterNonIso.tauTag = cms.InputTag('muHadNonIsoTauSelector')
 
 
 #Trigger object filter
-process.TriggerObjectFilter = cms.EDFilter('TriggerObjectFilter',
-                                           WMuonTag = cms.InputTag("WIsoMuonSelector"),
-                                           triggerEventTag = cms.untracked.InputTag("hltTriggerSummaryAOD", "", "HLT"),
-                                           triggerResultsTag = cms.untracked.InputTag("TriggerResults", "", "HLT"),
-                                           triggerDelRMatch = cms.untracked.double(0.1),
-                                           hltTags = cms.VInputTag(cms.InputTag("HLT_IsoMu24_eta2p1_v1", "", "HLT"),
-                                                                   cms.InputTag("HLT_IsoMu24_eta2p1_v2", "", "HLT"),
-                                                                   cms.InputTag("HLT_IsoMu24_eta2p1_v3", "", "HLT"),
-                                                                   cms.InputTag("HLT_IsoMu24_eta2p1_v4", "", "HLT"),
-                                                                   cms.InputTag("HLT_IsoMu24_eta2p1_v5", "", "HLT"),
-                                                                   cms.InputTag("HLT_IsoMu24_eta2p1_v6", "", "HLT"),
-                                                                   cms.InputTag("HLT_IsoMu24_eta2p1_v7", "", "HLT"),
-                                                                   cms.InputTag("HLT_IsoMu24_eta2p1_v8", "", "HLT"),
-                                                                   cms.InputTag("HLT_IsoMu24_eta2p1_v9", "", "HLT"),
-                                                                   cms.InputTag("HLT_IsoMu24_eta2p1_v10", "", "HLT"),
-                                                                   cms.InputTag("HLT_IsoMu24_eta2p1_v11", "", "HLT"),
-                                                                   cms.InputTag("HLT_IsoMu24_eta2p1_v12", "", "HLT"),
-                                                                   cms.InputTag("HLT_IsoMu24_eta2p1_v13", "", "HLT"),
-                                                                   cms.InputTag("HLT_IsoMu24_eta2p1_v14", "", "HLT"),
-                                                                   cms.InputTag("HLT_IsoMu24_eta2p1_v15", "", "HLT")
-                                                                   ),
-                                           theRightHLTTag = cms.InputTag("HLT_IsoMu24_eta2p1"),
-                                           theRightHLTSubFilter = cms.InputTag("hltL3crIsoL1sMu16Eta2p1L1f0L2f16QL3f24QL3cr"),
-                                           HLTSubFilters = cms.untracked.VInputTag("")
-                                           )
+process.TriggerObjectFilter = cms.EDFilter(
+    'TriggerObjectFilter',
+    WMuonTag = cms.InputTag("WIsoMuonSelector"),
+    triggerEventTag = cms.untracked.InputTag("hltTriggerSummaryAOD", "", "HLT"),
+    triggerResultsTag = cms.untracked.InputTag("TriggerResults", "", "HLT"),
+    triggerDelRMatch = cms.untracked.double(0.1),
+    hltTags = cms.VInputTag(cms.InputTag("HLT_IsoMu24_eta2p1_v1", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v2", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v3", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v4", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v5", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v6", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v7", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v8", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v9", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v10", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v11", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v12", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v13", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v14", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v15", "", "HLT")
+                            ),
+    theRightHLTTag = cms.InputTag("HLT_IsoMu24_eta2p1"),
+    theRightHLTSubFilter = cms.InputTag("hltL3crIsoL1sMu16Eta2p1L1f0L2f16QL3f24QL3cr"),
+    HLTSubFilters = cms.untracked.VInputTag("")
+    )
 
 #sequences
 process.beginSequence = cms.Sequence(process.genPartonSelector*process.genMuSelector)
@@ -370,7 +376,7 @@ process.isoTauAnalysisSequence = cms.Sequence(process.muHadIsoTauSelector*
                                               process.TriggerObjectFilter*
                                               process.OSSFFilterIso*
                                               process.SSSFFilterIso*
-                                              process.muHadIsoTauAnalyzer)
+                                             process.muHadIsoTauAnalyzer)
 process.signalIsoTauAnalysisSequence = cms.Sequence(process.genWMuNuSelector*
                                                     process.IsoMu24eta2p1Selector*
                                                     process.WMuonPTSelector*
@@ -388,8 +394,7 @@ process.nonIsoTauAnalysisSequence = cms.Sequence(process.muHadTauSelector*
                                                  process.OSSFFilterNonIso*
                                                  process.SSSFFilterNonIso*
                                                  process.muHadNonIsoTauAnalyzer)
-process.tauAnalysisSequence = cms.Sequence(process.muHadTauSelector*
-                                           process.muHadTauAnalyzer)
+process.tauAnalysisSequence = cms.Sequence(process.muHadTauSelector*process.muHadTauAnalyzer)
 
 #path
 process.p = cms.Path(SEQUENCE)

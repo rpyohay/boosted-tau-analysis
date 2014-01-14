@@ -1,10 +1,21 @@
 #!/bin/bash
 
+if [ $# -gt 2 ]
+    then
+    echo "Usage: ./generateQCDTauAnalyzerCfgs.sh <version> [reweightOnly|]"
+    exit 0
+fi
+
 ####STUFF TO CONFIGURE####
 
 #version
-version="v12"
+version=$1
 infoTag=""
+reweightOnly=0
+if [ "$2" == "reweightOnly" ]
+    then
+    reweightOnly=1
+fi
 dir=$version
 
 #number of samples
@@ -40,6 +51,7 @@ cleanJetsOutFiles=( "${cleanJetsOutputFilePrefix}NMSSMSignal_MuProperties_QCD_Pt
 #TauAnalyzer output files
 isoTauAnalyzerOutputFiles=( "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_QCD_Pt-20to30_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_QCD_Pt-30to50_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_QCD_Pt-50to80_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_QCD_Pt-80to120_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_QCD_Pt-120to170_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_QCD_Pt-170to300_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_QCD_Pt-300to470_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_QCD_Pt-470to600_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_QCD_Pt-600to800_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_QCD_Pt-800to1000_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_QCD_Pt-1000_${version}.root" )
 nonIsoTauAnalyzerOutputFiles=( "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_QCD_Pt-20to30_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_QCD_Pt-30to50_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_QCD_Pt-50to80_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_QCD_Pt-80to120_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_QCD_Pt-120to170_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_QCD_Pt-170to300_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_QCD_Pt-300to470_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_QCD_Pt-470to600_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_QCD_Pt-600to800_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_QCD_Pt-800to1000_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_QCD_Pt-1000_${version}.root" )
+nonIsoReweightTauAnalyzerOutputFiles=( "${tauAnalyzerOutputFilePrefix}muHadNonIsoReweightAnalysis_QCD_Pt-20to30_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoReweightAnalysis_QCD_Pt-30to50_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoReweightAnalysis_QCD_Pt-50to80_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoReweightAnalysis_QCD_Pt-80to120_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoReweightAnalysis_QCD_Pt-120to170_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoReweightAnalysis_QCD_Pt-170to300_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoReweightAnalysis_QCD_Pt-300to470_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoReweightAnalysis_QCD_Pt-470to600_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoReweightAnalysis_QCD_Pt-600to800_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoReweightAnalysis_QCD_Pt-800to1000_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoReweightAnalysis_QCD_Pt-1000_${version}.root" )
 allTauAnalyzerOutputFiles=( "${tauAnalyzerOutputFilePrefix}muHadAnalysis_QCD_Pt-20to30_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadAnalysis_QCD_Pt-30to50_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadAnalysis_QCD_Pt-50to80_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadAnalysis_QCD_Pt-80to120_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadAnalysis_QCD_Pt-120to170_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadAnalysis_QCD_Pt-170to300_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadAnalysis_QCD_Pt-300to470_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadAnalysis_QCD_Pt-470to600_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadAnalysis_QCD_Pt-600to800_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadAnalysis_QCD_Pt-800to1000_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadAnalysis_QCD_Pt-1000_${version}.root" )
 
 #EDM output files
@@ -59,12 +71,18 @@ for i in `seq $iBeg $iEnd`
   do
 
   #generate cfg file for the isolated sample
-  sed -e "s%FILES%${inputFileBlocks[${i}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${i}]}%" -e "s%NONISOTAUANALYZEROUTFILE%${nonIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%ALLTAUANALYZEROUTFILE%${allTauAnalyzerOutputFiles[${i}]}%" -e "s%ISOTAUANALYZEROUTFILE%${isoTauAnalyzerOutputFiles[${i}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${i}]}%" -e "s%SEQUENCE%process.isoTauAnalysisSequence%" -e "s%PUSCENARIO%S10%" ../tauanalyzer_WNJetsToLNu_Wh1_template_cfg.py > tauanalyzer_${samples[${i}]}_iso_cfg.py
+  sed -e "s%FILES%${inputFileBlocks[${i}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${i}]}%" -e "s%NONISOTAUANALYZEROUTFILE%${nonIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%ALLTAUANALYZEROUTFILE%${allTauAnalyzerOutputFiles[${i}]}%" -e "s%ISOTAUANALYZEROUTFILE%${isoTauAnalyzerOutputFiles[${i}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${i}]}%" -e "s%SEQUENCE%process.isoTauAnalysisSequence%" -e "s%PUSCENARIO%S10%" -e "s%REWEIGHT%False%" ../tauanalyzer_WNJetsToLNu_Wh1_template_cfg.py > tauanalyzer_${samples[${i}]}_iso_cfg.py
 
   #generate cfg file for the non-isolated sample
-  sed -e "s%FILES%${inputFileBlocks[${i}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${i}]}%" -e "s%NONISOTAUANALYZEROUTFILE%${nonIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%ALLTAUANALYZEROUTFILE%${allTauAnalyzerOutputFiles[${i}]}%" -e "s%ISOTAUANALYZEROUTFILE%${isoTauAnalyzerOutputFiles[${i}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${i}]}%" -e "s%SEQUENCE%process.nonIsoTauAnalysisSequence%" -e "s%PUSCENARIO%S10%" ../tauanalyzer_WNJetsToLNu_Wh1_template_cfg.py > tauanalyzer_${samples[${i}]}_nonIso_cfg.py
+  sed -e "s%FILES%${inputFileBlocks[${i}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${i}]}%" -e "s%NONISOTAUANALYZEROUTFILE%${nonIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%ALLTAUANALYZEROUTFILE%${allTauAnalyzerOutputFiles[${i}]}%" -e "s%ISOTAUANALYZEROUTFILE%${isoTauAnalyzerOutputFiles[${i}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${i}]}%" -e "s%SEQUENCE%process.nonIsoTauAnalysisSequence%" -e "s%PUSCENARIO%S10%" -e "s%REWEIGHT%False%" ../tauanalyzer_WNJetsToLNu_Wh1_template_cfg.py > tauanalyzer_${samples[${i}]}_nonIso_cfg.py
 
-  #generate job submission script for LSF
+  #generate cfg file for the non-isolated, reweighted sample
+  sed -e "s%FILES%${inputFileBlocks[${i}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${i}]}%" -e "s%NONISOTAUANALYZEROUTFILE%${nonIsoReweightTauAnalyzerOutputFiles[${i}]}%" -e "s%ALLTAUANALYZEROUTFILE%${allTauAnalyzerOutputFiles[${i}]}%" -e "s%ISOTAUANALYZEROUTFILE%${isoTauAnalyzerOutputFiles[${i}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${i}]}%" -e "s%SEQUENCE%process.nonIsoTauAnalysisSequence%" -e "s%PUSCENARIO%S10%" -e "s%REWEIGHT%True%" ../tauanalyzer_WNJetsToLNu_Wh1_template_cfg.py > tauanalyzer_${samples[${i}]}_nonIsoReweight_cfg.py
+
+  #generate cfg file for the sample with no isolation cut
+  sed -e "s%FILES%${inputFileBlocks[${i}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${i}]}%" -e "s%NONISOTAUANALYZEROUTFILE%${nonIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%ALLTAUANALYZEROUTFILE%${allTauAnalyzerOutputFiles[${i}]}%" -e "s%ISOTAUANALYZEROUTFILE%${isoTauAnalyzerOutputFiles[${i}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${i}]}%" -e "s%SEQUENCE%process.tauAnalysisSequence%" -e "s%PUSCENARIO%S10%" -e "s%REWEIGHT%False%" ../tauanalyzer_WNJetsToLNu_Wh1_template_cfg.py > tauanalyzer_${samples[${i}]}_all_cfg.py
+
+  #generate iso+nonIso+reweight job submission script for LSF
   cat <<EOF > tauanalyzer_${samples[${i}]}_cfg.sh
 #!/bin/bash
 
@@ -74,16 +92,41 @@ fileNamePrefix="tauanalyzer_${samples[${i}]}"
 cd \$jobDir
 eval \`scramv1 runtime -sh\`
 cd -
-cp \$jobDir/\${fileNamePrefix}_iso_cfg.py \$jobDir/\${fileNamePrefix}_nonIso_cfg.py .
+cp \$jobDir/\${fileNamePrefix}_iso_cfg.py \$jobDir/\${fileNamePrefix}_nonIso_cfg.py \$jobDir/\${fileNamePrefix}_nonIsoReweight_cfg.py .
 cmsRun \${fileNamePrefix}_iso_cfg.py
-cmsRun \${fileNamePrefix}_nonIso_cfg.py
+if [ $reweightOnly -eq 0 ]
+    then
+    cmsRun \${fileNamePrefix}_nonIso_cfg.py
+    cmsStage -f ${nonIsoTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/
+    rm ${nonIsoTauAnalyzerOutputFiles[${i}]}
+fi
+cmsRun \${fileNamePrefix}_nonIsoReweight_cfg.py
 cmsStage -f ${isoTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/
-cmsStage -f ${nonIsoTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/
-rm ${isoTauAnalyzerOutputFiles[${i}]} ${nonIsoTauAnalyzerOutputFiles[${i}]} 
+cmsStage -f ${nonIsoReweightTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/
+rm ${isoTauAnalyzerOutputFiles[${i}]} ${nonIsoReweightTauAnalyzerOutputFiles[${i}]}
 
 exit 0
 EOF
   chmod a+x tauanalyzer_${samples[${i}]}_cfg.sh
+
+  #generate noIsoCut job submission script for LSF
+  cat <<EOF > tauanalyzer_${samples[${i}]}_all_cfg.sh
+#!/bin/bash
+
+jobDir="`pwd`"
+fileNamePrefix="tauanalyzer_${samples[${i}]}"
+
+cd \$jobDir
+eval \`scramv1 runtime -sh\`
+cd -
+cp \$jobDir/\${fileNamePrefix}_all_cfg.py .
+cmsRun \${fileNamePrefix}_all_cfg.py
+cmsStage -f ${allTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/
+rm ${allTauAnalyzerOutputFiles[${i}]}
+
+exit 0
+EOF
+  chmod a+x tauanalyzer_${samples[${i}]}_all_cfg.sh
 done
 
 #generate run cfg that runs all files in the directory
@@ -100,11 +143,11 @@ exit 0
 EOF
 chmod a+x runQCDTauAnalyzerCfgs.sh
 
-#generate script that submits all jobs to LSF
+#generate script that submits all iso+nonIso+reweight jobs to LSF
 cat <<EOF > submitQCDTauAnalyzerJobs.sh
 #!/bin/bash
 
-for file in \`ls -alh tauanalyzer*QCD_*.sh | awk '{ print \$9 }'\`
+for file in \`ls -alh tauanalyzer*QCD_*.sh | grep -v all | awk '{ print \$9 }'\`
   do
   jobName=\`echo \$file | sed -e "s%\(.*\)\.sh%\1%"\`
   bsub -q 8nh -J \$jobName < \$file
@@ -114,21 +157,54 @@ exit 0
 EOF
 chmod a+x submitQCDTauAnalyzerJobs.sh
 
-#generate script that copies all files locally from EOS
+#generate script that submits all noIsoCut jobs to LSF
+cat <<EOF > submitQCDAllTauAnalyzerJobs.sh
+#!/bin/bash
+
+for file in \`ls -alh tauanalyzer*QCD_*all*.sh | awk '{ print \$9 }'\`
+  do
+  jobName=\`echo \$file | sed -e "s%\(.*\)\.sh%\1%"\`
+  bsub -q 8nh -J \$jobName < \$file
+done
+
+exit 0
+EOF
+chmod a+x submitQCDAllTauAnalyzerJobs.sh
+
+#generate script that copies all iso+nonIso+reweight files locally from EOS
 cat <<EOF > copyQCDFromEOS.sh
 #!/bin/bash
 
 eval \`scramv1 runtime -sh\`
 for sample in "20to30" "30to50" "50to80" "80to120" "120to170" "170to300" "300to470" "470to600" "600to800" "800to1000" "1000"
   do
-  for cut in Iso NonIso
+  for cut in Iso NonIso NonIsoReweight
     do
-    cmsStage -f /store/user/`whoami`/muHad\${cut}Analysis_QCD_Pt-\${sample}_${version}.root /data1/`whoami`/QCD/analysis/
+    if [ "\$cut" != "NonIso" ] || [ $reweightOnly -eq 0 ]
+        then
+        cmsStage -f /store/user/`whoami`/muHad\${cut}Analysis_QCD_Pt-\${sample}_${version}.root /data1/`whoami`/QCD/analysis/
+        cmsRm /store/user/`whoami`/muHad\${cut}Analysis_QCD_Pt-\${sample}_${version}.root
+    fi
   done
 done
 
 exit 0
 EOF
 chmod a+x copyQCDFromEOS.sh
+
+#generate script that copies all noIsoCut files locally from EOS
+cat <<EOF > copyAllQCDFromEOS.sh
+#!/bin/bash
+
+eval \`scramv1 runtime -sh\`
+for sample in "20to30" "30to50" "50to80" "80to120" "120to170" "170to300" "300to470" "470to600" "600to800" "800to1000" "1000"
+  do
+  cmsStage -f /store/user/`whoami`/muHadAnalysis_QCD_Pt-\${sample}_${version}.root /data1/`whoami`/QCD/analysis/
+  cmsRm /store/user/`whoami`/muHadAnalysis_QCD_Pt-\${sample}_${version}.root
+done
+
+exit 0
+EOF
+chmod a+x copyAllQCDFromEOS.sh
 
 exit 0

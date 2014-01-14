@@ -129,13 +129,14 @@ void MuonIsolationAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
   //plot combined particle isolation vs. muon pT
   for (unsigned int iMuon = 0; iMuon < pMuons->size(); ++iMuon) {
     edm::RefToBase<reco::Muon> muon(pMuons->refAt(iMuon));
-    if (muon->pt() > highestpT)
-      {
+//     if (muon->pt() > highestpT)
+//       {
 	highestpT = muon->pt();
 	iso = Common::getMuonCombPFIso(*muon, muonPFIsoPUSubtractionCoeff_);
-      }
-  }
   combParticleIsoOverMuonPT_->Fill(iso/highestpT);
+//       }
+  }
+//   combParticleIsoOverMuonPT_->Fill(iso/highestpT);
 }
 
 
@@ -159,7 +160,7 @@ void MuonIsolationAnalyzer::endJob()
   Common::setCanvasMargins(combParticleIsoOverMuonPTCanvas, 0.2, 0.2, 0.2, 0.2);
 
   //format the muon isolation plots
-  Common::setHistogramOptions(combParticleIsoOverMuonPT_, kBlack, 0.7, 20, 1.6, "Muon isolation/pT", "", 0.04);
+  Common::setHistogramOptions(combParticleIsoOverMuonPT_, kBlack, 0.7, 20, 1.0, "Muon isolation/pT", "", 0.04);
 
   //draw muon isolation plots
   combParticleIsoOverMuonPTCanvas.cd();

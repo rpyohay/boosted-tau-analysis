@@ -75,11 +75,7 @@ process.load("Configuration.Geometry.GeometryRecoDB_cff")
 process.load("RecoTauTag.Configuration.RecoPFTauTag_cff")
 process.load("RecoTauTag.RecoTau.RecoTauPiZeroProducer_cfi")
 process.load('BoostedTauAnalysis/CleanJets/cleanjets_cfi')
-<<<<<<< HEAD
-process.load('BoostedTauAnalysis/TauAnalyzer/tauanalyzer_cfi')
-=======
 
->>>>>>> 46247d24eb20eea62a68284a461b2dc6bfa58c65
 #define a parameter set to be passed to all modules that utilize GenTauDecayID for signal taus
 commonGenTauDecayIDPSet = cms.PSet(momPDGID = cms.vint32(A_PDGID),
                                    chargedHadronPTMin = cms.double(0.0),
@@ -249,12 +245,7 @@ process.WIsoMuonSelector = cms.EDFilter('CustomMuonSelector',
                                         detectorIsoMax = cms.double(-1.0),
                                         PUSubtractionCoeff = cms.double(0.5),
                                         usePFIso = cms.bool(True),
-<<<<<<< HEAD
-#                                        passIso = cms.bool(True),
-                                        passIso = cms.bool(False),
-=======
                                         passIso = cms.bool(True),
->>>>>>> 46247d24eb20eea62a68284a461b2dc6bfa58c65
                                         etaMax = cms.double(2.1),
                                         minNumObjsToPassFilter = cms.uint32(1)
                                         )
@@ -397,13 +388,8 @@ process.noSelectionSequence = cms.Sequence(process.IsoMu24eta2p1Selector*process
                                            process.muHadTauSelector)
 
 ## #selection path
-<<<<<<< HEAD
-##process.p = cms.Path(process.selectionSequence)
-##process.e = cms.EndPath(process.selectedOutput)
-=======
 ## process.p = cms.Path(process.selectionSequence)
 ## process.e = cms.EndPath(process.selectedOutput)
->>>>>>> 46247d24eb20eea62a68284a461b2dc6bfa58c65
 
 #anti-selection path
 ## process.p = cms.Path(process.antiSelectionSequence)

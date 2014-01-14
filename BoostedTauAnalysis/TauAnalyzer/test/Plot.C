@@ -1,6 +1,7 @@
 #include <string>
 #include <map>
 #include <iostream>
+#include <sstream>
 #include "TFile.h"
 #include "TH1F.h"
 #include "TH2F.h"
@@ -236,10 +237,10 @@ ErrorCode plotEfficiency(TFile& in, TFile& out, const map<string, pair<string, s
     numeratorHist->GetYaxis()->SetRangeUser(0.0, 1.1);
     denominatorHist->GetYaxis()->SetRangeUser(0.0, 1.1);
 
-    //rebin
-    cerr << "Rebinning\n";
-    numeratorHist->Rebin(2);
-    denominatorHist->Rebin(2);
+//     //rebin
+//     cerr << "Rebinning\n";
+//     numeratorHist->Rebin(2);
+//     denominatorHist->Rebin(2);
 
     //make efficiency histogram
     TGraphAsymmErrors effGraph(numeratorHist, denominatorHist);
@@ -604,12 +605,13 @@ void draw(const vector<string>& canvasNames, TFile& outStream, vector<TCanvas*>&
     outputCanvases[canvasIndex]->SetLogz();
     if (hists[canvasIndex] != NULL) {
       setHistogramOptions(hists[canvasIndex], kBlack, 0.7/*4.2*/, 20, 1.6, 1.0);
+//       hists[canvasIndex]->GetZaxis()->SetRangeUser(0.00001, 1.0);
       hists[canvasIndex]->GetZaxis()->SetRangeUser(0.1, 10000.0);
       hists[canvasIndex]->Draw("COLZ");
-      TProfile* profileX = 
-	hists[canvasIndex]->ProfileX((string(hists[canvasIndex]->GetName()) + "_pfx").c_str());
-      profileX->SetLineWidth(3);
-      // profileX->Draw("HISTSAME");
+//       TProfile* profileX = 
+// 	hists[canvasIndex]->ProfileX((string(hists[canvasIndex]->GetName()) + "_pfx").c_str());
+//       profileX->SetLineWidth(3);
+//       profileX->Draw("HISTSAME");
     }
   }
 }
@@ -688,9 +690,11 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
   vector<vector<TH1F*> > hists;
   setup(canvasNames, outputCanvases, setLogY, legends, stacks, legendHeaders, hists, 
 	inputFiles.size(), dataMC);
+  bool data = true;
   for (vector<string>::const_iterator iInputFile = inputFiles.begin(); 
        iInputFile != inputFiles.end(); ++iInputFile) {
     const unsigned int fileIndex = iInputFile - inputFiles.begin();
+    if ((fileIndex == 0) && (iInputFile->find("Wh1") != string::npos)) data = false;
     inputStreams.push_back(new TFile(iInputFile->c_str()));
     for (vector<string>::const_iterator iCanvasName = canvasNames.begin(); 
 	 iCanvasName != canvasNames.end(); ++iCanvasName) {
@@ -707,16 +711,16 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
       }
       else {
 	pHist = (TH1F*)pCanvas->GetPrimitive(graphNames[canvasIndex].c_str());
-	// 	if (string(pHist->GetName()) == "tauHadIso") {
-	// 	  cout << *iInputFile << endl;
-	// 	  cout << "Integral: " << pHist->Integral(0, -1) << endl;
-	// 	}
 	float weight = weights[fileIndex] == 0.0 ? 1.0/pHist->Integral(0, -1) : weights[fileIndex];
 	setHistogramOptions(pHist, colors[fileIndex], 0.7, styles[fileIndex], 
 			    weight, 
 			    string(pHist->GetName()) == "muHadPTOverMuHadMass" ? 
 			    "p_{T}/m" : pHist->GetXaxis()->GetTitle(), 
 			    pHist->GetYaxis()->GetTitle());
+	if (string(pHist->GetName()) == "muHadMass"/*"tauHadIso"*/) {
+	  cout << *iInputFile << endl;
+	  cout << "Integral: " << pHist->Integral(5, -1)/*pHist->Integral(0, -1)*/ << endl;
+	}
 	string histName(pHist->GetName());
 	if (histName == "jet_pt_etacut") pHist->GetXaxis()->SetTitle("p_{T} (GeV)");
 	if (histName == "jet_eta") pHist->GetXaxis()->SetTitle("#eta");
@@ -725,14 +729,8 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 	if (histName == "jet_ptmj_etacut") {
 	  pHist->GetXaxis()->SetTitle("#frac{p_{T}}{m}");
 	}
-// 	if (string(pHist->GetName()) == "muHadPTOverMuHadMass") {
-// 	  cout << *iInputFile << endl;
-// 	  cout << "Integral(pT/m > 13): " << pHist->Integral(14, -1) << endl;
-// 	}
-// 	if (string(pHist->GetName()) == "tauHadIso") {
-// 	  cout << *iInputFile << endl;
-// 	  cout << "Integral: " << pHist->Integral(0, -1) << endl;
-// 	  cout << "Weight: " << weight << endl;
+// 	if (string(pHist->GetName()) == "jet_ptmj_etacut") {
+// 	  cout << "Integral(second jet pT/m > 13): " << pHist->Integral(14, -1) << endl;
 // 	}
 	if (setLogY) pHist->GetYaxis()->SetRangeUser(0.1, 10000.0);
 	string legendStyle("l");
@@ -740,8 +738,12 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 // 	  pHist->SetFillStyle(0);
 // 	  pHist->SetFillColor(0);
 	  pHist->SetFillStyle(1001);
-	  pHist->SetFillColor(colors[fileIndex]);
-	  if (fileIndex == 0) legendStyle = "lp";
+	  if ((fileIndex == 0) && !data) pHist->SetFillColor(0);
+	  else pHist->SetFillColor(colors[fileIndex]);
+	  if (fileIndex == 0) {
+	    if (data) legendStyle = "lp";
+	    else legendStyle = "l";
+	  }
 	  else legendStyle = "f";
 	}
 	hists[canvasIndex][fileIndex] = pHist;
@@ -764,7 +766,7 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
       outStream.cd();
       outputCanvases[canvasIndex]->cd(dataMC ? 1 : 0);
       TH1F* pHistWithMaxMaxBin = histWithLargestBinContent(hists[canvasIndex]);
-      if (pHistWithMaxMaxBin != NULL) pHistWithMaxMaxBin->Draw();
+      if (pHistWithMaxMaxBin != NULL) pHistWithMaxMaxBin->Draw("HIST");
     }
   }
   for (vector<string>::const_iterator iCanvasName = canvasNames.begin(); 
@@ -776,7 +778,7 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
       for (vector<string>::const_iterator iInputFile = inputFiles.begin(); 
 	   iInputFile != inputFiles.end(); ++iInputFile) {
 	const unsigned int fileIndex = iInputFile - inputFiles.begin();
-	if (hists[canvasIndex][fileIndex] != NULL) hists[canvasIndex][fileIndex]->Draw("SAME");
+	if (hists[canvasIndex][fileIndex] != NULL) hists[canvasIndex][fileIndex]->Draw("HISTSAME");
       }
     }
     else {
@@ -799,15 +801,19 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 	  for (int i = 0; i < exponent; ++i) { axisMin/=10; }
 	}
 	else for (int i = 0; i < exponent; ++i) { axisMin*=10; }
-	stacks[canvasIndex]->SetMinimum(/*axisMin == 0.0 ? */0.1/* : axisMin*/);
-	stacks[canvasIndex]->SetMaximum(10000.0);
+// 	stacks[canvasIndex]->SetMinimum(/*axisMin == 0.0 ? */0.1/* : axisMin*/);
+// 	stacks[canvasIndex]->SetMaximum(10000.0);
+	stacks[canvasIndex]->SetMinimum(1.0);
+	stacks[canvasIndex]->SetMaximum(10000000.0);
       }
       stacks[canvasIndex]->Draw();
       TList* stackedHists = stacks[canvasIndex]->GetHists();
       TH1F* hist = (TH1F*)stackedHists->First();
       stacks[canvasIndex]->GetXaxis()->SetTitle(hist->GetXaxis()->GetTitle());
       stacks[canvasIndex]->GetYaxis()->SetTitle(hist->GetYaxis()->GetTitle());
-      hists[canvasIndex][0]->Draw("SAME");
+      string drawOpt("SAME");
+      if (!data) drawOpt = "HISTSAME";
+      hists[canvasIndex][0]->Draw(drawOpt.c_str());
       TH1F* stackSumHist = NULL;
       for (Int_t i = 0; i < stackedHists->GetEntries(); ++i) {
 	TH1F* stackHist = (TH1F*)stackedHists->At(i)->Clone();
@@ -1217,3 +1223,247 @@ void drawQCDRegionAHistograms(const string& outputFileA,
   deleteObjects(outputCanvases);
 
 } // end routine
+
+//test data-driven background estimation method with MC on a given variable
+void addClosurePlot(TFile& sigVsBkgIso20InvFbStream, const string& var, const string& unit, 
+		    TFile& bkgNonIsoStream, const float nonIsoScale, 
+		    const int normRegionLowerBin, const int normRegionUpperBin, TFile& outStream)
+{
+  //top level declarations
+  string canvasName(var + "Canvas");
+  string stackName(var + "Stack");
+
+  //get plots of signal and background MC, isolated tau sample, 20 fb^-1 normalization
+  TCanvas* canvasIso = NULL;
+  sigVsBkgIso20InvFbStream.GetObject(canvasName.c_str(), canvasIso);
+
+  //get the signal histogram
+  TH1F* histSig = NULL;
+  THStack* stackBkgIso = NULL;
+  if (canvasIso != NULL) {
+    histSig = (TH1F*)canvasIso->GetPrimitive(var.c_str());
+    setHistogramOptions(histSig, kBlack, 0.7, 20, 1.0, unit.c_str(), "");
+    histSig->GetYaxis()->SetRangeUser(0.1, 10000.0);
+
+    /*get the background stack histogram in the signal region (isolated taus) and convert it to a 
+      TH1*/
+    stackBkgIso = (THStack*)canvasIso->GetPrimitive(stackName.c_str());
+  }
+  else {
+    cerr << "Error opening canvas " << canvasName << " from file ";
+    cerr << sigVsBkgIso20InvFbStream.GetName() << ".\n";
+    return;
+  }
+  TList* stackedHistsIso = NULL;
+  if (stackBkgIso != NULL) stackedHistsIso = stackBkgIso->GetHists();
+  else {
+    cerr << "Error opening stack " << stackName << " from canvas " << canvasName << " from file ";
+    cerr << sigVsBkgIso20InvFbStream.GetName() << ".\n";
+    return;
+  }
+  TH1F* histBkgIso = NULL;
+  if (stackedHistsIso != NULL) {
+    for (Int_t i = 0; i < stackedHistsIso->GetEntries(); ++i) {
+      TH1F* stackHist = (TH1F*)stackedHistsIso->At(i)->Clone();
+      if (i == 0) histBkgIso = stackHist;
+      else histBkgIso->Add(stackHist);
+    }
+    setHistogramOptions(histBkgIso, kBlue, 0.7, 21, 1.0, unit.c_str(), "");
+    histBkgIso->GetYaxis()->SetRangeUser(0.1, 10000.0);
+  }
+  else {
+    cerr << "Error opening histogram list from stack " << stackName << " from canvas ";
+    cerr << canvasName << " from file " << sigVsBkgIso20InvFbStream.GetName() << ".\n";
+    return;
+  }
+
+  //get plots of background MC, non-isolated tau sample, 2.5 fb^-1 normalization
+  TCanvas* canvasNonIso = NULL;
+  bkgNonIsoStream.GetObject(canvasName.c_str(), canvasNonIso);
+  THStack* stackBkgNonIso = NULL;
+  if (canvasNonIso != NULL) {
+//     histBkgNonIso = (TH1F*)canvasNonIso->GetPrimitive(var.c_str());
+    canvasNonIso->Draw();
+    stackBkgNonIso = (THStack*)canvasNonIso->cd(1)->GetPrimitive(stackName.c_str());
+  }
+  else {
+    cerr << "Error opening canvas " << canvasName << " from file " << bkgNonIsoStream.GetName();
+    cerr << ".\n";
+    return;
+  }
+  TList* stackedHistsNonIso = NULL;
+  if (stackBkgNonIso != NULL) stackedHistsNonIso = stackBkgNonIso->GetHists();
+  else {
+    cerr << "Error opening stack " << stackName << " from canvas " << canvasName << " from file ";
+    cerr << bkgNonIsoStream.GetName() << ".\n";
+    return;
+  }
+  TH1F* histBkgNonIso = NULL;
+  if (stackedHistsNonIso != NULL) {
+    for (Int_t i = 0; i < stackedHistsNonIso->GetEntries(); ++i) {
+      TH1F* stackHist = (TH1F*)stackedHistsNonIso->At(i)->Clone();
+      if (i == 0) histBkgNonIso = stackHist;
+      else histBkgNonIso->Add(stackHist);
+    }
+    histBkgNonIso->Scale(nonIsoScale);
+  }
+  else {
+    cerr << "Error opening histogram list from stack " << stackName << " from canvas ";
+    cerr << canvasName << " from file " << bkgNonIsoStream.GetName() << ".\n";
+    return;
+  }
+
+  /*normalize non-isolated background MC histogram to isolated background MC in signal-depleted 
+    region*/
+  histBkgNonIso->Scale(histBkgIso->Integral(normRegionLowerBin, normRegionUpperBin)/
+		       histBkgNonIso->Integral(normRegionLowerBin, normRegionUpperBin));
+  setHistogramOptions(histBkgNonIso, kRed, 0.7, 20, 1.0, unit.c_str(), "");
+  histBkgNonIso->GetYaxis()->SetRangeUser(0.1, 10000.0);
+
+  //calculate weights
+  TH1F* histBkgIsoNorm1 = (TH1F*)histBkgIso->Clone();
+  histBkgIsoNorm1->Scale(1.0/histBkgIsoNorm1->Integral(0, -1));
+  TH1F* histBkgNonIsoNorm1 = (TH1F*)histBkgNonIso->Clone();
+  histBkgNonIsoNorm1->Scale(1.0/histBkgNonIsoNorm1->Integral(0, -1));
+  histBkgIsoNorm1->Divide(histBkgNonIsoNorm1);
+  cout << histSig->GetName() << endl;
+  for (Int_t iBin = 1; iBin <= histBkgIsoNorm1->GetNbinsX(); ++iBin) {
+    cout << iBin << " " << histBkgIsoNorm1->GetBinContent(iBin) << endl;
+  }
+  cout << "------------\n";
+
+  //write to file
+  outStream.cd();
+  TCanvas outCanvas(canvasName.c_str(), "", 600, 600);
+  setCanvasOptions(outCanvas, 1, 1, 0);
+  setCanvasMargins(outCanvas, 0.2, 0.2, 0.2, 0.2);
+  outCanvas.cd();
+  Double_t histBkgIsoErr = -1.0;
+  Double_t histBkgNonIsoErr = -1.0;
+  histSig->Draw("HIST");
+  cout << histSig->Integral(5, -1) << endl;
+  histBkgIso->Draw("HISTE");
+  cout << histBkgIso->IntegralAndError(5, -1, histBkgIsoErr) << "+/-";
+  cout << histBkgIsoErr << endl;
+  histBkgNonIso->Draw("HISTESAME");
+  cout << histBkgNonIso->IntegralAndError(5, -1, histBkgNonIsoErr) << "+/-";
+  cout << histBkgNonIsoErr << endl;
+  outCanvas.Write();
+}
+
+//test data-driven background estimation method with MC
+void makeMCClosurePlots(const string& sigVsBkgIso20InvFbFileName, const vector<string>& vars, 
+			const vector<string>& units, const string& bkgNonIsoFileName, 
+			const float nonIsoScale, const vector<int>& normRegionLowerBins, 
+			const vector<int>& normRegionUpperBins, const string& outputFileName)
+{
+  //open files
+  TFile sigVsBkgIso20InvFbStream(sigVsBkgIso20InvFbFileName.c_str());
+  TFile bkgNonIsoStream(bkgNonIsoFileName.c_str());
+  TFile outStream(outputFileName.c_str(), "RECREATE");
+  if (sigVsBkgIso20InvFbStream.IsOpen() && bkgNonIsoStream.IsOpen() && outStream.IsOpen()) {
+    for (vector<string>::const_iterator iVar = vars.begin(); iVar != vars.end(); ++iVar) {
+      const unsigned int varIndex = iVar - vars.begin();
+      addClosurePlot(sigVsBkgIso20InvFbStream, *iVar, units[varIndex], bkgNonIsoStream, 
+		     nonIsoScale, normRegionLowerBins[varIndex], normRegionUpperBins[varIndex], 
+		     outStream);
+    }
+  }
+  else {
+    cerr << "Error opening files " << sigVsBkgIso20InvFbFileName << " or " << bkgNonIsoFileName;
+    cerr << " or " << outputFileName << ".\n";
+    return;
+  }
+
+  //write to file
+  outStream.Write();
+  outStream.Close();
+  sigVsBkgIso20InvFbStream.Close();
+  bkgNonIsoStream.Close();
+}
+
+TH2F* twoDimTotalBackgroundHistogram(const vector<string>& files, const string& histName)
+{
+  //set canvas name
+  string canvasName(histName + "Canvas");
+
+  //set total background histogram pointer
+  TH2F* bkgTotHist = NULL;
+
+  //loop over files
+  for (vector<string>::const_iterator iFile = files.begin(); iFile != files.end(); ++iFile) {
+    const unsigned int fileIndex = iFile - files.begin();
+    TFile* file = new TFile(iFile->c_str());
+    TCanvas* canvas = NULL;
+    TH2F* hist = NULL;
+    if (file->IsOpen()) {
+
+      //add  histogram to running tally
+      file->GetObject(canvasName.c_str(), canvas);
+      if (canvas != NULL) {
+	hist = (TH2F*)canvas->GetPrimitive(histName.c_str());
+	if (hist != NULL) {
+	  if (fileIndex == 0) bkgTotHist = (TH2F*)hist->Clone();
+	  else bkgTotHist->Add(hist);
+	}
+	else cerr << "Error: could not get " << histName << " from " << canvasName << endl;
+      }
+      else cerr << "Error: could not get " << canvasName << " from " << *iFile << endl;
+    }
+    else cerr << "Error: could not open " << *iFile << endl;
+
+//     //close  file
+//     file->Close();
+//     delete file;
+  }
+
+  //return
+  return bkgTotHist;
+}
+
+void print2DWeights(const vector<string>& isoFiles, const vector<string>& nonIsoFiles, 
+		    const string& hist)
+{
+  //sanity check
+  const unsigned int isoFilesSize = isoFiles.size();
+  const unsigned int nonIsoFilesSize = nonIsoFiles.size();
+  if (isoFilesSize > nonIsoFilesSize) {
+    cerr << "Error: size of isoFiles (" << isoFilesSize << ") > size of nonIsoFiles (";
+    cerr << nonIsoFilesSize << ")\n";
+    return;
+  }
+
+  //fill total background histograms
+  TH2F* isoBkgTot = twoDimTotalBackgroundHistogram(isoFiles, hist);
+  TH2F* nonIsoBkgTot = twoDimTotalBackgroundHistogram(nonIsoFiles, hist);
+
+  /*normalize both histograms, then divide iso histogram by non-iso histogram and print result bin 
+    by bin*/
+  isoBkgTot->Scale(1.0/isoBkgTot->Integral(0, -1, 0, -1));
+  nonIsoBkgTot->Scale(1.0/nonIsoBkgTot->Integral(0, -1, 0, -1));
+  isoBkgTot->Divide(nonIsoBkgTot);
+  TAxis* xAxis = isoBkgTot->GetXaxis();
+  TAxis* yAxis = isoBkgTot->GetYaxis();
+  cout.width(15);
+  cout << left << "Tau pT (GeV)";
+  cout.width(15);
+  cout << left << "Muon pT (GeV)";
+  cout << endl;
+  for (Int_t iBinX = 1; iBinX <= isoBkgTot->GetNbinsX(); ++iBinX) {
+    Double_t xBinLowEdge = xAxis->GetBinLowEdge(iBinX);
+    stringstream xStream;
+    xStream << xBinLowEdge << "-" << (xBinLowEdge + xAxis->GetBinWidth(iBinX));
+    for (Int_t iBinY = 1; iBinY <= isoBkgTot->GetNbinsY(); ++iBinY) {
+      Double_t yBinLowEdge = yAxis->GetBinLowEdge(iBinY);
+      stringstream yStream;
+      yStream << yBinLowEdge << "-" << (yBinLowEdge + yAxis->GetBinWidth(iBinY));
+      cout.width(12);
+      cout << right << xStream.str();
+      cout.width(15);
+      cout << right << yStream.str();
+      cout.precision(3);
+      cout << scientific << left << ": " << isoBkgTot->GetBinContent(iBinX, iBinY);
+      cout << endl;
+    }
+  }
+}

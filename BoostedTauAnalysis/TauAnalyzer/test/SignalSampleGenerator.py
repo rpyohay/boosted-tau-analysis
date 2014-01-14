@@ -180,6 +180,7 @@ process.generator = cms.EDFilter(
 	#tan beta (PARU(141))?
 
 	#only allow leptonic W decays (this should affect the LO cross section reported by Pythia)
+	#does this mess with status 2 Ws in hadronic tau decays?
 	'24:ALLOFF',
 	'24:ONIFANY 11 13 15',
 

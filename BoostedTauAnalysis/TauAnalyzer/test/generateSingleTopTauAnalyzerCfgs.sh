@@ -1,10 +1,21 @@
 #!/bin/bash
 
+if [ $# -gt 2 ]
+    then
+    echo "Usage: ./generateSingleTopTauAnalyzerCfgs.sh <version> [reweightOnly|]"
+    exit 0
+fi
+
 ####STUFF TO CONFIGURE####
 
 #version
-version="v12"
+version=$1
 infoTag=""
+reweightOnly=0
+if [ "$2" == "reweightOnly" ]
+    then
+    reweightOnly=1
+fi
 dir=$version
 
 #number of samples
@@ -38,6 +49,7 @@ cleanJetsOutFiles=( "${cleanJetsOutputFilePrefix}NMSSMSignal_MuProperties_T_s-ch
 #TauAnalyzer output files
 isoTauAnalyzerOutputFiles=( "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_T_s-channel_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_Tbar_s-channel_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_T_t-channel_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_Tbar_t-channel_${version}.root" )
 nonIsoTauAnalyzerOutputFiles=( "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_T_s-channel_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_Tbar_s-channel_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_T_t-channel_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_Tbar_t-channel_${version}.root" )
+nonIsoReweightTauAnalyzerOutputFiles=( "${tauAnalyzerOutputFilePrefix}muHadNonIsoReweightAnalysis_T_s-channel_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoReweightAnalysis_Tbar_s-channel_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoReweightAnalysis_T_t-channel_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoReweightAnalysis_Tbar_t-channel_${version}.root" )
 allTauAnalyzerOutputFiles=( "${tauAnalyzerOutputFilePrefix}muHadAnalysis_T_s-channel_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadAnalysis_Tbar_s-channel_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadAnalysis_T_t-channel_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadAnalysis_Tbar_t-channel_${version}.root" )
 
 #EDM output files
@@ -57,12 +69,18 @@ for i in `seq $iBeg $iEnd`
   do
 
   #generate cfg file for the isolated sample
-  sed -e "s%FILES%${inputFileBlocks[${i}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${i}]}%" -e "s%NONISOTAUANALYZEROUTFILE%${nonIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%ALLTAUANALYZEROUTFILE%${allTauAnalyzerOutputFiles[${i}]}%" -e "s%ISOTAUANALYZEROUTFILE%${isoTauAnalyzerOutputFiles[${i}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${i}]}%" -e "s%SEQUENCE%process.isoTauAnalysisSequence%" -e "s%PUSCENARIO%S10%" ../tauanalyzer_WNJetsToLNu_Wh1_template_cfg.py > tauanalyzer_${samples[${i}]}_iso_cfg.py
+  sed -e "s%FILES%${inputFileBlocks[${i}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${i}]}%" -e "s%NONISOTAUANALYZEROUTFILE%${nonIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%ALLTAUANALYZEROUTFILE%${allTauAnalyzerOutputFiles[${i}]}%" -e "s%ISOTAUANALYZEROUTFILE%${isoTauAnalyzerOutputFiles[${i}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${i}]}%" -e "s%SEQUENCE%process.isoTauAnalysisSequence%" -e "s%PUSCENARIO%S10%" -e "s%REWEIGHT%False%" ../tauanalyzer_WNJetsToLNu_Wh1_template_cfg.py > tauanalyzer_${samples[${i}]}_iso_cfg.py
 
   #generate cfg file for the non-isolated sample
-  sed -e "s%FILES%${inputFileBlocks[${i}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${i}]}%" -e "s%NONISOTAUANALYZEROUTFILE%${nonIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%ALLTAUANALYZEROUTFILE%${allTauAnalyzerOutputFiles[${i}]}%" -e "s%ISOTAUANALYZEROUTFILE%${isoTauAnalyzerOutputFiles[${i}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${i}]}%" -e "s%SEQUENCE%process.nonIsoTauAnalysisSequence%" -e "s%PUSCENARIO%S10%" ../tauanalyzer_WNJetsToLNu_Wh1_template_cfg.py > tauanalyzer_${samples[${i}]}_nonIso_cfg.py
+  sed -e "s%FILES%${inputFileBlocks[${i}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${i}]}%" -e "s%NONISOTAUANALYZEROUTFILE%${nonIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%ALLTAUANALYZEROUTFILE%${allTauAnalyzerOutputFiles[${i}]}%" -e "s%ISOTAUANALYZEROUTFILE%${isoTauAnalyzerOutputFiles[${i}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${i}]}%" -e "s%SEQUENCE%process.nonIsoTauAnalysisSequence%" -e "s%PUSCENARIO%S10%" -e "s%REWEIGHT%False%" ../tauanalyzer_WNJetsToLNu_Wh1_template_cfg.py > tauanalyzer_${samples[${i}]}_nonIso_cfg.py
 
-  #generate job submission script for LSF
+  #generate cfg file for the non-isolated, reweighted sample
+  sed -e "s%FILES%${inputFileBlocks[${i}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${i}]}%" -e "s%NONISOTAUANALYZEROUTFILE%${nonIsoReweightTauAnalyzerOutputFiles[${i}]}%" -e "s%ALLTAUANALYZEROUTFILE%${allTauAnalyzerOutputFiles[${i}]}%" -e "s%ISOTAUANALYZEROUTFILE%${isoTauAnalyzerOutputFiles[${i}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${i}]}%" -e "s%SEQUENCE%process.nonIsoTauAnalysisSequence%" -e "s%PUSCENARIO%S10%" -e "s%REWEIGHT%True%" ../tauanalyzer_WNJetsToLNu_Wh1_template_cfg.py > tauanalyzer_${samples[${i}]}_nonIsoReweight_cfg.py
+
+  #generate cfg file for the sample with no isolation cut
+  sed -e "s%FILES%${inputFileBlocks[${i}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${i}]}%" -e "s%NONISOTAUANALYZEROUTFILE%${nonIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%ALLTAUANALYZEROUTFILE%${allTauAnalyzerOutputFiles[${i}]}%" -e "s%ISOTAUANALYZEROUTFILE%${isoTauAnalyzerOutputFiles[${i}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${i}]}%" -e "s%SEQUENCE%process.tauAnalysisSequence%" -e "s%PUSCENARIO%S10%" -e "s%REWEIGHT%False%" ../tauanalyzer_WNJetsToLNu_Wh1_template_cfg.py > tauanalyzer_${samples[${i}]}_all_cfg.py
+
+  #generate iso+nonIso+reweight job submission script for LSF
   cat <<EOF > tauanalyzer_${samples[${i}]}_cfg.sh
 #!/bin/bash
 
@@ -72,16 +90,41 @@ fileNamePrefix="tauanalyzer_${samples[${i}]}"
 cd \$jobDir
 eval \`scramv1 runtime -sh\`
 cd -
-cp \$jobDir/\${fileNamePrefix}_iso_cfg.py \$jobDir/\${fileNamePrefix}_nonIso_cfg.py .
+cp \$jobDir/\${fileNamePrefix}_iso_cfg.py \$jobDir/\${fileNamePrefix}_nonIso_cfg.py \$jobDir/\${fileNamePrefix}_nonIsoReweight_cfg.py .
 cmsRun \${fileNamePrefix}_iso_cfg.py
-cmsRun \${fileNamePrefix}_nonIso_cfg.py
+if [ $reweightOnly -eq 0 ]
+    then
+    cmsRun \${fileNamePrefix}_nonIso_cfg.py
+    cmsStage -f ${nonIsoTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/
+    rm ${nonIsoTauAnalyzerOutputFiles[${i}]}
+fi
+cmsRun \${fileNamePrefix}_nonIsoReweight_cfg.py
 cmsStage -f ${isoTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/
-cmsStage -f ${nonIsoTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/
-rm ${isoTauAnalyzerOutputFiles[${i}]} ${nonIsoTauAnalyzerOutputFiles[${i}]} 
+cmsStage -f ${nonIsoReweightTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/
+rm ${isoTauAnalyzerOutputFiles[${i}]} ${nonIsoReweightTauAnalyzerOutputFiles[${i}]} 
 
 exit 0
 EOF
   chmod a+x tauanalyzer_${samples[${i}]}_cfg.sh
+
+  #generate noIsoCut job submission script for LSF
+  cat <<EOF > tauanalyzer_${samples[${i}]}_all_cfg.sh
+#!/bin/bash
+
+jobDir="`pwd`"
+fileNamePrefix="tauanalyzer_${samples[${i}]}"
+
+cd \$jobDir
+eval \`scramv1 runtime -sh\`
+cd -
+cp \$jobDir/\${fileNamePrefix}_all_cfg.py .
+cmsRun \${fileNamePrefix}_all_cfg.py
+cmsStage -f ${allTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/
+rm ${allTauAnalyzerOutputFiles[${i}]}
+
+exit 0
+EOF
+  chmod a+x tauanalyzer_${samples[${i}]}_all_cfg.sh
 done
 
 #generate run cfg that runs all files in the directory
@@ -98,11 +141,11 @@ exit 0
 EOF
 chmod a+x runSingleTopTauAnalyzerCfgs.sh
 
-#generate script that submits all jobs to LSF
+#generate script that submits all iso+nonIso+reweight jobs to LSF
 cat <<EOF > submitSingleTopTauAnalyzerJobs.sh
 #!/bin/bash
 
-for file in \`ls -alh tauanalyzer*T*channel*.sh | awk '{ print \$9 }'\`
+for file in \`ls -alh tauanalyzer*T*channel*.sh | grep -v all | awk '{ print \$9 }'\`
   do
   jobName=\`echo \$file | sed -e "s%\(.*\)\.sh%\1%"\`
   bsub -q 8nh -J \$jobName < \$file
@@ -112,21 +155,54 @@ exit 0
 EOF
 chmod a+x submitSingleTopTauAnalyzerJobs.sh
 
-#generate script that copies all files locally from EOS
+#generate script that submits all noIsoCut jobs to LSF
+cat <<EOF > submitSingleTopAllTauAnalyzerJobs.sh
+#!/bin/bash
+
+for file in \`ls -alh tauanalyzer*T*channel*all*.sh | awk '{ print \$9 }'\`
+  do
+  jobName=\`echo \$file | sed -e "s%\(.*\)\.sh%\1%"\`
+  bsub -q 8nh -J \$jobName < \$file
+done
+
+exit 0
+EOF
+chmod a+x submitSingleTopAllTauAnalyzerJobs.sh
+
+#generate script that copies all iso+nonIso+reweight files locally from EOS
 cat <<EOF > copySingleTopFromEOS.sh
 #!/bin/bash
 
 eval \`scramv1 runtime -sh\`
 for sample in "_s" "bar_s" "_t" "bar_t"
   do
-  for cut in Iso NonIso
+  for cut in Iso NonIso NonIsoReweight
     do
-    cmsStage -f /store/user/`whoami`/muHad\${cut}Analysis_T\${sample}-channel_${version}.root /data1/`whoami`/SingleTop/analysis/
+    if [ "\$cut" != "NonIso" ] || [ $reweightOnly -eq 0 ]
+        then
+        cmsStage -f /store/user/`whoami`/muHad\${cut}Analysis_T\${sample}-channel_${version}.root /data1/`whoami`/SingleTop/analysis/
+        cmsRm /store/user/`whoami`/muHad\${cut}Analysis_T\${sample}-channel_${version}.root
+    fi
   done
 done
 
 exit 0
 EOF
 chmod a+x copySingleTopFromEOS.sh
+
+#generate script that copies all noIsoCut files locally from EOS
+cat <<EOF > copyAllSingleTopFromEOS.sh
+#!/bin/bash
+
+eval \`scramv1 runtime -sh\`
+for sample in "_s" "bar_s" "_t" "bar_t"
+  do
+  cmsStage -f /store/user/`whoami`/muHadAnalysis_T\${sample}-channel_${version}.root /data1/`whoami`/SingleTop/analysis/
+  cmsRm /store/user/`whoami`/muHadAnalysis_T\${sample}-channel_${version}.root
+done
+
+exit 0
+EOF
+chmod a+x copyAllSingleTopFromEOS.sh
 
 exit 0
