@@ -92,7 +92,7 @@ cd \$jobDir
 eval \`scramv1 runtime -sh\`
 cd -
 cp \$jobDir/\${fileNamePrefix}_iso_cfg.py \$jobDir/\${fileNamePrefix}_nonIso_cfg.py \$jobDir/\${fileNamePrefix}_nonIsoReweight_cfg.py .
-#cmsRun \${fileNamePrefix}_iso_cfg.py #BLINDED!!!
+cmsRun \${fileNamePrefix}_iso_cfg.py #BLINDED!!!
 if [ $reweightOnly -eq 0 ]
     then
     cmsRun \${fileNamePrefix}_nonIso_cfg.py
@@ -100,9 +100,9 @@ if [ $reweightOnly -eq 0 ]
     rm ${nonIsoTauAnalyzerOutputFiles[${i}]}
 fi
 cmsRun \${fileNamePrefix}_nonIsoReweight_cfg.py
-#cmsStage -f ${isoTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/ #BLINDED!!!
+cmsStage -f ${isoTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/ #BLINDED!!!
 cmsStage -f ${nonIsoReweightTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/
-#rm ${isoTauAnalyzerOutputFiles[${i}]} #BLINDED!!!
+rm ${isoTauAnalyzerOutputFiles[${i}]} #BLINDED!!!
 rm ${nonIsoReweightTauAnalyzerOutputFiles[${i}]} 
 
 exit 0
@@ -120,9 +120,9 @@ cd \$jobDir
 eval \`scramv1 runtime -sh\`
 cd -
 cp \$jobDir/\${fileNamePrefix}_all_cfg.py .
-cmsRun \${fileNamePrefix}_all_cfg.py
-cmsStage -f ${allTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/
-rm ${allTauAnalyzerOutputFiles[${i}]}
+#cmsRun \${fileNamePrefix}_all_cfg.py #BLINDED!!!
+#cmsStage -f ${allTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/ #BLINDED!!!
+#rm ${allTauAnalyzerOutputFiles[${i}]} #BLINDED!!!
 
 exit 0
 EOF
@@ -137,12 +137,12 @@ for file in \`ls -alh *SingleMu*.py | awk '{ print \$9 }'\`
   do
   outFile=\`echo \$file | sed -e "s%\.py%.txt%"\`
   isIso=\`echo \$file | sed -e "s%.*\(iso\).*%\1%"\`
-  if [ "\$isIso" != "iso" ] #BLINDED!!!
-      then
+#  if [ "\$isIso" != "iso" ] #BLINDED!!!
+#      then
       cmsRun \$file > \$outFile
-  else
-      echo "Not running script \$file due to blinding requirement"
-  fi
+#  else
+#      echo "Not running script \$file due to blinding requirement"
+#  fi
 done
 
 exit 0
@@ -184,8 +184,8 @@ cat <<EOF > copyDataFromEOS.sh
 eval \`scramv1 runtime -sh\`
 for sample in "A" "B" "C" "D"
   do
-#  for cut in Iso NonIso NonIsoReweight #BLINDED!!!
-  for cut in NonIso NonIsoReweight
+  for cut in Iso NonIso NonIsoReweight #BLINDED!!!
+#  for cut in NonIso NonIsoReweight
     do
     if [ "\$cut" != "NonIso" ] || [ $reweightOnly -eq 0 ]
         then
@@ -206,8 +206,8 @@ cat <<EOF > copyAllDataFromEOS.sh
 eval \`scramv1 runtime -sh\`
 for sample in "A" "B" "C" "D"
   do
-  #cmsStage -f /store/user/`whoami`/muHadAnalysis_SingleMu_Run2012\${sample}_${version}.root /data1/`whoami`/data/analysis/ #BLINDED!!!
-  #cmsRm /store/user/`whoami`/muHadAnalysis_SingleMu_Run2012\${sample}_${version}.root #BLINDED!!!
+  cmsStage -f /store/user/`whoami`/muHadAnalysis_SingleMu_Run2012\${sample}_${version}.root /data1/`whoami`/data/analysis/ #BLINDED!!!
+  cmsRm /store/user/`whoami`/muHadAnalysis_SingleMu_Run2012\${sample}_${version}.root #BLINDED!!!
 done
 
 exit 0
