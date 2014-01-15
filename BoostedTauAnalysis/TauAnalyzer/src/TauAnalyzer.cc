@@ -233,6 +233,11 @@ private:
   //histogram of mu+had mass
   TH1F* muHadMass_;
 
+  /*histogram of mu+had mass weighted by the stat. error on hadronic tau pT weights (i.e. each 
+    event is filled with a weight of sigma_w, where sigma_w is the stat. error on the hadronic tau 
+    pT weight for that event)*/
+  TH1F* muHadMassReweightErrSq_;
+
   //histogram of mu charge + had charge
   TH1F* muHadCharge_;
 
@@ -504,6 +509,9 @@ private:
   //hadronic tau pT weights
   std::vector<double> tauHadPTWeights_;
 
+  //hadronic tau pT weight errors
+  std::vector<double> tauHadPTWeightErrs_;
+
   //hadronic tau pT bins
   std::vector<double> tauHadPTBins_;
 
@@ -668,60 +676,8 @@ TauAnalyzer::TauAnalyzer(const edm::ParameterSet& iConfig) :
   }
 
   //instantiate the vector of weights based on hadronic tau pT bin
-//   tauHadPTWeights_.push_back(0);
-//   tauHadPTWeights_.push_back(0);
-//   tauHadPTWeights_.push_back(1.92104);
-//   tauHadPTWeights_.push_back(1.2739);
-//   tauHadPTWeights_.push_back(0.588595);
-//   tauHadPTWeights_.push_back(0.926218);
-//   tauHadPTWeights_.push_back(0.526632);
-//   tauHadPTWeights_.push_back(0.870165);
-//   tauHadPTWeights_.push_back(0.271711);
-//   tauHadPTWeights_.push_back(0.267905);
-//   tauHadPTWeights_.push_back(0.437444);
-//   tauHadPTWeights_.push_back(0.0413015);
-//   tauHadPTWeights_.push_back(0.13013);
-//   tauHadPTWeights_.push_back(0.425225);
-//   tauHadPTWeights_.push_back(0);
-//   tauHadPTWeights_.push_back(0.1472);
-//   tauHadPTWeights_.push_back(1.8152);
-//   tauHadPTWeights_.push_back(0.418199);
-//   tauHadPTWeights_.push_back(0);
-//   tauHadPTWeights_.push_back(0.321613);
-//   tauHadPTWeights_.push_back(0);
-//   tauHadPTWeights_.push_back(0);
-//   tauHadPTWeights_.push_back(0);
-//   tauHadPTWeights_.push_back(0);
-//   tauHadPTWeights_.push_back(1.92104);
-//   tauHadPTWeights_.push_back(1.2739);
-//   tauHadPTWeights_.push_back(0.588595);
-//   tauHadPTWeights_.push_back(0.926218);
-//   tauHadPTWeights_.push_back(0.526632);
-//   tauHadPTWeights_.push_back(0.870165);
-//   tauHadPTWeights_.push_back(0.271711);
-//   tauHadPTWeights_.push_back(0.267905);
-//   tauHadPTWeights_.push_back(0.437444);
-//   tauHadPTWeights_.push_back(0.0413015);
-//   tauHadPTWeights_.push_back(0.13013);
-//   tauHadPTWeights_.push_back(0.425225);
-//   tauHadPTWeights_.push_back(0.406535);
-//   tauHadPTWeights_.push_back(0);
-//   tauHadPTWeights_.push_back(0);
-//   tauHadPTWeights_.push_back(1.77044);
-//   tauHadPTWeights_.push_back(1.40081);
-//   tauHadPTWeights_.push_back(0.929384);
-//   tauHadPTWeights_.push_back(0.73791);
-//   tauHadPTWeights_.push_back(0.613288);
-//   tauHadPTWeights_.push_back(0.402148);
-//   tauHadPTWeights_.push_back(0.332301);
-//   tauHadPTWeights_.push_back(0.280916);
-//   tauHadPTWeights_.push_back(0.270815);
-//   tauHadPTWeights_.push_back(0.20075);
-//   tauHadPTWeights_.push_back(0.160553);
-//   tauHadPTWeights_.push_back(0);
-//   tauHadPTWeights_.push_back(0.221906);
-  tauHadPTWeights_.push_back(0);
-  tauHadPTWeights_.push_back(0);
+  tauHadPTWeights_.push_back(0.0);
+  tauHadPTWeights_.push_back(0.0);
   tauHadPTWeights_.push_back(1.51893);
   tauHadPTWeights_.push_back(1.25836);
   tauHadPTWeights_.push_back(0.941484);
@@ -733,8 +689,25 @@ TauAnalyzer::TauAnalyzer(const edm::ParameterSet& iConfig) :
   tauHadPTWeights_.push_back(0.299415);
   tauHadPTWeights_.push_back(0.227085);
   tauHadPTWeights_.push_back(0.202105);
-  tauHadPTWeights_.push_back(0);
+//   tauHadPTWeights_.push_back(0.0);
   tauHadPTWeights_.push_back(0.381331);
+
+  //instantiate the vector of hadronic tau pT weight errors
+  tauHadPTWeightErrs_.push_back(0.0);
+  tauHadPTWeightErrs_.push_back(0.0);
+  tauHadPTWeightErrs_.push_back(0.122517);
+  tauHadPTWeightErrs_.push_back(0.116761);
+  tauHadPTWeightErrs_.push_back(0.110995);
+  tauHadPTWeightErrs_.push_back(0.121495);
+  tauHadPTWeightErrs_.push_back(0.122936);
+  tauHadPTWeightErrs_.push_back(0.119452);
+  tauHadPTWeightErrs_.push_back(0.108295);
+  tauHadPTWeightErrs_.push_back(0.124753);
+  tauHadPTWeightErrs_.push_back(0.152426);
+  tauHadPTWeightErrs_.push_back(0.162645);
+  tauHadPTWeightErrs_.push_back(0.204292);
+//   tauHadPTWeightErrs_.push_back(0.0);
+  tauHadPTWeightErrs_.push_back(0.275146);
 
   //fill hadronic tau pT bins
   tauHadPTBins_.push_back(0.0);
@@ -745,24 +718,13 @@ TauAnalyzer::TauAnalyzer(const edm::ParameterSet& iConfig) :
   tauHadPTBins_.push_back(25.0);
   tauHadPTBins_.push_back(30.0);
   tauHadPTBins_.push_back(35.0);
-
   tauHadPTBins_.push_back(40.0);
   tauHadPTBins_.push_back(50.0);
   tauHadPTBins_.push_back(60.0);
   tauHadPTBins_.push_back(70.0);
   tauHadPTBins_.push_back(80.0);
-  tauHadPTBins_.push_back(90.0);
+//   tauHadPTBins_.push_back(90.0);
   tauHadPTBins_.push_back(100.0);
-//   tauHadPTBins_.push_back(110.0);
-//   tauHadPTBins_.push_back(120.0);
-
-//   tauHadPTBins_.push_back(140.0);
-//   tauHadPTBins_.push_back(160.0);
-//   tauHadPTBins_.push_back(180.0);
-
-//   tauHadPTBins_.push_back(220.0);
-//   tauHadPTBins_.push_back(260.0);
-
   tauHadPTBins_.push_back(600.0);
 }
 
@@ -1046,8 +1008,12 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     }
     const int tauHadPTBin = (int)(iBinEdge - tauHadPTBins_.begin());
     double tauHadPTWeight = 1.0;
+    double tauHadPTWeightErr = 0.0;
     if (reweight_) {
-      if (foundBin) tauHadPTWeight = tauHadPTWeights_[tauHadPTBin];
+      if (foundBin) {
+	tauHadPTWeight = tauHadPTWeights_[tauHadPTBin];
+	tauHadPTWeightErr = tauHadPTWeightErrs_[tauHadPTBin];
+      }
     }
 
     //find the highest pT associated muon
@@ -1149,6 +1115,10 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       const double muHadMass = 
 	(removedMuonRefs[removedMuonRefs.size() - 1]->p4() + (*iTau)->p4()).M();
       muHadMass_->Fill(muHadMass, PUWeight*tauHadPTWeight);
+
+      /*plot the mu + tau invariant mass for the highest pT muon weighted by the statistical error 
+	on the hadronic tau pT weight for this event*/
+      muHadMassReweightErrSq_->Fill(muHadMass, tauHadPTWeightErr);
 
       //plot the mu + tau charge for the highest pT muon
       muHadCharge_->
@@ -1984,6 +1954,8 @@ void TauAnalyzer::beginJob()
   hadTauAssociatedMuMultiplicity_ = 
     new TH1F("hadTauAssociatedMuMultiplicity", ";N_{#mu}/#tau;", 2, 0.5, 2.5);
   muHadMass_ = new TH1F("muHadMass", ";m_{#mu+had} (GeV);", 20, 0.0, 20.0);
+  muHadMassReweightErrSq_ = 
+    new TH1F("muHadMassReweightErrSq", ";m_{#mu+had} (GeV);", 20, 0.0, 20.0);
   muHadCharge_ = new TH1F("muHadCharge", ";q_{#mu} + q_{had};", 5, -2.5, 2.5);
   WMuMT_ = new TH1F("WMuMT", ";W muon M_{T} (GeV);", 100, 0.0, 400.0);
   tauMuMT_ = new TH1F("tauMuMT", ";#tau muon M_{T} (GeV);", 50, 0.0, 200.0);
@@ -2213,6 +2185,7 @@ void TauAnalyzer::beginJob()
   MET_->Sumw2();
   hadTauAssociatedMuMultiplicity_->Sumw2();
   muHadMass_->Sumw2();
+  muHadMassReweightErrSq_->Sumw2();
   muHadCharge_->Sumw2();
   WMuMT_->Sumw2();
   tauMuMT_->Sumw2();
@@ -2327,6 +2300,7 @@ void TauAnalyzer::endJob()
   TCanvas hadTauAssociatedMuMultiplicityCanvas("hadTauAssociatedMuMultiplicityCanvas", "", 
 					       600, 600);
   TCanvas muHadMassCanvas("muHadMassCanvas", "", 600, 600);
+  TCanvas muHadMassReweightErrSqCanvas("muHadMassReweightErrSqCanvas", "", 600, 600);
   TCanvas muHadChargeCanvas("muHadChargeCanvas", "", 600, 600);
   TCanvas WMuMTCanvas("WMuMTCanvas", "", 600, 600);
   TCanvas tauMuMTCanvas("tauMuMTCanvas", "", 600, 600);
@@ -2445,6 +2419,7 @@ void TauAnalyzer::endJob()
   Common::draw1DHistograms(METCanvas, MET_);
   Common::draw1DHistograms(hadTauAssociatedMuMultiplicityCanvas, hadTauAssociatedMuMultiplicity_);
   Common::draw1DHistograms(muHadMassCanvas, muHadMass_);
+  Common::draw1DHistograms(muHadMassReweightErrSqCanvas, muHadMassReweightErrSq_);
   Common::draw1DHistograms(muHadChargeCanvas, muHadCharge_);
   Common::draw1DHistograms(WMuMTCanvas, WMuMT_);
   Common::draw1DHistograms(tauMuMTCanvas, tauMuMT_);
@@ -2563,6 +2538,7 @@ void TauAnalyzer::endJob()
   METCanvas.Write();
   hadTauAssociatedMuMultiplicityCanvas.Write();
   muHadMassCanvas.Write();
+  muHadMassReweightErrSqCanvas.Write();
   muHadChargeCanvas.Write();
   WMuMTCanvas.Write();
   tauMuMTCanvas.Write();
@@ -2785,6 +2761,8 @@ void TauAnalyzer::reset(const bool doDelete)
   hadTauAssociatedMuMultiplicity_ = NULL;
   if (doDelete && (muHadMass_ != NULL)) delete muHadMass_;
   muHadMass_ = NULL;
+  if (doDelete && (muHadMassReweightErrSq_ != NULL)) delete muHadMassReweightErrSq_;
+  muHadMassReweightErrSq_ = NULL;
   if (doDelete && (muHadCharge_ != NULL)) delete muHadCharge_;
   muHadCharge_ = NULL;
   if (doDelete && (WMuMT_ != NULL)) delete WMuMT_;
