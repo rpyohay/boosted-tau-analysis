@@ -430,7 +430,6 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   const string nonIsoWDataVTag("_" + inputVersion);
   const string Wh1SigVTag("_" + inputVersion);
   const string ggSigVTag("_" + inputVersion);
-  const string nonIsoWggSigVTag("_" + inputVersion);
   const string QCDVTag("_" + inputVersion);
   const string QCDBVTag("_" + inputVersion);
   const string QCDBMuVTag("_" + inputVersion);
@@ -575,29 +574,6 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
     haddCanvases(ggAllHaddOutputFile, ggAllHaddInputFiles, vector<float>(1, ggWeight20InvFb), 
 		 canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
 		 nullBlindHigh);
-  }
-
-  //"hadd" nonIsoWgg sample just to get the formatting of the 2D plots the same
-  string nonIsoWggSuffix(nonIsoWggSigVTag + fileExt);
-  string nonIsoWggIsoPrefix(analysisFilePath + "nonIsoWgg/muHadIsoAnalysis_nonIsoWgg");
-  string nonIsoWggIsoHaddOutputFile(nonIsoWggIsoPrefix + "_hadd" + nonIsoWggSuffix);
-  string nonIsoWggAllPrefix(analysisFilePath + "nonIsoWgg/muHadAnalysis_nonIsoWgg");
-  string nonIsoWggAllHaddOutputFile(nonIsoWggAllPrefix + "_hadd" + nonIsoWggSuffix);
-  vector<string> nonIsoWggIsoHaddInputFiles;
-  vector<string> nonIsoWggAllHaddInputFiles;
-  stringstream nonIsoWggIsoName;
-  nonIsoWggIsoName << nonIsoWggIsoPrefix << nonIsoWggSuffix;
-  nonIsoWggIsoHaddInputFiles.push_back(nonIsoWggIsoName.str());
-  stringstream nonIsoWggAllName;
-  nonIsoWggAllName << nonIsoWggAllPrefix << nonIsoWggSuffix;
-  nonIsoWggAllHaddInputFiles.push_back(nonIsoWggAllName.str());
-  haddCanvases(nonIsoWggIsoHaddOutputFile, nonIsoWggIsoHaddInputFiles, 
-	       vector<float>(1, ggWeight20InvFb), canvasNames1D, graphNames1D, canvasNames2D, 
-	       graphNames2D, nullBlindLow, nullBlindHigh);
-  if (doNoHPSIsoCut) {
-    haddCanvases(nonIsoWggAllHaddOutputFile, nonIsoWggAllHaddInputFiles, 
-		 vector<float>(1, ggWeight20InvFb), canvasNames1D, graphNames1D, canvasNames2D, 
-		 graphNames2D, nullBlindLow, nullBlindHigh);
   }
 
   //hadd QCD Mu-enriched Pt-binned samples
@@ -1115,9 +1091,6 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 				       tag20InvFb + outputVTag + fileExt);
   string sigVsBkgOutputFileNoHPSIsoCutNorm1(analysisFilePath + "results/sigVsBkg_muHadAnalysis" + 
 					    tag1 + outputVTag + fileExt);
-  string sigVsBkgOutputFileNonIsoWIsoTau(analysisFilePath + 
-					 "results/sigVsBkg_nonIsoW_muHadIsoAnalysis" + 
-					 tag20InvFb + outputVTag + fileExt);
   vector<string> sigVsBkgInputFiles;
   sigVsBkgInputFiles.push_back(Wh1IsoHaddOutputFile);
   sigVsBkgInputFiles.push_back(ggIsoHaddOutputFile);
@@ -1148,10 +1121,6 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   sigVsBkgNoHPSIsoCutInputFiles.push_back(ZZAllHaddOutputFile);
   sigVsBkgNoHPSIsoCutInputFiles.push_back(WWAllHaddOutputFile);
   std::reverse(sigVsBkgNoHPSIsoCutInputFiles.begin() + 2, sigVsBkgNoHPSIsoCutInputFiles.end());
-  vector<string> sigVsBkgNonIsoWIsoTauInputFiles;
-  sigVsBkgNonIsoWIsoTauInputFiles.push_back(nonIsoWggIsoHaddOutputFile);
-  sigVsBkgNonIsoWIsoTauInputFiles.push_back(nonIsoWDataIsoHaddOutputFile);
-  std::reverse(sigVsBkgNonIsoWIsoTauInputFiles.begin() + 1, sigVsBkgNonIsoWIsoTauInputFiles.end());
   drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgOutputFile20InvFb, sigVsBkgInputFiles, 
 					canvasNames1D, graphNames1D, legendHeaders20InvFb, 
 					colors, styles, legendEntriesSigBkg, weightsSigBkg, 
@@ -1172,11 +1141,6 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 					  legendEntriesSigBkg, weights1, setLinY, drawSame, 
 					  sigBkg);
   }
-  drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgOutputFileNonIsoWIsoTau, 
-					sigVsBkgNonIsoWIsoTauInputFiles, canvasNames1D, 
-					graphNames1D, legendHeaders20InvFb, colors, styles, 
-					legendEntriesSigBkg, vector<float>(2, 1.0), setLogY, 
-					drawStack, sigBkg);
 
   //compare data to MC in control region
   string dataVsMCOutputFile2p5InvFb(analysisFilePath + "results/dataVsMC_muHadNonIsoAnalysis" + 
