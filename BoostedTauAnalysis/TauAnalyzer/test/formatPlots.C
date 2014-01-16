@@ -33,6 +33,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   canvasNames1D.push_back("METCanvas");
   canvasNames1D.push_back("WMuMTCanvas");
   canvasNames1D.push_back("tauMuMTCanvas");
+  //canvasNames1D.push_back("tauHadMTCanvas");
   canvasNames1D.push_back("dPhiWMuMETCanvas");
   canvasNames1D.push_back("dPhiTauMuMETCanvas");
   canvasNames1D.push_back("tauMuTauHadJetHTCanvas");
@@ -135,6 +136,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   graphNames1D.push_back("MET");
   graphNames1D.push_back("WMuMT");
   graphNames1D.push_back("tauMuMT");
+  //graphNames1D.push_back("tauHadMT");
   graphNames1D.push_back("dPhiWMuMET");
   graphNames1D.push_back("dPhiTauMuMET");
   graphNames1D.push_back("tauMuTauHadJetHT");
@@ -280,17 +282,14 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   colors.push_back(kMagenta + 2);
   colors.push_back(kCyan + 2);
   colors.push_back(kRed + 2);
-  colors.push_back(kSpring + 4);
-  colors.push_back(kViolet - 7);
   colors.push_back(kYellow);
+  colors.push_back(kViolet - 7);
+  colors.push_back(kSpring + 4);
   colors.push_back(kBlue + 1);
   colors.push_back(kGray + 2);
   colors.push_back(kMagenta - 2);
   colors.push_back(kGreen + 3);
   colors.push_back(kRed);
-//   colors.push_back(2);
-//   colors.push_back(3);
-//   colors.push_back(4);
   vector<Style_t> styles;
   styles.push_back(20);
   styles.push_back(21);
@@ -628,7 +627,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   ptBins.push_back("_Pt-600to800");
   ptBins.push_back("_Pt-800to1000");
   ptBins.push_back("_Pt-1000");
-  for (vector<string>::const_iterator iPtBin = ptBins.begin(); iPtBin != ptBins.end(); 
+   for (vector<string>::const_iterator iPtBin = ptBins.begin(); iPtBin != ptBins.end(); 
        ++iPtBin) {
     stringstream QCDIsoName;
     QCDIsoName << QCDIsoPrefix << *iPtBin << QCDSuffix;
@@ -1182,6 +1181,8 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   //compare data to MC in control region
   string dataVsMCOutputFile2p5InvFb(analysisFilePath + "results/dataVsMC_muHadNonIsoAnalysis" + 
 				    tag2p5InvFb + outputVTag + fileExt);
+  string dataVsMCOutputDiff2p5InvFb(analysisFilePath + "results/dataVsMC_muHadNonIsoDifference" + 
+				    tag2p5InvFb + outputVTag + fileExt);
   string dataVsMCReweightOutputFile2p5InvFb(analysisFilePath + 
 					    "results/dataVsMC_muHadNonIsoReweightAnalysis" + 
 					    tag2p5InvFb + outputVTag + fileExt);
@@ -1208,7 +1209,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   dataVsMCReweightInputFiles.push_back(TTJetsNonIsoReweightHaddOutputFile);
   dataVsMCReweightInputFiles.push_back(TNonIsoReweightHaddOutputFile);
   dataVsMCReweightInputFiles.push_back(WNJetsToLNuNonIsoReweightHaddOutputFile);
-  dataVsMCReweightInputFiles.push_back(WJetsToLNuNonIsoReweightHaddOutputFile);
+//   dataVsMCReweightInputFiles.push_back(WJetsToLNuNonIsoReweightHaddOutputFile);
   dataVsMCReweightInputFiles.push_back(WZNonIsoReweightHaddOutputFile);
   dataVsMCReweightInputFiles.push_back(ZZNonIsoReweightHaddOutputFile);
   dataVsMCReweightInputFiles.push_back(WWNonIsoReweightHaddOutputFile);
@@ -1222,7 +1223,21 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 					legendHeaders2p5InvFb, colors, styles, 
 					legendEntriesMCData, weightsMCData, setLogY, drawStack, 
 					dataMC);
+  drawDifferenceGraphsOn1Canvas(dataVsMCOutputDiff2p5InvFb, dataVsMCInputFiles, canvasNames1D, 
+				graphNames1D, legendHeaders2p5InvFb, colors, styles, 
+				legendEntriesMCData, weightsMCData, setLogY, sigBkg);
 
+
+  string outputFileNameA(analysisFilePath + "results/dataVsMC_RegionAQCDEstimate" + dataVTag + 
+			 fileExt);
+  string inputFileNameB(dataVsMCOutputDiff2p5InvFb);
+  string inputFileNameC(nonIsoWDataIsoHaddOutputFile);
+  string inputFileNameD(nonIsoWDataNonIsoHaddOutputFile);
+  drawQCDRegionAHistograms(outputFileNameA,inputFileNameB,inputFileNameC,
+			   inputFileNameD,canvasNames1D, graphNames1D,
+			   legendHeaders2p5InvFb,colors, styles, legendEntriesMCData,
+			   weightsMCData, setLogY, sigBkg);
+  
   //compare QCD search sample to control sample
   string QCDSearchVsControlOutputFile(analysisFilePath + "QCD/analysis/isoVsNonIsoTaus" + tag1 + 
 				      outputVTag + fileExt);

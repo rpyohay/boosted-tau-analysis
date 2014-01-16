@@ -701,6 +701,9 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
       cerr << *i << endl;
     }
     cerr << weights.size() << endl;
+    cerr << legendHeaders.size() << endl;
+    cerr << canvasNames.size() << endl;
+    cerr << graphNames.size() << endl;
     return;
   }
   TFile outStream(outputFileName.c_str(), "RECREATE");
@@ -808,7 +811,7 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 	Double_t histMin = stacks[canvasIndex]->GetMinimum();
 	Double_t axisMin = 1.0;
 	int exponent = 0;
-	if (histMin != 0.0) {
+	/*if (histMin != 0.0) {
 	  while (histMin < 1.0) {
 	    histMin*=10;
 	    --exponent;
@@ -817,7 +820,7 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 	    histMin/=10;
 	    ++exponent;
 	  }
-	}
+	}*/
 	if (exponent < 0) {
 	  exponent+=(2*exponent);
 	  for (int i = 0; i < exponent; ++i) { axisMin/=10; }
@@ -985,6 +988,282 @@ void mergePlotsIn1File(const char* inputFileName, const char* outputFileName)
   in.Close();
   out.Close();
 }
+
+//draw difference between data and MC
+void drawDifferenceGraphsOn1Canvas(const string& outputFileName, 
+					   const vector<string>& inputFiles, 
+					   const vector<string>& canvasNames, 
+					   const vector<string>& graphNames, 
+					   const vector<string>& legendHeaders, 
+					   const vector<Color_t>& colors, 
+					   const vector<Style_t>& styles, 
+					   const vector<string>& legendEntries, 
+					   const vector<float>& weights, const bool setLogY, 
+					   const bool dataMC)
+{
+  if ((inputFiles.size() > colors.size()) || (inputFiles.size() > styles.size()) || 
+      (inputFiles.size() > legendEntries.size()) || (inputFiles.size() > weights.size()) || 
+      (canvasNames.size() > graphNames.size()) || (canvasNames.size() > legendHeaders.size())) {
+    cerr << "Error: vector size mismatch.\n";
+    cerr << inputFiles.size() << endl;
+    cerr << colors.size() << endl;
+    cerr << styles.size() << endl;
+    cerr << legendEntries.size() << endl;
+    for (vector<string>::const_iterator i = legendEntries.begin(); i != legendEntries.end(); ++i) {
+      cerr << *i << endl;
+    }
+    cerr << weights.size() << endl;
+    return;
+  }
+  TFile outStream(outputFileName.c_str(), "RECREATE");
+  vector<TFile*> inputStreams;
+  vector<TCanvas*> outputCanvases;
+  vector<TLegend*> legends;
+  vector<THStack*> stacks;
+  vector<vector<TH1F*> > hists;
+  vector<TH1F*> histDiff(canvasNames.size());
+  setup(canvasNames, outputCanvases, setLogY, legends, stacks, legendHeaders, hists, 
+	inputFiles.size(), dataMC);
+  for (vector<string>::const_iterator iInputFile = inputFiles.begin(); 
+       iInputFile != inputFiles.end(); ++iInputFile) {
+    const unsigned int fileIndex = iInputFile - inputFiles.begin();
+    inputStreams.push_back(new TFile(iInputFile->c_str()));
+    for (vector<string>::const_iterator iCanvasName = canvasNames.begin(); 
+	 iCanvasName != canvasNames.end(); ++iCanvasName) {
+      const unsigned int canvasIndex = iCanvasName - canvasNames.begin();
+      TCanvas* pCanvas;
+      inputStreams[inputStreams.size() - 1]->GetObject(iCanvasName->c_str(), pCanvas);
+      TGraphAsymmErrors* pGraph = NULL;
+      TH1F* pHist = NULL;
+      if (graphNames[canvasIndex].find("divide") != string::npos) {
+	pGraph = (TGraphAsymmErrors*)pCanvas->GetPrimitive(graphNames[canvasIndex].c_str());
+	setGraphOptions(*pGraph, colors[fileIndex], 0.7, styles[fileIndex], 
+			pGraph->GetXaxis()->GetTitle(), pGraph->GetYaxis()->GetTitle());
+	legends[canvasIndex]->AddEntry(pGraph, legendEntries[fileIndex].c_str(), "l");
+      }
+      else {
+	pHist = (TH1F*)pCanvas->GetPrimitive(graphNames[canvasIndex].c_str());
+// 	if (string(pHist->GetName()) == "tauHadIso") {
+// 	  cout << *iInputFile << endl;
+// 	  cout << "Integral: " << pHist->Integral(0, -1) << endl;
+// 	}
+	float weight = weights[fileIndex] == 0.0 ? 1.0/pHist->Integral(0, -1) : weights[fileIndex];
+	setHistogramOptions(pHist, colors[fileIndex], 0.7, styles[fileIndex], 
+			    weight, 
+			    string(pHist->GetName()) == "muHadPTOverMuHadMass" ? 
+			    "p_{T}/m" : pHist->GetXaxis()->GetTitle(), 
+			    pHist->GetYaxis()->GetTitle());
+	string histName(pHist->GetName());
+	if (histName == "jet_pt_etacut") pHist->GetXaxis()->SetTitle("p_{T} (GeV)");
+	if (histName == "jet_eta") pHist->GetXaxis()->SetTitle("#eta");
+	if (histName == "jet_phi") pHist->GetXaxis()->SetTitle("#phi");
+	if (histName == "jet_mass_etacut") pHist->GetXaxis()->SetTitle("m (GeV)");
+	if (histName == "jet_ptmj_etacut") {
+	  pHist->GetXaxis()->SetTitle("#frac{p_{T}}{m}");
+	}
+// 	if (string(pHist->GetName()) == "muHadPTOverMuHadMass") {
+// 	  cout << *iInputFile << endl;
+// 	  cout << "Integral(pT/m > 13): " << pHist->Integral(14, -1) << endl;
+// 	}
+// 	if (string(pHist->GetName()) == "tauHadIso") {
+// 	  cout << *iInputFile << endl;
+// 	  cout << "Integral: " << pHist->Integral(0, -1) << endl;
+// 	  cout << "Weight: " << weight << endl;
+// 	}
+	if (setLogY) pHist->GetYaxis()->SetRangeUser(0.1, 10000.0);
+	string legendStyle("l");
+	hists[canvasIndex][fileIndex] = pHist;
+	legends[canvasIndex]->
+	  AddEntry(pHist, legendEntries[fileIndex].c_str(), legendStyle.c_str());
+// 	if (fileIndex == (inputFiles.size() - 1)) stacks[canvasIndex]->Add(pHist, "HIST");
+// 	else stacks[canvasIndex]->Add(pHist, "HISTE");
+	if (fileIndex != 0) stacks[canvasIndex]->Add(pHist, "HIST");
+      }
+      outStream.cd();
+      outputCanvases[canvasIndex]->cd(dataMC ? 1 : 0);
+      //outputCanvases[canvasIndex]->cd(0);
+      if (fileIndex == 0) { if (pGraph != NULL) pGraph->Draw("AP"); }
+      else if (pGraph != NULL) pGraph->Draw("PSAME");
+    }
+  }
+  for (vector<string>::const_iterator iCanvasName = canvasNames.begin(); 
+       iCanvasName != canvasNames.end(); ++iCanvasName) {
+    //histDiff.push_back(<TH1F*>);
+    const unsigned int canvasIndex = iCanvasName - canvasNames.begin();
+    outStream.cd();
+    outputCanvases[canvasIndex]->cd(dataMC ? 1 : 0);
+    TH1F* pHistWithMaxMaxBin = histWithLargestBinContent(hists[canvasIndex]);
+    if (pHistWithMaxMaxBin != NULL) pHistWithMaxMaxBin->Draw();
+  }
+  for (vector<string>::const_iterator iCanvasName = canvasNames.begin(); 
+       iCanvasName != canvasNames.end(); ++iCanvasName) {
+    const unsigned int canvasIndex = iCanvasName - canvasNames.begin();
+    outStream.cd();
+    outputCanvases[canvasIndex]->cd(dataMC ? 1 : 0);
+    //outputCanvases[canvasIndex]->cd(0);
+    for (vector<string>::const_iterator iInputFile = inputFiles.begin(); 
+	 iInputFile != inputFiles.end(); ++iInputFile) { // loop over input files
+      const unsigned int fileIndex = iInputFile - inputFiles.begin();
+      if (hists[canvasIndex][fileIndex] != NULL)
+	{ // if there is a histogram for this filename and canvas
+	  if (fileIndex == 0)
+	    { // if data
+	      histDiff[canvasIndex] = (TH1F*)hists[canvasIndex][fileIndex]->Clone();
+	    } // if data
+	  else
+	    { // if MC
+	      if (inputFiles[fileIndex].find("QCD") != string::npos)
+		{ // do nothing
+		  if (graphNames[canvasIndex].find("muHadMass") != string::npos)
+		    {
+		      double integral = hists[canvasIndex][fileIndex]->Integral();
+		      //cout << "Integrated number of events for " << graphNames[canvasIndex];//.c_str;
+		      //cout << " in sample " << inputFiles[fileIndex];//.c_str;
+		      //cout << " = " << integral << endl;
+		    }
+		  
+		} // do nothing
+	      else
+		{
+		  if (graphNames[canvasIndex].find("muHadMass") != string::npos)
+		    {
+		      double integral = hists[canvasIndex][fileIndex]->Integral();
+		      //cout << "Integrated number of events for " << graphNames[canvasIndex];//.c_str;
+		      //cout << " in sample " << inputFiles[fileIndex];//.c_str;
+		      //cout << " = " << integral << endl;
+		    }
+		  histDiff[canvasIndex]->Add(hists[canvasIndex][fileIndex], -1.); // subtract from data
+		}
+	    } // if MC
+	} // if there is a histogram for this filename and canvas
+    } // loop over input files
+  }
+  if (dataMC)
+    {
+      for (vector<string>::const_iterator iCanvasName = canvasNames.begin(); 
+	   iCanvasName != canvasNames.end(); ++iCanvasName) {
+	const unsigned int canvasIndex = iCanvasName - canvasNames.begin();
+	outputCanvases[canvasIndex]->cd(dataMC ? 1 : 0);
+	//outputCanvases[canvasIndex]->cd(0);
+	histDiff[canvasIndex]->Draw();
+	//legends[canvasIndex]->Draw("same");
+      }
+    }
+
+  outStream.cd();
+  write(outputCanvases);
+  outStream.Write();
+  outStream.Close();
+  deleteObjects(legends);
+  deleteObjects(stacks);
+  deleteObjects(outputCanvases);
+  deleteStreams(inputStreams);
+}
+
+//get Region A QCD histograms
+void drawQCDRegionAHistograms(const string& outputFileA, 
+			      const string& inputFileNameB, 
+			      const string& inputFileNameC, 
+			      const string& inputFileNameD, 
+			      const vector<string>& canvasNames, 
+			      const vector<string>& graphNames, 
+			      const vector<string>& legendHeaders, 
+			      const vector<Color_t>& colors, 
+			      const vector<Style_t>& styles, 
+			      const vector<string>& legendEntries, 
+			      const vector<float>& weights, const bool setLogY, 
+			      const bool dataMC)
+{ // start routine
+  
+  if ((canvasNames.size() > graphNames.size()) || (canvasNames.size() > legendHeaders.size())) {
+    cerr << "Error: vector size mismatch.\n";
+    cerr << colors.size() << endl;
+    cerr << styles.size() << endl;
+    cerr << legendEntries.size() << endl;
+    for (vector<string>::const_iterator i = legendEntries.begin(); i != legendEntries.end(); ++i) {
+      cerr << *i << endl;
+    }
+    cerr << weights.size() << endl;
+    return;
+  }
+  
+  TFile outStream(outputFileA.c_str(), "RECREATE");
+  TFile inputFileB(inputFileNameB.c_str(), "read");
+  TFile inputFileC(inputFileNameC.c_str(), "read");
+  TFile inputFileD(inputFileNameD.c_str(), "read");
+  vector<TCanvas*> outputCanvases;
+  vector<TLegend*> legends;
+  vector<THStack*> stacks;
+  vector<vector<TH1F*> > hists;
+  setup(canvasNames, outputCanvases, setLogY, legends, stacks, legendHeaders, hists, 3, dataMC);
+  
+  for (vector<string>::const_iterator iCanvasName = canvasNames.begin(); 
+       iCanvasName != canvasNames.end(); ++iCanvasName) { // loop over canvases
+    const unsigned int canvasIndex = iCanvasName - canvasNames.begin();
+    TCanvas* pCanvasB;
+    TCanvas* pCanvasC;
+    TCanvas* pCanvasD;
+    inputFileB.GetObject(iCanvasName->c_str(), pCanvasB);
+    inputFileC.GetObject(iCanvasName->c_str(), pCanvasC);
+    inputFileD.GetObject(iCanvasName->c_str(), pCanvasD);
+    TH1F* pHistB = NULL;
+    TH1F* pHistC = NULL;
+    TH1F* pHistD = NULL;
+    //string canvasNameB(iCanvasName->c_str());
+    //canvasNameB+="_1";
+    //TCanvas* pCanvasB1 = (TCanvas*)pCanvasB->GetPrimitive(canvasNameB.c_str());
+    pHistB = (TH1F*)pCanvasB->GetPrimitive(graphNames[canvasIndex].c_str())->Clone();
+    pHistC = (TH1F*)pCanvasC->GetPrimitive(graphNames[canvasIndex].c_str())->Clone();
+    pHistD = (TH1F*)pCanvasD->GetPrimitive(graphNames[canvasIndex].c_str())->Clone();
+    //cout << "graph: " << graphNames[canvasIndex].c_str() << endl;
+    //cout << "pHistB integral = " << pHistB->Integral() << endl;
+    //cout << "pHistB integral > 4 = " << pHistB->Integral(5,100) << endl;
+    //cout << "pHistC integral = " << pHistC->Integral() << endl;
+    //cout << "pHistC integral > 4 = " << pHistC->Integral(5,100) << endl;
+    //cout << "pHistD integral = " << pHistD->Integral() << endl;
+    //cout << "pHistD integral > 4 = " << pHistD->Integral(5,100) << endl;
+    //cout << "pHistB minimum = " << pHistB->GetMinimum() << endl;
+    pHistB->Multiply(pHistC);
+    //cout << "pHistBC integral = " << pHistB->Integral() << endl;
+    pHistB->Divide(pHistD);
+    //cout << "pHistBC/D integral > 4 = " << pHistB->Integral(5,100) << endl;
+    //cout << "pHistBC/D minimum = " << pHistB->GetMinimum() << endl;
+    float weight = 1.0;
+    setHistogramOptions(pHistB, colors[0], 0.7, styles[0], 
+			weight, 
+			string(pHistB->GetName()) == "muHadPTOverMuHadMass" ? 
+			"p_{T}/m" : pHistB->GetXaxis()->GetTitle(), 
+			pHistB->GetYaxis()->GetTitle());
+    string histName(pHistB->GetName());
+    if (histName == "jet_pt_etacut") pHistB->GetXaxis()->SetTitle("p_{T} (GeV)");
+    if (histName == "jet_eta") pHistB->GetXaxis()->SetTitle("#eta");
+    if (histName == "jet_phi") pHistB->GetXaxis()->SetTitle("#phi");
+    if (histName == "jet_mass_etacut") pHistB->GetXaxis()->SetTitle("m (GeV)");
+    if (histName == "jet_ptmj_etacut") {
+      pHistB->GetXaxis()->SetTitle("#frac{p_{T}}{m}");
+    }
+    if (setLogY) pHistB->GetYaxis()->SetRangeUser(0.1, 10000.0);
+    string legendStyle("l");
+    legends[canvasIndex]->
+      AddEntry(pHistB, legendEntries[0].c_str(), legendStyle.c_str());
+    outStream.cd();
+    outputCanvases[canvasIndex]->cd(dataMC ? 1 : 0);
+    //outputCanvases[canvasIndex]->cd(0);
+    pHistB->Draw();
+  } // loop over canvases
+
+  outStream.cd();
+  write(outputCanvases);
+  outStream.Write();
+  outStream.Close();
+  inputFileB.Close();
+  inputFileC.Close();
+  inputFileD.Close();
+  deleteObjects(legends);
+  deleteObjects(stacks);
+  deleteObjects(outputCanvases);
+
+} // end routine
 
 //test data-driven background estimation method with MC on a given variable
 void addClosurePlot(TFile& sigVsBkgIso20InvFbStream, const string& var, const string& unit, 
@@ -1176,6 +1455,7 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
   string canvasName(var + "Canvas");
   string stackName(var + "Stack");
   string canvasReweightErrSqName(var + "ReweightErrSqCanvas");
+  string varReweightErrSq(var + "ReweightErrSq");
 
   //get plots of signal and background MC and data-driven QCD estimate, isolated tau sample
   TCanvas* canvasIsoSigBkg = NULL;
@@ -1313,7 +1593,7 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
     cerr << nonIsoDataFile.first->GetName() << ".\n";
     return;
   }
-
+      cerr << __LINE__ << endl;
   //get the reweighting error histogram, non-isolated tau sample
   TCanvas* canvasNonIsoDataReweightErrSq = NULL;
   nonIsoDataFile.first->GetObject(canvasReweightErrSqName.c_str(), canvasNonIsoDataReweightErrSq);
@@ -1321,14 +1601,14 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
   if (canvasNonIsoDataReweightErrSq != NULL) {
     canvasNonIsoDataReweightErrSq->Draw();
     nonIsoDataReweightErrSq = 
-      (TH1F*)canvasNonIsoDataReweightErrSq->cd(1)->GetPrimitive(var.c_str())->Clone();
+      (TH1F*)canvasNonIsoDataReweightErrSq->cd(1)->GetPrimitive(varReweightErrSq.c_str())->Clone();
   }
   else {
     cerr << "Error opening canvas " << canvasReweightErrSqName << " from file ";
     cerr << nonIsoDataFile.first->GetName() << ".\n";
     return;
   }
-
+      cerr << __LINE__ << endl;
   //get the data histogram, isolated tau sample
   TCanvas* canvasIsoData = NULL;
   isoDataFile.GetObject(canvasName.c_str(), canvasIsoData);
@@ -1351,36 +1631,35 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
   Double_t norm = isoData->Integral(normRegionLowerBin, normRegionUpperBin)/
     nonIsoData->Integral(normRegionLowerBin, normRegionUpperBin);
 
-  //debug
-  cerr << "Norm bin 1\n";
-  cerr << "----------\n";
-  cerr << "NIso = " << isoData->GetBinContent(1) << ", errIso = " << isoData->GetBinError(1);
-  cerr << "\n";
-  cerr << "NNonIso = " << nonIsoData->GetBinContent(1) << ", errNonIso = ";
-  cerr << nonIsoData->GetBinError(1) << "\n";
-  cerr << "reweight error squared = ";
-  cerr << nonIsoDataReweightErrSq->GetBinError(1)*nonIsoDataReweightErrSq->GetBinError(1) << endl;
-  cerr << endl;
-  cerr << "Norm bin 2\n";
-  cerr << "----------\n";
-  cerr << "NIso = " << isoData->GetBinContent(2) << ", errIso = " << isoData->GetBinError(2);
-  cerr << "\n";
-  cerr << "NNonIso = " << nonIsoData->GetBinContent(2) << ", errNonIso = ";
-  cerr << nonIsoData->GetBinError(2) << "\n";
-  cerr << "reweight error squared = ";
-  cerr << nonIsoDataReweightErrSq->GetBinError(2)*nonIsoDataReweightErrSq->GetBinError(2) << endl;
-  cerr << endl;
-  cerr << "Search bin 1\n";
-  cerr << "----------\n";
-  cerr << "NIso = " << isoData->GetBinContent(4) << ", errIso = " << isoData->GetBinError(4);
-  cerr << "\n";
-  cerr << "NNonIso = " << nonIsoData->GetBinContent(4) << ", errNonIso = ";
-  cerr << nonIsoData->GetBinError(4) << "\n";
-  cerr << "reweight error squared = ";
-  cerr << nonIsoDataReweightErrSq->GetBinError(4)*nonIsoDataReweightErrSq->GetBinError(4) << endl;
-  cerr << endl;
-  cerr << "norm = " << norm << endl << endl;
-
+//   //debug
+//   cerr << "Norm bin 1\n";
+//   cerr << "----------\n";
+//   cerr << "NIso = " << isoData->GetBinContent(1) << ", errIso = " << isoData->GetBinError(1);
+//   cerr << "\n";
+//   cerr << "NNonIso = " << nonIsoData->GetBinContent(1) << ", errNonIso = ";
+//   cerr << nonIsoData->GetBinError(1) << "\n";
+//   cerr << "reweight error squared = ";
+//   cerr << nonIsoDataReweightErrSq->GetBinError(1)*nonIsoDataReweightErrSq->GetBinError(1) << endl;
+//   cerr << endl;
+//   cerr << "Norm bin 2\n";
+//   cerr << "----------\n";
+//   cerr << "NIso = " << isoData->GetBinContent(2) << ", errIso = " << isoData->GetBinError(2);
+//   cerr << "\n";
+//   cerr << "NNonIso = " << nonIsoData->GetBinContent(2) << ", errNonIso = ";
+//   cerr << nonIsoData->GetBinError(2) << "\n";
+//   cerr << "reweight error squared = ";
+//   cerr << nonIsoDataReweightErrSq->GetBinError(2)*nonIsoDataReweightErrSq->GetBinError(2) << endl;
+//   cerr << endl;
+//   cerr << "Search bin 1\n";
+//   cerr << "----------\n";
+//   cerr << "NIso = " << isoData->GetBinContent(4) << ", errIso = " << isoData->GetBinError(4);
+//   cerr << "\n";
+//   cerr << "NNonIso = " << nonIsoData->GetBinContent(4) << ", errNonIso = ";
+//   cerr << nonIsoData->GetBinError(4) << "\n";
+//   cerr << "reweight error squared = ";
+//   cerr << nonIsoDataReweightErrSq->GetBinError(4)*nonIsoDataReweightErrSq->GetBinError(4) << endl;
+//   cerr << endl;
+//   cerr << "norm = " << norm << endl << endl;
 
   /*calculate the statistical error on the background prediction from the non-isolated data, 
     including the term from the error on the normalization factor*/
@@ -1397,25 +1676,29 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
 			 normErrSq(dynamic_cast<const TH1*>(isoData), nonIsoDataPtrCast, 
 				   nonIsoDataReweightErrSqPtrCast, normRegionLowerBin, 
 				   normRegionUpperBin, norm)));
-//434401.4766 + 1.200894736 + 0.021129675
+    /*normerrsq = 1.150853756e-5 + 7.886904069e-9 + 6.778838651e-7 dominated by the term coming 
+      from stats. in region A data, as expected
+      normerrsq = 1.219430833e-5
+      bkgerrsq = 2.648612772 (norm) + 1.200894736 (stat) + 0.0189198162 (reweight) = 3.868427324
+      rel. error ~doubles due to reweighting and normalization (0.05-->0.09)*/
   }
 
-  //debug
-  cerr << endl << "nonIsoDataStatErrSq[3] = " << nonIsoDataStatErrSq[3] << endl;
+//   //debug
+//   cerr << endl << "nonIsoDataStatErrSq[3] = " << nonIsoDataStatErrSq[3] << endl;
 
   //normalize non-isolated data histogram to isolated data in signal-depleted region
   nonIsoData->Scale(norm);
 
-  //debug
-  cerr << "Search bin 1 NNonIso = " << nonIsoData->GetBinContent(4) << endl;
+//   //debug
+//   cerr << "Search bin 1 NNonIso = " << nonIsoData->GetBinContent(4) << endl;
 
   //set statistical error in each bin of the non-isolated data histogram
   for (Int_t iBin = 1; iBin <= nonIsoData->GetNbinsX(); ++iBin) {
     nonIsoData->SetBinError(iBin, sqrt(nonIsoDataStatErrSq[iBin - 1]));
   }
 
-  //debug
-  cerr << "Search bin 1 errNonIso = " << nonIsoData->GetBinError(4) << endl;
+//   //debug
+//   cerr << "Search bin 1 errNonIso = " << nonIsoData->GetBinError(4) << endl;
 
   //write to file
   outStream.cd();

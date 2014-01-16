@@ -351,6 +351,24 @@ process.output = cms.OutputModule(
 #MET filter
 process.METFilter.minMET = cms.double(40.)
 
+#OS filter for tau_mu W_mu charge product
+process.OSSFFilterIso = cms.EDFilter('OSSFFilter',
+                                  WMuonTag = cms.InputTag('WIsoMuonSelector'),
+                                  tauTag = cms.InputTag('muHadIsoTauSelector'),
+                                  jetMuonMapTag = cms.InputTag('CleanJets', '', 'SKIM')
+                                  )
+process.OSSFFilterNonIso = process.OSSFFilterIso.clone()
+process.OSSFFilterNonIso.tauTag = cms.InputTag('muHadNonIsoTauSelector')
+
+#SS filter for tau_mu tau_had charge product
+process.SSSFFilterIso = cms.EDFilter('SSSFFilter',
+                                  WMuonTag = cms.InputTag('WIsoMuonSelector'),
+                                  tauTag = cms.InputTag('muHadIsoTauSelector'),
+                                  jetMuonMapTag = cms.InputTag('CleanJets', '', 'SKIM')
+                                  )
+process.SSSFFilterNonIso = process.SSSFFilterIso.clone()
+process.SSSFFilterNonIso.tauTag = cms.InputTag('muHadNonIsoTauSelector')
+
 #Trigger object filter
 process.TriggerObjectFilter = cms.EDFilter(
     'TriggerObjectFilter',
@@ -384,7 +402,9 @@ process.beginSequence = cms.Sequence(process.genWMuNuSelector*process.genWTauNuS
                                      process.genPartonSelector*process.genMuSelector*
                                      process.genTauMuSelector)
 process.isoTauAnalysisSequence = cms.Sequence(process.muHadIsoTauSelector*
-##                                               process.TriggerObjectFilter*process.METFilter*
+                                              process.TriggerObjectFilter*
+                                              process.OSSFFilterIso*
+                                              process.SSSFFilterIso*
                                               process.muHadIsoTauAnalyzer)
 process.signalIsoTauAnalysisSequence = cms.Sequence(process.genWMuNuSelector*
                                                     process.IsoMu24eta2p1Selector*
@@ -393,11 +413,15 @@ process.signalIsoTauAnalysisSequence = cms.Sequence(process.genWMuNuSelector*
                                                     process.tauMuonPTSelector*
                                                     process.tauMuonSelector*process.PFTau*
                                                     process.muHadIsoTauSelector*
-##                                                     process.TriggerObjectFilter*process.METFilter*
+                                                    process.TriggerObjectFilter*
+                                                    process.OSSFFilterIso*
+                                                    process.SSSFFilterIso*
                                                     process.muHadIsoTauAnalyzer)
 process.nonIsoTauAnalysisSequence = cms.Sequence(process.muHadTauSelector*
                                                  process.muHadNonIsoTauSelector*
-##                                                  process.TriggerObjectFilter*process.METFilter*
+                                                 process.TriggerObjectFilter*
+                                                 process.OSSFFilterNonIso*
+                                                 process.SSSFFilterNonIso*
                                                  process.muHadNonIsoTauAnalyzer)
 process.tauAnalysisSequence = cms.Sequence(process.muHadTauSelector*process.muHadTauAnalyzer)
 
