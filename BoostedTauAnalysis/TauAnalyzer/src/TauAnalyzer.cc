@@ -1030,7 +1030,7 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     reco::PFJet correctedTauJet;
     for (reco::PFJetCollection::const_iterator iJet = correctedOldJets.begin(); 
 	 iJet != correctedOldJets.end(); ++iJet) {
-      const unsigned int jetIndex = iJet - pOldJets->begin(); //what's going on here?
+//       const unsigned int jetIndex = iJet - pOldJets->begin(); //what's going on here?
 
       if (/*tauOldJetRef.key() != jetIndex*/deltaR(*iJet, **iTau) >= dR_) {
 	correctedOldJetsExcludingTau.push_back(*iJet);
@@ -1087,12 +1087,6 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 			      removedMuonRefs[removedMuonRefs.size() - 1]->p4()).M();
 
     //impose pT and decay mode cut on tau
-    // put MT cut here too
-    double MT = sqrt(2*(WMuonRefs[WMuonRefs.size() - 1])->pt()*pMET->refAt(0)->et()*
-		     (1.0 - cos(reco::deltaPhi((WMuonRefs[WMuonRefs.size() - 1])->phi(), pMET->refAt(0)->phi()))));
-      double M_WMuTauMu = (WMuonRefs[WMuonRefs.size() - 1]->p4() + 
-			      removedMuonRefs[removedMuonRefs.size() - 1]->p4()).M();
-
     if (((*iTau)->pt() > tauPTMin_) && 
 	((removedMuonRefs[removedMuonRefs.size() - 1]->charge() + (*iTau)->charge()) == 0) && 
 	((removedMuonRefs[removedMuonRefs.size() - 1]->charge()*
@@ -1564,7 +1558,7 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       fastjet::PseudoJet thisGroomedJet = pruner(thisMainJet); // jet grooming
       vector<fastjet::PseudoJet> FJparticles2 = thisGroomedJet.constituents();
       //vector<fastjet::PseudoJet> FJparticles2 = thisMainJet.constituents(); // if you don't want to prune
-      NsubParameters paraNsub = NsubParameters(1.0, 0.8);
+//       NsubParameters paraNsub = NsubParameters(1.0, 0.8);
       Nsubjettiness routine1(1, Njettiness::kt_axes, 1.0, 0.8, 10000.0);
       Nsubjettiness routine2(2, Njettiness::kt_axes, 1.0, 0.8, 10000.0);
       Nsubjettiness routine3(3, Njettiness::kt_axes, 1.0, 0.8, 10000.0);
@@ -1572,7 +1566,7 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       double tau1 = routine1.result(thisGroomedJet);
       double tau2 = routine2.result(thisGroomedJet);
       double tau3 = routine3.result(thisGroomedJet);
-      double tau4 = routine4.result(thisGroomedJet);
+//       double tau4 = routine4.result(thisGroomedJet);
       //double tau1 = routine1.result(thisMainJet); // if you don't want to prune
       //double tau2 = routine2.result(thisMainJet); // if you don't want to prune
       //double tau3 = routine3.result(thisMainJet); // if you don't want to prune
@@ -1623,14 +1617,14 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	      for (std::vector<fastjet::PseudoJet>::const_iterator fjconst = FJparticles2.begin(); fjconst != FJparticles2.end(); fjconst++)
 		{ // loop over FJparticles2
 		  double minDelR = 10000.;
-		  unsigned int tauJetCandID = 0;
+// 		  unsigned int tauJetCandID = 0;
 		  for (std::vector<reco::PFCandidatePtr>::const_iterator jetcand = tauJetCands.begin(); jetcand != tauJetCands.end(); jetcand++)
 		    {
 		      double delR = deltaR(fjconst->eta(), fjconst->phi(), (**jetcand).eta(), (**jetcand).phi());
 		      if (delR < minDelR)
 			{
 			  minDelR = delR;
-			  tauJetCandID = (**jetcand).particleId();
+// 			  tauJetCandID = (**jetcand).particleId();
 			}
 		    }
 		  if (minDelR < 0.3)

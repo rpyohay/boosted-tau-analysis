@@ -808,26 +808,6 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
     }
     else {
       if (setLogY) {
-	Double_t histMin = stacks[canvasIndex]->GetMinimum();
-	Double_t axisMin = 1.0;
-	int exponent = 0;
-	/*if (histMin != 0.0) {
-	  while (histMin < 1.0) {
-	    histMin*=10;
-	    --exponent;
-	  }
-	  while (histMin >= 10.0) {
-	    histMin/=10;
-	    ++exponent;
-	  }
-	}*/
-	if (exponent < 0) {
-	  exponent+=(2*exponent);
-	  for (int i = 0; i < exponent; ++i) { axisMin/=10; }
-	}
-	else for (int i = 0; i < exponent; ++i) { axisMin*=10; }
-// 	stacks[canvasIndex]->SetMinimum(/*axisMin == 0.0 ? */0.1/* : axisMin*/);
-// 	stacks[canvasIndex]->SetMaximum(10000.0);
 	stacks[canvasIndex]->SetMinimum(1.0);
 	stacks[canvasIndex]->SetMaximum(10000000.0);
       }
@@ -1116,7 +1096,7 @@ void drawDifferenceGraphsOn1Canvas(const string& outputFileName,
 		{ // do nothing
 		  if (graphNames[canvasIndex].find("muHadMass") != string::npos)
 		    {
-		      double integral = hists[canvasIndex][fileIndex]->Integral();
+// 		      double integral = hists[canvasIndex][fileIndex]->Integral();
 		      //cout << "Integrated number of events for " << graphNames[canvasIndex];//.c_str;
 		      //cout << " in sample " << inputFiles[fileIndex];//.c_str;
 		      //cout << " = " << integral << endl;
@@ -1127,7 +1107,7 @@ void drawDifferenceGraphsOn1Canvas(const string& outputFileName,
 		{
 		  if (graphNames[canvasIndex].find("muHadMass") != string::npos)
 		    {
-		      double integral = hists[canvasIndex][fileIndex]->Integral();
+// 		      double integral = hists[canvasIndex][fileIndex]->Integral();
 		      //cout << "Integrated number of events for " << graphNames[canvasIndex];//.c_str;
 		      //cout << " in sample " << inputFiles[fileIndex];//.c_str;
 		      //cout << " = " << integral << endl;
