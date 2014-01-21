@@ -1118,8 +1118,8 @@ void drawDifferenceGraphsOn1Canvas(const string& outputFileName,
 	} // if there is a histogram for this filename and canvas
     } // loop over input files
   }
-  if (dataMC)
-    {
+//   if (dataMC)
+//     {
       for (vector<string>::const_iterator iCanvasName = canvasNames.begin(); 
 	   iCanvasName != canvasNames.end(); ++iCanvasName) {
 	const unsigned int canvasIndex = iCanvasName - canvasNames.begin();
@@ -1128,7 +1128,7 @@ void drawDifferenceGraphsOn1Canvas(const string& outputFileName,
 	histDiff[canvasIndex]->Draw();
 	//legends[canvasIndex]->Draw("same");
       }
-    }
+//     }
 
   outStream.cd();
   write(outputCanvases);
@@ -1203,9 +1203,10 @@ void drawQCDRegionAHistograms(const string& outputFileA,
     //cout << "pHistD integral = " << pHistD->Integral() << endl;
     //cout << "pHistD integral > 4 = " << pHistD->Integral(5,100) << endl;
     //cout << "pHistB minimum = " << pHistB->GetMinimum() << endl;
-    pHistB->Multiply(pHistC);
+//     pHistB->Multiply(pHistC);
+    pHistB->Scale(pHistC->Integral(0, -1)/pHistD->Integral(0, -1));
     //cout << "pHistBC integral = " << pHistB->Integral() << endl;
-    pHistB->Divide(pHistD);
+//     pHistB->Divide(pHistD);
     //cout << "pHistBC/D integral > 4 = " << pHistB->Integral(5,100) << endl;
     //cout << "pHistBC/D minimum = " << pHistB->GetMinimum() << endl;
     float weight = 1.0;
@@ -1541,7 +1542,7 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
     isoBkgMain5.Add(isoBkgWNJetsHist, "HIST");
     isoBkgMain5.Add(isoBkgTopHist, "HIST");
     isoBkgMain5.Add(isoBkgDrellYanHist, "HIST");
-//     isoBkgMain5.Add(isoBkgQCDHist, "HIST");
+    isoBkgMain5.Add(isoBkgQCDHist, "HIST");
     legendBkgAll.AddEntry(isoBkgAllHist, "MC EW + data QCD", "f");
     legendBkgMain5.AddEntry(isoBkgDibosonHist, "MC diboson", "f");
     legendBkgMain5.AddEntry(isoBkgWNJetsHist, "MC W + #geq1 jet", "f");
@@ -1573,7 +1574,7 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
     cerr << nonIsoDataFile.first->GetName() << ".\n";
     return;
   }
-      cerr << __LINE__ << endl;
+
   //get the reweighting error histogram, non-isolated tau sample
   TCanvas* canvasNonIsoDataReweightErrSq = NULL;
   nonIsoDataFile.first->GetObject(canvasReweightErrSqName.c_str(), canvasNonIsoDataReweightErrSq);
@@ -1588,7 +1589,7 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
     cerr << nonIsoDataFile.first->GetName() << ".\n";
     return;
   }
-      cerr << __LINE__ << endl;
+
   //get the data histogram, isolated tau sample
   TCanvas* canvasIsoData = NULL;
   isoDataFile.GetObject(canvasName.c_str(), canvasIsoData);
@@ -1693,6 +1694,14 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
   }
   else if (option == "main 5") {
     isoBkgMain5.Draw();
+    Float_t sum = 0.0;
+    for (Int_t iHist = 0; iHist < isoBkgMain5.GetHists()->GetEntries(); ++iHist) {
+      TH1F* hist = (TH1F*)isoBkgMain5.GetHists()->At(iHist);
+      for (Int_t iBin = 5; iBin <= (hist->GetNbinsX() + 1); ++iBin) {
+	sum+=hist->GetBinContent(iBin);
+      }
+    }
+    cerr << "Region A MC + data-driven QCD, m > 4: " << sum << endl;
     isoBkgMain5.SetMinimum(0.01);
     isoBkgMain5.SetMaximum(10000.0);
   }
@@ -1701,11 +1710,15 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
     isoBkgAll.GetHistogram()->GetYaxis()->SetRangeUser(0.01, 10000.0);
   }
   nonIsoData->Draw("HISTESAME");
+  cerr << "Region B data, m > 4: " << nonIsoData->Integral(5, -1) << endl;
   for (vector<TH1F*>::iterator iIsoSig = isoSig.begin(); iIsoSig != isoSig.end(); 
        ++iIsoSig) {
     (*iIsoSig)->Draw("HISTSAME");
+    cerr << "Region A signal " << iIsoSig - isoSig.begin() << ", m > 4: ";
+    cerr << (*iIsoSig)->Integral(5, -1) << endl;
   }
   isoData->Draw("ESAME");
+  cerr << "Region A data, m < 2: " << isoData->Integral(1, 2) << endl;
   if (option == "separate") legendBkgSep.Draw();
   else if (option == "main 5") legendBkgMain5.Draw();
   else if (option == "combined") legendBkgAll.Draw();
@@ -1900,4 +1913,117 @@ void print2DWeights(const vector<string>& isoFiles, const vector<string>& nonIso
       cout << endl;
     }
   }
+}
+
+//make plots of hadronic tau pT to support reweighting
+void plotTauHadPT(const vector<string>& fileNames, const vector<pair<Color_t, Color_t> >& colors, 
+		  const vector<pair<Style_t, Style_t> >& styles, const string& outputFileName)
+{
+  //setup
+  string thisFunction("const vector<string>& fileNames, ");
+  thisFunction+="const vector<pair<Color_t, Color_t> >& colors, ";
+  thisFunction+="const vector<pair<Style_t, Style_t> >& styles, const string&";
+  const string histogramName("tauHadPT");
+  const string canvasName(histogramName + "Canvas");
+  const string stackName(histogramName + "Stack");
+  const string unit("p_{T} (GeV)");
+  vector<TFile*> files(fileNames.size(), NULL);
+  vector<TCanvas*> canvases(fileNames.size(), NULL);
+  vector<pair<TH1F*, TH1F*> > histograms(fileNames.size(), pair<TH1F*, TH1F*>(NULL, NULL));
+
+  //loop over file names
+  for (vector<string>::const_iterator iFileName = fileNames.begin(); iFileName != fileNames.end(); 
+       ++iFileName) {
+    const unsigned int i = iFileName - fileNames.begin();
+
+    //open files
+    files[i] = new TFile(iFileName->c_str());
+
+    //get canvases
+    if (files[i]->IsOpen()) files[i]->GetObject(canvasName.c_str(), canvases[i]);
+    else cerr << errorCannotOpenFile(thisFunction, *iFileName);
+
+    //get TH1Fs (data for regions B and C, Wh1 for region A)
+    THStack* stack = NULL;
+    if (canvases[i] != NULL) {
+      if (i == 1) {
+	canvases[i]->Draw();
+	histograms[i].first = (TH1F*)canvases[i]->cd(1)->GetPrimitive(histogramName.c_str());
+      }
+      else histograms[i].first = (TH1F*)canvases[i]->GetPrimitive(histogramName.c_str());
+      setHistogramOptions(histograms[i].first, colors[i].first, 0.7, styles[i].first, 
+			  1.0/histograms[i].first->Integral(0, -1), unit.c_str(), "");
+
+      //get stacks (MC for regions A and B, nonexistent for region C)
+      TList* primitives = NULL;
+      if (i == 1) primitives = canvases[i]->cd(1)->GetListOfPrimitives();
+      else primitives = canvases[i]->GetListOfPrimitives();
+      Int_t j = 0;
+      while ((j < primitives->GetEntries()) && (stack == NULL)) {
+	if (string(primitives->At(j)->ClassName()) == "THStack") {
+	  if (i == 1) {
+	    canvases[i]->Draw();
+	    stack = (THStack*)canvases[i]->cd(1)->GetPrimitive(stackName.c_str());
+	  }
+	  else stack = (THStack*)canvases[i]->GetPrimitive(stackName.c_str());
+	}
+	++j;
+      }
+    }
+    else cerr << errorCannotRetrieveObject(thisFunction, *iFileName, canvasName);
+    TList* stackedHistograms = NULL;
+    if (stack != NULL) {
+      stackedHistograms = stack->GetHists();
+      for (Int_t j = 0; j < stackedHistograms->GetEntries(); ++j) {
+	if (j == 0) histograms[i].second = (TH1F*)stackedHistograms->At(j);
+	else histograms[i].second->Add((TH1F*)stackedHistograms->At(j));
+      }
+      setHistogramOptions(histograms[i].second, colors[i].second, 0.7, styles[i].second, 
+			  1.0/histograms[i].second->Integral(0, -1), unit.c_str(), "");
+    }
+  }
+
+  //open output file
+  TFile outputFile(outputFileName.c_str(), "RECREATE");
+  if (outputFile.IsOpen()) {
+
+    //plot region A background MC vs. region B background MC
+    TCanvas AMCVsBMCCanvas("AMCVsBMCCanvas", "", 600, 600);
+    setCanvasOptions(AMCVsBMCCanvas, 1, 0, 0);
+    setCanvasMargins(AMCVsBMCCanvas, 0.2, 0.2, 0.2, 0.2);
+    TLegend AMCVsBMCLegend(0.35, 0.55, 0.75, 0.75);
+    setLegendOptions(AMCVsBMCLegend, "MC (excluding QCD) normalized to 1");
+    AMCVsBMCLegend.AddEntry(histograms[0].second, "Signal region", "lp");
+    AMCVsBMCLegend.AddEntry(histograms[1].second, "Control region", "lp");
+    AMCVsBMCCanvas.cd();
+    histograms[0].second->Draw("E");
+    histograms[1].second->Draw("ESAME");
+    histograms[0].second->GetXaxis()->SetRange(1, histograms[0].second->GetNbinsX() - 1);
+    histograms[1].second->GetXaxis()->SetRange(1, histograms[1].second->GetNbinsX() - 1);
+    AMCVsBMCLegend.Draw();
+    outputFile.cd();
+    AMCVsBMCCanvas.Write();
+
+    //plot region A background MC vs. region C data
+    TCanvas AMCVsCDataCanvas("AMCVsCDataCanvas", "", 600, 600);
+    setCanvasOptions(AMCVsCDataCanvas, 1, 0, 0);
+    setCanvasMargins(AMCVsCDataCanvas, 0.2, 0.2, 0.2, 0.2);
+    TLegend AMCVsCDataLegend(0.35, 0.55, 0.75, 0.75);
+    setLegendOptions(AMCVsCDataLegend, "Normalized to 1");
+    AMCVsCDataLegend.AddEntry(histograms[0].second, "Signal region", "lp");
+    AMCVsCDataLegend.AddEntry(histograms[2].first, "Isolated W muon QCD control region", "lp");
+    AMCVsCDataCanvas.cd();
+    histograms[0].second->Draw("E");
+    histograms[2].first->Draw("ESAME");
+    histograms[0].second->GetXaxis()->SetRange(1, histograms[0].second->GetNbinsX() - 1);
+    histograms[2].first->GetXaxis()->SetRange(1, histograms[2].first->GetNbinsX() - 1);
+    AMCVsCDataLegend.Draw();
+    outputFile.cd();
+    AMCVsCDataCanvas.Write();
+  }
+
+  //close and delete
+  outputFile.Write();
+  outputFile.Close();
+  deleteStreams(files);
 }
