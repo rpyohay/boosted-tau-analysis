@@ -27,6 +27,7 @@ cd $version
 ./submitQCDAllTauAnalyzerJobs.sh
 ./submitQCDBAllTauAnalyzerJobs.sh
 ./submitQCDBMuAllTauAnalyzerJobs.sh
+./submitNonIsoWAllTauAnalyzerJobs.sh
 cd ..
 
 exit 0

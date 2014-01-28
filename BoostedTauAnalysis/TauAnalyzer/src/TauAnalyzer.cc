@@ -236,6 +236,11 @@ private:
   //histogram of mu+had mass
   TH1F* muHadMass_;
 
+  /*histogram of mu+had mass weighted by the stat. error on hadronic tau pT weights (i.e. each 
+    event is filled with a weight of sigma_w, where sigma_w is the stat. error on the hadronic tau 
+    pT weight for that event)*/
+  TH1F* muHadMassReweightErrSq_;
+
   //histogram of mu charge + had charge
   TH1F* muHadCharge_;
 
@@ -513,6 +518,9 @@ private:
   //hadronic tau pT weights
   std::vector<double> tauHadPTWeights_;
 
+  //hadronic tau pT weight errors
+  std::vector<double> tauHadPTWeightErrs_;
+
   //hadronic tau pT bins
   std::vector<double> tauHadPTBins_;
 
@@ -660,8 +668,8 @@ TauAnalyzer::TauAnalyzer(const edm::ParameterSet& iConfig) :
 			       0.000e+00, 0.000e+00, 0.000e+00, 0.000e+00, 0.000e+00, 0.000e+00};
     std::vector<float> S7PUDist(S7PUDistArray, S7PUDistArray + 
 				sizeof(S7PUDistArray)/sizeof(float));
-    //     PUReweight_ = edm::LumiReWeighting(S7PUDist, Data2012PUDist);
-    PUReweight_ = edm::LumiReWeighting(S7PUDist, Data20122p5InvFbPUDist);
+    PUReweight_ = edm::LumiReWeighting(S7PUDist, Data2012PUDist);
+//     PUReweight_ = edm::LumiReWeighting(S7PUDist, Data20122p5InvFbPUDist);
   }
   else if (PUScenario_ == "S10") {
     float S10PUDistArray[60] = {2.560E-06, 5.239E-06, 1.420E-05, 5.005E-05, 1.001E-04, 2.705E-04, 
@@ -676,78 +684,41 @@ TauAnalyzer::TauAnalyzer(const edm::ParameterSet& iConfig) :
 				7.126E-05, 4.948E-05, 3.405E-05, 2.322E-05, 1.570E-05, 5.005E-06};
     std::vector<float> S10PUDist(S10PUDistArray, S10PUDistArray + 
 				 sizeof(S10PUDistArray)/sizeof(float));
-    //     PUReweight_ = edm::LumiReWeighting(S10PUDist, Data2012PUDist);
-    PUReweight_ = edm::LumiReWeighting(S10PUDist, Data20122p5InvFbPUDist);
+    PUReweight_ = edm::LumiReWeighting(S10PUDist, Data2012PUDist);
+//     PUReweight_ = edm::LumiReWeighting(S10PUDist, Data20122p5InvFbPUDist);
   }
 
   //instantiate the vector of weights based on hadronic tau pT bin
-//   tauHadPTWeights_.push_back(0);
-//   tauHadPTWeights_.push_back(0);
-//   tauHadPTWeights_.push_back(1.92104);
-//   tauHadPTWeights_.push_back(1.2739);
-//   tauHadPTWeights_.push_back(0.588595);
-//   tauHadPTWeights_.push_back(0.926218);
-//   tauHadPTWeights_.push_back(0.526632);
-//   tauHadPTWeights_.push_back(0.870165);
-//   tauHadPTWeights_.push_back(0.271711);
-//   tauHadPTWeights_.push_back(0.267905);
-//   tauHadPTWeights_.push_back(0.437444);
-//   tauHadPTWeights_.push_back(0.0413015);
-//   tauHadPTWeights_.push_back(0.13013);
-//   tauHadPTWeights_.push_back(0.425225);
-//   tauHadPTWeights_.push_back(0);
-//   tauHadPTWeights_.push_back(0.1472);
-//   tauHadPTWeights_.push_back(1.8152);
-//   tauHadPTWeights_.push_back(0.418199);
-//   tauHadPTWeights_.push_back(0);
-//   tauHadPTWeights_.push_back(0.321613);
-//   tauHadPTWeights_.push_back(0);
-//   tauHadPTWeights_.push_back(0);
-//   tauHadPTWeights_.push_back(0);
-//   tauHadPTWeights_.push_back(0);
-//   tauHadPTWeights_.push_back(1.92104);
-//   tauHadPTWeights_.push_back(1.2739);
-//   tauHadPTWeights_.push_back(0.588595);
-//   tauHadPTWeights_.push_back(0.926218);
-//   tauHadPTWeights_.push_back(0.526632);
-//   tauHadPTWeights_.push_back(0.870165);
-//   tauHadPTWeights_.push_back(0.271711);
-//   tauHadPTWeights_.push_back(0.267905);
-//   tauHadPTWeights_.push_back(0.437444);
-//   tauHadPTWeights_.push_back(0.0413015);
-//   tauHadPTWeights_.push_back(0.13013);
-//   tauHadPTWeights_.push_back(0.425225);
-//   tauHadPTWeights_.push_back(0.406535);
-//   tauHadPTWeights_.push_back(0);
-//   tauHadPTWeights_.push_back(0);
-//   tauHadPTWeights_.push_back(1.77044);
-//   tauHadPTWeights_.push_back(1.40081);
-//   tauHadPTWeights_.push_back(0.929384);
-//   tauHadPTWeights_.push_back(0.73791);
-//   tauHadPTWeights_.push_back(0.613288);
-//   tauHadPTWeights_.push_back(0.402148);
-//   tauHadPTWeights_.push_back(0.332301);
-//   tauHadPTWeights_.push_back(0.280916);
-//   tauHadPTWeights_.push_back(0.270815);
-//   tauHadPTWeights_.push_back(0.20075);
-//   tauHadPTWeights_.push_back(0.160553);
-//   tauHadPTWeights_.push_back(0);
-//   tauHadPTWeights_.push_back(0.221906);
-  tauHadPTWeights_.push_back(0);
-  tauHadPTWeights_.push_back(0);
-  tauHadPTWeights_.push_back(1.51893);
-  tauHadPTWeights_.push_back(1.25836);
-  tauHadPTWeights_.push_back(0.941484);
-  tauHadPTWeights_.push_back(0.816431);
-  tauHadPTWeights_.push_back(0.647238);
-  tauHadPTWeights_.push_back(0.447136);
-  tauHadPTWeights_.push_back(0.418871);
-  tauHadPTWeights_.push_back(0.322999);
-  tauHadPTWeights_.push_back(0.299415);
-  tauHadPTWeights_.push_back(0.227085);
-  tauHadPTWeights_.push_back(0.202105);
-  tauHadPTWeights_.push_back(0);
-  tauHadPTWeights_.push_back(0.381331);
+  tauHadPTWeights_.push_back(0.0);
+  tauHadPTWeights_.push_back(0.0);
+  tauHadPTWeights_.push_back(1.52423);
+  tauHadPTWeights_.push_back(1.29072);
+  tauHadPTWeights_.push_back(0.927203);
+  tauHadPTWeights_.push_back(0.782077);
+  tauHadPTWeights_.push_back(0.626892);
+  tauHadPTWeights_.push_back(0.458541);
+  tauHadPTWeights_.push_back(0.397239);
+  tauHadPTWeights_.push_back(0.323495);
+  tauHadPTWeights_.push_back(0.34062);
+  tauHadPTWeights_.push_back(0.290588);
+  tauHadPTWeights_.push_back(0.137788);
+  tauHadPTWeights_.push_back(0.313786);
+
+  //instantiate the vector of hadronic tau pT weight errors
+  tauHadPTWeightErrs_.push_back(0.0);
+  tauHadPTWeightErrs_.push_back(0.0);
+  tauHadPTWeightErrs_.push_back(0.11641);
+  tauHadPTWeightErrs_.push_back(0.114134);
+  tauHadPTWeightErrs_.push_back(0.105168);
+  tauHadPTWeightErrs_.push_back(0.112472);
+  tauHadPTWeightErrs_.push_back(0.11584);
+  tauHadPTWeightErrs_.push_back(0.12018);
+  tauHadPTWeightErrs_.push_back(0.100846);
+  tauHadPTWeightErrs_.push_back(0.123222);
+  tauHadPTWeightErrs_.push_back(0.171247);
+  tauHadPTWeightErrs_.push_back(0.206207);
+  tauHadPTWeightErrs_.push_back(0.138026);
+  tauHadPTWeightErrs_.push_back(0.222703);
 
   //fill hadronic tau pT bins
   tauHadPTBins_.push_back(0.0);
@@ -758,24 +729,12 @@ TauAnalyzer::TauAnalyzer(const edm::ParameterSet& iConfig) :
   tauHadPTBins_.push_back(25.0);
   tauHadPTBins_.push_back(30.0);
   tauHadPTBins_.push_back(35.0);
-
   tauHadPTBins_.push_back(40.0);
   tauHadPTBins_.push_back(50.0);
   tauHadPTBins_.push_back(60.0);
   tauHadPTBins_.push_back(70.0);
   tauHadPTBins_.push_back(80.0);
-  tauHadPTBins_.push_back(90.0);
   tauHadPTBins_.push_back(100.0);
-//   tauHadPTBins_.push_back(110.0);
-//   tauHadPTBins_.push_back(120.0);
-
-//   tauHadPTBins_.push_back(140.0);
-//   tauHadPTBins_.push_back(160.0);
-//   tauHadPTBins_.push_back(180.0);
-
-//   tauHadPTBins_.push_back(220.0);
-//   tauHadPTBins_.push_back(260.0);
-
   tauHadPTBins_.push_back(600.0);
 
   //fill mu+had mass bins
@@ -1069,8 +1028,12 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     }
     const int tauHadPTBin = (int)(iBinEdge - tauHadPTBins_.begin());
     double tauHadPTWeight = 1.0;
+    double tauHadPTWeightErr = 0.0;
     if (reweight_) {
-      if (foundBin) tauHadPTWeight = tauHadPTWeights_[tauHadPTBin];
+      if (foundBin) {
+	tauHadPTWeight = tauHadPTWeights_[tauHadPTBin];
+	tauHadPTWeightErr = tauHadPTWeightErrs_[tauHadPTBin];
+      }
     }
 
     //find the highest pT associated muon
@@ -1087,7 +1050,7 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     reco::PFJet correctedTauJet;
     for (reco::PFJetCollection::const_iterator iJet = correctedOldJets.begin(); 
 	 iJet != correctedOldJets.end(); ++iJet) {
-      const unsigned int jetIndex = iJet - pOldJets->begin(); //what's going on here?
+//       const unsigned int jetIndex = iJet - pOldJets->begin(); //what's going on here?
 
       if (/*tauOldJetRef.key() != jetIndex*/deltaR(*iJet, **iTau) >= dR_) {
 	correctedOldJetsExcludingTau.push_back(*iJet);
@@ -1144,16 +1107,7 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 			      removedMuonRefs[removedMuonRefs.size() - 1]->p4()).M();
 
     //impose pT and decay mode cut on tau
-    // put MT cut here too
-    double MT = sqrt(2*(WMuonRefs[WMuonRefs.size() - 1])->pt()*pMET->refAt(0)->et()*
-		     (1.0 - cos(reco::deltaPhi((WMuonRefs[WMuonRefs.size() - 1])->phi(), pMET->refAt(0)->phi()))));
-      double M_WMuTauMu = (WMuonRefs[WMuonRefs.size() - 1]->p4() + 
-			      removedMuonRefs[removedMuonRefs.size() - 1]->p4()).M();
-
     if (((*iTau)->pt() > tauPTMin_) && 
-	((removedMuonRefs[removedMuonRefs.size() - 1]->charge() + (*iTau)->charge()) == 0) && 
-	((removedMuonRefs[removedMuonRefs.size() - 1]->charge()*
-	  WMuonRefs[WMuonRefs.size() - 1]->charge()) > 0) && 
 	((tauDecayMode_ == reco::PFTau::kNull) || ((*iTau)->decayMode() == tauDecayMode_))) {
 
       //plot the number of good vertices
@@ -1175,6 +1129,10 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       const double muHadMass = 
 	(removedMuonRefs[removedMuonRefs.size() - 1]->p4() + (*iTau)->p4()).M();
       muHadMass_->Fill(muHadMass, PUWeight*tauHadPTWeight);
+
+      /*plot the mu + tau invariant mass for the highest pT muon weighted by the statistical error 
+	on the hadronic tau pT weight for this event*/
+      muHadMassReweightErrSq_->Fill(muHadMass, tauHadPTWeightErr);
 
       //plot the mu + tau charge for the highest pT muon
       muHadCharge_->
@@ -1622,7 +1580,7 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       fastjet::PseudoJet thisGroomedJet = pruner(thisMainJet); // jet grooming
       vector<fastjet::PseudoJet> FJparticles2 = thisGroomedJet.constituents();
       //vector<fastjet::PseudoJet> FJparticles2 = thisMainJet.constituents(); // if you don't want to prune
-      NsubParameters paraNsub = NsubParameters(1.0, 0.8);
+//       NsubParameters paraNsub = NsubParameters(1.0, 0.8);
       Nsubjettiness routine1(1, Njettiness::kt_axes, 1.0, 0.8, 10000.0);
       Nsubjettiness routine2(2, Njettiness::kt_axes, 1.0, 0.8, 10000.0);
       Nsubjettiness routine3(3, Njettiness::kt_axes, 1.0, 0.8, 10000.0);
@@ -1630,7 +1588,7 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       double tau1 = routine1.result(thisGroomedJet);
       double tau2 = routine2.result(thisGroomedJet);
       double tau3 = routine3.result(thisGroomedJet);
-      double tau4 = routine4.result(thisGroomedJet);
+//       double tau4 = routine4.result(thisGroomedJet);
       //double tau1 = routine1.result(thisMainJet); // if you don't want to prune
       //double tau2 = routine2.result(thisMainJet); // if you don't want to prune
       //double tau3 = routine3.result(thisMainJet); // if you don't want to prune
@@ -1681,14 +1639,14 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	      for (std::vector<fastjet::PseudoJet>::const_iterator fjconst = FJparticles2.begin(); fjconst != FJparticles2.end(); fjconst++)
 		{ // loop over FJparticles2
 		  double minDelR = 10000.;
-		  unsigned int tauJetCandID = 0;
+// 		  unsigned int tauJetCandID = 0;
 		  for (std::vector<reco::PFCandidatePtr>::const_iterator jetcand = tauJetCands.begin(); jetcand != tauJetCands.end(); jetcand++)
 		    {
 		      double delR = deltaR(fjconst->eta(), fjconst->phi(), (**jetcand).eta(), (**jetcand).phi());
 		      if (delR < minDelR)
 			{
 			  minDelR = delR;
-			  tauJetCandID = (**jetcand).particleId();
+// 			  tauJetCandID = (**jetcand).particleId();
 			}
 		    }
 		  if (minDelR < 0.3)
@@ -2025,8 +1983,9 @@ void TauAnalyzer::beginJob()
   MET_ = new TH1F("MET", ";#slash{E}_{T} (GeV);", 40, 0.0, 200.0);
   hadTauAssociatedMuMultiplicity_ = 
     new TH1F("hadTauAssociatedMuMultiplicity", ";N_{#mu}/#tau;", 2, 0.5, 2.5);
-  //muHadMass_ = new TH1F("muHadMass", ";m_{#mu+had} (GeV);", 20, 0.0, 20.0);
   muHadMass_ = new TH1F("muHadMass", ";m_{#mu+had} (GeV);", muHadMassBins_.size() - 1, &muHadMassBins_[0]);
+  muHadMassReweightErrSq_ = 
+    new TH1F("muHadMassReweightErrSq", ";m_{#mu+had} (GeV);", muHadMassBins_.size() - 1, &muHadMassBins_[0]);
   muHadCharge_ = new TH1F("muHadCharge", ";q_{#mu} + q_{had};", 5, -2.5, 2.5);
   WMuMT_ = new TH1F("WMuMT", ";W muon M_{T} (GeV);", 100, 0.0, 400.0);
   tauMuMT_ = new TH1F("tauMuMT", ";#tau muon M_{T} (GeV);", 50, 0.0, 200.0);
@@ -2261,6 +2220,7 @@ void TauAnalyzer::beginJob()
   MET_->Sumw2();
   hadTauAssociatedMuMultiplicity_->Sumw2();
   muHadMass_->Sumw2();
+  muHadMassReweightErrSq_->Sumw2();
   muHadCharge_->Sumw2();
   WMuMT_->Sumw2();
   tauMuMT_->Sumw2();
@@ -2377,6 +2337,7 @@ void TauAnalyzer::endJob()
   TCanvas hadTauAssociatedMuMultiplicityCanvas("hadTauAssociatedMuMultiplicityCanvas", "", 
 					       600, 600);
   TCanvas muHadMassCanvas("muHadMassCanvas", "", 600, 600);
+  TCanvas muHadMassReweightErrSqCanvas("muHadMassReweightErrSqCanvas", "", 600, 600);
   TCanvas muHadChargeCanvas("muHadChargeCanvas", "", 600, 600);
   TCanvas WMuMTCanvas("WMuMTCanvas", "", 600, 600);
   TCanvas tauMuMTCanvas("tauMuMTCanvas", "", 600, 600);
@@ -2497,6 +2458,7 @@ void TauAnalyzer::endJob()
   Common::draw1DHistograms(METCanvas, MET_);
   Common::draw1DHistograms(hadTauAssociatedMuMultiplicityCanvas, hadTauAssociatedMuMultiplicity_);
   Common::draw1DHistograms(muHadMassCanvas, muHadMass_);
+  Common::draw1DHistograms(muHadMassReweightErrSqCanvas, muHadMassReweightErrSq_);
   Common::draw1DHistograms(muHadChargeCanvas, muHadCharge_);
   Common::draw1DHistograms(WMuMTCanvas, WMuMT_);
   Common::draw1DHistograms(tauMuMTCanvas, tauMuMT_);
@@ -2617,6 +2579,7 @@ void TauAnalyzer::endJob()
   METCanvas.Write();
   hadTauAssociatedMuMultiplicityCanvas.Write();
   muHadMassCanvas.Write();
+  muHadMassReweightErrSqCanvas.Write();
   muHadChargeCanvas.Write();
   WMuMTCanvas.Write();
   tauMuMTCanvas.Write();
@@ -2841,6 +2804,8 @@ void TauAnalyzer::reset(const bool doDelete)
   hadTauAssociatedMuMultiplicity_ = NULL;
   if (doDelete && (muHadMass_ != NULL)) delete muHadMass_;
   muHadMass_ = NULL;
+  if (doDelete && (muHadMassReweightErrSq_ != NULL)) delete muHadMassReweightErrSq_;
+  muHadMassReweightErrSq_ = NULL;
   if (doDelete && (muHadCharge_ != NULL)) delete muHadCharge_;
   muHadCharge_ = NULL;
   if (doDelete && (WMuMT_ != NULL)) delete WMuMT_;

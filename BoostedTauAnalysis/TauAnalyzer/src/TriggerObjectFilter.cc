@@ -179,12 +179,12 @@ TriggerObjectFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
     for (std::vector<edm::InputTag>::const_iterator iMyHLT = hltTags_.begin(); 
 	 iMyHLT != hltTags_.end(); ++iMyHLT) {
       if ((*iMyHLT).label() == *iHLT) {
-	cout << "######## " << *iHLT << endl;
+// 	cout << "######## " << *iHLT << endl;
 	myHLTFilter = (*iMyHLT).label();
 	triggerInMenu[(*iMyHLT).label()] = true;
-	std::cout << "(*iMyHLT).label() = " << (*iMyHLT).label() << std::endl;
-	std::cout << "hltConfig_.prescaleValue(iEvent, iSetup, *iHLT) = ";
-	std::cout << hltConfig_.prescaleValue(iEvent, iSetup, *iHLT) << std::endl;
+// 	std::cout << "(*iMyHLT).label() = " << (*iMyHLT).label() << std::endl;
+// 	std::cout << "hltConfig_.prescaleValue(iEvent, iSetup, *iHLT) = ";
+// 	std::cout << hltConfig_.prescaleValue(iEvent, iSetup, *iHLT) << std::endl;
       }
     }
   } // active paths loop
@@ -196,14 +196,14 @@ TriggerObjectFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
    //choose the right sub-filter depending on the HLT path name
    std::vector<std::string> filters;
    try { filters = hltConfig_.moduleLabels( theRightHLTTag_.label() ); }
-   catch (std::exception ex) { cout << "bad trigger\n"; }
+   catch (std::exception ex) { /*cout << "bad trigger\n";*/ }
    //try { filters = hltConfig_.moduleLabels( myHLTFilter ); }
    //catch (std::exception ex) { cout << "bad trigger 2\n"; }
 
    //loop over moduleLabels of hltConfig
    //loop over sub-filters and see if they match any moduleLabel
-   std::vector<std::string>::const_iterator filter = filters.begin();
-   bool foundMatch = false;
+//    std::vector<std::string>::const_iterator filter = filters.begin();
+//    bool foundMatch = false;
    /*   while ((filter != filters.end()) && !foundMatch) {
      std::vector<edm::InputTag>::const_iterator iHLTSubFilter = HLTSubFilters_.begin();
      while ((iHLTSubFilter != HLTSubFilters_.end()) && !foundMatch) {
@@ -218,18 +218,18 @@ TriggerObjectFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
    //loop over filterTags of the trgEvent
    //store the position of the one that matches the right sub-filter
-   cout << "theRightSubFilter label = " << theRightHLTSubFilter_.label() << endl;
+//    cout << "theRightSubFilter label = " << theRightHLTSubFilter_.label() << endl;
    for(int i=0; i != trgEvent->sizeFilters(); ++i) {
      std::string label(trgEvent->filterTag(i).label());
      //if( label == theRightHLTSubFilter_.label() ) index = i;
      if( label.find(theRightHLTSubFilter_.label()) != std::string::npos )
        {
-	 std::cout << "filterTag label: " << label << std::endl;
-	 cout << "found subfilter!" << endl;
+// 	 std::cout << "filterTag label: " << label << std::endl;
+// 	 cout << "found subfilter!" << endl;
 	 index = i;
        }
    }
-   cout << "index = " << index << endl;
+//    cout << "index = " << index << endl;
    // find how many objects there are
    if (index == 9999)
      index = 0;
@@ -243,8 +243,8 @@ TriggerObjectFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
    //const unsigned int trgIndex = trgNames.triggerIndex(theRightHLTTag_.label());
    const unsigned int trgIndex = trgNames.triggerIndex(myHLTFilter);
    bool firedHLT = (trgIndex < trgNames.size()) && (pTrgResults->accept(trgIndex));
-   cout << "trgIndex = " << trgIndex << " and trgNames size = " << trgNames.size() << endl;
-   cout << "firedHLT = " << firedHLT << endl;
+//    cout << "trgIndex = " << trgIndex << " and trgNames size = " << trgNames.size() << endl;
+//    cout << "firedHLT = " << firedHLT << endl;
 
    // If the event fired the HLT,
    // loop over the trigger object collection 
@@ -257,7 +257,7 @@ TriggerObjectFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	 
 	 const trigger::TriggerObject& TO = TOC[KEYS[ipart]];	
 	 double dRval = deltaR(Wmu_eta, Wmu_phi, TO.eta(), TO.phi());
-	 cout << "dRval = " << dRval << endl;
+// 	 cout << "dRval = " << dRval << endl;
 	 hltTrigger = dRval < delRMatchingCut_;
 	 if( hltTrigger )
 	   {

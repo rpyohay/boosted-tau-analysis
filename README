@@ -45,14 +45,13 @@ mkdir -p /data1/`whoami`/WW/EDM_files
 mkdir -p /data1/`whoami`/WZ/analysis
 mkdir -p /data1/`whoami`/WZ/EDM_files
 mkdir -p /data1/`whoami`/Wh1_Medium/EDM_files
+mkdir -p /data1/`whoami`/gg/EDM_files
 mkdir -p /data1/`whoami`/ZZ/analysis
 mkdir -p /data1/`whoami`/ZZ/EDM_files
 mkdir -p /data1/`whoami`/data/analysis
 mkdir -p /data1/`whoami`/data/EDM_files
 mkdir -p /data1/`whoami`/nonIsoWData/analysis
 mkdir -p /data1/`whoami`/nonIsoWData/EDM_files
-mkdir -p /data1/`whoami`/nonIsoWQCD/analysis
-mkdir -p /data1/`whoami`/nonIsoWQCD/EDM_files
 mkdir -p /data1/`whoami`/results
 
 4. Execute
@@ -82,7 +81,10 @@ cd ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test
 ./generateJobFiles.sh v<version_number>
 ./submitAll.sh v<version_number>
 
-to launch the batch jobs.  The STDOUT files created by the batch jobs will be written to ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/v<version_number>/LSFJOB_XXXXXXXXX/STDOUT, where is XXXXXXXXX is the job number.  These files will tell you whether the jobs finished successfully or not.
+to launch the batch jobs.  The STDOUT files created by the batch jobs will be written to ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/v<version_number>/LSFJOB_XXXXXXXXX/STDOUT, where is XXXXXXXXX is the job number.  These files will tell you whether the jobs finished successfully or not.  If you want to launch the jobs for plotting quantities without the tau isolation cut, execute
+
+cd ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test
+./submitNoHPSIso.sh v<version_number>
 
 3. Once the batch jobs are finished, login to ucdavis.cern.ch and execute
 
@@ -91,6 +93,16 @@ cmsenv
 ./copyAll.sh v<version_number>
 cd v<version_number>
 cmsRun tauanalyzer_Wh1_iso_cfg.py
+cmsRun tauanalyzer_gg_iso_cfg.py
+
+If you want to run the jobs for plotting quantities without the tau isolation cut, execute
+
+cd ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test
+cmsenv
+./copyNoHPSIso.sh v<version_number>
+cd v<version_number>
+cmsRun tauanalyzer_Wh1_all_cfg.py
+cmsRun tauanalyzer_gg_all_cfg.py
 
 4. Make sure that in your rootlogon.C script, you DO NOT have the line
 
@@ -111,62 +123,88 @@ where
 
 "Reweighting" above refers to hadronic tau pT reweighting, which is used on the data control sample for measuring the background in the plot of mu+had invariant mass.  You have to execute step 2 with reweighting turned on to get the reweighted data vs. MC files.
 
+If you want to also make plots where no HPS tau isolation cut is applied, do
+
+root -l -b -q 'formatPlots.C("v<input_version>", "v<output_version>", "v<raw_version>", "v<reweight_version>", true)'
+
+instead of the root command given above.
+
 5. Check the output files:
 
 /data1/<your_username>/QCD/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
 /data1/<your_username>/QCD/analysis/muHadIsoAnalysis_QCD_v<version_number>.root
 /data1/<your_username>/QCD/analysis/muHadNonIsoAnalysis_QCD_v<version_number>.root
+/data1/<your_username>/QCD/analysis/muHadNonIsoReweightAnalysis_QCD_v<version_number>.root
 
 /data1/<your_username>/QCDB/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
 /data1/<your_username>/QCDB/analysis/muHadIsoAnalysis_QCDB_v<version_number>.root
 /data1/<your_username>/QCDB/analysis/muHadNonIsoAnalysis_QCDB_v<version_number>.root
+/data1/<your_username>/QCDB/analysis/muHadNonIsoReweightAnalysis_QCDB_v<version_number>.root
 
 /data1/<your_username>/QCDBMu/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
 /data1/<your_username>/QCDBMu/analysis/muHadIsoAnalysis_QCDBMu_v<version_number>.root
 /data1/<your_username>/QCDBMu/analysis/muHadNonIsoAnalysis_QCDBMu_v<version_number>.root
+/data1/<your_username>/QCDBMu/analysis/muHadNonIsoReweightAnalysis_QCDBMu_v<version_number>.root
 
 /data1/<your_username>/DYJetsToLL/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
 /data1/<your_username>/DYJetsToLL/analysis/muHadIsoAnalysis_DYJetsToLL_v<version_number>.root
 /data1/<your_username>/DYJetsToLL/analysis/muHadNonIsoAnalysis_DYJetsToLL_v<version_number>.root
+/data1/<your_username>/DYJetsToLL/analysis/muHadNonIsoReweightAnalysis_DYJetsToLL_v<version_number>.root
 
 /data1/<your_username>/SingleTop/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
 /data1/<your_username>/SingleTop/analysis/muHadIsoAnalysis_T_v<version_number>.root
 /data1/<your_username>/SingleTop/analysis/muHadNonIsoAnalysis_T_v<version_number>.root
+/data1/<your_username>/SingleTop/analysis/muHadNonIsoReweightAnalysis_T_v<version_number>.root
 
 /data1/<your_username>/TTJets/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
 /data1/<your_username>/TTJets/analysis/muHadIsoAnalysis_TTJets_v<version_number>.root
 /data1/<your_username>/TTJets/analysis/muHadNonIsoAnalysis_TTJets_v<version_number>.root
+/data1/<your_username>/TTJets/analysis/muHadNonIsoReweightAnalysis_TTJets_v<version_number>.root
 
 /data1/<your_username>/WNJetsToLNu/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
 /data1/<your_username>/WNJetsToLNu/analysis/muHadIsoAnalysis_WNJetsToLNu_v<version_number>.root
 /data1/<your_username>/WNJetsToLNu/analysis/muHadNonIsoAnalysis_WNJetsToLNu_v<version_number>.root
+/data1/<your_username>/WNJetsToLNu/analysis/muHadNonIsoReweightAnalysis_WNJetsToLNu_v<version_number>.root
 
 /data1/<your_username>/WJetsToLNu/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
 /data1/<your_username>/WJetsToLNu/analysis/muHadIsoAnalysis_WJetsToLNu_v<version_number>.root
 /data1/<your_username>/WJetsToLNu/analysis/muHadNonIsoAnalysis_WJetsToLNu_v<version_number>.root
+/data1/<your_username>/WJetsToLNu/analysis/muHadNonIsoReweightAnalysis_WJetsToLNu_v<version_number>.root
 
 /data1/<your_username>/WW/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
 /data1/<your_username>/WW/analysis/muHadIsoAnalysis_WW_v<version_number>.root
 /data1/<your_username>/WW/analysis/muHadNonIsoAnalysis_WW_v<version_number>.root
+/data1/<your_username>/WW/analysis/muHadNonIsoReweightAnalysis_WW_v<version_number>.root
 
 /data1/<your_username>/WZ/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
 /data1/<your_username>/WZ/analysis/muHadIsoAnalysis_WZ_v<version_number>.root
 /data1/<your_username>/WZ/analysis/muHadNonIsoAnalysis_WZ_v<version_number>.root
+/data1/<your_username>/WZ/analysis/muHadNonIsoReweightAnalysis_WZ_v<version_number>.root
 
-/data1/<your_username>/Wh1_Medium/analysis/muHadIsoAnalysis_Wh1_v<version_number>.root
+/data1/<your_username>/Wh1_Medium/muHadIsoAnalysis_Wh1_v<version_number>.root
+
+/data1/<your_username>/gg/muHadIsoAnalysis_gg_v<version_number>.root
 
 /data1/<your_username>/ZZ/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
 /data1/<your_username>/ZZ/analysis/muHadIsoAnalysis_ZZ_v<version_number>.root
 /data1/<your_username>/ZZ/analysis/muHadNonIsoAnalysis_ZZ_v<version_number>.root
+/data1/<your_username>/ZZ/analysis/muHadNonIsoReweightAnalysis_ZZ_v<version_number>.root
 
 /data1/<your_username>/data/analysis/muHadNonIsoAnalysis_SingleMu_v<version_number>.root
+/data1/<your_username>/data/analysis/muHadNonIsoReweightAnalysis_SingleMu_v<version_number>.root
+
+/data1/<your_username>/nonIsoWData/analysis/nonIsoW_muHadIsoAnalysis_SingleMu_v<version_number>.root
+/data1/<your_username>/nonIsoWData/analysis/nonIsoW_muHadNonIsoAnalysis_SingleMu_v<version_number>.root
+/data1/<your_username>/nonIsoWData/analysis/nonIsoW_muHadNonIsoReweightAnalysis_SingleMu_v<version_number>.root
 
 /data1/<your_username>/results/dataVsMC_muHadNonIsoAnalysis_2p5fb-1_v<version_number>.root
+/data1/<your_username>/results/dataVsMC_muHadNonIsoReweightAnalysis_2p5fb-1_v<version_number>.root
 /data1/<your_username>/results/sigVsBkg_muHadIsoAnalysis_20fb-1_v<version_number>.root
 /data1/<your_username>/results/sigVsBkg_muHadIsoAnalysis_normalizedTo1_v<version_number>.root
 /data1/<your_username>/results/sigVsBkg_muHadAnalysis_20fb-1_v<version_number>.root
 /data1/<your_username>/results/sigVsBkg_muHadAnalysis_normalizedTo1_v<version_number>.root
 /data1/<your_username>/results/MC_closure_v<reweight_version>.root
+/data1/<your_username>/results/final_v<output_version>.root
 
 
 
@@ -268,7 +306,7 @@ pixelLumiCalc.py overview -i SingleMu_Run2012B-22Jan2013-v1_AOD_skim_v2/res/lumi
 pixelLumiCalc.py overview -i SingleMu_Run2012C-22Jan2013-v1_AOD_skim_v2/res/lumiSummary.json
 pixelLumiCalc.py overview -i SingleMu_Run2012D-22Jan2013-v1_AOD_skim_v2/res/lumiSummary.json
 
-to get the processed recorded luminosity per dataset
+to get the processed recorded luminosity per dataset, changing the "_skim_v2" as necessary to fit what you originally submitted
 
 7. Calculate the total processed recorded luminosity by adding the recorded luminosities for the 4 datasets in step 6
 
@@ -277,6 +315,7 @@ to get the processed recorded luminosity per dataset
 9. Update the locations of the new data skim files in
 
 ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/generateDataTauAnalyzerCfgs.sh
+~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/generateNonIsoWDataTauAnalyzerCfgs.sh
 
 
 
@@ -300,5 +339,6 @@ Skimming SIGNAL MC SAMPLE ONLY
 cd ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test
 cmsenv
 cmsRun tauSelectionSkim_Wh1.py >& tauSelectionSkim_Wh1.txt &
+cmsRun tauSelectionSkim_gg.py >& tauSelectionSkim_gg.txt &
 
-Note that this will overwrite the previous skim.  If you do not want to do this, change the names of the files in lines 1368, 1374, and 1381 of ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test/tauSelectionSkim_Wh1.py to be unique
+Note that this will overwrite the previous skim.  If you do not want to do this, change the names of the files in lines 1368, 1374, and 1381 of ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test/tauSelectionSkim_Wh1.py and ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test/tauSelectionSkim_gg.py to be unique

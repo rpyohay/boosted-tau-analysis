@@ -98,7 +98,7 @@ cd \$jobDir
 eval \`scramv1 runtime -sh\`
 cd -
 cp \$jobDir/\${fileNamePrefix}_iso_cfg.py \$jobDir/\${fileNamePrefix}_nonIso_cfg.py \$jobDir/\${fileNamePrefix}_nonIsoReweight_cfg.py .
-#cmsRun \${fileNamePrefix}_iso_cfg.py #BLINDED!!!
+cmsRun \${fileNamePrefix}_iso_cfg.py #BLINDED!!!
 if [ $reweightOnly -eq 0 ]
     then
     cmsRun \${fileNamePrefix}_nonIso_cfg.py
@@ -106,10 +106,10 @@ if [ $reweightOnly -eq 0 ]
     rm ${nonIsoTauAnalyzerOutputFiles[${index}]}
 fi
 cmsRun \${fileNamePrefix}_nonIsoReweight_cfg.py
-#cmsStage -f ${isoTauAnalyzerOutputFiles[${index}]} /store/user/`whoami`/ #BLINDED!!!
-cmsStage -f ${nonIsoReweightTauAnalyzerOutputFiles[${index}]} /store/user/`whoami`/
-#rm ${isoTauAnalyzerOutputFiles[${index}]} #BLINDED!!!
-rm ${nonIsoReweightTauAnalyzerOutputFiles[${index}]} 
+cmsStage -f ${isoTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/ #BLINDED!!!
+cmsStage -f ${nonIsoReweightTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/
+rm ${isoTauAnalyzerOutputFiles[${i}]} #BLINDED!!!
+rm ${nonIsoReweightTauAnalyzerOutputFiles[${i}]} 
 
 exit 0
 EOF
@@ -126,9 +126,9 @@ cd \$jobDir
 eval \`scramv1 runtime -sh\`
 cd -
 cp \$jobDir/\${fileNamePrefix}_all_cfg.py .
-cmsRun \${fileNamePrefix}_all_cfg.py
-cmsStage -f ${allTauAnalyzerOutputFiles[${index}]} /store/user/`whoami`/
-rm ${allTauAnalyzerOutputFiles[${index}]}
+#cmsRun \${fileNamePrefix}_all_cfg.py #BLINDED!!!
+#cmsStage -f ${allTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/ #BLINDED!!!
+#rm ${allTauAnalyzerOutputFiles[${i}]} #BLINDED!!!
 
 exit 0
 EOF
@@ -140,16 +140,16 @@ done # loop over samples i
 cat <<EOF > runDataTauAnalyzerCfgs.sh
 #!/bin/bash
 
-for file in \`ls -alh *SingleMu*.py | awk '{ print \$9 }'\`
+for file in \`ls -alh *SingleMu*.py | grep -v nonIsoW | awk '{ print \$9 }'\`
   do
   outFile=\`echo \$file | sed -e "s%\.py%.txt%"\`
   isIso=\`echo \$file | sed -e "s%.*\(iso\).*%\1%"\`
-  if [ "\$isIso" != "iso" ] #BLINDED!!!
-      then
+#  if [ "\$isIso" != "iso" ] #BLINDED!!!
+#      then
       cmsRun \$file > \$outFile
-  else
-      echo "Not running script \$file due to blinding requirement"
-  fi
+#  else
+#      echo "Not running script \$file due to blinding requirement"
+#  fi
 done
 
 exit 0
@@ -160,7 +160,7 @@ chmod a+x runDataTauAnalyzerCfgs.sh
 cat <<EOF > submitDataTauAnalyzerJobs.sh
 #!/bin/bash
 
-for file in \`ls -alh tauanalyzer*SingleMu*.sh | grep -v all | awk '{ print \$9 }'\`
+for file in \`ls -alh tauanalyzer*SingleMu*.sh | grep -v all | grep -v nonIsoW | awk '{ print \$9 }'\`
   do
   jobName=\`echo \$file | sed -e "s%\(.*\)\.sh%\1%"\`
   bsub -q 8nh -J \$jobName < \$file
@@ -174,7 +174,7 @@ chmod a+x submitDataTauAnalyzerJobs.sh
 cat <<EOF > submitDataAllTauAnalyzerJobs.sh
 #!/bin/bash
 
-for file in \`ls -alh tauanalyzer*SingleMu*all*.sh | awk '{ print \$9 }'\`
+for file in \`ls -alh tauanalyzer*SingleMu*all*.sh | grep -v nonIsoW | awk '{ print \$9 }'\`
   do
   jobName=\`echo \$file | sed -e "s%\(.*\)\.sh%\1%"\`
   bsub -q 8nh -J \$jobName < \$file

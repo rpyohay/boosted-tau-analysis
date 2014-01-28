@@ -2,6 +2,7 @@
 #include <map>
 #include <iostream>
 #include <sstream>
+#include <algorithm>
 #include "TFile.h"
 #include "TH1F.h"
 #include "TH2F.h"
@@ -10,6 +11,7 @@
 #include "TLegend.h"
 #include "THStack.h"
 #include "TProfile.h"
+#include "Error.C"
 
 //default drawing options
 const Double_t defaultXAxisLabelSize = 0.05;
@@ -568,7 +570,8 @@ void setup(const vector<string>& canvasNames, vector<TCanvas*>& outputCanvases,
 
 template<typename T>
 void scaleAndAdd(const vector<string>& canvasNames, TFile* in, const vector<string>& graphNames, 
-		 const float weight, vector<T*>& hists, const unsigned int fileIndex)
+		 const float weight, vector<T*>& hists, const unsigned int fileIndex, 
+		 const vector<Int_t>& blindLow, const vector<Int_t>& blindHigh)
 {
   for (vector<string>::const_iterator iCanvasName = canvasNames.begin(); 
        iCanvasName != canvasNames.end(); ++iCanvasName) {
@@ -579,6 +582,24 @@ void scaleAndAdd(const vector<string>& canvasNames, TFile* in, const vector<stri
     pHist->Scale(weight);
     if (fileIndex == 0) hists[canvasIndex] = pHist;
     else hists[canvasIndex]->Add(pHist);
+    Int_t iBin = blindLow[canvasIndex];
+    Int_t endBin = blindHigh[canvasIndex];
+    if ((blindLow[canvasIndex] < 0) || (blindHigh[canvasIndex] < -2)) {
+      cerr << "Error: blindLow should be in [0, inf) and blindHigh should be in [-2, inf).\n";
+      cerr << "Blinding entire histogram.\n";
+      cerr << blindLow[canvasIndex] << " " << blindHigh[canvasIndex] << endl;
+      iBin = 0;
+      endBin = hists[canvasIndex]->GetNbinsX() + 1;
+    }
+    else {
+      if (blindHigh[canvasIndex] == -1) endBin = hists[canvasIndex]->GetNbinsX() + 1;
+      if (blindHigh[canvasIndex] == -2) endBin = blindLow[canvasIndex] - 1;
+    }
+    while (iBin <= endBin) {
+      hists[canvasIndex]->SetBinContent(iBin, 0.0);
+      hists[canvasIndex]->SetBinError(iBin, 0.0);
+      ++iBin;
+    }
   }
 }
 
@@ -680,6 +701,9 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
       cerr << *i << endl;
     }
     cerr << weights.size() << endl;
+    cerr << legendHeaders.size() << endl;
+    cerr << canvasNames.size() << endl;
+    cerr << graphNames.size() << endl;
     return;
   }
   TFile outStream(outputFileName.c_str(), "RECREATE");
@@ -738,20 +762,21 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 // 	  pHist->SetFillStyle(0);
 // 	  pHist->SetFillColor(0);
 	  pHist->SetFillStyle(1001);
-	  if ((fileIndex == 0) && !data) pHist->SetFillColor(0);
+	  if (((fileIndex == 0) || (fileIndex == 1)) && !data) pHist->SetFillColor(0);
 	  else pHist->SetFillColor(colors[fileIndex]);
 	  if (fileIndex == 0) {
 	    if (data) legendStyle = "lp";
 	    else legendStyle = "l";
 	  }
+	  else if ((fileIndex == 1) && !data) legendStyle = "l";
 	  else legendStyle = "f";
 	}
 	hists[canvasIndex][fileIndex] = pHist;
 	legends[canvasIndex]->
 	  AddEntry(pHist, legendEntries[fileIndex].c_str(), legendStyle.c_str());
-// 	if (fileIndex == (inputFiles.size() - 1)) stacks[canvasIndex]->Add(pHist, "HIST");
-// 	else stacks[canvasIndex]->Add(pHist, "HISTE");
-	if (fileIndex != 0) stacks[canvasIndex]->Add(pHist, "HIST");
+	if ((data && (fileIndex != 0)) || (!data && (fileIndex != 0) && (fileIndex != 1))) {
+	  stacks[canvasIndex]->Add(pHist, "HIST");
+	}
       }
       outStream.cd();
       outputCanvases[canvasIndex]->cd(dataMC ? 1 : 0);
@@ -783,26 +808,6 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
     }
     else {
       if (setLogY) {
-	Double_t histMin = stacks[canvasIndex]->GetMinimum();
-	Double_t axisMin = 1.0;
-	int exponent = 0;
-	/*if (histMin != 0.0) {
-	  while (histMin < 1.0) {
-	    histMin*=10;
-	    --exponent;
-	  }
-	  while (histMin >= 10.0) {
-	    histMin/=10;
-	    ++exponent;
-	  }
-	}*/
-	if (exponent < 0) {
-	  exponent+=(2*exponent);
-	  for (int i = 0; i < exponent; ++i) { axisMin/=10; }
-	}
-	else for (int i = 0; i < exponent; ++i) { axisMin*=10; }
-// 	stacks[canvasIndex]->SetMinimum(/*axisMin == 0.0 ? */0.1/* : axisMin*/);
-// 	stacks[canvasIndex]->SetMaximum(10000.0);
 	stacks[canvasIndex]->SetMinimum(1.0);
 	stacks[canvasIndex]->SetMaximum(10000000.0);
       }
@@ -814,6 +819,7 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
       string drawOpt("SAME");
       if (!data) drawOpt = "HISTSAME";
       hists[canvasIndex][0]->Draw(drawOpt.c_str());
+      if (!data) hists[canvasIndex][1]->Draw(drawOpt.c_str());
       TH1F* stackSumHist = NULL;
       for (Int_t i = 0; i < stackedHists->GetEntries(); ++i) {
 	TH1F* stackHist = (TH1F*)stackedHists->At(i)->Clone();
@@ -846,15 +852,28 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
   deleteStreams(inputStreams);
 }
 
+//predicates needed for find_if
+bool lessThan0(int i) { return (i < 0); }
+bool lessThanNeg2(int i) { return (i < -2); }
+
 //hadd histograms drawn on canvases
+//blindLow = -1 ==> overflow bin
+//blindHigh = -2 ==> don't blind anything
 void haddCanvases(const string& outputFileName, const vector<string>& inputFiles, 
 		  const vector<float>& weights, const vector<string>& canvasNames1D, 
 		  const vector<string>& graphNames1D, const vector<string>& canvasNames2D, 
-		  const vector<string>& graphNames2D)
+		  const vector<string>& graphNames2D, const vector<Int_t>& blindLow, 
+		  const vector<Int_t>& blindHigh)
 {
   if ((inputFiles.size() != weights.size()) || (canvasNames1D.size() != graphNames1D.size()) || 
+      (graphNames1D.size() != blindLow.size()) || (blindLow.size() != blindHigh.size()) || 
       (canvasNames2D.size() != graphNames2D.size())) {
     cerr << "Error: vector size mismatch.\n";
+    return;
+  }
+  if ((find_if(blindLow.begin(), blindLow.end(), lessThan0) != blindLow.end()) || 
+      (find_if(blindHigh.begin(), blindHigh.end(), lessThanNeg2) != blindHigh.end())) {
+    cerr << "Error: blindLow should be in [0, inf) and blindHigh should be in [-2, inf).\n";
     return;
   }
   TFile outStream(outputFileName.c_str(), "RECREATE");
@@ -865,14 +884,16 @@ void haddCanvases(const string& outputFileName, const vector<string>& inputFiles
   vector<TH2F*> hists2D;
   setup(canvasNames1D, outputCanvases1D, hists1D);
   setup(canvasNames2D, outputCanvases2D, hists2D);
+  vector<Int_t> nullBlindLow(canvasNames2D.size(), 0);
+  vector<Int_t> nullBlindHigh(canvasNames2D.size(), -2);
   for (vector<string>::const_iterator iInputFile = inputFiles.begin(); 
        iInputFile != inputFiles.end(); ++iInputFile) {
     const unsigned int fileIndex = iInputFile - inputFiles.begin();
     inputStreams.push_back(new TFile(iInputFile->c_str()));
     scaleAndAdd(canvasNames1D, inputStreams[inputStreams.size() - 1], graphNames1D, 
-		weights[fileIndex], hists1D, fileIndex);
+		weights[fileIndex], hists1D, fileIndex, blindLow, blindHigh);
     scaleAndAdd(canvasNames2D, inputStreams[inputStreams.size() - 1], graphNames2D, 
-		weights[fileIndex], hists2D, fileIndex);
+		weights[fileIndex], hists2D, fileIndex, nullBlindLow, nullBlindHigh);
   }
   draw(canvasNames1D, outStream, outputCanvases1D, hists1D);
   draw(canvasNames2D, outStream, outputCanvases2D, hists2D);
@@ -1075,7 +1096,7 @@ void drawDifferenceGraphsOn1Canvas(const string& outputFileName,
 		{ // do nothing
 		  if (graphNames[canvasIndex].find("muHadMass") != string::npos)
 		    {
-		      double integral = hists[canvasIndex][fileIndex]->Integral();
+// 		      double integral = hists[canvasIndex][fileIndex]->Integral();
 		      //cout << "Integrated number of events for " << graphNames[canvasIndex];//.c_str;
 		      //cout << " in sample " << inputFiles[fileIndex];//.c_str;
 		      //cout << " = " << integral << endl;
@@ -1086,7 +1107,7 @@ void drawDifferenceGraphsOn1Canvas(const string& outputFileName,
 		{
 		  if (graphNames[canvasIndex].find("muHadMass") != string::npos)
 		    {
-		      double integral = hists[canvasIndex][fileIndex]->Integral();
+// 		      double integral = hists[canvasIndex][fileIndex]->Integral();
 		      //cout << "Integrated number of events for " << graphNames[canvasIndex];//.c_str;
 		      //cout << " in sample " << inputFiles[fileIndex];//.c_str;
 		      //cout << " = " << integral << endl;
@@ -1105,8 +1126,7 @@ void drawDifferenceGraphsOn1Canvas(const string& outputFileName,
     //outputCanvases[canvasIndex]->cd(0);
     histDiff[canvasIndex]->Draw();
     //legends[canvasIndex]->Draw("same");
-  }
-   
+  } 
 
   outStream.cd();
   write(outputCanvases);
@@ -1181,9 +1201,10 @@ void drawQCDRegionAHistograms(const string& outputFileA,
     //cout << "pHistD integral = " << pHistD->Integral() << endl;
     //cout << "pHistD integral > 4 = " << pHistD->Integral(5,100) << endl;
     //cout << "pHistB minimum = " << pHistB->GetMinimum() << endl;
-    pHistB->Multiply(pHistC);
+//     pHistB->Multiply(pHistC);
+    pHistB->Scale(pHistC->Integral(0, -1)/pHistD->Integral(0, -1));
     //cout << "pHistBC integral = " << pHistB->Integral() << endl;
-    pHistB->Divide(pHistD);
+//     pHistB->Divide(pHistD);
     //cout << "pHistBC/D integral > 4 = " << pHistB->Integral(5,100) << endl;
     //cout << "pHistBC/D minimum = " << pHistB->GetMinimum() << endl;
     float weight = 1.0;
@@ -1225,8 +1246,8 @@ void drawQCDRegionAHistograms(const string& outputFileA,
 
 //test data-driven background estimation method with MC on a given variable
 void addClosurePlot(TFile& sigVsBkgIso20InvFbStream, const string& var, const string& unit, 
-		    TFile& bkgNonIsoStream, const float nonIsoScale, 
-		    const int normRegionLowerBin, const int normRegionUpperBin, TFile& outStream)
+                    TFile& bkgNonIsoStream, const float nonIsoScale, 
+                    const int normRegionLowerBin, const int normRegionUpperBin, TFile& outStream)
 {
   //top level declarations
   string canvasName(var + "Canvas");
@@ -1281,7 +1302,6 @@ void addClosurePlot(TFile& sigVsBkgIso20InvFbStream, const string& var, const st
   bkgNonIsoStream.GetObject(canvasName.c_str(), canvasNonIso);
   THStack* stackBkgNonIso = NULL;
   if (canvasNonIso != NULL) {
-//     histBkgNonIso = (TH1F*)canvasNonIso->GetPrimitive(var.c_str());
     canvasNonIso->Draw();
     stackBkgNonIso = (THStack*)canvasNonIso->cd(1)->GetPrimitive(stackName.c_str());
   }
@@ -1315,21 +1335,9 @@ void addClosurePlot(TFile& sigVsBkgIso20InvFbStream, const string& var, const st
   /*normalize non-isolated background MC histogram to isolated background MC in signal-depleted 
     region*/
   histBkgNonIso->Scale(histBkgIso->Integral(normRegionLowerBin, normRegionUpperBin)/
-		       histBkgNonIso->Integral(normRegionLowerBin, normRegionUpperBin));
+                       histBkgNonIso->Integral(normRegionLowerBin, normRegionUpperBin));
   setHistogramOptions(histBkgNonIso, kRed, 0.7, 20, 1.0, unit.c_str(), "");
   histBkgNonIso->GetYaxis()->SetRangeUser(0.1, 10000.0);
-
-  //calculate weights
-  TH1F* histBkgIsoNorm1 = (TH1F*)histBkgIso->Clone();
-  histBkgIsoNorm1->Scale(1.0/histBkgIsoNorm1->Integral(0, -1));
-  TH1F* histBkgNonIsoNorm1 = (TH1F*)histBkgNonIso->Clone();
-  histBkgNonIsoNorm1->Scale(1.0/histBkgNonIsoNorm1->Integral(0, -1));
-  histBkgIsoNorm1->Divide(histBkgNonIsoNorm1);
-  cout << histSig->GetName() << endl;
-  for (Int_t iBin = 1; iBin <= histBkgIsoNorm1->GetNbinsX(); ++iBin) {
-    cout << iBin << " " << histBkgIsoNorm1->GetBinContent(iBin) << endl;
-  }
-  cout << "------------\n";
 
   //write to file
   outStream.cd();
@@ -1381,6 +1389,392 @@ void makeMCClosurePlots(const string& sigVsBkgIso20InvFbFileName, const vector<s
   bkgNonIsoStream.Close();
 }
 
+//structs defining the draw options for each sample
+struct drawOptions {
+  string sampleName;
+  unsigned int sampleNumber;
+  Color_t markerColor;
+  Style_t markerStyle;
+  Color_t lineColor;
+  Color_t fillColor;
+  Style_t fillStyle;
+} Wh1, gg, WW, ZZ, WZ, WNJets, singleTop, tt, DrellYan;
+
+//set the draw options for each sample and store it all in global scope
+void setDrawOptions(drawOptions& sampleDrawOptions, const string& sampleName, 
+		    unsigned int sampleNumber, Color_t markerColor, Style_t markerStyle, 
+		    Color_t lineColor, Color_t fillColor, Style_t fillStyle)
+{
+  sampleDrawOptions.sampleName = sampleName;
+  sampleDrawOptions.sampleNumber = sampleNumber;
+  sampleDrawOptions.markerColor = markerColor;
+  sampleDrawOptions.markerStyle = markerStyle;
+  sampleDrawOptions.lineColor = lineColor;
+  sampleDrawOptions.fillColor = fillColor;
+  sampleDrawOptions.fillStyle = fillStyle;
+}
+
+/*make final plot showing:
+  - Wh1 expected signal
+  - gg expected signal
+  - full background estimate from region B data
+  - background estimate from MC
+  - QCD estimate from region B/C/D data*/
+/*options for displaying MC background:
+  - each sample separately
+  - WW/WZ/ZZ combined into diboson, tt and single top combined into top
+  - all samples combined
+ */
+void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile, 
+		  pair<TFile*, float>& nonIsoDataFile, const string& var, const string& unit, 
+		  const int normRegionLowerBin, const int normRegionUpperBin, 
+		  const string& option, TFile& outStream)
+{
+  //top level declarations
+  string canvasName(var + "Canvas");
+  string stackName(var + "Stack");
+  string canvasReweightErrSqName(var + "ReweightErrSqCanvas");
+  string varReweightErrSq(var + "ReweightErrSq");
+
+  //get plots of signal and background MC and data-driven QCD estimate, isolated tau sample
+  TCanvas* canvasIsoSigBkg = NULL;
+  isoSigBkgFile.first->GetObject(canvasName.c_str(), canvasIsoSigBkg);
+
+  //get the signal histograms
+  vector<TH1F*> isoSig(2, NULL);
+  THStack* isoBkg = NULL;
+  TLegend legendBkgSep(0.35, 0.55, 0.75, 0.75);
+  TLegend legendBkgMain5(0.35, 0.55, 0.75, 0.75);
+  TLegend legendBkgAll(0.35, 0.55, 0.75, 0.75);
+  setLegendOptions(legendBkgSep, "CMS 2.5 fb^{-1}");
+  setLegendOptions(legendBkgMain5, "CMS 2.5 fb^{-1}");
+  setLegendOptions(legendBkgAll, "CMS 2.5 fb^{-1}");
+  if (canvasIsoSigBkg != NULL) {
+    TList* sigs = canvasIsoSigBkg->GetListOfPrimitives();
+    for (vector<TH1F*>::iterator iIsoSig = isoSig.begin(); iIsoSig != isoSig.end(); 
+	 ++iIsoSig) {
+      const unsigned int i = iIsoSig - isoSig.begin();
+      *iIsoSig = (TH1F*)sigs->At(i + 2)->Clone();
+      (*iIsoSig)->GetYaxis()->SetRangeUser(0.01, 10000.0);
+    }
+    legendBkgSep.AddEntry(isoSig[0], "Wh_{1}", "l");
+    legendBkgSep.AddEntry(isoSig[1], "gg fusion", "l");
+    legendBkgMain5.AddEntry(isoSig[0], "Wh_{1}", "l");
+    legendBkgMain5.AddEntry(isoSig[1], "gg fusion", "l");
+    legendBkgAll.AddEntry(isoSig[0], "Wh_{1}", "l");
+    legendBkgAll.AddEntry(isoSig[1], "gg fusion", "l");
+    setHistogramOptions(isoSig[0], kSpring - 1, 0.7, 20, isoSigBkgFile.second, unit.c_str(), "");
+    setHistogramOptions(isoSig[1], kAzure + 1, 0.7, 20, isoSigBkgFile.second, unit.c_str(), "");
+
+    /*get the MC + data-driven QCD background stack histogram and make some new stacks with 
+      different combinations of the backgrounds*/
+    isoBkg = (THStack*)canvasIsoSigBkg->GetPrimitive(stackName.c_str());
+  }
+  else {
+    cerr << "Error opening canvas " << canvasName << " from file ";
+    cerr << isoSigBkgFile.first->GetName() << ".\n";
+    return;
+  }
+  TList* isoBkgHists = NULL;
+  if (isoBkg != NULL) isoBkgHists = isoBkg->GetHists();
+  else {
+    cerr << "Error opening stack " << stackName << " from canvas " << canvasName << " from file ";
+    cerr << isoSigBkgFile.first->GetName() << ".\n";
+    return;
+  }
+  TH1F* isoBkgAllHist = NULL;
+  TH1F* isoBkgDibosonHist = NULL;
+  TH1F* isoBkgWNJetsHist = NULL;
+  TH1F* isoBkgTopHist = NULL;
+  TH1F* isoBkgDrellYanHist = NULL;
+  TH1F* isoBkgQCDHist = NULL;
+  THStack isoBkgSep("isoBkgSep", "");
+  THStack isoBkgAll("isoBkgAll", "");
+  THStack isoBkgMain5("isoBkgMain5", "");
+  if (isoBkgHists != NULL) {
+    for (Int_t i = 0; i < isoBkgHists->GetEntries(); ++i) {
+      TH1F* stackHist = (TH1F*)isoBkgHists->At(i)->Clone();
+      stackHist->Scale(isoSigBkgFile.second);
+      stackHist->GetYaxis()->SetRangeUser(0.01, 10000.0);
+      isoBkgSep.Add(stackHist, "HIST");
+      if (i == 0) {
+	isoBkgAllHist = (TH1F*)isoBkgHists->At(i)->Clone();
+	isoBkgAllHist->Scale(isoSigBkgFile.second);
+	isoBkgDibosonHist = (TH1F*)isoBkgHists->At(i)->Clone();
+	isoBkgDibosonHist->Scale(isoSigBkgFile.second);
+	legendBkgSep.AddEntry(stackHist, "WW (MC)", "f");
+      }
+      else isoBkgAllHist->Add(stackHist);
+      if (i == 1) legendBkgSep.AddEntry(stackHist, "ZZ (MC)", "f");
+      if (i == 2) legendBkgSep.AddEntry(stackHist, "WZ (MC)", "f");
+      if ((i == 1) || (i == 2)) isoBkgDibosonHist->Add(stackHist);
+      if (i == 3) {
+	isoBkgWNJetsHist = (TH1F*)isoBkgHists->At(i)->Clone();
+	isoBkgWNJetsHist->Scale(isoSigBkgFile.second);
+	legendBkgSep.AddEntry(stackHist, "W + #geq1 jet (MC)", "f");
+      }
+      if (i == 4) {
+	isoBkgTopHist = (TH1F*)isoBkgHists->At(i)->Clone();
+	isoBkgTopHist->Scale(isoSigBkgFile.second);
+	legendBkgSep.AddEntry(stackHist, "t/#bar{t} (MC)", "f");
+      }
+      if (i == 5) {
+	isoBkgTopHist->Add(stackHist);
+	legendBkgSep.AddEntry(stackHist, "t#bar{t} + jets (MC)", "f");
+      }
+      if (i == 6) {
+	isoBkgDrellYanHist = (TH1F*)isoBkgHists->At(i)->Clone();
+	isoBkgDrellYanHist->Scale(isoSigBkgFile.second);
+	legendBkgSep.AddEntry(stackHist, "Drell-Yan + jets (MC)", "f");
+      }
+      if (i == 7) {
+	isoBkgQCDHist = (TH1F*)isoBkgHists->At(i)->Clone();
+	isoBkgQCDHist->Scale(isoSigBkgFile.second);
+	legendBkgSep.AddEntry(stackHist, "QCD (data)", "f");
+      }
+    }
+//     setHistogramOptions(isoBkgAllHist, kBlue, 0.7, 21, 1.0, unit.c_str(), "");
+    isoBkgAllHist->GetYaxis()->SetRangeUser(0.01, 10000.0);
+    isoBkgAll.Add(isoBkgAllHist, "HIST");
+    isoBkgMain5.Add(isoBkgDibosonHist, "HIST");
+    isoBkgMain5.Add(isoBkgWNJetsHist, "HIST");
+    isoBkgMain5.Add(isoBkgTopHist, "HIST");
+    isoBkgMain5.Add(isoBkgDrellYanHist, "HIST");
+    isoBkgMain5.Add(isoBkgQCDHist, "HIST");
+    legendBkgAll.AddEntry(isoBkgAllHist, "MC EW + data QCD", "f");
+    legendBkgMain5.AddEntry(isoBkgDibosonHist, "MC diboson", "f");
+    legendBkgMain5.AddEntry(isoBkgWNJetsHist, "MC W + #geq1 jet", "f");
+    legendBkgMain5.AddEntry(isoBkgTopHist, "MC top + jets", "f");
+    legendBkgMain5.AddEntry(isoBkgDrellYanHist, "MC Drell-Yan + jets", "f");
+    legendBkgMain5.AddEntry(isoBkgQCDHist, "Data QCD", "f");
+  }
+  else {
+    cerr << "Error opening histogram list from stack " << stackName << " from canvas ";
+    cerr << canvasName << " from file " << isoSigBkgFile.first->GetName() << ".\n";
+    return;
+  }
+
+  //get the data histogram, non-isolated tau sample
+  TCanvas* canvasNonIsoData = NULL;
+  nonIsoDataFile.first->GetObject(canvasName.c_str(), canvasNonIsoData);
+  TH1F* nonIsoData = NULL;
+  if (canvasNonIsoData != NULL) {
+    canvasNonIsoData->Draw();
+    nonIsoData = (TH1F*)canvasNonIsoData->cd(1)->GetPrimitive(var.c_str())->Clone();
+    setHistogramOptions(nonIsoData, kRed, 0.7, 20, nonIsoDataFile.second, unit.c_str(), "");
+    nonIsoData->GetYaxis()->SetRangeUser(0.01, 10000.0);
+    legendBkgSep.AddEntry(nonIsoData, "Background (from data)", "lp");
+    legendBkgMain5.AddEntry(nonIsoData, "Background (from data)", "lp");
+    legendBkgAll.AddEntry(nonIsoData, "Background (from data)", "lp");
+  }
+  else {
+    cerr << "Error opening canvas " << canvasName << " from file ";
+    cerr << nonIsoDataFile.first->GetName() << ".\n";
+    return;
+  }
+
+  //get the reweighting error histogram, non-isolated tau sample
+  TCanvas* canvasNonIsoDataReweightErrSq = NULL;
+  nonIsoDataFile.first->GetObject(canvasReweightErrSqName.c_str(), canvasNonIsoDataReweightErrSq);
+  TH1F* nonIsoDataReweightErrSq = NULL;
+  if (canvasNonIsoDataReweightErrSq != NULL) {
+    canvasNonIsoDataReweightErrSq->Draw();
+    nonIsoDataReweightErrSq = 
+      (TH1F*)canvasNonIsoDataReweightErrSq->cd(1)->GetPrimitive(varReweightErrSq.c_str())->Clone();
+  }
+  else {
+    cerr << "Error opening canvas " << canvasReweightErrSqName << " from file ";
+    cerr << nonIsoDataFile.first->GetName() << ".\n";
+    return;
+  }
+
+  //get the data histogram, isolated tau sample
+  TCanvas* canvasIsoData = NULL;
+  isoDataFile.GetObject(canvasName.c_str(), canvasIsoData);
+  TH1F* isoData = NULL;
+  if (canvasIsoData != NULL) {
+    isoData = (TH1F*)canvasIsoData->GetPrimitive(var.c_str())->Clone();
+    legendBkgSep.AddEntry(isoData, "Data", "p");
+    legendBkgMain5.AddEntry(isoData, "Data", "p");
+    legendBkgAll.AddEntry(isoData, "Data", "p");
+//     setHistogramOptions(isoData, kBlack, 0.7, 20, 1.0, unit.c_str(), "");
+    isoData->GetYaxis()->SetRangeUser(0.01, 10000.0);
+  }
+  else {
+    cerr << "Error opening canvas " << canvasName << " from file " << isoDataFile.GetName();
+    cerr << ".\n";
+    return;
+  }
+
+  //calculate the normalization factor
+  Double_t norm = isoData->Integral(normRegionLowerBin, normRegionUpperBin)/
+    nonIsoData->Integral(normRegionLowerBin, normRegionUpperBin);
+
+//   //debug
+//   cerr << "Norm bin 1\n";
+//   cerr << "----------\n";
+//   cerr << "NIso = " << isoData->GetBinContent(1) << ", errIso = " << isoData->GetBinError(1);
+//   cerr << "\n";
+//   cerr << "NNonIso = " << nonIsoData->GetBinContent(1) << ", errNonIso = ";
+//   cerr << nonIsoData->GetBinError(1) << "\n";
+//   cerr << "reweight error squared = ";
+//   cerr << nonIsoDataReweightErrSq->GetBinError(1)*nonIsoDataReweightErrSq->GetBinError(1) << endl;
+//   cerr << endl;
+//   cerr << "Norm bin 2\n";
+//   cerr << "----------\n";
+//   cerr << "NIso = " << isoData->GetBinContent(2) << ", errIso = " << isoData->GetBinError(2);
+//   cerr << "\n";
+//   cerr << "NNonIso = " << nonIsoData->GetBinContent(2) << ", errNonIso = ";
+//   cerr << nonIsoData->GetBinError(2) << "\n";
+//   cerr << "reweight error squared = ";
+//   cerr << nonIsoDataReweightErrSq->GetBinError(2)*nonIsoDataReweightErrSq->GetBinError(2) << endl;
+//   cerr << endl;
+//   cerr << "Search bin 1\n";
+//   cerr << "----------\n";
+//   cerr << "NIso = " << isoData->GetBinContent(4) << ", errIso = " << isoData->GetBinError(4);
+//   cerr << "\n";
+//   cerr << "NNonIso = " << nonIsoData->GetBinContent(4) << ", errNonIso = ";
+//   cerr << nonIsoData->GetBinError(4) << "\n";
+//   cerr << "reweight error squared = ";
+//   cerr << nonIsoDataReweightErrSq->GetBinError(4)*nonIsoDataReweightErrSq->GetBinError(4) << endl;
+//   cerr << endl;
+//   cerr << "norm = " << norm << endl << endl;
+
+  /*calculate the statistical error on the background prediction from the non-isolated data, 
+    including the term from the error on the normalization factor*/
+  const TH1* nonIsoDataPtrCast = dynamic_cast<const TH1*>(nonIsoData);
+  const TH1* nonIsoDataReweightErrSqPtrCast = dynamic_cast<const TH1*>(nonIsoDataReweightErrSq);
+  vector<Double_t> nonIsoDataStatErrSq;
+  for (Int_t iBin = 1; iBin <= nonIsoData->GetNbinsX(); ++iBin) {
+//     nonIsoDataStatErrSq.
+//       push_back(bkgErrSqFromNorm(nonIsoDataPtrCast->GetBinContent(iBin), normErrSq) + 
+// 		bkgErrSqFromStats(norm, nonIsoDataPtrCast->GetBinError(iBin)) + 
+// 		bkgErrSqFromReweight(norm, reweightErrSq));
+    nonIsoDataStatErrSq.
+      push_back(bkgErrSq(nonIsoDataPtrCast, nonIsoDataReweightErrSqPtrCast, iBin, norm, 
+			 normErrSq(dynamic_cast<const TH1*>(isoData), nonIsoDataPtrCast, 
+				   nonIsoDataReweightErrSqPtrCast, normRegionLowerBin, 
+				   normRegionUpperBin, norm)));
+    /*normerrsq = 1.150853756e-5 + 7.886904069e-9 + 6.778838651e-7 dominated by the term coming 
+      from stats. in region A data, as expected
+      normerrsq = 1.219430833e-5
+      bkgerrsq = 2.648612772 (norm) + 1.200894736 (stat) + 0.0189198162 (reweight) = 3.868427324
+      rel. error ~doubles due to reweighting and normalization (0.05-->0.09)*/
+  }
+
+//   //debug
+//   cerr << endl << "nonIsoDataStatErrSq[3] = " << nonIsoDataStatErrSq[3] << endl;
+
+  //normalize non-isolated data histogram to isolated data in signal-depleted region
+  nonIsoData->Scale(norm);
+
+//   //debug
+//   cerr << "Search bin 1 NNonIso = " << nonIsoData->GetBinContent(4) << endl;
+
+  //set statistical error in each bin of the non-isolated data histogram
+  for (Int_t iBin = 1; iBin <= nonIsoData->GetNbinsX(); ++iBin) {
+    nonIsoData->SetBinError(iBin, sqrt(nonIsoDataStatErrSq[iBin - 1]));
+  }
+
+//   //debug
+//   cerr << "Search bin 1 errNonIso = " << nonIsoData->GetBinError(4) << endl;
+
+  //write to file
+  outStream.cd();
+  TCanvas outCanvas(canvasName.c_str(), "", 600, 600);
+  setCanvasOptions(outCanvas, 1, 1, 0);
+  setCanvasMargins(outCanvas, 0.2, 0.2, 0.2, 0.2);
+  outCanvas.cd();
+  if (option == "separate") {
+    isoBkgSep.Draw();
+    isoBkgSep.SetMinimum(0.01);
+    isoBkgSep.SetMaximum(10000.0);
+  }
+  else if (option == "main 5") {
+    isoBkgMain5.Draw();
+    Float_t sum = 0.0;
+    for (Int_t iHist = 0; iHist < isoBkgMain5.GetHists()->GetEntries(); ++iHist) {
+      TH1F* hist = (TH1F*)isoBkgMain5.GetHists()->At(iHist);
+      for (Int_t iBin = 5; iBin <= (hist->GetNbinsX() + 1); ++iBin) {
+	sum+=hist->GetBinContent(iBin);
+      }
+    }
+    cerr << "Region A MC + data-driven QCD, m > 4: " << sum << endl;
+    isoBkgMain5.SetMinimum(0.01);
+    isoBkgMain5.SetMaximum(10000.0);
+  }
+  else if (option == "combined") {
+    isoBkgAll.Draw();
+    isoBkgAll.GetHistogram()->GetYaxis()->SetRangeUser(0.01, 10000.0);
+  }
+  nonIsoData->Draw("HISTESAME");
+  cerr << "Region B data, m > 4: " << nonIsoData->Integral(5, -1) << endl;
+  for (vector<TH1F*>::iterator iIsoSig = isoSig.begin(); iIsoSig != isoSig.end(); 
+       ++iIsoSig) {
+    (*iIsoSig)->Draw("HISTSAME");
+    cerr << "Region A signal " << iIsoSig - isoSig.begin() << ", m > 4: ";
+    cerr << (*iIsoSig)->Integral(5, -1) << endl;
+  }
+  isoData->Draw("ESAME");
+  cerr << "Region A data, m < 2: " << isoData->Integral(1, 2) << endl;
+  if (option == "separate") legendBkgSep.Draw();
+  else if (option == "main 5") legendBkgMain5.Draw();
+  else if (option == "combined") legendBkgAll.Draw();
+  outCanvas.Write();
+}
+
+//create a file of properly formatted final plots
+void makeFinalPlot(const pair<string, float>& isoMC, const string& isoDataFileName, 
+		   const pair<string, float>& nonIsoData, const vector<string>& vars, 
+		   const vector<string>& units, const vector<int>& normRegionLowerBins, 
+		   const vector<int>& normRegionUpperBins, const string& outputFileName, 
+		   const string& option// , const vector<Color_t>& colors, 
+// 		   const vector<Style_t>& styles
+		   )
+{
+//   //set the draw options for each sample and store it all in global scope
+//   setDrawOptions(Wh1, "Wh_{1}", 2, kBlack, 20, kBlack, 0, 0);
+//   setDrawOptions(gg, "Wh_{1}", 2, kBlack, 20, kBlack, 0, 0);
+//   setDrawOptions(WW, "Wh_{1}", 2, kBlack, 20, kBlack, 0, 0);
+//   setDrawOptions(ZZ, "Wh_{1}", 2, kBlack, 20, kBlack, 0, 0);
+//   setDrawOptions(WZ, "Wh_{1}", 2, kBlack, 20, kBlack, 0, 0);
+//   setDrawOptions(WNJets, "Wh_{1}", 2, kBlack, 20, kBlack, 0, 0);
+//   setDrawOptions(singleTop, "Wh_{1}", 2, kBlack, 20, kBlack, 0, 0);
+//   setDrawOptions(tt, "Wh_{1}", 2, kBlack, 20, kBlack, 0, 0);
+//   setDrawOptions(DrellYan, "Wh_{1}", 2, kBlack, 20, kBlack, 0, 0);
+
+  //open files
+  pair<TFile*, float> isoSigBkgFile(new TFile(isoMC.first.c_str()), isoMC.second);
+  TFile isoDataFile(isoDataFileName.c_str());
+  pair<TFile*, float> nonIsoDataFile(new TFile(nonIsoData.first.c_str()), nonIsoData.second);
+  TFile outStream(outputFileName.c_str(), "RECREATE");
+  if (isoSigBkgFile.first->IsOpen() && isoDataFile.IsOpen() && nonIsoDataFile.first->IsOpen() && 
+      outStream.IsOpen()) {
+
+    //add plots
+    for (vector<string>::const_iterator iVar = vars.begin(); iVar != vars.end(); ++iVar) {
+      const unsigned int varIndex = iVar - vars.begin();
+      addFinalPlot(isoSigBkgFile, isoDataFile, nonIsoDataFile, *iVar, units[varIndex], 
+		   normRegionLowerBins[varIndex], normRegionUpperBins[varIndex], option, 
+		   outStream);
+    }
+  }
+  else {
+    cerr << "Error opening files " << isoMC.first << " or " << isoDataFileName << " or ";
+    cerr << nonIsoData.first << " or " << outputFileName << ".\n";
+    return;
+  }
+
+  //write to file
+  outStream.Write();
+  outStream.Close();
+  isoSigBkgFile.first->Close();
+  isoDataFile.Close();
+  nonIsoDataFile.first->Close();
+  delete isoSigBkgFile.first;
+  delete nonIsoDataFile.first;
+}
+
 TH2F* twoDimTotalBackgroundHistogram(const vector<string>& files, const string& histName)
 {
   //set canvas name
@@ -1418,6 +1812,58 @@ TH2F* twoDimTotalBackgroundHistogram(const vector<string>& files, const string& 
 
   //return
   return bkgTotHist;
+}
+
+void printWeightsAndErrors(const string& numeratorFile, const string& denominatorFile)
+{
+  TFile numeratorStream(numeratorFile.c_str());
+  TFile denominatorStream(denominatorFile.c_str());
+  TCanvas* numeratorCanvas = NULL;
+  TCanvas* denominatorCanvas = NULL;
+  if (numeratorStream.IsOpen() && denominatorStream.IsOpen()) {
+    numeratorStream.GetObject("tauHadPTCanvas", numeratorCanvas);
+    denominatorStream.GetObject("tauHadPTCanvas", denominatorCanvas);
+    if ((numeratorCanvas != NULL) && (denominatorCanvas != NULL)) {
+      TH1F* numeratorHist = (TH1F*)numeratorCanvas->GetPrimitive("tauHadPT");
+      TH1F* denominatorHist = (TH1F*)denominatorCanvas->GetPrimitive("tauHadPT");
+      const Int_t nBinsNumerator = numeratorHist->GetNbinsX();
+      const Int_t nBinsDenominator = denominatorHist->GetNbinsX();
+      if (nBinsNumerator == nBinsDenominator) {
+	const Double_t nEvtsNumerator = numeratorHist->Integral(0, -1);
+	const Double_t nEvtsDenominator = denominatorHist->Integral(0, -1);
+	if ((nEvtsNumerator != 0.0) && (nEvtsDenominator != 0.0)) {
+	  const Double_t coefficient = nEvtsDenominator/nEvtsNumerator;
+	  for (Int_t iBin = 1; iBin <= nBinsNumerator; ++iBin) {
+	    const Double_t binContentNumerator = numeratorHist->GetBinContent(iBin);
+	    const Double_t binContentDenominator = denominatorHist->GetBinContent(iBin);
+	    if ((binContentNumerator != 0.0) && (binContentDenominator != 0.0)) {
+	      const Double_t weight = coefficient*binContentNumerator/binContentDenominator;
+	      const Double_t error = 
+		weight*sqrt(1.0/binContentNumerator + 1.0/binContentDenominator + 
+			    1.0/nEvtsDenominator + 1.0/nEvtsNumerator);
+	      cout << iBin << " " << weight << " " << error << endl;
+	    }
+	    else cerr << "Error: numerator or denominator bin " << iBin << " has no entries.\n";
+	  }
+	}
+	else cerr << "Error: numerator or denominator histogram has no entries.\n";
+      }
+      else {
+	cerr << "Error: no. of numerator bins " << nBinsNumerator;
+	cerr << " unequal to no. of denominator bins " << nBinsDenominator << ".\n";
+      }
+    }
+    else {
+      cerr << "Error: could not get canvas tauHadPTCanvas from " << numeratorFile << " or ";
+      cerr << denominatorFile << ".\n";
+    }
+  }
+  else {
+    cerr << "Error: could not open files " << numeratorFile << " or " << denominatorFile;
+    cerr << ".\n";
+  }
+  numeratorStream.Close();
+  denominatorStream.Close();
 }
 
 void print2DWeights(const vector<string>& isoFiles, const vector<string>& nonIsoFiles, 
@@ -1465,4 +1911,117 @@ void print2DWeights(const vector<string>& isoFiles, const vector<string>& nonIso
       cout << endl;
     }
   }
+}
+
+//make plots of hadronic tau pT to support reweighting
+void plotTauHadPT(const vector<string>& fileNames, const vector<pair<Color_t, Color_t> >& colors, 
+		  const vector<pair<Style_t, Style_t> >& styles, const string& outputFileName)
+{
+  //setup
+  string thisFunction("const vector<string>& fileNames, ");
+  thisFunction+="const vector<pair<Color_t, Color_t> >& colors, ";
+  thisFunction+="const vector<pair<Style_t, Style_t> >& styles, const string&";
+  const string histogramName("tauHadPT");
+  const string canvasName(histogramName + "Canvas");
+  const string stackName(histogramName + "Stack");
+  const string unit("p_{T} (GeV)");
+  vector<TFile*> files(fileNames.size(), NULL);
+  vector<TCanvas*> canvases(fileNames.size(), NULL);
+  vector<pair<TH1F*, TH1F*> > histograms(fileNames.size(), pair<TH1F*, TH1F*>(NULL, NULL));
+
+  //loop over file names
+  for (vector<string>::const_iterator iFileName = fileNames.begin(); iFileName != fileNames.end(); 
+       ++iFileName) {
+    const unsigned int i = iFileName - fileNames.begin();
+
+    //open files
+    files[i] = new TFile(iFileName->c_str());
+
+    //get canvases
+    if (files[i]->IsOpen()) files[i]->GetObject(canvasName.c_str(), canvases[i]);
+    else cerr << errorCannotOpenFile(thisFunction, *iFileName);
+
+    //get TH1Fs (data for regions B and C, Wh1 for region A)
+    THStack* stack = NULL;
+    if (canvases[i] != NULL) {
+      if (i == 1) {
+	canvases[i]->Draw();
+	histograms[i].first = (TH1F*)canvases[i]->cd(1)->GetPrimitive(histogramName.c_str());
+      }
+      else histograms[i].first = (TH1F*)canvases[i]->GetPrimitive(histogramName.c_str());
+      setHistogramOptions(histograms[i].first, colors[i].first, 0.7, styles[i].first, 
+			  1.0/histograms[i].first->Integral(0, -1), unit.c_str(), "");
+
+      //get stacks (MC for regions A and B, nonexistent for region C)
+      TList* primitives = NULL;
+      if (i == 1) primitives = canvases[i]->cd(1)->GetListOfPrimitives();
+      else primitives = canvases[i]->GetListOfPrimitives();
+      Int_t j = 0;
+      while ((j < primitives->GetEntries()) && (stack == NULL)) {
+	if (string(primitives->At(j)->ClassName()) == "THStack") {
+	  if (i == 1) {
+	    canvases[i]->Draw();
+	    stack = (THStack*)canvases[i]->cd(1)->GetPrimitive(stackName.c_str());
+	  }
+	  else stack = (THStack*)canvases[i]->GetPrimitive(stackName.c_str());
+	}
+	++j;
+      }
+    }
+    else cerr << errorCannotRetrieveObject(thisFunction, *iFileName, canvasName);
+    TList* stackedHistograms = NULL;
+    if (stack != NULL) {
+      stackedHistograms = stack->GetHists();
+      for (Int_t j = 0; j < stackedHistograms->GetEntries(); ++j) {
+	if (j == 0) histograms[i].second = (TH1F*)stackedHistograms->At(j);
+	else histograms[i].second->Add((TH1F*)stackedHistograms->At(j));
+      }
+      setHistogramOptions(histograms[i].second, colors[i].second, 0.7, styles[i].second, 
+			  1.0/histograms[i].second->Integral(0, -1), unit.c_str(), "");
+    }
+  }
+
+  //open output file
+  TFile outputFile(outputFileName.c_str(), "RECREATE");
+  if (outputFile.IsOpen()) {
+
+    //plot region A background MC vs. region B background MC
+    TCanvas AMCVsBMCCanvas("AMCVsBMCCanvas", "", 600, 600);
+    setCanvasOptions(AMCVsBMCCanvas, 1, 0, 0);
+    setCanvasMargins(AMCVsBMCCanvas, 0.2, 0.2, 0.2, 0.2);
+    TLegend AMCVsBMCLegend(0.35, 0.55, 0.75, 0.75);
+    setLegendOptions(AMCVsBMCLegend, "MC (excluding QCD) normalized to 1");
+    AMCVsBMCLegend.AddEntry(histograms[0].second, "Signal region", "lp");
+    AMCVsBMCLegend.AddEntry(histograms[1].second, "Control region", "lp");
+    AMCVsBMCCanvas.cd();
+    histograms[0].second->Draw("E");
+    histograms[1].second->Draw("ESAME");
+    histograms[0].second->GetXaxis()->SetRange(1, histograms[0].second->GetNbinsX() - 1);
+    histograms[1].second->GetXaxis()->SetRange(1, histograms[1].second->GetNbinsX() - 1);
+    AMCVsBMCLegend.Draw();
+    outputFile.cd();
+    AMCVsBMCCanvas.Write();
+
+    //plot region A background MC vs. region C data
+    TCanvas AMCVsCDataCanvas("AMCVsCDataCanvas", "", 600, 600);
+    setCanvasOptions(AMCVsCDataCanvas, 1, 0, 0);
+    setCanvasMargins(AMCVsCDataCanvas, 0.2, 0.2, 0.2, 0.2);
+    TLegend AMCVsCDataLegend(0.35, 0.55, 0.75, 0.75);
+    setLegendOptions(AMCVsCDataLegend, "Normalized to 1");
+    AMCVsCDataLegend.AddEntry(histograms[0].second, "Signal region", "lp");
+    AMCVsCDataLegend.AddEntry(histograms[2].first, "Isolated W muon QCD control region", "lp");
+    AMCVsCDataCanvas.cd();
+    histograms[0].second->Draw("E");
+    histograms[2].first->Draw("ESAME");
+    histograms[0].second->GetXaxis()->SetRange(1, histograms[0].second->GetNbinsX() - 1);
+    histograms[2].first->GetXaxis()->SetRange(1, histograms[2].first->GetNbinsX() - 1);
+    AMCVsCDataLegend.Draw();
+    outputFile.cd();
+    AMCVsCDataCanvas.Write();
+  }
+
+  //close and delete
+  outputFile.Write();
+  outputFile.Close();
+  deleteStreams(files);
 }

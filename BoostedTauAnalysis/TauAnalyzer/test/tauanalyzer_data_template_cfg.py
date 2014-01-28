@@ -335,7 +335,7 @@ process.OSSFFilterNonIso.tauTag = cms.InputTag('muHadNonIsoTauSelector')
 
 #SS filter for tau_mu tau_had charge product
 process.SSSFFilterIso = cms.EDFilter('SSSFFilter',
-                                  WMuonTag = cms.InputTag('WIsoMuonSelector'),
+##                                   WMuonTag = cms.InputTag('WIsoMuonSelector'),
                                   tauTag = cms.InputTag('muHadIsoTauSelector'),
                                   jetMuonMapTag = cms.InputTag('CleanJets', '', 'SKIM')
                                   )
