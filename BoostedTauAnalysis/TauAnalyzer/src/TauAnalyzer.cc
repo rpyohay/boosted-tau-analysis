@@ -658,8 +658,8 @@ TauAnalyzer::TauAnalyzer(const edm::ParameterSet& iConfig) :
 			       0.000e+00, 0.000e+00, 0.000e+00, 0.000e+00, 0.000e+00, 0.000e+00};
     std::vector<float> S7PUDist(S7PUDistArray, S7PUDistArray + 
 				sizeof(S7PUDistArray)/sizeof(float));
-    //     PUReweight_ = edm::LumiReWeighting(S7PUDist, Data2012PUDist);
-    PUReweight_ = edm::LumiReWeighting(S7PUDist, Data20122p5InvFbPUDist);
+    PUReweight_ = edm::LumiReWeighting(S7PUDist, Data2012PUDist);
+//     PUReweight_ = edm::LumiReWeighting(S7PUDist, Data20122p5InvFbPUDist);
   }
   else if (PUScenario_ == "S10") {
     float S10PUDistArray[60] = {2.560E-06, 5.239E-06, 1.420E-05, 5.005E-05, 1.001E-04, 2.705E-04, 
@@ -674,43 +674,41 @@ TauAnalyzer::TauAnalyzer(const edm::ParameterSet& iConfig) :
 				7.126E-05, 4.948E-05, 3.405E-05, 2.322E-05, 1.570E-05, 5.005E-06};
     std::vector<float> S10PUDist(S10PUDistArray, S10PUDistArray + 
 				 sizeof(S10PUDistArray)/sizeof(float));
-    //     PUReweight_ = edm::LumiReWeighting(S10PUDist, Data2012PUDist);
-    PUReweight_ = edm::LumiReWeighting(S10PUDist, Data20122p5InvFbPUDist);
+    PUReweight_ = edm::LumiReWeighting(S10PUDist, Data2012PUDist);
+//     PUReweight_ = edm::LumiReWeighting(S10PUDist, Data20122p5InvFbPUDist);
   }
 
   //instantiate the vector of weights based on hadronic tau pT bin
   tauHadPTWeights_.push_back(0.0);
   tauHadPTWeights_.push_back(0.0);
-  tauHadPTWeights_.push_back(1.51893);
-  tauHadPTWeights_.push_back(1.25836);
-  tauHadPTWeights_.push_back(0.941484);
-  tauHadPTWeights_.push_back(0.816431);
-  tauHadPTWeights_.push_back(0.647238);
-  tauHadPTWeights_.push_back(0.447136);
-  tauHadPTWeights_.push_back(0.418871);
-  tauHadPTWeights_.push_back(0.322999);
-  tauHadPTWeights_.push_back(0.299415);
-  tauHadPTWeights_.push_back(0.227085);
-  tauHadPTWeights_.push_back(0.202105);
-//   tauHadPTWeights_.push_back(0.0);
-  tauHadPTWeights_.push_back(0.381331);
+  tauHadPTWeights_.push_back(1.52423);
+  tauHadPTWeights_.push_back(1.29072);
+  tauHadPTWeights_.push_back(0.927203);
+  tauHadPTWeights_.push_back(0.782077);
+  tauHadPTWeights_.push_back(0.626892);
+  tauHadPTWeights_.push_back(0.458541);
+  tauHadPTWeights_.push_back(0.397239);
+  tauHadPTWeights_.push_back(0.323495);
+  tauHadPTWeights_.push_back(0.34062);
+  tauHadPTWeights_.push_back(0.290588);
+  tauHadPTWeights_.push_back(0.137788);
+  tauHadPTWeights_.push_back(0.313786);
 
   //instantiate the vector of hadronic tau pT weight errors
   tauHadPTWeightErrs_.push_back(0.0);
   tauHadPTWeightErrs_.push_back(0.0);
-  tauHadPTWeightErrs_.push_back(0.122517);
-  tauHadPTWeightErrs_.push_back(0.116761);
-  tauHadPTWeightErrs_.push_back(0.110995);
-  tauHadPTWeightErrs_.push_back(0.121495);
-  tauHadPTWeightErrs_.push_back(0.122936);
-  tauHadPTWeightErrs_.push_back(0.119452);
-  tauHadPTWeightErrs_.push_back(0.108295);
-  tauHadPTWeightErrs_.push_back(0.124753);
-  tauHadPTWeightErrs_.push_back(0.152426);
-  tauHadPTWeightErrs_.push_back(0.162645);
-  tauHadPTWeightErrs_.push_back(0.204292);
-//   tauHadPTWeightErrs_.push_back(0.0);
-  tauHadPTWeightErrs_.push_back(0.275146);
+  tauHadPTWeightErrs_.push_back(0.11641);
+  tauHadPTWeightErrs_.push_back(0.114134);
+  tauHadPTWeightErrs_.push_back(0.105168);
+  tauHadPTWeightErrs_.push_back(0.112472);
+  tauHadPTWeightErrs_.push_back(0.11584);
+  tauHadPTWeightErrs_.push_back(0.12018);
+  tauHadPTWeightErrs_.push_back(0.100846);
+  tauHadPTWeightErrs_.push_back(0.123222);
+  tauHadPTWeightErrs_.push_back(0.171247);
+  tauHadPTWeightErrs_.push_back(0.206207);
+  tauHadPTWeightErrs_.push_back(0.138026);
+  tauHadPTWeightErrs_.push_back(0.222703);
 
   //fill hadronic tau pT bins
   tauHadPTBins_.push_back(0.0);
@@ -726,7 +724,6 @@ TauAnalyzer::TauAnalyzer(const edm::ParameterSet& iConfig) :
   tauHadPTBins_.push_back(60.0);
   tauHadPTBins_.push_back(70.0);
   tauHadPTBins_.push_back(80.0);
-//   tauHadPTBins_.push_back(90.0);
   tauHadPTBins_.push_back(100.0);
   tauHadPTBins_.push_back(600.0);
 }
@@ -1088,9 +1085,6 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
     //impose pT and decay mode cut on tau
     if (((*iTau)->pt() > tauPTMin_) && 
-	((removedMuonRefs[removedMuonRefs.size() - 1]->charge() + (*iTau)->charge()) == 0) && 
-	((removedMuonRefs[removedMuonRefs.size() - 1]->charge()*
-	  WMuonRefs[WMuonRefs.size() - 1]->charge()) > 0) && 
 	((tauDecayMode_ == reco::PFTau::kNull) || ((*iTau)->decayMode() == tauDecayMode_))) {
 
       //plot the number of good vertices

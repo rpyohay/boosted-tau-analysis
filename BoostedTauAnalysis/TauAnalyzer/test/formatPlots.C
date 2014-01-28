@@ -33,7 +33,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   canvasNames1D.push_back("METCanvas");
   canvasNames1D.push_back("WMuMTCanvas");
   canvasNames1D.push_back("tauMuMTCanvas");
-  //canvasNames1D.push_back("tauHadMTCanvas");
+//   canvasNames1D.push_back("tauHadMTCanvas");
   canvasNames1D.push_back("dPhiWMuMETCanvas");
   canvasNames1D.push_back("dPhiTauMuMETCanvas");
   canvasNames1D.push_back("tauMuTauHadJetHTCanvas");
@@ -136,7 +136,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   graphNames1D.push_back("MET");
   graphNames1D.push_back("WMuMT");
   graphNames1D.push_back("tauMuMT");
-  //graphNames1D.push_back("tauHadMT");
+//   graphNames1D.push_back("tauHadMT");
   graphNames1D.push_back("dPhiWMuMET");
   graphNames1D.push_back("dPhiTauMuMET");
   graphNames1D.push_back("tauMuTauHadJetHT");
@@ -321,6 +321,8 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   legendEntriesSigBkg.push_back("ZZ");
   legendEntriesSigBkg.push_back("WW");
   std::reverse(legendEntriesSigBkg.begin() + 2, legendEntriesSigBkg.end());
+  vector<string> legendEntriesSigBkgQCDFromData(legendEntriesSigBkg);
+  legendEntriesSigBkgQCDFromData.push_back("QCD (from data)");
   vector<string> legendEntriesMCData(legendEntriesSigBkg);
   legendEntriesMCData[0] = "Data 2.5 fb^{-1}";
   legendEntriesMCData.erase(legendEntriesMCData.begin() + 1);
@@ -354,30 +356,24 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   weightsSigBkg.push_back(1.0); //ZZ already weighted to 20 fb^-1
   weightsSigBkg.push_back(1.0); //WW already weighted to 20 fb^-1
   std::reverse(weightsSigBkg.begin() + 2, weightsSigBkg.end());
+  vector<float> weightsSigBkgQCDFromData(weightsSigBkg);
+//   weightsSigBkgQCDFromData.push_back(20.0/2.5); /*QCD estimate from data weighted to 2.5 fb^-1 ==> 
+// 						  multiply by 20/2.5 to get an overall weight for 
+// 						  20 fb^-1*/
+  weightsSigBkgQCDFromData.push_back(1.0); //QCD estimate from data already weighted to 20 fb^-1
   vector<float> weightsMCData;
-  weightsMCData.push_back(1.0); //data (int. lumi. = 2.5 fb^-1)
-//   weightsMCData.push_back(2.5/20.0); /*QCDRelXSecWeights already weighted to 20 fb^-1 ==>
-// 				       multiply by 2.5/20 to get overall weight for 2.5 fb^-1*/
-//   weightsMCData.push_back(2.5/20.0); /*QCDBRelXSecWeights already weighted to 20 fb^-1 ==>
-// 				       multiply by 2.5/20 to get overall weight for 2.5 fb^-1*/
-//   weightsMCData.push_back(2.5/20.0); /*QCDBMuRelXSecWeights already weighted to 20 fb^-1 ==>
-// 				       multiply by 2.5/20 to get overall weight for 2.5 fb^-1*/
-  weightsMCData.push_back(2.5/20.0); /*DYJetsToLLRelXSecWeights already weighted to 20 fb^-1 ==> 
-				       multiply by 2.5/20 to get overall weight for 2.5 fb^-1*/
-  weightsMCData.push_back(2.5/20.0); /*tt + jets already weighted to 20 fb^-1 ==> 
-				       multiply by 2.5/20 to get overall weight for 2.5 fb^-1*/
-  weightsMCData.push_back(2.5/20.0); /*single top already weighted to 20 fb^-1 ==> 
-				       multiply by 2.5/20 to get overall weight for 2.5 fb^-1*/
-  weightsMCData.push_back(2.5/20.0); /*W + >=1 jet already weighted to 20 fb^-1 ==> 
-				       multiply by 2.5/20 to get overall weight for 2.5 fb^-1*/
-//   weightsMCData.push_back(2.5/20.0); /*W + jets already weighted to 20 fb^-1 ==> 
-// 				       multiply by 2.5/20 to get overall weight for 2.5 fb^-1*/
-  weightsMCData.push_back(2.5/20.0); /*WZ already weighted to 20 fb^-1 ==> 
-				       multiply by 2.5/20 to get overall weight for 2.5 fb^-1*/
-  weightsMCData.push_back(2.5/20.0); /*ZZ already weighted to 20 fb^-1 ==> 
-				       multiply by 2.5/20 to get overall weight for 2.5 fb^-1*/
-  weightsMCData.push_back(2.5/20.0); /*WW already weighted to 20 fb^-1 ==> 
-				       multiply by 2.5/20 to get overall weight for 2.5 fb^-1*/
+  weightsMCData.push_back(1.0); //data (int. lumi. = 20 fb^-1)
+//   weightsMCData.push_back(1.0); //QCDRelXSecWeights already weighted to 20 fb^-1
+//   weightsMCData.push_back(1.0); //QCDBRelXSecWeights already weighted to 20 fb^-1
+//   weightsMCData.push_back(1.0); //QCDBMuRelXSecWeights already weighted to 20 fb^-1
+  weightsMCData.push_back(1.0); //DYJetsToLLRelXSecWeights already weighted to 20 fb^-1
+  weightsMCData.push_back(1.0); //tt + jets already weighted to 20 fb^-1
+  weightsMCData.push_back(1.0); //single top already weighted to 20 fb^-1
+  weightsMCData.push_back(1.0); //W + >=1 jet already weighted to 20 fb^-1
+//   weightsMCData.push_back(1.0); //W + jets already weighted to 20 fb^-1
+  weightsMCData.push_back(1.0); //WZ already weighted to 20 fb^-1
+  weightsMCData.push_back(1.0); //ZZ already weighted to 20 fb^-1
+  weightsMCData.push_back(1.0); //WW already weighted to 20 fb^-1
   std::reverse(weightsMCData.begin() + 1, weightsMCData.end());
   vector<float> QCDRelXSecWeights;  //weighted to 20 fb^-1 using PREP cross sections
   QCDRelXSecWeights.push_back(4396.184992); // Pt 20-30
@@ -1142,7 +1138,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 					  sigBkg);
   }
 
-  //compare data to MC in control region
+  //compare data to MC in control region and compute data - MC for data-driven QCD shape
   string dataVsMCOutputFile2p5InvFb(analysisFilePath + "results/dataVsMC_muHadNonIsoAnalysis" + 
 				    tag2p5InvFb + outputVTag + fileExt);
   string dataVsMCOutputDiff2p5InvFb(analysisFilePath + "results/dataVsMC_muHadNonIsoDifference" + 
@@ -1192,6 +1188,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 				legendEntriesMCData, weightsMCData, setLogY, sigBkg);
 
 
+  //compute data-driven QCD estimate in signal (i.e. isolated W muon + isolated tau) region
   string outputFileNameA(analysisFilePath + "results/dataVsMC_RegionAQCDEstimate" + dataVTag + 
 			 fileExt);
   string inputFileNameB(dataVsMCOutputDiff2p5InvFb);
@@ -1201,6 +1198,26 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 			   inputFileNameD,canvasNames1D, graphNames1D,
 			   legendHeaders2p5InvFb,colors, styles, legendEntriesMCData,
 			   weightsMCData, setLogY, sigBkg);
+
+  //compare MC signal + data-driven QCD to background
+  string sigVsBkgQCDFromDataOutputFile20InvFb(analysisFilePath + 
+					      "results/sigVsBkgQCDFromData_muHadIsoAnalysis" + 
+					      tag20InvFb + outputVTag + fileExt);
+  string sigVsBkgQCDFromDataOutputFile1(analysisFilePath + 
+					"results/sigVsBkgQCDFromData_muHadIsoAnalysis" + tag1 + 
+					outputVTag + fileExt);
+  vector<string> sigVsBkgQCDFromDataInputFiles(sigVsBkgInputFiles);
+  sigVsBkgQCDFromDataInputFiles.push_back(outputFileNameA);
+  drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgQCDFromDataOutputFile20InvFb, 
+					sigVsBkgQCDFromDataInputFiles, canvasNames1D, 
+					graphNames1D, legendHeaders20InvFb, colors, styles, 
+					legendEntriesSigBkgQCDFromData, weightsSigBkgQCDFromData, 
+					setLogY, drawStack, sigBkg);
+  drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgQCDFromDataOutputFile1, 
+					sigVsBkgQCDFromDataInputFiles, canvasNames1D, 
+					graphNames1D, legendHeaders1, colors, styles, 
+					legendEntriesSigBkgQCDFromData, weights1, setLinY, 
+					drawSame, sigBkg);
   
   //compare QCD search sample to control sample
   string QCDSearchVsControlOutputFile(analysisFilePath + "QCD/analysis/isoVsNonIsoTaus" + tag1 + 
@@ -1334,7 +1351,8 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 					drawSame, sigBkg);
 
   //make the final plot showing all background methods, signals, data, and errors
-  makeFinalPlot(pair<string, float>(sigVsBkgOutputFile20InvFb, 2.5/20.0), dataIsoHaddOutputFile, 
+  makeFinalPlot(pair<string, float>(sigVsBkgQCDFromDataOutputFile20InvFb, 2.5/20.0), 
+		dataIsoHaddOutputFile, 
 		pair<string, float>(dataVsMCReweightOutputFile2p5InvFb, 1.0), 
 		vector<string>(1, "muHadMass"), vector<string>(1, "m_{#mu+had} (GeV)"), 
 		vector<int>(1, 1), vector<int>(1, 2), 
@@ -1350,9 +1368,9 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   vector<string> units;
   units.push_back("m_{#mu+had} (GeV)");
   units.push_back("p_{T} (GeV)");
-  vector<int> normRegionLowerBins;
-  normRegionLowerBins.push_back(1);
-  normRegionLowerBins.push_back(1);
+//   vector<int> normRegionLowerBins;
+//   normRegionLowerBins.push_back(1);
+//   normRegionLowerBins.push_back(1);
   vector<int> normRegionUpperBins;
   normRegionUpperBins.push_back(2);
   normRegionUpperBins.push_back(3);
@@ -1362,4 +1380,20 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 		     reweightVersion + fileExt, 20.0/2.5, normRegionLowerBins, 
 		     normRegionUpperBins, analysisFilePath + "results/MC_closure_" + 
 		     reweightVersion + fileExt);
+
+  //make plots of hadronic tau pT to support reweighting
+  vector<string> fileNames;
+  fileNames.push_back(sigVsBkgOutputFile20InvFb); //region A
+  fileNames.push_back(dataVsMCOutputFile2p5InvFb); //region B
+  fileNames.push_back(nonIsoWDataIsoHaddOutputFile); //region C
+  vector<pair<Color_t, Color_t> > colorPairs;
+  colorPairs.push_back(pair<Color_t, Color_t>(kBlack, kBlack));
+  colorPairs.push_back(pair<Color_t, Color_t>(kRed, kBlue));
+  colorPairs.push_back(pair<Color_t, Color_t>(kMagenta, kBlack));
+  vector<pair<Style_t, Style_t> > stylePairs;
+  stylePairs.push_back(pair<Style_t, Style_t>(20, 20));
+  stylePairs.push_back(pair<Style_t, Style_t>(21, 22));
+  stylePairs.push_back(pair<Style_t, Style_t>(23, 20));
+  plotTauHadPT(fileNames, colorPairs, stylePairs, 
+	       analysisFilePath + "results/tauHadPT" + outputVTag + fileExt);
 }
