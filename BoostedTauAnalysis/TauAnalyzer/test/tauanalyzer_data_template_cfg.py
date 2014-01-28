@@ -265,6 +265,7 @@ process.muHadIsoTauAnalyzer = cms.EDAnalyzer(
     tauTag = cms.InputTag('muHadIsoTauSelector'),
     METTag = cms.InputTag('pfMet'),
     muonTag = cms.InputTag('WIsoMuonSelector'),
+    muonPFIsoPUSubtractionCoeff = cms.double(0.5),
     genMatchedMuonTag = cms.InputTag('WIsoMuonSelector'),
     oldJetTag = cms.InputTag('ak5PFJets'),
     newJetTag = cms.InputTag('CleanJets', 'ak5PFJetsNoMu', 'SKIM'),

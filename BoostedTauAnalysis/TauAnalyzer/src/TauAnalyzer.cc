@@ -176,6 +176,9 @@ private:
   //muon gen particle tag
   edm::InputTag muonGenParticleTag_;
 
+  //PU subtraction coefficient for muon PF isolation
+  double muonPFIsoPUSubtractionCoeff_;
+
   //PU info tag
   edm::InputTag PUTag_;
 
@@ -462,6 +465,9 @@ private:
   //histogram of pT(mu+had)/(mu+had mass) vs. hadronic tau isolation
   TH2F* muHadPTOverMuHadMassVsTauHadIso_;
 
+  //histogram of W muon isolation vs. hadronic tau isolation
+  TH2F* WMuIsoVsTauHadIso_;
+
   //histogram of soft muon pT vs. hadronic tau pT
   TH2F* softMuPTVsTauHadPT_;
 
@@ -518,6 +524,9 @@ private:
   //hadronic tau pT bins
   std::vector<double> tauHadPTBins_;
 
+  //mu+had mass bins
+  std::vector<double> muHadMassBins_;
+
   /*second jet pT for |eta| < 2.4, second jet is highest pT jet in the event excluding W muon and 
     mu+had*/
   TH1F *jet_pt_etacut;
@@ -570,6 +579,7 @@ TauAnalyzer::TauAnalyzer(const edm::ParameterSet& iConfig) :
   tauHadIsoTag_(iConfig.getParameter<edm::InputTag>("tauHadIsoTag")),
   allMuonTag_(iConfig.getParameter<edm::InputTag>("allMuonTag")),
   muonGenParticleTag_(iConfig.getParameter<edm::InputTag>("muonGenParticleTag")),
+  muonPFIsoPUSubtractionCoeff_(iConfig.getParameter<double>("muonPFIsoPUSubtractionCoeff")),
   PUTag_(iConfig.getParameter<edm::InputTag>("PUTag")),
   vtxTag_(iConfig.getParameter<edm::InputTag>("vtxTag")),
   allGenParticleTag_(iConfig.getParameter<edm::InputTag>("allGenParticleTag")),
@@ -726,6 +736,19 @@ TauAnalyzer::TauAnalyzer(const edm::ParameterSet& iConfig) :
   tauHadPTBins_.push_back(80.0);
   tauHadPTBins_.push_back(100.0);
   tauHadPTBins_.push_back(600.0);
+
+  //fill mu+had mass bins
+  muHadMassBins_.push_back(0.0);
+  muHadMassBins_.push_back(1.0);
+  muHadMassBins_.push_back(2.0);
+  muHadMassBins_.push_back(3.0);
+  muHadMassBins_.push_back(4.0);
+  muHadMassBins_.push_back(5.0);
+  muHadMassBins_.push_back(6.0);
+  muHadMassBins_.push_back(8.0);
+  muHadMassBins_.push_back(10.0);
+  muHadMassBins_.push_back(20.0);
+
 }
 
 TauAnalyzer::~TauAnalyzer()
@@ -1262,6 +1285,11 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
       //plot hadronic tau deltaBeta-corrected isolation energy
       tauHadIso_->Fill((*pTauHadIso)[*iTau], PUWeight);
+
+      //plot W mu PF isolation vs hadronic tau isolation energy
+      double WMuIso = Common::getMuonCombPFIso(*(WMuonRefs[WMuonRefs.size() - 1]), muonPFIsoPUSubtractionCoeff_);
+      double WMuRelIso = WMuIso/WMuonRefs[WMuonRefs.size() - 1]->pt();
+      WMuIsoVsTauHadIso_->Fill((*pTauHadIso)[*iTau], WMuRelIso, PUWeight);
 
       //find nearest muon to soft muon
       int nearestMuIndex = -1;
@@ -1955,9 +1983,9 @@ void TauAnalyzer::beginJob()
   MET_ = new TH1F("MET", ";#slash{E}_{T} (GeV);", 40, 0.0, 200.0);
   hadTauAssociatedMuMultiplicity_ = 
     new TH1F("hadTauAssociatedMuMultiplicity", ";N_{#mu}/#tau;", 2, 0.5, 2.5);
-  muHadMass_ = new TH1F("muHadMass", ";m_{#mu+had} (GeV);", 20, 0.0, 20.0);
+  muHadMass_ = new TH1F("muHadMass", ";m_{#mu+had} (GeV);", muHadMassBins_.size() - 1, &muHadMassBins_[0]);
   muHadMassReweightErrSq_ = 
-    new TH1F("muHadMassReweightErrSq", ";m_{#mu+had} (GeV);", 20, 0.0, 20.0);
+    new TH1F("muHadMassReweightErrSq", ";m_{#mu+had} (GeV);", muHadMassBins_.size() - 1, &muHadMassBins_[0]);
   muHadCharge_ = new TH1F("muHadCharge", ";q_{#mu} + q_{had};", 5, -2.5, 2.5);
   WMuMT_ = new TH1F("WMuMT", ";W muon M_{T} (GeV);", 100, 0.0, 400.0);
   tauMuMT_ = new TH1F("tauMuMT", ";#tau muon M_{T} (GeV);", 50, 0.0, 200.0);
@@ -2062,6 +2090,10 @@ void TauAnalyzer::beginJob()
     new TH2F("muHadPTOverMuHadMassVsTauHadIso", 
 	     ";Isolation energy (GeV);#frac{p_{T}^{#mu+had}}{m_{#mu+had}}", 
 	     20, 0.0, 20.0, 80, 0.0, 80.0);
+  WMuIsoVsTauHadIso_ = 
+    new TH2F("WMuIsoVsTauHadIso", 
+	     ";#tau_{h} Isolation energy (GeV);W_{#mu} PFRelIsolation", 
+	     20, 0.0, 20.0, 400, 0.0, 40.0);
   softMuPTVsTauHadPT_ = 
     new TH2F("softMuPTVsTauHadPT", ";p_{T}^{#tau} (GeV);p_{T}^{#mu} (GeV)", 
 	     20, 0.0, 100.0, 20, 0.0, 100.0);
@@ -2248,6 +2280,7 @@ void TauAnalyzer::beginJob()
   softMuPTOverMuHadMassVsTauHadIso_->Sumw2();
   avgTauHadSoftMuPTOverMuHadMassVsTauHadIso_->Sumw2();
   muHadPTOverMuHadMassVsTauHadIso_->Sumw2();
+  WMuIsoVsTauHadIso_->Sumw2();
   softMuPTVsTauHadPT_->Sumw2();
   muHad_t3t1Vsptmj_->Sumw2();
   muHad_t3t1VsDecayMode_->Sumw2();
@@ -2374,6 +2407,7 @@ void TauAnalyzer::endJob()
     avgTauHadSoftMuPTOverMuHadMassVsTauHadIsoCanvas("avgTauHadSoftMuPTOverMuHadMassVsTauHadIsoCanvas", "", 600, 600);
   TCanvas 
     muHadPTOverMuHadMassVsTauHadIsoCanvas("muHadPTOverMuHadMassVsTauHadIsoCanvas", "", 600, 600);
+  TCanvas WMuIsoVsTauHadIsoCanvas("WMuIsoVsTauHadIsoCanvas", "", 600, 600);
   TCanvas softMuPTVsTauHadPTCanvas("softMuPTVsTauHadPTCanvas", "", 600, 600);
   TCanvas muHad_t3t1Canvas("muHad_t3t1Canvas", "", 600, 600);
   TCanvas muHad_t2t1Canvas("muHad_t2t1Canvas", "", 600, 600);
@@ -2521,6 +2555,7 @@ void TauAnalyzer::endJob()
 			   avgTauHadSoftMuPTOverMuHadMassVsTauHadIso_);
   Common::draw2DHistograms(muHadPTOverMuHadMassVsTauHadIsoCanvas, 
 			   muHadPTOverMuHadMassVsTauHadIso_);
+  Common::draw2DHistograms(WMuIsoVsTauHadIsoCanvas, WMuIsoVsTauHadIso_);
   Common::draw2DHistograms(softMuPTVsTauHadPTCanvas, softMuPTVsTauHadPT_);
   Common::draw2DHistograms(muHadPTOverMuHadMassVsMWMuSoftMuCanvas, 
 			   muHadPTOverMuHadMassVsMWMuSoftMu_);
@@ -2604,6 +2639,7 @@ void TauAnalyzer::endJob()
   softMuPTOverMuHadMassVsTauHadIsoCanvas.Write();
   avgTauHadSoftMuPTOverMuHadMassVsTauHadIsoCanvas.Write();
   muHadPTOverMuHadMassVsTauHadIsoCanvas.Write();
+  WMuIsoVsTauHadIsoCanvas.Write();
   softMuPTVsTauHadPTCanvas.Write();
   muHad_t3t1Canvas.Write();
   muHad_t2t1Canvas.Write();

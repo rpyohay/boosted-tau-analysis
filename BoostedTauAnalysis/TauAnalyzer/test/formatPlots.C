@@ -33,7 +33,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   canvasNames1D.push_back("METCanvas");
   canvasNames1D.push_back("WMuMTCanvas");
   canvasNames1D.push_back("tauMuMTCanvas");
-//   canvasNames1D.push_back("tauHadMTCanvas");
+  canvasNames1D.push_back("tauHadMTCanvas");
   canvasNames1D.push_back("dPhiWMuMETCanvas");
   canvasNames1D.push_back("dPhiTauMuMETCanvas");
   canvasNames1D.push_back("tauMuTauHadJetHTCanvas");
@@ -114,6 +114,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   canvasNames2D.push_back("softMuPTOverMuHadMassVsTauHadIsoCanvas");
   canvasNames2D.push_back("avgTauHadSoftMuPTOverMuHadMassVsTauHadIsoCanvas");
   canvasNames2D.push_back("muHadPTOverMuHadMassVsTauHadIsoCanvas");
+  canvasNames2D.push_back("WMuIsoVsTauHadIsoCanvas");
   canvasNames2D.push_back("softMuPTVsTauHadPTCanvas");
   canvasNames2D.push_back("muHadPTOverMuHadMassVsMWMuSoftMuCanvas");
   canvasNames2D.push_back("softMuPFPTVsRECOPTCanvas");
@@ -136,7 +137,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   graphNames1D.push_back("MET");
   graphNames1D.push_back("WMuMT");
   graphNames1D.push_back("tauMuMT");
-//   graphNames1D.push_back("tauHadMT");
+  graphNames1D.push_back("tauHadMT");
   graphNames1D.push_back("dPhiWMuMET");
   graphNames1D.push_back("dPhiTauMuMET");
   graphNames1D.push_back("tauMuTauHadJetHT");
@@ -217,6 +218,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   graphNames2D.push_back("softMuPTOverMuHadMassVsTauHadIso");
   graphNames2D.push_back("avgTauHadSoftMuPTOverMuHadMassVsTauHadIso");
   graphNames2D.push_back("muHadPTOverMuHadMassVsTauHadIso");
+  graphNames2D.push_back("WMuIsoVsTauHadIso");
   graphNames2D.push_back("softMuPTVsTauHadPT");
   graphNames2D.push_back("muHadPTOverMuHadMassVsMWMuSoftMu");
   graphNames2D.push_back("softMuPFPTVsRECOPT");
@@ -458,33 +460,44 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   runEras.push_back("_Run2012B");
   runEras.push_back("_Run2012C");
   runEras.push_back("_Run2012D");
+  vector<string> subJobs;
+  subJobs.push_back("_0");
+  subJobs.push_back("_1");
+  subJobs.push_back("_2");
+  subJobs.push_back("_3");
+  subJobs.push_back("_4");
+  subJobs.push_back("_5");
+  subJobs.push_back("_6");
+  subJobs.push_back("_7");
+
   for (vector<string>::const_iterator iRunEra = runEras.begin(); iRunEra != runEras.end(); 
        ++iRunEra) {
-    stringstream dataIsoName;
-    dataIsoName << dataIsoPrefix << *iRunEra << dataSuffix; //BLINDED!!!
-    dataIsoHaddInputFiles.push_back(dataIsoName.str());
-    stringstream dataNonIsoName;
-    dataNonIsoName << dataNonIsoPrefix << *iRunEra << dataSuffix;
-    dataNonIsoHaddInputFiles.push_back(dataNonIsoName.str());
-    stringstream dataNonIsoReweightName;
-    dataNonIsoReweightName << dataNonIsoReweightPrefix << *iRunEra << dataSuffix;
-    dataNonIsoReweightHaddInputFiles.push_back(dataNonIsoReweightName.str());
-    stringstream dataAllName; //BLINDED!!!
-    dataAllName << dataAllPrefix << *iRunEra << dataSuffix;
-    dataAllHaddInputFiles.push_back(dataAllName.str());
+    for (vector<string>::const_iterator iSubJob = subJobs.begin(); iSubJob != subJobs.end(); ++iSubJob) {
+      stringstream dataIsoName;
+      dataIsoName << dataIsoPrefix << *iRunEra << *iSubJob << dataSuffix; //BLINDED!!!
+      dataIsoHaddInputFiles.push_back(dataIsoName.str());
+      stringstream dataNonIsoName;
+      dataNonIsoName << dataNonIsoPrefix << *iRunEra << *iSubJob << dataSuffix;
+      dataNonIsoHaddInputFiles.push_back(dataNonIsoName.str());
+      cout << dataNonIsoName.str() << endl;
+      stringstream dataNonIsoReweightName;
+      dataNonIsoReweightName << dataNonIsoReweightPrefix << *iRunEra << *iSubJob << dataSuffix;
+      dataNonIsoReweightHaddInputFiles.push_back(dataNonIsoReweightName.str());
+      cout << dataNonIsoReweightName.str() << endl;
+    }
   }
-  haddCanvases(dataIsoHaddOutputFile, dataIsoHaddInputFiles, vector<float>(4, 1.0), 
+  haddCanvases(dataIsoHaddOutputFile, dataIsoHaddInputFiles, vector<float>(32, 1.0), 
 	       canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, dataBlindLow, 
 	       dataBlindHigh); //BLINDED!!!
-  haddCanvases(dataNonIsoHaddOutputFile, dataNonIsoHaddInputFiles, vector<float>(4, 1.0), 
+  haddCanvases(dataNonIsoHaddOutputFile, dataNonIsoHaddInputFiles, vector<float>(32, 1.0), 
 	       canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
 	       nullBlindHigh);
   haddCanvases(dataNonIsoReweightHaddOutputFile, dataNonIsoReweightHaddInputFiles, 
-	       vector<float>(4, 1.0), canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, 
+	       vector<float>(32, 1.0), canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, 
 	       nullBlindLow, nullBlindHigh);
   if (doNoHPSIsoCut) {
     haddCanvases(dataAllHaddOutputFile, dataAllHaddInputFiles, 
-		 vector<float>(4, 1.0), canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, 
+		 vector<float>(32, 1.0), canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, 
 		 dataBlindLow, dataBlindHigh); //BLINDED!!!
   }
 
@@ -1368,9 +1381,9 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   vector<string> units;
   units.push_back("m_{#mu+had} (GeV)");
   units.push_back("p_{T} (GeV)");
-//   vector<int> normRegionLowerBins;
-//   normRegionLowerBins.push_back(1);
-//   normRegionLowerBins.push_back(1);
+  vector<int> normRegionLowerBins;
+  normRegionLowerBins.push_back(1);
+  normRegionLowerBins.push_back(1);
   vector<int> normRegionUpperBins;
   normRegionUpperBins.push_back(2);
   normRegionUpperBins.push_back(3);
