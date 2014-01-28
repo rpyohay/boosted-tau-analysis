@@ -109,7 +109,8 @@ CustomTauSelector::CustomTauSelector(const edm::ParameterSet& iConfig) :
   muonRemovalDecisionTag_(iConfig.existsAs<edm::InputTag>("muonRemovalDecisionTag") ? 
 			  iConfig.getParameter<edm::InputTag>("muonRemovalDecisionTag") : 
 			  edm::InputTag()),
-  muonTag_(iConfig.getParameter<edm::InputTag>("muonTag")),
+  muonTag_(iConfig.existsAs<edm::InputTag>("muonTag") ? 
+	  iConfig.getParameter<edm::InputTag>("muonTag") : edm::InputTag()),
   tauDiscriminatorTags_(iConfig.getParameter<std::vector<edm::InputTag> >("tauDiscriminatorTags")),
   passDiscriminator_(iConfig.getParameter<bool>("passDiscriminator")),
   pTMin_(iConfig.getParameter<double>("pTMin")),
@@ -121,6 +122,11 @@ CustomTauSelector::CustomTauSelector(const edm::ParameterSet& iConfig) :
       (!(jetTag_ == edm::InputTag()) && (muonRemovalDecisionTag_ == edm::InputTag()))) {
     std::cerr << "Warning: only one of jetTag or muonRemovalDecisionTag was supplied.  No ";
     std::cerr << "decision on tau seed jet will be made.\n";
+  }
+  if ((muonTag_ == edm::InputTag()) && !(jetTag_ == edm::InputTag()) && 
+      !(muonRemovalDecisionTag_ == edm::InputTag())) {
+    std::cerr << "Warning: both jetTag and muonRemovalDecisionTag were supplied, but not muonTag.";
+    std::cerr << "  Overlap with W muons will not be checked.\n";
   }
   produces<reco::PFTauRefVector>();
 }
@@ -174,12 +180,15 @@ bool CustomTauSelector::filter(edm::Event& iEvent, const edm::EventSetup& iSetup
 
   //get W muons
   edm::Handle<reco::MuonRefVector> pMuons;
-  iEvent.getByLabel(muonTag_, pMuons);
+  if (muonTag_ == edm::InputTag()) {}
+  else iEvent.getByLabel(muonTag_, pMuons);
 
   //fill STL container of pointers to W muons
   std::vector<reco::Muon*> muonPtrs;
-  for (reco::MuonRefVector::const_iterator iMuon = pMuons->begin(); iMuon != pMuons->end(); 
-       ++iMuon) { muonPtrs.push_back(const_cast<reco::Muon*>(iMuon->get())); }
+  if (pMuons.isValid()) {
+    for (reco::MuonRefVector::const_iterator iMuon = pMuons->begin(); iMuon != pMuons->end(); 
+	 ++iMuon) { muonPtrs.push_back(const_cast<reco::Muon*>(iMuon->get())); }
+  }
 
 //   //debug
 //   std::cerr << "Jets " << pJets.isValid() << std::endl;
@@ -203,8 +212,9 @@ bool CustomTauSelector::filter(edm::Event& iEvent, const edm::EventSetup& iSetup
     const reco::Muon* nearestMuon = 
       Common::nearestObject(*iTau, muonPtrs, nearestMuonIndex);
 
-    //if tau doesn't overlap with W muon...
-    if ((nearestMuon != NULL) && (reco::deltaR(**iTau, *nearestMuon) > dR_)) {
+    //if tau doesn't overlap with W muon (or no overlap checking requested)...
+    if (!(pMuons.isValid()) || 
+	((nearestMuon != NULL) && (reco::deltaR(**iTau, *nearestMuon) > dR_))) {
 
       /*...if jet collection and muon removal decision map exist, fill output collection if tau is 
 	matched to jet tagged for muon removal*/
