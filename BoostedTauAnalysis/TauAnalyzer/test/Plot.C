@@ -865,7 +865,7 @@ void haddCanvases(const string& outputFileName, const vector<string>& inputFiles
 		  const vector<string>& graphNames2D, const vector<Int_t>& blindLow, 
 		  const vector<Int_t>& blindHigh)
 {
-  if ((inputFiles.size() != weights.size()) || (canvasNames1D.size() != graphNames1D.size()) || 
+  if ((inputFiles.size() > weights.size()) || (canvasNames1D.size() != graphNames1D.size()) || 
       (graphNames1D.size() != blindLow.size()) || (blindLow.size() != blindHigh.size()) || 
       (canvasNames2D.size() != graphNames2D.size())) {
     cerr << "Error: vector size mismatch.\n";
@@ -1463,6 +1463,8 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
     legendBkgMain5.AddEntry(isoSig[1], "gg fusion", "l");
     legendBkgAll.AddEntry(isoSig[0], "Wh_{1}", "l");
     legendBkgAll.AddEntry(isoSig[1], "gg fusion", "l");
+    isoSig[0]->SetName((var + "Wh1Search").c_str());
+    isoSig[1]->SetName((var + "ggSearch").c_str());
     setHistogramOptions(isoSig[0], kSpring - 1, 0.7, 20, isoSigBkgFile.second, unit.c_str(), "");
     setHistogramOptions(isoSig[1], kAzure + 1, 0.7, 20, isoSigBkgFile.second, unit.c_str(), "");
 
@@ -1561,6 +1563,7 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
   if (canvasNonIsoData != NULL) {
     canvasNonIsoData->Draw();
     nonIsoData = (TH1F*)canvasNonIsoData->cd(1)->GetPrimitive(var.c_str())->Clone();
+    nonIsoData->SetName((var + "DataControl").c_str());
     setHistogramOptions(nonIsoData, kRed, 0.7, 20, nonIsoDataFile.second, unit.c_str(), "");
     nonIsoData->GetYaxis()->SetRangeUser(0.01, 10000.0);
     legendBkgSep.AddEntry(nonIsoData, "Background (from data)", "lp");
@@ -1594,6 +1597,7 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
   TH1F* isoData = NULL;
   if (canvasIsoData != NULL) {
     isoData = (TH1F*)canvasIsoData->GetPrimitive(var.c_str())->Clone();
+    isoData->SetName((var + "DataSearch").c_str());
     legendBkgSep.AddEntry(isoData, "Data", "p");
     legendBkgMain5.AddEntry(isoData, "Data", "p");
     legendBkgAll.AddEntry(isoData, "Data", "p");
