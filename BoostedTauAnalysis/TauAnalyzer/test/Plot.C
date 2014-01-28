@@ -1097,17 +1097,16 @@ void drawDifferenceGraphsOn1Canvas(const string& outputFileName,
 	} // if there is a histogram for this filename and canvas
     } // loop over input files
   }
-  if (dataMC)
-    {
-      for (vector<string>::const_iterator iCanvasName = canvasNames.begin(); 
-	   iCanvasName != canvasNames.end(); ++iCanvasName) {
-	const unsigned int canvasIndex = iCanvasName - canvasNames.begin();
-	outputCanvases[canvasIndex]->cd(dataMC ? 1 : 0);
-	//outputCanvases[canvasIndex]->cd(0);
-	histDiff[canvasIndex]->Draw();
-	//legends[canvasIndex]->Draw("same");
-      }
-    }
+    
+  for (vector<string>::const_iterator iCanvasName = canvasNames.begin(); 
+       iCanvasName != canvasNames.end(); ++iCanvasName) {
+    const unsigned int canvasIndex = iCanvasName - canvasNames.begin();
+    outputCanvases[canvasIndex]->cd(dataMC ? 1 : 0);
+    //outputCanvases[canvasIndex]->cd(0);
+    histDiff[canvasIndex]->Draw();
+    //legends[canvasIndex]->Draw("same");
+  }
+   
 
   outStream.cd();
   write(outputCanvases);
