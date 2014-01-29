@@ -106,10 +106,10 @@ if [ $reweightOnly -eq 0 ]
     rm ${nonIsoTauAnalyzerOutputFiles[${index}]}
 fi
 cmsRun \${fileNamePrefix}_nonIsoReweight_cfg.py
-cmsStage -f ${isoTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/ #BLINDED!!!
-cmsStage -f ${nonIsoReweightTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/
-rm ${isoTauAnalyzerOutputFiles[${i}]} #BLINDED!!!
-rm ${nonIsoReweightTauAnalyzerOutputFiles[${i}]} 
+cmsStage -f ${isoTauAnalyzerOutputFiles[${index}]} /store/user/`whoami`/ #BLINDED!!!
+cmsStage -f ${nonIsoReweightTauAnalyzerOutputFiles[${index}]} /store/user/`whoami`/
+rm ${isoTauAnalyzerOutputFiles[${index}]} #BLINDED!!!
+rm ${nonIsoReweightTauAnalyzerOutputFiles[${index}]}
 
 exit 0
 EOF
@@ -127,8 +127,8 @@ eval \`scramv1 runtime -sh\`
 cd -
 cp \$jobDir/\${fileNamePrefix}_all_cfg.py .
 #cmsRun \${fileNamePrefix}_all_cfg.py #BLINDED!!!
-#cmsStage -f ${allTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/ #BLINDED!!!
-#rm ${allTauAnalyzerOutputFiles[${i}]} #BLINDED!!!
+#cmsStage -f ${allTauAnalyzerOutputFiles[${index}]} /store/user/`whoami`/ #BLINDED!!!
+#rm ${allTauAnalyzerOutputFiles[${index}]} #BLINDED!!!
 
 exit 0
 EOF
@@ -194,8 +194,8 @@ for sample in "A" "B" "C" "D"
     #loop over number of subjobs
     for jInd in \`seq ${jBeg} ${jEnd}\`
       do
-      #  for cut in Iso NonIso NonIsoReweight #BLINDED!!!
-      for cut in NonIso NonIsoReweight
+       for cut in Iso NonIso NonIsoReweight #BLINDED!!!
+      #for cut in NonIso NonIsoReweight
         do
           if [ "\$cut" != "NonIso" ] || [ $reweightOnly -eq 0 ]
           then
