@@ -746,7 +746,7 @@ TauAnalyzer::TauAnalyzer(const edm::ParameterSet& iConfig) :
   muHadMassBins_.push_back(5.0);
   muHadMassBins_.push_back(6.0);
   muHadMassBins_.push_back(8.0);
-  muHadMassBins_.push_back(10.0);
+//   muHadMassBins_.push_back(10.0);
   muHadMassBins_.push_back(20.0);
 
 }
