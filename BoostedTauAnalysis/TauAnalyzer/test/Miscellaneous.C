@@ -3,6 +3,8 @@
 #include "TCanvas.h"
 #include "TH1F.h"
 
+/*compare the mu+had mass bin contents one to one for two versions of the analysis and print 
+  discrepant bins*/
 void compareVersions(const vector<vector<string> >& versions)
 {
   const string histogramName("muHadMass");
@@ -48,4 +50,16 @@ void compareVersions(const vector<vector<string> >& versions)
       }
     }
   }
+}
+
+//generate a new string from the given one with a given phrase replaced with another given phrase
+string smartReplace(const string& oldString, const string& phraseToReplace, 
+		    const string& replacementPhrase)
+{
+  string newString(oldString);
+  const size_t replacePos = oldString.find(phraseToReplace);
+  if (replacePos != string::npos) {
+    newString.replace(replacePos, phraseToReplace.length(), replacementPhrase);
+  }
+  return newString;
 }
