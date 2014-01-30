@@ -18,6 +18,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   string macroPath(CMSSWPathCPPString + "/src/BoostedTauAnalysis/TauAnalyzer/test/");
   gROOT->ProcessLine("#include <utility>");
   gSystem->Load((macroPath + "STLDictionary.so").c_str());
+  gROOT->LoadMacro((macroPath + "Miscellaneous.C++").c_str());
   gROOT->LoadMacro((macroPath + "Error.C++").c_str());
   gROOT->LoadMacro((macroPath + "Plot.C++").c_str());
 
@@ -1230,12 +1231,20 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   //compare QCD search sample to control sample
   string QCDSearchVsControlOutputFile(analysisFilePath + "QCD/analysis/isoVsNonIsoTaus" + tag1 + 
 				      outputVTag + fileExt);
-  string QCDSearchVsControlReweightOutputFile(QCDSearchVsControlOutputFile);
+  string QCDSearchVsControlReweightOutputFile = 
+    smartReplace(QCDSearchVsControlOutputFile, "NonIso", "NonIsoReweight");
   vector<string> QCDSearchVsControlInputFiles;
   QCDSearchVsControlInputFiles.push_back(QCDIsoHaddOutputFile);
   QCDSearchVsControlInputFiles.push_back(QCDNonIsoHaddOutputFile);
+  vector<string> QCDSearchVsControlReweightInputFiles(QCDSearchVsControlInputFiles);
+  QCDSearchVsControlReweightInputFiles[1] = QCDNonIsoReweightHaddOutputFile;
   drawMultipleEfficiencyGraphsOn1Canvas(QCDSearchVsControlOutputFile, 
 					QCDSearchVsControlInputFiles, canvasNames1D, 
+					graphNames1D, legendHeaders1QCD, colors, styles, 
+					legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
+					sigBkg);
+  drawMultipleEfficiencyGraphsOn1Canvas(QCDSearchVsControlReweightOutputFile, 
+					QCDSearchVsControlReweightInputFiles, canvasNames1D, 
 					graphNames1D, legendHeaders1QCD, colors, styles, 
 					legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
 					sigBkg);
@@ -1243,11 +1252,20 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   //compare QCDB search sample to control sample
   string QCDBSearchVsControlOutputFile(analysisFilePath + "QCDB/analysis/isoVsNonIsoTaus" + tag1 + 
 				       outputVTag + fileExt);
+  string QCDBSearchVsControlReweightOutputFile = 
+    smartReplace(QCDBSearchVsControlOutputFile, "NonIso", "NonIsoReweight");
   vector<string> QCDBSearchVsControlInputFiles;
   QCDBSearchVsControlInputFiles.push_back(QCDBIsoHaddOutputFile);
   QCDBSearchVsControlInputFiles.push_back(QCDBNonIsoHaddOutputFile);
+  vector<string> QCDBSearchVsControlReweightInputFiles(QCDBSearchVsControlInputFiles);
+  QCDBSearchVsControlReweightInputFiles[1] = QCDBNonIsoReweightHaddOutputFile;
   drawMultipleEfficiencyGraphsOn1Canvas(QCDBSearchVsControlOutputFile, 
 					QCDBSearchVsControlInputFiles, canvasNames1D, 
+					graphNames1D, legendHeaders1QCDB, colors, styles, 
+					legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
+					sigBkg);
+  drawMultipleEfficiencyGraphsOn1Canvas(QCDBSearchVsControlReweightOutputFile, 
+					QCDBSearchVsControlReweightInputFiles, canvasNames1D, 
 					graphNames1D, legendHeaders1QCDB, colors, styles, 
 					legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
 					sigBkg);
@@ -1255,11 +1273,20 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   //compare QCDBMu search sample to control sample
   string QCDBMuSearchVsControlOutputFile(analysisFilePath + "QCDBMu/analysis/isoVsNonIsoTaus" + 
 					 tag1 + outputVTag + fileExt);
+  string QCDBMuSearchVsControlReweightOutputFile = 
+    smartReplace(QCDBMuSearchVsControlOutputFile, "NonIso", "NonIsoReweight");
   vector<string> QCDBMuSearchVsControlInputFiles;
   QCDBMuSearchVsControlInputFiles.push_back(QCDBMuIsoHaddOutputFile);
   QCDBMuSearchVsControlInputFiles.push_back(QCDBMuNonIsoHaddOutputFile);
+  vector<string> QCDBMuSearchVsControlReweightInputFiles(QCDBMuSearchVsControlInputFiles);
+  QCDBMuSearchVsControlReweightInputFiles[1] = QCDBMuNonIsoReweightHaddOutputFile;
   drawMultipleEfficiencyGraphsOn1Canvas(QCDBMuSearchVsControlOutputFile, 
 					QCDBMuSearchVsControlInputFiles, canvasNames1D, 
+					graphNames1D, legendHeaders1QCDBMu, colors, styles, 
+					legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
+					sigBkg);
+  drawMultipleEfficiencyGraphsOn1Canvas(QCDBMuSearchVsControlReweightOutputFile, 
+					QCDBMuSearchVsControlReweightInputFiles, canvasNames1D, 
 					graphNames1D, legendHeaders1QCDBMu, colors, styles, 
 					legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
 					sigBkg);
@@ -1268,23 +1295,41 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   string DYJetsToLLSearchVsControlOutputFile(analysisFilePath + 
 					     "DYJetsToLL/analysis/isoVsNonIsoTaus" + tag1 + 
 					     outputVTag + fileExt);
+  string DYJetsToLLSearchVsControlReweightOutputFile = 
+    smartReplace(DYJetsToLLSearchVsControlOutputFile, "NonIso", "NonIsoReweight");
   vector<string> DYJetsToLLSearchVsControlInputFiles;
   DYJetsToLLSearchVsControlInputFiles.push_back(DYJetsToLLIsoHaddOutputFile);
   DYJetsToLLSearchVsControlInputFiles.push_back(DYJetsToLLNonIsoHaddOutputFile);
+  vector<string> DYJetsToLLSearchVsControlReweightInputFiles(DYJetsToLLSearchVsControlInputFiles);
+  DYJetsToLLSearchVsControlReweightInputFiles[1] = DYJetsToLLNonIsoReweightHaddOutputFile;
   drawMultipleEfficiencyGraphsOn1Canvas(DYJetsToLLSearchVsControlOutputFile, 
 					DYJetsToLLSearchVsControlInputFiles, canvasNames1D, 
 					graphNames1D, legendHeaders1DYJetsToLL, colors, styles, 
 					legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
 					sigBkg);
+  drawMultipleEfficiencyGraphsOn1Canvas(DYJetsToLLSearchVsControlReweightOutputFile, 
+					DYJetsToLLSearchVsControlReweightInputFiles, 
+					canvasNames1D, graphNames1D, legendHeaders1DYJetsToLL, 
+					colors, styles, legendEntriesSearchVsControl, weights1, 
+					setLinY, drawSame, sigBkg);
 
   //compare tt+jets search sample to control sample
   string TTJetsSearchVsControlOutputFile(analysisFilePath + "TTJets/analysis/isoVsNonIsoTaus" + 
 					 tag1 + outputVTag + fileExt);
+  string TTJetsSearchVsControlReweightOutputFile = 
+    smartReplace(TTJetsSearchVsControlOutputFile, "NonIso", "NonIsoReweight");
   vector<string> TTJetsSearchVsControlInputFiles;
   TTJetsSearchVsControlInputFiles.push_back(TTJetsIsoHaddOutputFile);
   TTJetsSearchVsControlInputFiles.push_back(TTJetsNonIsoHaddOutputFile);
+  vector<string> TTJetsSearchVsControlReweightInputFiles(TTJetsSearchVsControlInputFiles);
+  TTJetsSearchVsControlReweightInputFiles[1] = TTJetsNonIsoReweightHaddOutputFile;
   drawMultipleEfficiencyGraphsOn1Canvas(TTJetsSearchVsControlOutputFile, 
 					TTJetsSearchVsControlInputFiles, canvasNames1D, 
+					graphNames1D, legendHeaders1TTJets, colors, styles, 
+					legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
+					sigBkg);
+  drawMultipleEfficiencyGraphsOn1Canvas(TTJetsSearchVsControlReweightOutputFile, 
+					TTJetsSearchVsControlReweightInputFiles, canvasNames1D, 
 					graphNames1D, legendHeaders1TTJets, colors, styles, 
 					legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
 					sigBkg);
@@ -1292,72 +1337,127 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   //compare single top search sample to control sample
   string TSearchVsControlOutputFile(analysisFilePath + "SingleTop/analysis/isoVsNonIsoTaus" + 
 				    tag1 + outputVTag + fileExt);
+  string TSearchVsControlReweightOutputFile = 
+    smartReplace(TSearchVsControlOutputFile, "NonIso", "NonIsoReweight");
   vector<string> TSearchVsControlInputFiles;
   TSearchVsControlInputFiles.push_back(TIsoHaddOutputFile);
   TSearchVsControlInputFiles.push_back(TNonIsoHaddOutputFile);
+  vector<string> TSearchVsControlReweightInputFiles(TSearchVsControlInputFiles);
+  TSearchVsControlReweightInputFiles[1] = TNonIsoReweightHaddOutputFile;
   drawMultipleEfficiencyGraphsOn1Canvas(TSearchVsControlOutputFile, TSearchVsControlInputFiles, 
 					canvasNames1D, graphNames1D, legendHeaders1T, colors, 
 					styles, legendEntriesSearchVsControl, weights1, setLinY, 
 					drawSame, sigBkg);
+  drawMultipleEfficiencyGraphsOn1Canvas(TSearchVsControlReweightOutputFile, 
+					TSearchVsControlReweightInputFiles, canvasNames1D, 
+					graphNames1D, legendHeaders1T, colors, styles, 
+					legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
+					sigBkg);
 
   //compare W+>=1 jet search sample to control sample
   string WNJetsToLNuSearchVsControlOutputFile(analysisFilePath + 
 					      "WNJetsToLNu/analysis/isoVsNonIsoTaus" + tag1 + 
 					      outputVTag + fileExt);
+  string WNJetsToLNuSearchVsControlReweightOutputFile = 
+    smartReplace(WNJetsToLNuSearchVsControlOutputFile, "NonIso", "NonIsoReweight");
   vector<string> WNJetsToLNuSearchVsControlInputFiles;
   WNJetsToLNuSearchVsControlInputFiles.push_back(WNJetsToLNuIsoHaddOutputFile);
   WNJetsToLNuSearchVsControlInputFiles.push_back(WNJetsToLNuNonIsoHaddOutputFile);
+  vector<string> 
+    WNJetsToLNuSearchVsControlReweightInputFiles(WNJetsToLNuSearchVsControlInputFiles);
+  WNJetsToLNuSearchVsControlReweightInputFiles[1] = WNJetsToLNuNonIsoReweightHaddOutputFile;
   drawMultipleEfficiencyGraphsOn1Canvas(WNJetsToLNuSearchVsControlOutputFile, 
 					WNJetsToLNuSearchVsControlInputFiles, canvasNames1D, 
 					graphNames1D, legendHeaders1WNJetsToLNu, colors, styles, 
 					legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
 					sigBkg);
+  drawMultipleEfficiencyGraphsOn1Canvas(WNJetsToLNuSearchVsControlReweightOutputFile, 
+					WNJetsToLNuSearchVsControlReweightInputFiles, 
+					canvasNames1D, graphNames1D, legendHeaders1WNJetsToLNu, 
+					colors, styles, legendEntriesSearchVsControl, weights1, 
+					setLinY, drawSame, sigBkg);
 
   //compare W+jets jet search sample to control sample
   string WJetsToLNuSearchVsControlOutputFile(analysisFilePath + 
 					     "WJetsToLNu/analysis/isoVsNonIsoTaus" + tag1 + 
 					     outputVTag + fileExt);
+  string WJetsToLNuSearchVsControlReweightOutputFile = 
+    smartReplace(WJetsToLNuSearchVsControlOutputFile, "NonIso", "NonIsoReweight");
   vector<string> WJetsToLNuSearchVsControlInputFiles;
   WJetsToLNuSearchVsControlInputFiles.push_back(WJetsToLNuIsoHaddOutputFile);
   WJetsToLNuSearchVsControlInputFiles.push_back(WJetsToLNuNonIsoHaddOutputFile);
+  vector<string> WJetsToLNuSearchVsControlReweightInputFiles(WJetsToLNuSearchVsControlInputFiles);
+  WJetsToLNuSearchVsControlReweightInputFiles[1] = WJetsToLNuNonIsoReweightHaddOutputFile;
   drawMultipleEfficiencyGraphsOn1Canvas(WJetsToLNuSearchVsControlOutputFile, 
 					WJetsToLNuSearchVsControlInputFiles, canvasNames1D, 
 					graphNames1D, legendHeaders1WJetsToLNu, colors, styles, 
 					legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
 					sigBkg);
+  drawMultipleEfficiencyGraphsOn1Canvas(WJetsToLNuSearchVsControlReweightOutputFile, 
+					WJetsToLNuSearchVsControlReweightInputFiles, 
+					canvasNames1D, graphNames1D, legendHeaders1WJetsToLNu, 
+					colors, styles, legendEntriesSearchVsControl, weights1, 
+					setLinY, drawSame, sigBkg);
 
   //compare WZ search sample to control sample
   string WZSearchVsControlOutputFile(analysisFilePath + "WZ/analysis/isoVsNonIsoTaus" + tag1 + 
 				     outputVTag + fileExt);
+  string WZSearchVsControlReweightOutputFile = 
+    smartReplace(WZSearchVsControlOutputFile, "NonIso", "NonIsoReweight");
   vector<string> WZSearchVsControlInputFiles;
   WZSearchVsControlInputFiles.push_back(WZIsoHaddOutputFile);
   WZSearchVsControlInputFiles.push_back(WZNonIsoHaddOutputFile);
+  vector<string> WZSearchVsControlReweightInputFiles(WZSearchVsControlInputFiles);
+  WZSearchVsControlReweightInputFiles[1] = WZNonIsoReweightHaddOutputFile;
   drawMultipleEfficiencyGraphsOn1Canvas(WZSearchVsControlOutputFile, WZSearchVsControlInputFiles, 
 					canvasNames1D, graphNames1D, legendHeaders1WZ, colors, 
 					styles, legendEntriesSearchVsControl, weights1, setLinY, 
 					drawSame, sigBkg);
+  drawMultipleEfficiencyGraphsOn1Canvas(WZSearchVsControlReweightOutputFile, 
+					WZSearchVsControlReweightInputFiles, canvasNames1D, 
+					graphNames1D, legendHeaders1WZ, colors, styles, 
+					legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
+					sigBkg);
 
   //compare ZZ search sample to control sample
   string ZZSearchVsControlOutputFile(analysisFilePath + "ZZ/analysis/isoVsNonIsoTaus" + tag1 + 
 				     outputVTag + fileExt);
+  string ZZSearchVsControlReweightOutputFile = 
+    smartReplace(ZZSearchVsControlOutputFile, "NonIso", "NonIsoReweight");
   vector<string> ZZSearchVsControlInputFiles;
   ZZSearchVsControlInputFiles.push_back(ZZIsoHaddOutputFile);
   ZZSearchVsControlInputFiles.push_back(ZZNonIsoHaddOutputFile);
+  vector<string> ZZSearchVsControlReweightInputFiles(ZZSearchVsControlInputFiles);
+  ZZSearchVsControlReweightInputFiles[1] = ZZNonIsoReweightHaddOutputFile;
   drawMultipleEfficiencyGraphsOn1Canvas(ZZSearchVsControlOutputFile, ZZSearchVsControlInputFiles, 
 					canvasNames1D, graphNames1D, legendHeaders1ZZ, colors, 
 					styles, legendEntriesSearchVsControl, weights1, setLinY, 
 					drawSame, sigBkg);
+  drawMultipleEfficiencyGraphsOn1Canvas(ZZSearchVsControlReweightOutputFile, 
+					ZZSearchVsControlReweightInputFiles, canvasNames1D, 
+					graphNames1D, legendHeaders1ZZ, colors, styles, 
+					legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
+					sigBkg);
 
   //compare WW search sample to control sample
   string WWSearchVsControlOutputFile(analysisFilePath + "WW/analysis/isoVsNonIsoTaus" + tag1 + 
 				     outputVTag + fileExt);
+  string WWSearchVsControlReweightOutputFile = 
+    smartReplace(WWSearchVsControlOutputFile, "NonIso", "NonIsoReweight");
   vector<string> WWSearchVsControlInputFiles;
   WWSearchVsControlInputFiles.push_back(WWIsoHaddOutputFile);
   WWSearchVsControlInputFiles.push_back(WWNonIsoHaddOutputFile);
+  vector<string> WWSearchVsControlReweightInputFiles(WWSearchVsControlInputFiles);
+  WWSearchVsControlReweightInputFiles[1] = WWNonIsoReweightHaddOutputFile;
   drawMultipleEfficiencyGraphsOn1Canvas(WWSearchVsControlOutputFile, WWSearchVsControlInputFiles, 
 					canvasNames1D, graphNames1D, legendHeaders1WW, colors, 
 					styles, legendEntriesSearchVsControl, weights1, setLinY, 
 					drawSame, sigBkg);
+  drawMultipleEfficiencyGraphsOn1Canvas(WWSearchVsControlReweightOutputFile, 
+					WWSearchVsControlReweightInputFiles, canvasNames1D, 
+					graphNames1D, legendHeaders1WW, colors, styles, 
+					legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
+					sigBkg);
 
   //make the final plot showing all background methods, signals, data, and errors
   makeFinalPlot(pair<string, float>(sigVsBkgQCDFromDataOutputFile20InvFb, 1.0), 
