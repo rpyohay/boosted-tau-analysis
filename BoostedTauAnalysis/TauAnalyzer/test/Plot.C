@@ -1685,14 +1685,20 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
 
   //write to file
   outStream.cd();
-  TCanvas outCanvas(canvasName.c_str(), "", 600, 600);
-  setCanvasOptions(outCanvas, 1, 1, 0);
-  setCanvasMargins(outCanvas, 0.2, 0.2, 0.2, 0.2);
-  outCanvas.cd();
+  TCanvas outCanvas(canvasName.c_str(), "", 600, 900);
+  outCanvas.Divide(1, 2);
+  outCanvas.cd(1)->SetPad(0.0, 0.33, 1.0, 1.0);
+  setCanvasOptions(*outCanvas.cd(1), 1, 1, 0);
+  setCanvasMargins(*outCanvas.cd(1), 0.2, 0.2, 0.2, 0.2);
+  outCanvas.cd(2)->SetPad(0.0, 0.0, 1.0, 0.33);
+  setCanvasOptions(*outCanvas.cd(2), 1, 0, 0);
+  setCanvasMargins(*outCanvas.cd(2), 0.2, 0.2, 0.2, 0.2);
+  outCanvas.cd(1);
   if (option == "separate") {
     isoBkgSep.Draw();
     isoBkgSep.SetMinimum(0.01);
     isoBkgSep.SetMaximum(10000.0);
+    isoBkgSep.GetHistogram()->GetXaxis()->SetTitle(unit.c_str());
   }
   else if (option == "main 5") {
     isoBkgMain5.Draw();
@@ -1706,10 +1712,13 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
     cerr << "Region A MC + data-driven QCD, m > 4: " << sum << endl;
     isoBkgMain5.SetMinimum(0.01);
     isoBkgMain5.SetMaximum(10000.0);
+    isoBkgMain5.GetHistogram()->GetXaxis()->SetTitle(unit.c_str());
   }
   else if (option == "combined") {
     isoBkgAll.Draw();
-    isoBkgAll.GetHistogram()->GetYaxis()->SetRangeUser(0.01, 10000.0);
+    isoBkgAll.SetMinimum(0.01);
+    isoBkgAll.SetMaximum(10000.0);
+    isoBkgAll.GetHistogram()->GetXaxis()->SetTitle(unit.c_str());
   }
   nonIsoData->Draw("HISTESAME");
   cerr << "Region B data, m > 4: " << nonIsoData->Integral(5, -1) << endl;
@@ -1724,6 +1733,13 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
   if (option == "separate") legendBkgSep.Draw();
   else if (option == "main 5") legendBkgMain5.Draw();
   else if (option == "combined") legendBkgAll.Draw();
+  outCanvas.cd(2);
+  TH1F* nonIsoDataMinusIsoBkgAll = (TH1F*)nonIsoData->Clone();
+  nonIsoDataMinusIsoBkgAll->Add(isoBkgAllHist, -1.0);
+  nonIsoDataMinusIsoBkgAll->Divide(nonIsoData);
+  nonIsoDataMinusIsoBkgAll->GetYaxis()->SetTitle("#frac{Data (B) - MC (A)}{Data (B)}");
+  nonIsoDataMinusIsoBkgAll->GetYaxis()->SetRangeUser(-1.0, 1.0);
+  nonIsoDataMinusIsoBkgAll->Draw();
   outCanvas.Write();
 }
 
