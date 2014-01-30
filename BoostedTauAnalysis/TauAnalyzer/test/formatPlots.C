@@ -359,9 +359,6 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   weightsSigBkg.push_back(1.0); //WW already weighted to 20 fb^-1
   std::reverse(weightsSigBkg.begin() + 2, weightsSigBkg.end());
   vector<float> weightsSigBkgQCDFromData(weightsSigBkg);
-//   weightsSigBkgQCDFromData.push_back(20.0/2.5); /*QCD estimate from data weighted to 2.5 fb^-1 ==> 
-// 						  multiply by 20/2.5 to get an overall weight for 
-// 						  20 fb^-1*/
   weightsSigBkgQCDFromData.push_back(1.0); //QCD estimate from data already weighted to 20 fb^-1
   vector<float> weightsMCData;
   weightsMCData.push_back(1.0); //data (int. lumi. = 20 fb^-1)
@@ -469,21 +466,19 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   subJobs.push_back("_5");
   subJobs.push_back("_6");
   subJobs.push_back("_7");
-
   for (vector<string>::const_iterator iRunEra = runEras.begin(); iRunEra != runEras.end(); 
        ++iRunEra) {
-    for (vector<string>::const_iterator iSubJob = subJobs.begin(); iSubJob != subJobs.end(); ++iSubJob) {
+    for (vector<string>::const_iterator iSubJob = subJobs.begin(); iSubJob != subJobs.end(); 
+	 ++iSubJob) {
       stringstream dataIsoName;
       dataIsoName << dataIsoPrefix << *iRunEra << *iSubJob << dataSuffix; //BLINDED!!!
       dataIsoHaddInputFiles.push_back(dataIsoName.str());
       stringstream dataNonIsoName;
       dataNonIsoName << dataNonIsoPrefix << *iRunEra << *iSubJob << dataSuffix;
       dataNonIsoHaddInputFiles.push_back(dataNonIsoName.str());
-      cout << dataNonIsoName.str() << endl;
       stringstream dataNonIsoReweightName;
       dataNonIsoReweightName << dataNonIsoReweightPrefix << *iRunEra << *iSubJob << dataSuffix;
       dataNonIsoReweightHaddInputFiles.push_back(dataNonIsoReweightName.str());
-      cout << dataNonIsoReweightName.str() << endl;
     }
   }
   haddCanvases(dataIsoHaddOutputFile, dataIsoHaddInputFiles, vector<float>(32, 1.0), 
@@ -1235,6 +1230,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   //compare QCD search sample to control sample
   string QCDSearchVsControlOutputFile(analysisFilePath + "QCD/analysis/isoVsNonIsoTaus" + tag1 + 
 				      outputVTag + fileExt);
+  string QCDSearchVsControlReweightOutputFile(QCDSearchVsControlOutputFile);
   vector<string> QCDSearchVsControlInputFiles;
   QCDSearchVsControlInputFiles.push_back(QCDIsoHaddOutputFile);
   QCDSearchVsControlInputFiles.push_back(QCDNonIsoHaddOutputFile);
@@ -1364,7 +1360,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 					drawSame, sigBkg);
 
   //make the final plot showing all background methods, signals, data, and errors
-  makeFinalPlot(pair<string, float>(sigVsBkgQCDFromDataOutputFile20InvFb, 2.5/20.0), 
+  makeFinalPlot(pair<string, float>(sigVsBkgQCDFromDataOutputFile20InvFb, 1.0), 
 		dataIsoHaddOutputFile, 
 		pair<string, float>(dataVsMCReweightOutputFile2p5InvFb, 1.0), 
 		vector<string>(1, "muHadMass"), vector<string>(1, "m_{#mu+had} (GeV)"), 
