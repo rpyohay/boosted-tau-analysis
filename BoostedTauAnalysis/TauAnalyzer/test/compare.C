@@ -1,4 +1,266 @@
 {
+//   //open files
+//   TFile ggMuonsPassingEtaFile("isoOverPT1_gg.root");
+//   TFile ggMuonsPassingEtaTightIDFile("isoOverPT2_gg.root");
+//   TFile ggMuonsPassingEtaHLTFile("isoOverPT3_gg.root");
+//   TFile ggMuonsPassingEtaTightIDHLTFile("isoOverPT4_gg.root");
+//   TFile Wh1MuonsPassingEtaFile("isoOverPT1_Wh1.root");
+//   TFile Wh1MuonsPassingEtaTightIDFile("isoOverPT2_Wh1.root");
+//   TFile Wh1MuonsPassingEtaHLTFile("isoOverPT3_Wh1.root");
+//   TFile Wh1MuonsPassingEtaTightIDHLTFile("isoOverPT4_Wh1.root");
+
+//   //get canvases
+//   TCanvas* ggMuonsPassingEtaCanvas = NULL;
+//   TCanvas* ggMuonsPassingEtaTightIDCanvas = NULL;
+//   TCanvas* ggMuonsPassingEtaHLTCanvas = NULL;
+//   TCanvas* ggMuonsPassingEtaTightIDHLTCanvas = NULL;
+//   TCanvas* Wh1MuonsPassingEtaCanvas = NULL;
+//   TCanvas* Wh1MuonsPassingEtaTightIDCanvas = NULL;
+//   TCanvas* Wh1MuonsPassingEtaHLTCanvas = NULL;
+//   TCanvas* Wh1MuonsPassingEtaTightIDHLTCanvas = NULL;
+//   ggMuonsPassingEtaFile.
+//     GetObject("combParticleIsoOverMuonPTCanvas", ggMuonsPassingEtaCanvas);
+//   ggMuonsPassingEtaTightIDFile.
+//     GetObject("combParticleIsoOverMuonPTCanvas", ggMuonsPassingEtaTightIDCanvas);
+//   ggMuonsPassingEtaHLTFile.
+//     GetObject("combParticleIsoOverMuonPTCanvas", ggMuonsPassingEtaHLTCanvas);
+//   ggMuonsPassingEtaTightIDHLTFile.
+//     GetObject("combParticleIsoOverMuonPTCanvas", ggMuonsPassingEtaTightIDHLTCanvas);
+//   Wh1MuonsPassingEtaFile.
+//     GetObject("combParticleIsoOverMuonPTCanvas", Wh1MuonsPassingEtaCanvas);
+//   Wh1MuonsPassingEtaTightIDFile.
+//     GetObject("combParticleIsoOverMuonPTCanvas", Wh1MuonsPassingEtaTightIDCanvas);
+//   Wh1MuonsPassingEtaHLTFile.
+//     GetObject("combParticleIsoOverMuonPTCanvas", Wh1MuonsPassingEtaHLTCanvas);
+//   Wh1MuonsPassingEtaTightIDHLTFile.
+//     GetObject("combParticleIsoOverMuonPTCanvas", Wh1MuonsPassingEtaTightIDHLTCanvas);
+
+//   //get histograms
+//   TH1F* ggMuonsPassingEtaHist = 
+//     (TH1F*)ggMuonsPassingEtaCanvas->GetPrimitive("combParticleIsoOverMuonPT")->Clone();
+//   TH1F* ggMuonsPassingEtaTightIDHist = 
+//     (TH1F*)ggMuonsPassingEtaTightIDCanvas->GetPrimitive("combParticleIsoOverMuonPT")->Clone();
+//   TH1F* ggMuonsPassingEtaHLTHist = 
+//     (TH1F*)ggMuonsPassingEtaHLTCanvas->GetPrimitive("combParticleIsoOverMuonPT")->Clone();
+//   TH1F* ggMuonsPassingEtaTightIDHLTHist = 
+//     (TH1F*)ggMuonsPassingEtaTightIDHLTCanvas->GetPrimitive("combParticleIsoOverMuonPT")->Clone();
+//   TH1F* Wh1MuonsPassingEtaHist = 
+//     (TH1F*)Wh1MuonsPassingEtaCanvas->GetPrimitive("combParticleIsoOverMuonPT")->Clone();
+//   TH1F* Wh1MuonsPassingEtaTightIDHist = 
+//     (TH1F*)Wh1MuonsPassingEtaTightIDCanvas->GetPrimitive("combParticleIsoOverMuonPT")->Clone();
+//   TH1F* Wh1MuonsPassingEtaHLTHist = 
+//     (TH1F*)Wh1MuonsPassingEtaHLTCanvas->GetPrimitive("combParticleIsoOverMuonPT")->Clone();
+//   TH1F* Wh1MuonsPassingEtaTightIDHLTHist = 
+//     (TH1F*)Wh1MuonsPassingEtaTightIDHLTCanvas->GetPrimitive("combParticleIsoOverMuonPT")->Clone();
+//   ggMuonsPassingEtaHist->GetYaxis()->SetRangeUser(0.1, 100000.0);
+//   ggMuonsPassingEtaTightIDHist->GetYaxis()->SetRangeUser(0.1, 100000.0);
+//   ggMuonsPassingEtaHLTHist->GetYaxis()->SetRangeUser(0.1, 100000.0);
+//   ggMuonsPassingEtaTightIDHLTHist->GetYaxis()->SetRangeUser(0.1, 100000.0);
+//   Wh1MuonsPassingEtaHist->GetYaxis()->SetRangeUser(0.1, 100000.0);
+//   Wh1MuonsPassingEtaTightIDHist->GetYaxis()->SetRangeUser(0.1, 100000.0);
+//   Wh1MuonsPassingEtaHLTHist->GetYaxis()->SetRangeUser(0.1, 100000.0);
+//   Wh1MuonsPassingEtaTightIDHLTHist->GetYaxis()->SetRangeUser(0.1, 100000.0);
+// //   ggMuonsPassingEtaHist->Scale(1.0/ggMuonsPassingEtaHist->Integral(0, -1));
+// //   ggMuonsPassingEtaTightIDHist->Scale(1.0/ggMuonsPassingEtaTightIDHist->Integral(0, -1));
+// //   ggMuonsPassingEtaHLTHist->Scale(1.0/ggMuonsPassingEtaHLTHist->Integral(0, -1));
+// //   ggMuonsPassingEtaTightIDHLTHist->Scale(1.0/ggMuonsPassingEtaTightIDHLTHist->Integral(0, -1));
+// //   Wh1MuonsPassingEtaHist->Scale(1.0/Wh1MuonsPassingEtaHist->Integral(0, -1));
+// //   Wh1MuonsPassingEtaTightIDHist->Scale(1.0/Wh1MuonsPassingEtaTightIDHist->Integral(0, -1));
+// //   Wh1MuonsPassingEtaHLTHist->Scale(1.0/Wh1MuonsPassingEtaHLTHist->Integral(0, -1));
+// //   Wh1MuonsPassingEtaTightIDHLTHist->Scale(1.0/Wh1MuonsPassingEtaTightIDHLTHist->Integral(0, -1));
+// //   ggMuonsPassingEtaHist->GetYaxis()->SetRangeUser(0.00001, 1.0);
+// //   ggMuonsPassingEtaTightIDHist->GetYaxis()->SetRangeUser(0.00001, 1.0);
+// //   ggMuonsPassingEtaHLTHist->GetYaxis()->SetRangeUser(0.00001, 1.0);
+// //   ggMuonsPassingEtaTightIDHLTHist->GetYaxis()->SetRangeUser(0.00001, 1.0);
+// //   Wh1MuonsPassingEtaHist->GetYaxis()->SetRangeUser(0.00001, 1.0);
+// //   Wh1MuonsPassingEtaTightIDHist->GetYaxis()->SetRangeUser(0.00001, 1.0);
+// //   Wh1MuonsPassingEtaHLTHist->GetYaxis()->SetRangeUser(0.00001, 1.0);
+// //   Wh1MuonsPassingEtaTightIDHLTHist->GetYaxis()->SetRangeUser(0.00001, 1.0);
+
+//   //set up output canvases
+//   TCanvas muonsPassingEtaCanvas("muonsPassingEtaCanvas", "", 600, 600);
+//   TCanvas muonsPassingEtaTightIDCanvas("muonsPassingEtaTightIDCanvas", "", 600, 600);
+//   TCanvas muonsPassingEtaHLTCanvas("muonsPassingEtaHLTCanvas", "", 600, 600);
+//   TCanvas muonsPassingEtaTightIDHLTCanvas("muonsPassingEtaTightIDHLTCanvas", "", 600, 600);
+//   TCanvas ggMuonsPassingEtaHLTVsNoneCanvas("ggMuonsPassingEtaHLTVsNoneCanvas", "", 
+// 					   600, 600);
+//   TCanvas ggMuonsPassingEtaTightIDHLTVsNoneCanvas("ggMuonsPassingEtaTightIDHLTVsNoneCanvas", "", 
+// 						  600, 600);
+//   TCanvas Wh1MuonsPassingEtaHLTVsNoneCanvas("Wh1MuonsPassingEtaHLTVsNoneCanvas", "", 
+// 					    600, 600);
+//   TCanvas Wh1MuonsPassingEtaTightIDHLTVsNoneCanvas("Wh1MuonsPassingEtaTightIDHLTVsNoneCanvas", "", 
+// 						   600, 600);
+//   muonsPassingEtaCanvas.SetFillStyle(0);
+//   muonsPassingEtaTightIDCanvas.SetFillStyle(0);
+//   muonsPassingEtaHLTCanvas.SetFillStyle(0);
+//   muonsPassingEtaTightIDHLTCanvas.SetFillStyle(0);
+//   ggMuonsPassingEtaHLTVsNoneCanvas.SetFillStyle(0);
+//   ggMuonsPassingEtaTightIDHLTVsNoneCanvas.SetFillStyle(0);
+//   Wh1MuonsPassingEtaHLTVsNoneCanvas.SetFillStyle(0);
+//   Wh1MuonsPassingEtaTightIDHLTVsNoneCanvas.SetFillStyle(0);
+//   muonsPassingEtaCanvas.SetFillColor(0);
+//   muonsPassingEtaTightIDCanvas.SetFillColor(0);
+//   muonsPassingEtaHLTCanvas.SetFillColor(0);
+//   muonsPassingEtaTightIDHLTCanvas.SetFillColor(0);
+//   ggMuonsPassingEtaHLTVsNoneCanvas.SetFillColor(0);
+//   ggMuonsPassingEtaTightIDHLTVsNoneCanvas.SetFillColor(0);
+//   Wh1MuonsPassingEtaHLTVsNoneCanvas.SetFillColor(0);
+//   Wh1MuonsPassingEtaTightIDHLTVsNoneCanvas.SetFillColor(0);
+//   muonsPassingEtaCanvas.SetGrid(1, 1);
+//   muonsPassingEtaTightIDCanvas.SetGrid(1, 1);
+//   muonsPassingEtaHLTCanvas.SetGrid(1, 1);
+//   muonsPassingEtaTightIDHLTCanvas.SetGrid(1, 1);
+//   ggMuonsPassingEtaHLTVsNoneCanvas.SetGrid(1, 1);
+//   ggMuonsPassingEtaTightIDHLTVsNoneCanvas.SetGrid(1, 1);
+//   Wh1MuonsPassingEtaHLTVsNoneCanvas.SetGrid(1, 1);
+//   Wh1MuonsPassingEtaTightIDHLTVsNoneCanvas.SetGrid(1, 1);
+//   muonsPassingEtaCanvas.SetLogy(1);
+//   muonsPassingEtaTightIDCanvas.SetLogy(1);
+//   muonsPassingEtaHLTCanvas.SetLogy(1);
+//   muonsPassingEtaTightIDHLTCanvas.SetLogy(1);
+//   ggMuonsPassingEtaHLTVsNoneCanvas.SetLogy(1);
+//   ggMuonsPassingEtaTightIDHLTVsNoneCanvas.SetLogy(1);
+//   Wh1MuonsPassingEtaHLTVsNoneCanvas.SetLogy(1);
+//   Wh1MuonsPassingEtaTightIDHLTVsNoneCanvas.SetLogy(1);
+
+//   //set up legends
+//   TLegend muonsPassingEtaLegend(0.6, 0.6, 0.9, 0.8);
+//   TLegend muonsPassingEtaTightIDLegend(0.6, 0.6, 0.9, 0.8);
+//   TLegend muonsPassingEtaHLTLegend(0.6, 0.6, 0.9, 0.8);
+//   TLegend muonsPassingEtaTightIDHLTLegend(0.6, 0.6, 0.9, 0.8);
+//   TLegend ggMuonsPassingEtaHLTVsNoneLegend(0.6, 0.6, 0.9, 0.8);
+//   TLegend ggMuonsPassingEtaTightIDHLTVsNoneLegend(0.6, 0.6, 0.9, 0.8);
+//   TLegend Wh1MuonsPassingEtaHLTVsNoneLegend(0.6, 0.6, 0.9, 0.8);
+//   TLegend Wh1MuonsPassingEtaTightIDHLTVsNoneLegend(0.6, 0.6, 0.9, 0.8);
+//   muonsPassingEtaLegend.SetFillStyle(0);
+//   muonsPassingEtaTightIDLegend.SetFillStyle(0);
+//   muonsPassingEtaHLTLegend.SetFillStyle(0);
+//   muonsPassingEtaTightIDHLTLegend.SetFillStyle(0);
+//   ggMuonsPassingEtaHLTVsNoneLegend.SetFillStyle(0);
+//   ggMuonsPassingEtaTightIDHLTVsNoneLegend.SetFillStyle(0);
+//   Wh1MuonsPassingEtaHLTVsNoneLegend.SetFillStyle(0);
+//   Wh1MuonsPassingEtaTightIDHLTVsNoneLegend.SetFillStyle(0);
+
+//   //compare gg to Wh1
+//   TFile ggVsWh1("ggVsWh1.root", "RECREATE");
+// //   TFile ggVsWh1("ggVsWh1_norm1.root", "RECREATE");
+//   ggVsWh1.cd();
+//   muonsPassingEtaCanvas.cd();
+//   ggMuonsPassingEtaHist->SetLineColor(kRed);
+//   Wh1MuonsPassingEtaHist->SetLineColor(kBlue);
+//   ggMuonsPassingEtaHist->SetLineWidth(2);
+//   Wh1MuonsPassingEtaHist->SetLineWidth(2);
+//   ggMuonsPassingEtaHist->Draw("HIST");
+//   Wh1MuonsPassingEtaHist->Draw("HISTSAME");
+//   muonsPassingEtaLegend.AddEntry(ggMuonsPassingEtaHist, "gg", "l");
+//   muonsPassingEtaLegend.AddEntry(Wh1MuonsPassingEtaHist, "Wh1", "l");
+//   muonsPassingEtaLegend.Draw();
+//   muonsPassingEtaCanvas.Write();
+//   muonsPassingEtaTightIDCanvas.cd();
+//   ggMuonsPassingEtaTightIDHist->SetLineColor(kRed);
+//   Wh1MuonsPassingEtaTightIDHist->SetLineColor(kBlue);
+//   ggMuonsPassingEtaTightIDHist->SetLineWidth(2);
+//   Wh1MuonsPassingEtaTightIDHist->SetLineWidth(2);
+//   ggMuonsPassingEtaTightIDHist->Draw("HIST");
+//   Wh1MuonsPassingEtaTightIDHist->Draw("HISTSAME");
+//   muonsPassingEtaTightIDLegend.AddEntry(ggMuonsPassingEtaTightIDHist, "gg", "l");
+//   muonsPassingEtaTightIDLegend.AddEntry(Wh1MuonsPassingEtaTightIDHist, "Wh1", "l");
+//   muonsPassingEtaTightIDLegend.Draw();
+//   muonsPassingEtaTightIDCanvas.Write();
+//   muonsPassingEtaHLTCanvas.cd();
+//   ggMuonsPassingEtaHLTHist->SetLineColor(kRed);
+//   Wh1MuonsPassingEtaHLTHist->SetLineColor(kBlue);
+//   ggMuonsPassingEtaHLTHist->SetLineWidth(2);
+//   Wh1MuonsPassingEtaHLTHist->SetLineWidth(2);
+//   ggMuonsPassingEtaHLTHist->Draw("HIST");
+//   Wh1MuonsPassingEtaHLTHist->Draw("HISTSAME");
+//   muonsPassingEtaHLTLegend.AddEntry(ggMuonsPassingEtaHLTHist, "gg", "l");
+//   muonsPassingEtaHLTLegend.AddEntry(Wh1MuonsPassingEtaHLTHist, "Wh1", "l");
+//   muonsPassingEtaHLTLegend.Draw();
+//   muonsPassingEtaHLTCanvas.Write();
+//   muonsPassingEtaTightIDHLTCanvas.cd();
+//   ggMuonsPassingEtaTightIDHLTHist->SetLineColor(kRed);
+//   Wh1MuonsPassingEtaTightIDHLTHist->SetLineColor(kBlue);
+//   ggMuonsPassingEtaTightIDHLTHist->SetLineWidth(2);
+//   Wh1MuonsPassingEtaTightIDHLTHist->SetLineWidth(2);
+//   ggMuonsPassingEtaTightIDHLTHist->Draw("HIST");
+//   Wh1MuonsPassingEtaTightIDHLTHist->Draw("HISTSAME");
+//   muonsPassingEtaTightIDHLTLegend.AddEntry(ggMuonsPassingEtaTightIDHLTHist, "gg", "l");
+//   muonsPassingEtaTightIDHLTLegend.AddEntry(Wh1MuonsPassingEtaTightIDHLTHist, "Wh1", "l");
+//   muonsPassingEtaTightIDHLTLegend.Draw();
+//   muonsPassingEtaTightIDHLTCanvas.Write();
+//   ggVsWh1.Write();
+//   ggVsWh1.Close();
+
+//   //compare HLT to none
+//   TFile HLTVsNone("HLTVsNone.root", "RECREATE");
+// //   TFile HLTVsNone("HLTVsNone_norm1.root", "RECREATE");
+//   HLTVsNone.cd();
+//   ggMuonsPassingEtaHLTVsNoneCanvas.cd();
+//   ggMuonsPassingEtaHist->SetLineColor(kRed);
+//   ggMuonsPassingEtaHLTHist->SetLineColor(kBlue);
+//   ggMuonsPassingEtaHist->SetLineWidth(2);
+//   ggMuonsPassingEtaHLTHist->SetLineWidth(2);
+//   ggMuonsPassingEtaHist->Draw("HIST");
+//   ggMuonsPassingEtaHLTHist->Draw("HISTSAME");
+//   ggMuonsPassingEtaHLTVsNoneLegend.
+//     AddEntry(ggMuonsPassingEtaHist, "gg no HLT", "l");
+//   ggMuonsPassingEtaHLTVsNoneLegend.
+//     AddEntry(ggMuonsPassingEtaHLTHist, "gg with HLT", "l");
+//   ggMuonsPassingEtaHLTVsNoneLegend.Draw();
+//   ggMuonsPassingEtaHLTVsNoneCanvas.Write();
+//   ggMuonsPassingEtaTightIDHLTVsNoneCanvas.cd();
+//   ggMuonsPassingEtaTightIDHist->SetLineColor(kRed);
+//   ggMuonsPassingEtaTightIDHLTHist->SetLineColor(kBlue);
+//   ggMuonsPassingEtaTightIDHist->SetLineWidth(2);
+//   ggMuonsPassingEtaTightIDHLTHist->SetLineWidth(2);
+//   ggMuonsPassingEtaTightIDHist->Draw("HIST");
+//   ggMuonsPassingEtaTightIDHLTHist->Draw("HISTSAME");
+//   ggMuonsPassingEtaTightIDHLTVsNoneLegend.
+//     AddEntry(ggMuonsPassingEtaTightIDHist, "gg tight ID no HLT", "l");
+//   ggMuonsPassingEtaTightIDHLTVsNoneLegend.
+//     AddEntry(ggMuonsPassingEtaTightIDHLTHist, "gg tight ID with HLT", "l");
+//   ggMuonsPassingEtaTightIDHLTVsNoneLegend.Draw();
+//   ggMuonsPassingEtaTightIDHLTVsNoneCanvas.Write();
+//   Wh1MuonsPassingEtaHLTVsNoneCanvas.cd();
+//   Wh1MuonsPassingEtaHist->SetLineColor(kRed);
+//   Wh1MuonsPassingEtaHLTHist->SetLineColor(kBlue);
+//   Wh1MuonsPassingEtaHist->SetLineWidth(2);
+//   Wh1MuonsPassingEtaHLTHist->SetLineWidth(2);
+//   Wh1MuonsPassingEtaHist->Draw("HIST");
+//   Wh1MuonsPassingEtaHLTHist->Draw("HISTSAME");
+//   Wh1MuonsPassingEtaHLTVsNoneLegend.
+//     AddEntry(Wh1MuonsPassingEtaHist, "Wh1 no HLT", "l");
+//   Wh1MuonsPassingEtaHLTVsNoneLegend.
+//     AddEntry(Wh1MuonsPassingEtaHLTHist, "Wh1 with HLT", "l");
+//   Wh1MuonsPassingEtaHLTVsNoneLegend.Draw();
+//   Wh1MuonsPassingEtaHLTVsNoneCanvas.Write();
+//   Wh1MuonsPassingEtaTightIDHLTVsNoneCanvas.cd();
+//   Wh1MuonsPassingEtaTightIDHist->SetLineColor(kRed);
+//   Wh1MuonsPassingEtaTightIDHLTHist->SetLineColor(kBlue);
+//   Wh1MuonsPassingEtaTightIDHist->SetLineWidth(2);
+//   Wh1MuonsPassingEtaTightIDHLTHist->SetLineWidth(2);
+//   Wh1MuonsPassingEtaTightIDHist->Draw("HIST");
+//   Wh1MuonsPassingEtaTightIDHLTHist->Draw("HISTSAME");
+//   Wh1MuonsPassingEtaTightIDHLTVsNoneLegend.
+//     AddEntry(Wh1MuonsPassingEtaTightIDHist, "Wh1 tight ID no HLT", "l");
+//   Wh1MuonsPassingEtaTightIDHLTVsNoneLegend.
+//     AddEntry(Wh1MuonsPassingEtaTightIDHLTHist, "Wh1 tight ID with HLT", "l");
+//   Wh1MuonsPassingEtaTightIDHLTVsNoneLegend.Draw();
+//   Wh1MuonsPassingEtaTightIDHLTVsNoneCanvas.Write();
+//   HLTVsNone.Write();
+//   HLTVsNone.Close();
+
+//   //close files
+//   ggMuonsPassingEtaFile.Close();
+//   ggMuonsPassingEtaTightIDFile.Close();
+//   ggMuonsPassingEtaHLTFile.Close();
+//   ggMuonsPassingEtaTightIDHLTFile.Close();
+//   Wh1MuonsPassingEtaFile.Close();
+//   Wh1MuonsPassingEtaTightIDFile.Close();
+//   Wh1MuonsPassingEtaHLTFile.Close();
+//   Wh1MuonsPassingEtaTightIDHLTFile.Close();
+
   //initial
   gROOT->Reset();
 
@@ -24,8 +286,8 @@
 
   //versions to compare
   const vector<string> versions;
-  versions.push_back("_v13");
-  versions.push_back("_v14");
+  versions.push_back("_v89");
+  versions.push_back("_v87");
 
   //compare data samples
   vector<vector<string> > dataIsoHaddInputFilesBothVersions; //BLINDED!!!
@@ -77,7 +339,7 @@
   compareVersions(dataNonIsoHaddInputFilesBothVersions);
   compareVersions(dataNonIsoReweightHaddInputFilesBothVersions);
 //   compareVersions(dataAllHaddInputFilesBothVersions); //BLINDED!!!
-/*
+
   //compare non-isolated W data samples
   vector<vector<string> > nonIsoWDataIsoHaddInputFilesBothVersions;
   vector<vector<string> > nonIsoWDataNonIsoHaddInputFilesBothVersions;
@@ -696,5 +958,4 @@
   compareVersions(WWNonIsoHaddInputFilesBothVersions);
   compareVersions(WWNonIsoReweightHaddInputFilesBothVersions);
 //   compareVersions(WWAllHaddInputFilesBothVersions);
-*/
 }
