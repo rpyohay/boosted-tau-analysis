@@ -1192,9 +1192,9 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 					legendHeaders2p5InvFb, colors, styles, 
 					legendEntriesMCData, weightsMCData, setLogY, drawStack, 
 					dataMC);
-  drawDifferenceGraphsOn1Canvas(dataVsMCOutputDiff2p5InvFb, dataVsMCInputFiles, canvasNames1D, 
-				graphNames1D, legendHeaders2p5InvFb, colors, styles, 
-				legendEntriesMCData, weightsMCData, setLogY, sigBkg);
+  drawDifferenceGraphsOn1Canvas(dataVsMCOutputDiff2p5InvFb, dataVsMCReweightInputFiles, 
+				canvasNames1D, graphNames1D, legendHeaders2p5InvFb, colors, 
+				styles, legendEntriesMCData, weightsMCData, setLogY, sigBkg);
 
 
   //compute data-driven QCD estimate in signal (i.e. isolated W muon + isolated tau) region
@@ -1242,12 +1242,12 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 					QCDSearchVsControlInputFiles, canvasNames1D, 
 					graphNames1D, legendHeaders1QCD, colors, styles, 
 					legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
-					sigBkg);
+					dataMC);
   drawMultipleEfficiencyGraphsOn1Canvas(QCDSearchVsControlReweightOutputFile, 
 					QCDSearchVsControlReweightInputFiles, canvasNames1D, 
 					graphNames1D, legendHeaders1QCD, colors, styles, 
 					legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
-					sigBkg);
+					dataMC);
 
   //compare QCDB search sample to control sample
   string QCDBSearchVsControlOutputFile(analysisFilePath + "QCDB/analysis/isoVsNonIsoTaus" + tag1 + 
@@ -1263,12 +1263,12 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 					QCDBSearchVsControlInputFiles, canvasNames1D, 
 					graphNames1D, legendHeaders1QCDB, colors, styles, 
 					legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
-					sigBkg);
+					dataMC);
   drawMultipleEfficiencyGraphsOn1Canvas(QCDBSearchVsControlReweightOutputFile, 
 					QCDBSearchVsControlReweightInputFiles, canvasNames1D, 
 					graphNames1D, legendHeaders1QCDB, colors, styles, 
 					legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
-					sigBkg);
+					dataMC);
 
   //compare QCDBMu search sample to control sample
   string QCDBMuSearchVsControlOutputFile(analysisFilePath + "QCDBMu/analysis/isoVsNonIsoTaus" + 
@@ -1284,12 +1284,12 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 					QCDBMuSearchVsControlInputFiles, canvasNames1D, 
 					graphNames1D, legendHeaders1QCDBMu, colors, styles, 
 					legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
-					sigBkg);
+					dataMC);
   drawMultipleEfficiencyGraphsOn1Canvas(QCDBMuSearchVsControlReweightOutputFile, 
 					QCDBMuSearchVsControlReweightInputFiles, canvasNames1D, 
 					graphNames1D, legendHeaders1QCDBMu, colors, styles, 
 					legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
-					sigBkg);
+					dataMC);
 
   //compare Drell-Yan+jets search sample to control sample
   string DYJetsToLLSearchVsControlOutputFile(analysisFilePath + 
@@ -1306,12 +1306,12 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 					DYJetsToLLSearchVsControlInputFiles, canvasNames1D, 
 					graphNames1D, legendHeaders1DYJetsToLL, colors, styles, 
 					legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
-					sigBkg);
+					dataMC);
   drawMultipleEfficiencyGraphsOn1Canvas(DYJetsToLLSearchVsControlReweightOutputFile, 
 					DYJetsToLLSearchVsControlReweightInputFiles, 
 					canvasNames1D, graphNames1D, legendHeaders1DYJetsToLL, 
 					colors, styles, legendEntriesSearchVsControl, weights1, 
-					setLinY, drawSame, sigBkg);
+					setLinY, drawSame, dataMC);
 
   //compare tt+jets search sample to control sample
   string TTJetsSearchVsControlOutputFile(analysisFilePath + "TTJets/analysis/isoVsNonIsoTaus" + 
@@ -1327,12 +1327,12 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 					TTJetsSearchVsControlInputFiles, canvasNames1D, 
 					graphNames1D, legendHeaders1TTJets, colors, styles, 
 					legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
-					sigBkg);
+					dataMC);
   drawMultipleEfficiencyGraphsOn1Canvas(TTJetsSearchVsControlReweightOutputFile, 
 					TTJetsSearchVsControlReweightInputFiles, canvasNames1D, 
 					graphNames1D, legendHeaders1TTJets, colors, styles, 
 					legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
-					sigBkg);
+					dataMC);
 
   //compare single top search sample to control sample
   string TSearchVsControlOutputFile(analysisFilePath + "SingleTop/analysis/isoVsNonIsoTaus" + 
@@ -1347,12 +1347,12 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   drawMultipleEfficiencyGraphsOn1Canvas(TSearchVsControlOutputFile, TSearchVsControlInputFiles, 
 					canvasNames1D, graphNames1D, legendHeaders1T, colors, 
 					styles, legendEntriesSearchVsControl, weights1, setLinY, 
-					drawSame, sigBkg);
+					drawSame, dataMC);
   drawMultipleEfficiencyGraphsOn1Canvas(TSearchVsControlReweightOutputFile, 
 					TSearchVsControlReweightInputFiles, canvasNames1D, 
 					graphNames1D, legendHeaders1T, colors, styles, 
 					legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
-					sigBkg);
+					dataMC);
 
   //compare W+>=1 jet search sample to control sample
   string WNJetsToLNuSearchVsControlOutputFile(analysisFilePath + 
@@ -1370,12 +1370,12 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 					WNJetsToLNuSearchVsControlInputFiles, canvasNames1D, 
 					graphNames1D, legendHeaders1WNJetsToLNu, colors, styles, 
 					legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
-					sigBkg);
+					dataMC);
   drawMultipleEfficiencyGraphsOn1Canvas(WNJetsToLNuSearchVsControlReweightOutputFile, 
 					WNJetsToLNuSearchVsControlReweightInputFiles, 
 					canvasNames1D, graphNames1D, legendHeaders1WNJetsToLNu, 
 					colors, styles, legendEntriesSearchVsControl, weights1, 
-					setLinY, drawSame, sigBkg);
+					setLinY, drawSame, dataMC);
 
   //compare W+jets jet search sample to control sample
   string WJetsToLNuSearchVsControlOutputFile(analysisFilePath + 
@@ -1392,12 +1392,12 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 					WJetsToLNuSearchVsControlInputFiles, canvasNames1D, 
 					graphNames1D, legendHeaders1WJetsToLNu, colors, styles, 
 					legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
-					sigBkg);
+					dataMC);
   drawMultipleEfficiencyGraphsOn1Canvas(WJetsToLNuSearchVsControlReweightOutputFile, 
 					WJetsToLNuSearchVsControlReweightInputFiles, 
 					canvasNames1D, graphNames1D, legendHeaders1WJetsToLNu, 
 					colors, styles, legendEntriesSearchVsControl, weights1, 
-					setLinY, drawSame, sigBkg);
+					setLinY, drawSame, dataMC);
 
   //compare WZ search sample to control sample
   string WZSearchVsControlOutputFile(analysisFilePath + "WZ/analysis/isoVsNonIsoTaus" + tag1 + 
@@ -1412,12 +1412,12 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   drawMultipleEfficiencyGraphsOn1Canvas(WZSearchVsControlOutputFile, WZSearchVsControlInputFiles, 
 					canvasNames1D, graphNames1D, legendHeaders1WZ, colors, 
 					styles, legendEntriesSearchVsControl, weights1, setLinY, 
-					drawSame, sigBkg);
+					drawSame, dataMC);
   drawMultipleEfficiencyGraphsOn1Canvas(WZSearchVsControlReweightOutputFile, 
 					WZSearchVsControlReweightInputFiles, canvasNames1D, 
 					graphNames1D, legendHeaders1WZ, colors, styles, 
 					legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
-					sigBkg);
+					dataMC);
 
   //compare ZZ search sample to control sample
   string ZZSearchVsControlOutputFile(analysisFilePath + "ZZ/analysis/isoVsNonIsoTaus" + tag1 + 
@@ -1432,12 +1432,12 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   drawMultipleEfficiencyGraphsOn1Canvas(ZZSearchVsControlOutputFile, ZZSearchVsControlInputFiles, 
 					canvasNames1D, graphNames1D, legendHeaders1ZZ, colors, 
 					styles, legendEntriesSearchVsControl, weights1, setLinY, 
-					drawSame, sigBkg);
+					drawSame, dataMC);
   drawMultipleEfficiencyGraphsOn1Canvas(ZZSearchVsControlReweightOutputFile, 
 					ZZSearchVsControlReweightInputFiles, canvasNames1D, 
 					graphNames1D, legendHeaders1ZZ, colors, styles, 
 					legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
-					sigBkg);
+					dataMC);
 
   //compare WW search sample to control sample
   string WWSearchVsControlOutputFile(analysisFilePath + "WW/analysis/isoVsNonIsoTaus" + tag1 + 
@@ -1452,12 +1452,12 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   drawMultipleEfficiencyGraphsOn1Canvas(WWSearchVsControlOutputFile, WWSearchVsControlInputFiles, 
 					canvasNames1D, graphNames1D, legendHeaders1WW, colors, 
 					styles, legendEntriesSearchVsControl, weights1, setLinY, 
-					drawSame, sigBkg);
+					drawSame, dataMC);
   drawMultipleEfficiencyGraphsOn1Canvas(WWSearchVsControlReweightOutputFile, 
 					WWSearchVsControlReweightInputFiles, canvasNames1D, 
 					graphNames1D, legendHeaders1WW, colors, styles, 
 					legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
-					sigBkg);
+					dataMC);
 
   //make the final plot showing all background methods, signals, data, and errors
   makeFinalPlot(pair<string, float>(sigVsBkgQCDFromDataOutputFile20InvFb, 1.0), 

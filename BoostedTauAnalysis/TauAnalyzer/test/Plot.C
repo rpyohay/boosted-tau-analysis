@@ -800,10 +800,21 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
     outStream.cd();
     outputCanvases[canvasIndex]->cd(dataMC ? 1 : 0);
     if (!drawStack) {
+      TH1F* ratioHist = NULL;
       for (vector<string>::const_iterator iInputFile = inputFiles.begin(); 
 	   iInputFile != inputFiles.end(); ++iInputFile) {
 	const unsigned int fileIndex = iInputFile - inputFiles.begin();
-	if (hists[canvasIndex][fileIndex] != NULL) hists[canvasIndex][fileIndex]->Draw("HISTSAME");
+	if (hists[canvasIndex][fileIndex] != NULL) {
+	  hists[canvasIndex][fileIndex]->Draw("HISTESAME");
+	  if (dataMC) {
+	    if (fileIndex == 0) ratioHist = (TH1F*)hists[canvasIndex][fileIndex]->Clone();
+	    else ratioHist->Divide(hists[canvasIndex][fileIndex]);
+	  }
+	}
+      }
+      if (ratioHist != NULL) {
+	outputCanvases[canvasIndex]->cd(dataMC ? 2 : 0);
+	ratioHist->Draw();
       }
     }
     else {
