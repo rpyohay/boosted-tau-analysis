@@ -813,6 +813,7 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 	}
       }
       if (ratioHist != NULL) {
+	ratioHist->GetYaxis()->SetRangeUser(0.0, 2.0);
 	outputCanvases[canvasIndex]->cd(dataMC ? 2 : 0);
 	ratioHist->Draw();
       }
