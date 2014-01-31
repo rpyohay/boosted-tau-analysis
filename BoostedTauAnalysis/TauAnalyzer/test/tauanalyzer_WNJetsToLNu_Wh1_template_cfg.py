@@ -62,6 +62,8 @@ process.source = cms.Source(
     )
 FILES
 
+process.source.duplicateCheckMode = cms.untracked.string('noDuplicateCheck') #speed?
+
 #for L1GtStableParametersRcd and jet corrections
 #START52_V9B is recommended for JEC in Summer12 CMSSWv5.2 MC
 #START52_V9 is what the Summer12 CMSSWv5.2 MC was produced with
