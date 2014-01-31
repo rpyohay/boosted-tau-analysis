@@ -1196,7 +1196,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 					legendHeaders2p5InvFb, colors, styles, 
 					legendEntriesMCData, weightsMCData, setLogY, drawStack, 
 					dataMC);
-  drawDifferenceGraphsOn1Canvas(dataVsMCOutputDiff2p5InvFb, dataVsMCInputFiles, canvasNames1D, 
+  drawDifferenceGraphsOn1Canvas(dataVsMCOutputDiff2p5InvFb, dataVsMCReweightInputFiles, canvasNames1D, 
 				graphNames1D, legendHeaders2p5InvFb, colors, styles, 
 				legendEntriesMCData, weightsMCData, setLogY, sigBkg);
 
@@ -1364,7 +1364,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 					drawSame, sigBkg);
 
   //make the final plot showing all background methods, signals, data, and errors
-  makeFinalPlot(pair<string, float>(sigVsBkgQCDFromDataOutputFile20InvFb, 2.5/20.0), 
+  makeFinalPlot(pair<string, float>(sigVsBkgQCDFromDataOutputFile20InvFb, 1.0), 
 		dataIsoHaddOutputFile, 
 		pair<string, float>(dataVsMCReweightOutputFile2p5InvFb, 1.0), 
 		vector<string>(1, "muHadMass"), vector<string>(1, "m_{#mu+had} (GeV)"), 
