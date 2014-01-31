@@ -1446,9 +1446,9 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
   TLegend legendBkgSep(0.35, 0.55, 0.75, 0.75);
   TLegend legendBkgMain5(0.35, 0.55, 0.75, 0.75);
   TLegend legendBkgAll(0.35, 0.55, 0.75, 0.75);
-  setLegendOptions(legendBkgSep, "CMS 2.5 fb^{-1}");
-  setLegendOptions(legendBkgMain5, "CMS 2.5 fb^{-1}");
-  setLegendOptions(legendBkgAll, "CMS 2.5 fb^{-1}");
+  setLegendOptions(legendBkgSep, "CMS 20 fb^{-1}");
+  setLegendOptions(legendBkgMain5, "CMS 20 fb^{-1}");
+  setLegendOptions(legendBkgAll, "CMS 20 fb^{-1}");
   if (canvasIsoSigBkg != NULL) {
     TList* sigs = canvasIsoSigBkg->GetListOfPrimitives();
     for (vector<TH1F*>::iterator iIsoSig = isoSig.begin(); iIsoSig != isoSig.end(); 

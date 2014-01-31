@@ -322,7 +322,8 @@ process.output = cms.OutputModule(
     )
 
 #MET filter
-process.METFilter.minMET = cms.double(40.)
+process.METFilter.minMET = cms.double(30.)
+process.MTFilter.minMT = cms.double(50.)
 
 #OS filter for tau_mu W_mu charge product
 process.OSSFFilterIso = cms.EDFilter('OSSFFilter',
@@ -377,6 +378,7 @@ process.isoTauAnalysisSequence = cms.Sequence(process.muHadIsoTauSelector*
                                               process.TriggerObjectFilter*
                                               process.OSSFFilterIso*
                                               process.SSSFFilterIso*
+                                              process.MTFilter*
                                              process.muHadIsoTauAnalyzer)
 process.signalIsoTauAnalysisSequence = cms.Sequence(process.genWMuNuSelector*
                                                     process.IsoMu24eta2p1Selector*
@@ -388,12 +390,14 @@ process.signalIsoTauAnalysisSequence = cms.Sequence(process.genWMuNuSelector*
                                                     process.TriggerObjectFilter*
                                                     process.OSSFFilterIso*
                                                     process.SSSFFilterIso*
+                                                    process.MTFilter*
                                                     process.muHadIsoTauAnalyzer)
 process.nonIsoTauAnalysisSequence = cms.Sequence(process.muHadTauSelector*
                                                  process.muHadNonIsoTauSelector*
                                                  process.TriggerObjectFilter*
                                                  process.OSSFFilterNonIso*
                                                  process.SSSFFilterNonIso*
+                                                 process.MTFilter*
                                                  process.muHadNonIsoTauAnalyzer)
 process.tauAnalysisSequence = cms.Sequence(process.muHadTauSelector*process.muHadTauAnalyzer)
 

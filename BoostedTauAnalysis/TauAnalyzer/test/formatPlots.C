@@ -1192,7 +1192,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 					legendHeaders2p5InvFb, colors, styles, 
 					legendEntriesMCData, weightsMCData, setLogY, drawStack, 
 					dataMC);
-  drawDifferenceGraphsOn1Canvas(dataVsMCOutputDiff2p5InvFb, dataVsMCInputFiles, canvasNames1D, 
+  drawDifferenceGraphsOn1Canvas(dataVsMCOutputDiff2p5InvFb, dataVsMCReweightInputFiles, canvasNames1D, 
 				graphNames1D, legendHeaders2p5InvFb, colors, styles, 
 				legendEntriesMCData, weightsMCData, setLogY, sigBkg);
 
