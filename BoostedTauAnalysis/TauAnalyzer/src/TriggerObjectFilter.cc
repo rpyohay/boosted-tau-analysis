@@ -83,6 +83,8 @@ class TriggerObjectFilter : public edm::EDFilter {
   edm::InputTag theRightHLTTag_;
   edm::InputTag theRightHLTSubFilter_;
   std::vector<edm::InputTag> HLTSubFilters_;
+  bool highestPTOnly_;
+  unsigned int minNumObjsToPassFilter_;
 };
 
 //
@@ -112,7 +114,13 @@ TriggerObjectFilter::TriggerObjectFilter(const edm::ParameterSet& iConfig):hltCo
   theRightHLTSubFilter_ = iConfig.getParameter<edm::InputTag>("theRightHLTSubFilter");
   //Whether using HLT trigger path name or the actual trigger filter name. Trigger path is default.
   HLTSubFilters_ = iConfig.getUntrackedParameter<std::vector<edm::InputTag> >("HLTSubFilters",std::vector<edm::InputTag>());
+  if (iConfig.existsAs<unsigned int>("minNumObjsToPassFilter")) {
+    minNumObjsToPassFilter_ = iConfig.getParameter<unsigned int>("minNumObjsToPassFilter");
+    highestPTOnly_ = false;
+  }
+  else highestPTOnly_ = true;
 
+  produces<reco::MuonRefVector>();
 }
 
 
@@ -133,6 +141,9 @@ TriggerObjectFilter::~TriggerObjectFilter()
 bool
 TriggerObjectFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
+  //create pointer to output collection
+  std::auto_ptr<reco::MuonRefVector> muonColl(new reco::MuonRefVector);
+
   bool trigger_matched = false;
   int index = 9999;
 
@@ -246,6 +257,10 @@ TriggerObjectFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 //    cout << "trgIndex = " << trgIndex << " and trgNames size = " << trgNames.size() << endl;
 //    cout << "firedHLT = " << firedHLT << endl;
 
+   /*store ref key of each passing muon so we can check that no muon is written into the 
+     produced collection more than once*/
+   std::vector<unsigned int> passingMuonRefKeys;
+
    // If the event fired the HLT,
    // loop over the trigger object collection 
    if (firedHLT)
@@ -253,21 +268,35 @@ TriggerObjectFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
        // Get cut decision for each candidate
        // Did this candidate cause an HLT trigger?
        bool hltTrigger = false;
+
        for(int ipart = 0; ipart != nK; ++ipart) { 
 	 
 	 const trigger::TriggerObject& TO = TOC[KEYS[ipart]];	
 	 double dRval = deltaR(Wmu_eta, Wmu_phi, TO.eta(), TO.phi());
-// 	 cout << "dRval = " << dRval << endl;
+	 // cout << "dRval = " << dRval << endl;
+
+	 //save RECO muons matched to trigger objects
+	 for (reco::MuonRefVector::const_iterator iMuon = WMuons->begin(); iMuon != WMuons->end(); 
+	      ++iMuon) {
+	   if ((deltaR(**iMuon, TO) < delRMatchingCut_) && 
+	       (std::find(passingMuonRefKeys.begin(), passingMuonRefKeys.end(), 
+			  iMuon->key()) == passingMuonRefKeys.end())) muonColl->push_back(*iMuon);
+	 }
+
 	 hltTrigger = dRval < delRMatchingCut_;
 	 if( hltTrigger )
 	   {
 	     trigger_matched = true;
-	     break;
+	     // break;
 	   }
        }        
      } //firedHLT
 
-  return trigger_matched;
+   //put collection of RECO muons matched to trigger objects into the event
+   iEvent.put(muonColl);
+
+   return (highestPTOnly_ ? 
+	   trigger_matched : (passingMuonRefKeys.size() >= minNumObjsToPassFilter_));
 }
 
 // ------------ method called once each job just before starting event loop  ------------
