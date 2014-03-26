@@ -38,7 +38,7 @@ void compareVersions(const vector<vector<string> >& versions)
     }
     muHadMass.push_back(muHadMassThisVersion);
   }
-  cout << "v86 v87 % difference\n";
+  cout << "old new % difference\n";
   for (unsigned int iFile = 0; iFile < versions[0].size(); ++iFile) {
     cout << versions[0][iFile] << endl;
     for (unsigned int iBin = 0; iBin < muHadMass[0][0].size(); ++iBin) {
