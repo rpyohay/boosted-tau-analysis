@@ -24,7 +24,7 @@ for i in `seq $start $num_jobs`
   sed -e "s%JOBNUM%$i%g" ../${script_name}.py > ${script_name}_${i}.py
   sed -e "s%JOBNUM%$i%g" -e "s%DIRNAME%$dir_name%g" -e "s%SCRIPTNAME%$script_name%g" ../${script_name}.sh > ${script_name}_${i}.sh
   chmod a+x ${script_name}_${i}.sh
-  bsub -q 8nh -J ${script_name}_${i} < ${script_name}_${i}.sh
+  bsub -q 1nd -J ${script_name}_${i} < ${script_name}_${i}.sh
 done
 
 exit 0
