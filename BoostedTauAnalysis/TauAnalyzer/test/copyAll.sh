@@ -20,7 +20,7 @@ cd $version
 ./copyTTJetsFromEOS.sh
 ./copyWJetsToLNuFromEOS.sh
 ./copyWNJetsToLNuFromEOS.sh
-./copyWJetsToLNuFromEOS.sh
+./copyWbbFromEOS.sh
 ./copySingleTopFromEOS.sh
 ./copyWZFromEOS.sh
 ./copyWWFromEOS.sh

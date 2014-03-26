@@ -13,6 +13,7 @@ version=$1
 ./generateTTJetsTauAnalyzerCfgs.sh $version
 ./generateWJetsToLNuTauAnalyzerCfgs.sh $version
 ./generateWNJetsToLNuTauAnalyzerCfgs.sh $version
+./generateWbbTauAnalyzerCfgs.sh $version
 ./generateSingleTopTauAnalyzerCfgs.sh $version
 ./generateWZTauAnalyzerCfgs.sh $version
 ./generateWWTauAnalyzerCfgs.sh $version
