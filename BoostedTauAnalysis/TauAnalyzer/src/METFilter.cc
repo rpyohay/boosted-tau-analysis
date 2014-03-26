@@ -105,7 +105,7 @@ METFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
   //get MET
   edm::Handle<edm::View<reco::PFMET> > pMET;
   iEvent.getByLabel(METTag_, pMET);
-  cout << "size of MET vector = " << pMET->size() << endl;
+//   cout << "size of MET vector = " << pMET->size() << endl;
   if (pMET->refAt(0)->et() > minMET_)
     return true;
   else
