@@ -124,6 +124,9 @@ class Common {
   //get muon combined particle isolation with adjustable PU subtraction
   static float getMuonCombPFIso(const reco::Muon&, const double);
 
+  //get muon isolation computed from leptons only
+  static float getMuonLeptonPFIso(const reco::Muon&);
+
   /*fill STL container with muons passing the 2012 tight selection, PF isolation, and |eta|
     (cf. https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId and 
     https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Muon_Isolation_AN1)*/
@@ -168,15 +171,17 @@ class Common {
   //fill STL container with taus passing specified discriminators in specified eta range
   static std::vector<reco::PFTauRef>
     getRecoTaus(const edm::Handle<reco::PFTauCollection>&,
-		const std::vector<edm::Handle<reco::PFTauDiscriminator> >&, const double, 
-		const double, const bool);
+		const std::vector<edm::Handle<reco::PFTauDiscriminator> >&, 
+		const edm::Handle<reco::PFTauDiscriminator>&, const double, const double, 
+		const bool, const double);
 
   //fill STL container with taus passing specified discriminators in specified eta range
   static std::vector<reco::PFTauRef>
     getRecoTaus(const edm::Handle<reco::PFTauRefVector>&, 
 		const edm::Handle<reco::PFTauCollection>&,
-		const std::vector<edm::Handle<reco::PFTauDiscriminator> >&, const double, 
-		const double, const bool);
+		const std::vector<edm::Handle<reco::PFTauDiscriminator> >&, 
+		const edm::Handle<reco::PFTauDiscriminator>&, const double, const double, 
+		const bool, const double);
 
   //set canvas drawing options
   static void setCanvasOptions(TCanvas&, const Int_t, const Int_t, const Int_t);

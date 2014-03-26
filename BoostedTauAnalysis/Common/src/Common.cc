@@ -180,6 +180,12 @@ float Common::getMuonCombPFIso(const reco::Muon& muon, const double PUSubtractio
 				 PUSubtractionCoeff*isoBlock.sumPUPt)));
 }
 
+float Common::getMuonLeptonPFIso(const reco::Muon& muon)
+{
+  const reco::MuonPFIsolation isoBlock = muon.pfIsolationR04();
+  return (isoBlock.sumChargedParticlePt - isoBlock.sumChargedHadronPt);
+}
+
 std::vector<reco::MuonRef>
 Common::getTightPFIsolatedRecoMuons(const edm::Handle<reco::MuonCollection>& pMuons, 
 				    const reco::Vertex* pPV, const double PUSubtractionCoeff, 
@@ -265,7 +271,8 @@ Common::getSoftRecoMuons(const edm::Handle<reco::MuonRefVector>& pMuons,
 std::vector<reco::PFTauRef> 
 Common::getRecoTaus(const edm::Handle<reco::PFTauCollection>& pTaus, 
 		    const std::vector<edm::Handle<reco::PFTauDiscriminator> >& pTauDiscriminators, 
-		    const double pTMin, const double etaMax, const bool passIso)
+		    const edm::Handle<reco::PFTauDiscriminator>& pTauHadIso, const double pTMin, 
+		    const double etaMax, const bool passIso, const double isoMax)
 {
   std::vector<reco::PFTauRef> taus;
   for (reco::PFTauCollection::const_iterator iTau = pTaus->begin(); iTau != pTaus->end(); ++iTau) {
@@ -279,7 +286,8 @@ Common::getRecoTaus(const edm::Handle<reco::PFTauCollection>& pTaus,
     }
     if (((passIso && passTauDiscriminators) || (!passIso && !passTauDiscriminators)) && 
 	((etaMax == -1.0) || (fabs(iTau->eta()) < etaMax)) && 
-	((pTMin == -1.0) || (iTau->pt() > pTMin))) {
+	((pTMin == -1.0) || (iTau->pt() > pTMin)) && 
+	((isoMax == -1.0) || ((*pTauHadIso)[tauRef] < isoMax))) {
       taus.push_back(tauRef);
     }
   }
@@ -290,7 +298,8 @@ std::vector<reco::PFTauRef>
 Common::getRecoTaus(const edm::Handle<reco::PFTauRefVector>& pTaus, 
 		    const edm::Handle<reco::PFTauCollection>& pBaseTaus, 
 		    const std::vector<edm::Handle<reco::PFTauDiscriminator> >& pTauDiscriminators, 
-		    const double pTMin, const double etaMax, const bool passIso)
+		    const edm::Handle<reco::PFTauDiscriminator>& pTauHadIso, const double pTMin, 
+		    const double etaMax, const bool passIso, const double isoMax)
 {
   std::vector<reco::PFTauRef> taus;
   for (reco::PFTauRefVector::const_iterator iTau = pTaus->begin(); iTau != pTaus->end(); ++iTau) {
@@ -304,7 +313,8 @@ Common::getRecoTaus(const edm::Handle<reco::PFTauRefVector>& pTaus,
     }
     if (((passIso && passTauDiscriminators) || (!passIso && !passTauDiscriminators)) && 
 	((etaMax == -1.0) || (fabs((*iTau)->eta()) < etaMax)) && 
-	((pTMin == -1.0) || ((*iTau)->pt() > pTMin))) {
+	((pTMin == -1.0) || ((*iTau)->pt() > pTMin)) && 
+	((isoMax == -1.0) || ((*pTauHadIso)[tauRef] < isoMax))) {
       taus.push_back(tauRef);
     }
   }
