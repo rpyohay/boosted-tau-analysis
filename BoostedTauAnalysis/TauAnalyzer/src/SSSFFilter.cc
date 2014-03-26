@@ -69,6 +69,7 @@ class SSSFFilter : public edm::EDFilter {
 //   edm::InputTag WMuonTag_;
   edm::InputTag tauTag_;
   edm::InputTag jetMuonMapTag_;
+  bool passFilter_;
 
 };
 
@@ -89,6 +90,7 @@ SSSFFilter::SSSFFilter(const edm::ParameterSet& iConfig)
 //   WMuonTag_ = iConfig.getParameter<edm::InputTag>("WMuonTag");
   tauTag_ = iConfig.getParameter<edm::InputTag>("tauTag");
   jetMuonMapTag_ = iConfig.getParameter<edm::InputTag>("jetMuonMapTag");
+  passFilter_ = iConfig.getParameter<bool>("passFilter");
 }
 
 
@@ -150,7 +152,8 @@ SSSFFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	 iMuon != removedMuons.end(); ++iMuon) { removedMuonRefs.push_back(*iMuon); }
     Common::sortByPT(removedMuonRefs);
     double chargeTauMuon = removedMuonRefs[removedMuonRefs.size() - 1]->charge();
-    if (chargeTauMuon*chargeTauHad < 0)
+    if ((passFilter_ && (chargeTauMuon*chargeTauHad < 0)) || //select opposite charge tau pairs
+	(!passFilter_ && (chargeTauMuon*chargeTauHad >= 0))) //select same charge tau pairs
       SignSelector = true;
     
     ++iTau; 

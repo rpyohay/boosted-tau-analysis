@@ -69,7 +69,7 @@ class OSSFFilter : public edm::EDFilter {
   edm::InputTag WMuonTag_;
   edm::InputTag tauTag_;
   edm::InputTag jetMuonMapTag_;
-
+  bool passFilter_;
 };
 
 //
@@ -89,6 +89,7 @@ OSSFFilter::OSSFFilter(const edm::ParameterSet& iConfig)
   WMuonTag_ = iConfig.getParameter<edm::InputTag>("WMuonTag");
   tauTag_ = iConfig.getParameter<edm::InputTag>("tauTag");
   jetMuonMapTag_ = iConfig.getParameter<edm::InputTag>("jetMuonMapTag");
+  passFilter_ = iConfig.getParameter<bool>("passFilter");
 }
 
 
@@ -150,7 +151,8 @@ OSSFFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	 iMuon != removedMuons.end(); ++iMuon) { removedMuonRefs.push_back(*iMuon); }
     Common::sortByPT(removedMuonRefs);
     double chargeTauMuon = removedMuonRefs[removedMuonRefs.size() - 1]->charge();
-    if (chargeTauMuon*chargeWMuon > 0)
+    if ((passFilter_ && (chargeTauMuon*chargeWMuon > 0)) || //select same charge muons
+	(!passFilter_ && (chargeTauMuon*chargeWMuon <= 0))) //select opposite charge muons
       SignSelector = true;
     
     ++iTau; 
