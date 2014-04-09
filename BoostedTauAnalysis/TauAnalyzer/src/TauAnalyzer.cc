@@ -1412,7 +1412,7 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       plotMT(removedMuonRefs[removedMuonRefs.size() - 1], pMET, tauMuMT_, PUWeight);
 
       //plot the transverse mass for the hadronic tau
-      edm::RefToBase<reco::PFMET> METRefToBase = pMET->refAt(0);
+
       double tauHad_TransverseMass = 
 	sqrt(2*(*iTau)->pt()*METRefToBase->et()*
 	     (1.0 - cos(reco::deltaPhi((*iTau)->phi(), METRefToBase->phi()))));
