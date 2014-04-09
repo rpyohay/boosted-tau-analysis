@@ -1,8 +1,8 @@
 #!/bin/bash
 
-if [ $# -ne 1 ]
+if [ $# -ne 2 ]
     then
-    echo "Usage: ./generateDataDrellYanAnalyzerCfgs.sh <version>"
+    echo "Usage: ./generateDataDrellYanAnalyzerCfgs.sh <version> <template cfg>"
     exit 0
 fi
 
@@ -10,6 +10,7 @@ fi
 
 #version
 version=$1
+templateCfg=$2
 infoTag=""
 dir=$version
 
@@ -50,7 +51,7 @@ for i in `seq $iBeg $iEnd`
   do
 
   #generate cfg file
-  sed -e "s%FILES%${inputFileBlocks[${i}]}%" -e "s%OUTFILE%${DrellYanAnalyzerOutputFiles[${i}]}%" -e "s%PUSCENARIO%S10%" -e "s%MCFLAG%False%" ../drellyananalyzer_template_cfg.py > drellyananalyzer_${samples[${i}]}_cfg.py
+  sed -e "s%FILES%${inputFileBlocks[${i}]}%" -e "s%OUTFILE%${DrellYanAnalyzerOutputFiles[${i}]}%" -e "s%PUSCENARIO%S10%" -e "s%MCFLAG%False%" ../${templateCfg} > drellyananalyzer_${samples[${i}]}_cfg.py
 
   #generate job submission script for LSF
   cat <<EOF > drellyananalyzer_${samples[${i}]}_cfg.sh
