@@ -1286,7 +1286,7 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       }
       else ++iBinEdge;
     }
-    const int tauHadPTBin = (int)(iBinEdge - fakeRateTauHadPTBins_.begin());
+//     const int tauHadPTBin = (int)(iBinEdge - fakeRateTauHadPTBins_.begin());
     double tauHadPTWeight = 1.0;
     double tauHadPTWeightErr = 0.0;
     if (reweight_) {
