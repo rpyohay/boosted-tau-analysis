@@ -5,4 +5,5 @@
 <use name="DataFormats/JetReco"/>
 <use name="DataFormats/TauReco"/>
 <use name="BoostedTauAnalysis/Common"/>
+<use name="JetMETCorrections/Objects"/>
 <flags EDM_PLUGIN="1"/>

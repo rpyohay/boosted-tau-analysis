@@ -338,7 +338,7 @@ CheckTauIsoCands::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 		 visibleHadTauP4+=hadTauDaughterRef->p4();
 	       }
 	     }
-	     const double visibleHadTauPT = visibleHadTauP4.Pt();
+// 	     const double visibleHadTauPT = visibleHadTauP4.Pt();
 	     const double visibleHadTauEta = visibleHadTauP4.Eta();
 	     
 	     //get the muon 4-vector

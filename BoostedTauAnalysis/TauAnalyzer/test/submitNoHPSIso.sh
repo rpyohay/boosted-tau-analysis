@@ -19,6 +19,7 @@ cd $version
 ./submitDataAllTauAnalyzerJobs.sh
 ./submitTTJetsAllTauAnalyzerJobs.sh
 ./submitWNJetsToLNuAllTauAnalyzerJobs.sh
+./submitWbbAllTauAnalyzerJobs.sh
 ./submitWJetsToLNuAllTauAnalyzerJobs.sh
 ./submitSingleTopAllTauAnalyzerJobs.sh
 ./submitWZAllTauAnalyzerJobs.sh
@@ -27,7 +28,7 @@ cd $version
 ./submitQCDAllTauAnalyzerJobs.sh
 ./submitQCDBAllTauAnalyzerJobs.sh
 ./submitQCDBMuAllTauAnalyzerJobs.sh
-./submitNonIsoWAllTauAnalyzerJobs.sh
+./submitNonIsoWDataAllTauAnalyzerJobs.sh
 cd ..
 
 exit 0

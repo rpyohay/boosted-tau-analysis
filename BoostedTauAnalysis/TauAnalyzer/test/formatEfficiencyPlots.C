@@ -86,15 +86,43 @@
   hist1DMapTau["numeratorEta"] = unitEtaTau;
   hist1DMapTau["denominatorEta"] = unitEtaTau;
 
-  //make individual efficiency plots for signal
+//   //make individual efficiency plots for signal
+//   vector<string> effInputFiles;
+//   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/HPSTauEff.root");
+//   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/HPSTauPTEff.root");
+//   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/HPSTauPTEtaDMFEff.root");
+//   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/HPSTauPTEtaDMFIsoEff.root");
+//   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/HPSTauPTEtaEff.root");
+//   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/softMuEtaEff.root");
+//   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/softMuPTEff.root");
+//   for (vector<string>::const_iterator iFile = effInputFiles.begin(); iFile != effInputFiles.end(); 
+//        ++iFile) {
+//     const unsigned int strLen = iFile->find(".root");
+//     const string outputFileName(iFile->substr(0, strLen) + "_final.root");
+//     plotNice(*iFile, effHistMap, binLabelMap, hist1DMap, outputFileName, "noPDF");
+//   }
+
+//   //make HLT efficiency plots for signal
+//   vector<string> effInputFiles;
+//   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/genWRecoMuonEtaHLTEff.root");
+//   effInputFiles.
+//     push_back("../../GenMatchedRecoObjectProducer/test/genWRecoMuonEtaPTIDHLTEff.root");
+//   effInputFiles.
+//     push_back("../../GenMatchedRecoObjectProducer/test/genA1TauRecoMuonEtaHLTEff.root");
+//   effInputFiles.
+//     push_back("../../GenMatchedRecoObjectProducer/test/genA1TauRecoMuonEtaPTIDHLTEff.root");
+//   for (vector<string>::const_iterator iFile = effInputFiles.begin(); iFile != effInputFiles.end(); 
+//        ++iFile) {
+//     const unsigned int strLen = iFile->find(".root");
+//     const string outputFileName(iFile->substr(0, strLen) + "_final.root");
+//     plotNice(*iFile, effHistMap, binLabelMap, hist1DMap, outputFileName, "noPDF");
+//   }
+
+  //make HLT efficiency plots for Z-->tautau
   vector<string> effInputFiles;
-  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/HPSTauEff.root");
-  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/HPSTauPTEff.root");
-  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/HPSTauPTEtaDMFEff.root");
-  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/HPSTauPTEtaDMFIsoEff.root");
-  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/HPSTauPTEtaEff.root");
-  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/softMuEtaEff.root");
-  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/softMuPTEff.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/testoutput_mi_had_muHLT.root");
+  effInputFiles.
+    push_back("../../GenMatchedRecoObjectProducer/test/all_dmf_rerun_had_muHLT.root");
   for (vector<string>::const_iterator iFile = effInputFiles.begin(); iFile != effInputFiles.end(); 
        ++iFile) {
     const unsigned int strLen = iFile->find(".root");

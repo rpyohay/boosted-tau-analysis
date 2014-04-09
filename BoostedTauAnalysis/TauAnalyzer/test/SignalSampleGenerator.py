@@ -30,6 +30,12 @@ process.load('Configuration.StandardSequences.Reconstruction_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
+#change the PU dataset for mix
+process.mix.input.fileNames = cms.untracked.vstring(
+	'/store/relval/CMSSW_5_3_6-START53_V14/RelValProdMinBias/GEN-SIM-RAW/v2/00000/4677049F-042A-E211-8525-0026189438E8.root',
+	'/store/relval/CMSSW_5_3_6-START53_V14/RelValProdMinBias/GEN-SIM-RAW/v2/00000/52000D8A-032A-E211-BC94-00304867BFA8.root'
+	)
+
 #so the seed is randomized for each job
 from IOMC.RandomEngine.RandomServiceHelper import  RandomNumberServiceHelper
 randHelper =  RandomNumberServiceHelper(process.RandomNumberGeneratorService)
@@ -46,8 +52,7 @@ process.maxEvents = cms.untracked.PSet(
 
 # Input source
 process.source = cms.Source("EmptySource")
-## process.source.firstRun = cms.untracked.uint32(JOBNUM)
-process.source.firstRun = cms.untracked.uint32(1)
+process.source.firstRun = cms.untracked.uint32(JOBNUM)
 
 process.options = cms.untracked.PSet(
 
@@ -120,8 +125,8 @@ process.generator = cms.EDFilter(
 	#masses of the 3 neutral scalar Higgses in the NMSSM, lightest to heaviest
 ## 	'PMAS(C25,1)=115.0 !h/H1 mass',
 ## 	'PMAS(C35,1)=125.0 !H/H2 mass',
-	'PMAS(C25,1)=125.0 !h/H2 mass',
-	'PMAS(C35,1)=115.0 !H/H1 mass',	
+	'PMAS(C25,1)=500.0 !h/H2 mass',
+	'PMAS(C35,1)=125.0 !H/H1 mass',	
 	'PMAS(C45,1)=500.0 !H3 mass',
 	
 	#charged Higgs mass?

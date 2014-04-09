@@ -19,6 +19,7 @@ cd $version
 ./submitDataTauAnalyzerJobs.sh
 ./submitTTJetsTauAnalyzerJobs.sh
 ./submitWNJetsToLNuTauAnalyzerJobs.sh
+./submitWbbTauAnalyzerJobs.sh
 ./submitWJetsToLNuTauAnalyzerJobs.sh
 ./submitSingleTopTauAnalyzerJobs.sh
 ./submitWZTauAnalyzerJobs.sh

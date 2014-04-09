@@ -61,6 +61,8 @@ process.source = cms.Source(
     )
 FILES
 
+process.source.duplicateCheckMode = cms.untracked.string('noDuplicateCheck') #speed?
+
 #for L1GtStableParametersRcd and jet corrections
 #START52_V9B is recommended for JEC in Summer12 CMSSWv5.2 MC
 #START52_V9 is what the Summer12 CMSSWv5.2 MC was produced with
@@ -258,6 +260,8 @@ process.PFTau = cms.Sequence(process.recoTauCommonSequence*process.recoTauClassi
 process.muHadIsoTauSelector = cms.EDFilter(
     'CustomTauSelector',
     baseTauTag = cms.InputTag('hpsPFTauProducer', '', 'SKIM'),
+    tauHadIsoTag = cms.InputTag('hpsPFTauDiscriminationByRawCombinedIsolationDBSumPtCorr', '',
+                                'SKIM'),
     tauDiscriminatorTags = cms.VInputTag(
     cms.InputTag('hpsPFTauDiscriminationByDecayModeFinding', '', 'SKIM'), 
     cms.InputTag('hpsPFTauDiscriminationByMediumCombinedIsolationDBSumPtCorr', '', 'SKIM')
@@ -268,6 +272,7 @@ process.muHadIsoTauSelector = cms.EDFilter(
     passDiscriminator = cms.bool(True),
     pTMin = cms.double(10.0),
     etaMax = cms.double(2.4),
+    isoMax = cms.double(-1.0),
     dR = cms.double(0.5),
     minNumObjsToPassFilter = cms.uint32(1)
     )
@@ -290,6 +295,33 @@ process.muHadNonIsoTauSelector.tauDiscriminatorTags = cms.VInputTag(
 process.muHadNonIsoTauSelector.passDiscriminator = cms.bool(False)
 
 #produce AK5PFchs L1FastL2L3 corrected jets
+
+#create a collection of corrected jets with pT > 20 GeV and |eta| < 2.4 distinct from the W muon
+#and isolated tau
+#this collection has no memory of the uncorrected jets
+process.corrJetDistinctIsoTauSelector = cms.EDFilter('CustomJetSelector',
+                                                     tauTag = cms.InputTag('muHadIsoTauSelector'),
+                                                     muonTag = cms.InputTag('WIsoMuonSelector'),
+                                                     oldJetTag = cms.InputTag('ak5PFJets'),
+                                                     jetMuonMapTag = cms.InputTag('CleanJets'),
+                                                     pTMin = cms.double(30.0),
+                                                     absEtaMax = cms.double(2.4),
+                                                     dR = cms.double(0.3),
+                                                     minNumObjsToPassFilter = cms.uint32(0),
+                                                     maxNumObjsToPassFilter = cms.int32(-1)
+                                                     )
+
+#create a collection of corrected jets with pT > 20 GeV and |eta| < 2.4 distinct from the W muon
+#and non-isolated tau
+#this collection has no memory of the uncorrected jets
+process.corrJetDistinctNonIsoTauSelector = process.corrJetDistinctIsoTauSelector.clone()
+process.corrJetDistinctNonIsoTauSelector.tauTag = cms.InputTag('muHadNonIsoTauSelector')
+
+#create a collection of corrected jets with pT > 20 GeV and |eta| < 2.4 distinct from the W muon
+#and tau passing decay mode finding
+#this collection has no memory of the uncorrected jets
+process.corrJetDistinctTauSelector = process.corrJetDistinctIsoTauSelector.clone()
+process.corrJetDistinctTauSelector.tauTag = cms.InputTag('muHadTauSelector')
 
 #produce Type-1 corrected PFMET objects
 process.pfMetType1 = process.pfType1CorrectedMet.clone()
@@ -328,6 +360,7 @@ process.muHadIsoTauAnalyzer = cms.EDAnalyzer(
     PUTag = cms.InputTag('addPileupInfo'),
     vtxTag = cms.InputTag('offlinePrimaryVertices'),
     allGenParticleTag = cms.InputTag('genParticles'),
+    corrJetTag = cms.InputTag('corrJetDistinctIsoTauSelector'),
     bJetTag = cms.InputTag('combinedSecondaryVertexBJetTags'),
     dR = cms.double(0.3),
     tauPTMin = cms.double(10.0), #GeV
@@ -351,6 +384,7 @@ process.muHadNonIsoTauAnalyzer.outFileName = cms.string(
     'NONISOTAUANALYZEROUTFILE'
     )
 process.muHadNonIsoTauAnalyzer.tauTag = cms.InputTag('muHadNonIsoTauSelector')
+process.muHadNonIsoTauAnalyzer.corrJetTag = cms.InputTag('corrJetDistinctNonIsoTauSelector')
 process.muHadNonIsoTauAnalyzer.reweight = cms.bool(REWEIGHT)
 
 #analyze all taus
@@ -359,6 +393,7 @@ process.muHadTauAnalyzer.outFileName = cms.string(
     'ALLTAUANALYZEROUTFILE'
     )
 process.muHadTauAnalyzer.tauTag = cms.InputTag('muHadTauSelector')
+process.muHadTauAnalyzer.corrJetTag = cms.InputTag('corrJetDistinctTauSelector')
 
 #output
 process.output = cms.OutputModule(
@@ -370,29 +405,36 @@ process.output = cms.OutputModule(
     )
 
 #MET filter
-process.METFilter.minMET = cms.double(50.)
-process.METFilter.METTag = cms.InputTag("pfMetType1")
-process.MTFilter.minMT = cms.double(80.)
+process.METFilter.minMET = cms.double(0.)
+
+#MT filter
+process.MTFilter.minMT = cms.double(50.)
 process.MTFilter.METTag = cms.InputTag("pfMetType1")
 
 #OS filter for tau_mu W_mu charge product
 process.OSSFFilterIso = cms.EDFilter('OSSFFilter',
                                   WMuonTag = cms.InputTag('WIsoMuonSelector'),
                                   tauTag = cms.InputTag('muHadIsoTauSelector'),
-                                  jetMuonMapTag = cms.InputTag('CleanJets', '', 'SKIM')
+                                  jetMuonMapTag = cms.InputTag('CleanJets', '', 'SKIM'),
+                                     passFilter = cms.bool(True)
                                   )
 process.OSSFFilterNonIso = process.OSSFFilterIso.clone()
 process.OSSFFilterNonIso.tauTag = cms.InputTag('muHadNonIsoTauSelector')
+process.OSSFFilter = process.OSSFFilterIso.clone()
+process.OSSFFilter.tauTag = cms.InputTag('muHadTauSelector')
 
 #SS filter for tau_mu tau_had charge product
 process.SSSFFilterIso = cms.EDFilter('SSSFFilter',
 ##                                   WMuonTag = cms.InputTag('WIsoMuonSelector'),
                                   tauTag = cms.InputTag('muHadIsoTauSelector'),
-                                  jetMuonMapTag = cms.InputTag('CleanJets', '', 'SKIM')
+                                  jetMuonMapTag = cms.InputTag('CleanJets', '', 'SKIM'),
+                                     passFilter = cms.bool(True)
                                   )
 process.SSSFFilterNonIso = process.SSSFFilterIso.clone()
 process.SSSFFilterNonIso.tauTag = cms.InputTag('muHadNonIsoTauSelector')
-
+## process.SSSFFilterNonIso.passFilter = cms.bool(False)
+process.SSSFFilter = process.SSSFFilterIso.clone()
+process.SSSFFilter.tauTag = cms.InputTag('muHadTauSelector')
 
 #Trigger object filter
 process.TriggerObjectFilter = cms.EDFilter(
@@ -424,14 +466,14 @@ process.TriggerObjectFilter = cms.EDFilter(
 
 #sequences
 process.beginSequence = cms.Sequence(process.genPartonSelector*process.genMuSelector)
-process.isoTauAnalysisSequence = cms.Sequence(process.btagging*
-                                              process.muHadIsoTauSelector*
+process.isoTauAnalysisSequence = cms.Sequence(process.btagging*process.muHadIsoTauSelector*
+                                              process.corrJetDistinctIsoTauSelector*
                                               process.TriggerObjectFilter*
                                               process.producePFMETCorrections*
                                               process.OSSFFilterIso*
                                               process.SSSFFilterIso*
-#                                              process.METFilter*
-                                             process.muHadIsoTauAnalyzer)
+                                              process.METFilter*
+                                              process.muHadIsoTauAnalyzer)
 process.signalIsoTauAnalysisSequence = cms.Sequence(process.genWMuNuSelector*
                                                     process.IsoMu24eta2p1Selector*
                                                     process.WMuonPTSelector*
@@ -444,18 +486,23 @@ process.signalIsoTauAnalysisSequence = cms.Sequence(process.genWMuNuSelector*
                                                     process.producePFMETCorrections*
                                                     process.OSSFFilterIso*
                                                     process.SSSFFilterIso*
-#                                                    process.METFilter*
+                                                    process.METFilter*
                                                     process.muHadIsoTauAnalyzer)
 process.nonIsoTauAnalysisSequence = cms.Sequence(process.btagging*
                                                  process.muHadTauSelector*
                                                  process.muHadNonIsoTauSelector*
+                                                 process.corrJetDistinctNonIsoTauSelector*
                                                  process.TriggerObjectFilter*
                                                  process.producePFMETCorrections*
                                                  process.OSSFFilterNonIso*
                                                  process.SSSFFilterNonIso*
-#                                                 process.METFilter*
+                                                 process.METFilter*
                                                  process.muHadNonIsoTauAnalyzer)
-process.tauAnalysisSequence = cms.Sequence(process.muHadTauSelector*process.muHadTauAnalyzer)
+process.tauAnalysisSequence = cms.Sequence(process.btagging*process.muHadTauSelector*
+                                           process.corrJetDistinctTauSelector*
+                                           process.TriggerObjectFilter*process.OSSFFilter*
+                                           process.SSSFFilter*process.METFilter*
+                                           process.muHadTauAnalyzer)
 
 #path
 process.p = cms.Path(SEQUENCE)

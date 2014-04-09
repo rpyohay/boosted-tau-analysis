@@ -61,6 +61,9 @@ private:
   //input tag for base tau collection
   edm::InputTag baseTauTag_;
 
+  //input tag for tau isolation energy
+  edm::InputTag tauHadIsoTag_;
+
   //input tag for clean jet collection
   edm::InputTag jetTag_;
 
@@ -81,6 +84,9 @@ private:
 
   //|eta| cut
   double etaMax_;
+
+  //maximum isolation cut
+  double isoMax_;
 
   //W muon matching cut
   double dR_;
@@ -104,6 +110,7 @@ CustomTauSelector::CustomTauSelector(const edm::ParameterSet& iConfig) :
   tauTag_(iConfig.existsAs<edm::InputTag>("tauTag") ? 
 	  iConfig.getParameter<edm::InputTag>("tauTag") : edm::InputTag()),
   baseTauTag_(iConfig.getParameter<edm::InputTag>("baseTauTag")),
+  tauHadIsoTag_(iConfig.getParameter<edm::InputTag>("tauHadIsoTag")),
   jetTag_(iConfig.existsAs<edm::InputTag>("jetTag") ? 
 	  iConfig.getParameter<edm::InputTag>("jetTag") : edm::InputTag()),
   muonRemovalDecisionTag_(iConfig.existsAs<edm::InputTag>("muonRemovalDecisionTag") ? 
@@ -115,6 +122,7 @@ CustomTauSelector::CustomTauSelector(const edm::ParameterSet& iConfig) :
   passDiscriminator_(iConfig.getParameter<bool>("passDiscriminator")),
   pTMin_(iConfig.getParameter<double>("pTMin")),
   etaMax_(iConfig.getParameter<double>("etaMax")),
+  isoMax_(iConfig.getParameter<double>("isoMax")),
   dR_(iConfig.getParameter<double>("dR")),
   minNumObjsToPassFilter_(iConfig.getParameter<unsigned int>("minNumObjsToPassFilter"))
 {
@@ -160,6 +168,10 @@ bool CustomTauSelector::filter(edm::Event& iEvent, const edm::EventSetup& iSetup
   edm::Handle<reco::PFTauCollection> pBaseTaus;
   iEvent.getByLabel(baseTauTag_, pBaseTaus);
 
+  //get hadronic tau deltaBeta-corrected isolation
+  edm::Handle<reco::PFTauDiscriminator> pTauHadIso;
+  iEvent.getByLabel(tauHadIsoTag_, pTauHadIso);
+
   //get tau discriminators
   std::vector<edm::Handle<reco::PFTauDiscriminator> > 
     pTauDiscriminators(tauDiscriminatorTags_.size(), edm::Handle<reco::PFTauDiscriminator>());
@@ -198,9 +210,10 @@ bool CustomTauSelector::filter(edm::Event& iEvent, const edm::EventSetup& iSetup
 
   //fill STL container with taus passing specified discriminators in specified eta and pT range
   std::vector<reco::PFTauRef> taus = pTaus.isValid() ? 
-    Common::getRecoTaus(pTaus, pBaseTaus, pTauDiscriminators, pTMin_, etaMax_, 
-			passDiscriminator_) : 
-    Common::getRecoTaus(pBaseTaus, pTauDiscriminators, pTMin_, etaMax_, passDiscriminator_);
+    Common::getRecoTaus(pTaus, pBaseTaus, pTauDiscriminators, pTauHadIso, pTMin_, etaMax_, 
+			passDiscriminator_, isoMax_) : 
+    Common::getRecoTaus(pBaseTaus, pTauDiscriminators, pTauHadIso, pTMin_, etaMax_, 
+			passDiscriminator_, isoMax_);
 
   //loop over selected taus
   unsigned int nPassingTaus = 0;

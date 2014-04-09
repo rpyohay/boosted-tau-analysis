@@ -38,6 +38,8 @@ mkdir -p /data1/`whoami`/TTJets/analysis
 mkdir -p /data1/`whoami`/TTJets/EDM_files
 mkdir -p /data1/`whoami`/WNJetsToLNu/analysis
 mkdir -p /data1/`whoami`/WNJetsToLNu/EDM_files
+mkdir -p /data1/`whoami`/Wbb/analysis
+mkdir -p /data1/`whoami`/Wbb/EDM_files
 mkdir -p /data1/`whoami`/WJetsToLNu/analysis
 mkdir -p /data1/`whoami`/WJetsToLNu/EDM_files
 mkdir -p /data1/`whoami`/WW/analysis
@@ -112,20 +114,17 @@ Then execute
 
 cd ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test
 cmsenv
-root -l -b -q 'formatPlots.C("v<input_version>", "v<output_version>", "v<raw_version>", "v<reweight_version>")'
+root -l -b -q 'formatPlots.C("v<input_version>", "v<output_version>", [true|false])'
 
 where
 
 <input_version> is the integer version number associated to the input files you want to analyze
 <output_version> is the version number that will be assigned to the output files you create (typically it's the same as the input version but there might be special cases where you'd like them to be different)
-<raw_version> is the version number of the non-reweighted signal vs. background output file
-<reweight_version> is the version number of the reweighted data vs. MC output file
-
-"Reweighting" above refers to hadronic tau pT reweighting, which is used on the data control sample for measuring the background in the plot of mu+had invariant mass.  You have to execute step 2 with reweighting turned on to get the reweighted data vs. MC files.
+"true" means recompile the code, "false" means do not recompile the code
 
 If you want to also make plots where no HPS tau isolation cut is applied, do
 
-root -l -b -q 'formatPlots.C("v<input_version>", "v<output_version>", "v<raw_version>", "v<reweight_version>", true)'
+root -l -b -q 'formatPlots.C("v<input_version>", "v<output_version>", [true|false], true)'
 
 instead of the root command given above.
 
@@ -165,6 +164,11 @@ instead of the root command given above.
 /data1/<your_username>/WNJetsToLNu/analysis/muHadIsoAnalysis_WNJetsToLNu_v<version_number>.root
 /data1/<your_username>/WNJetsToLNu/analysis/muHadNonIsoAnalysis_WNJetsToLNu_v<version_number>.root
 /data1/<your_username>/WNJetsToLNu/analysis/muHadNonIsoReweightAnalysis_WNJetsToLNu_v<version_number>.root
+
+/data1/<your_username>/Wbb/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
+/data1/<your_username>/Wbb/analysis/muHadIsoAnalysis_Wbb_v<version_number>.root
+/data1/<your_username>/Wbb/analysis/muHadNonIsoAnalysis_Wbb_v<version_number>.root
+/data1/<your_username>/Wbb/analysis/muHadNonIsoReweightAnalysis_Wbb_v<version_number>.root
 
 /data1/<your_username>/WJetsToLNu/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
 /data1/<your_username>/WJetsToLNu/analysis/muHadIsoAnalysis_WJetsToLNu_v<version_number>.root
@@ -250,6 +254,7 @@ where
 ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/generateSingleTopTauAnalyzerCfgs.sh
 ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/generateTTJetsTauAnalyzerCfgs.sh
 ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/generateWNJetsToLNuTauAnalyzerCfgs.sh
+~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/generateWbbTauAnalyzerCfgs.sh
 ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/generateWJetsToLNuTauAnalyzerCfgs.sh
 ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/generateWWTauAnalyzerCfgs.sh
 ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/generateWZTauAnalyzerCfgs.sh

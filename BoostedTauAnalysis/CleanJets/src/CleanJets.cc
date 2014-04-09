@@ -399,10 +399,10 @@ CleanJets::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 		   visibleHadTauP4+=hadTauDaughterRef->p4();
 		 }
 	       }
-	       const double visibleHadTauPT = visibleHadTauP4.Pt();
+// 	       const double visibleHadTauPT = visibleHadTauP4.Pt();
 	       const double visibleHadTauEta = visibleHadTauP4.Eta();
-	       double muTauEta;
-	       double muTauPhi;
+	       double muTauEta = 0.0;
+	       double muTauPhi = 0.0;
 	     
 	       //get the muon 4-vector
 	       int iGenMu = -1;
@@ -420,10 +420,10 @@ CleanJets::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	       if (iGenMu == -1) throw cms::Exception("TauAnalyzer") << "Muon not found.\n";
 	       reco::GenParticleRef muRef(genParticles, iGenMu);
 	       const double genMuPT = muRef->pt();
-	       const double genMuEta = muRef->eta();
+// 	       const double genMuEta = muRef->eta();
 	    
 	       //get dR between visible parts of hadronic tau and muonic tau
-	       const double muHadDR = reco::deltaR(visibleHadTauEta, visibleHadTauP4.Phi(), genMuEta, muRef->phi());
+// 	       const double muHadDR = reco::deltaR(visibleHadTauEta, visibleHadTauP4.Phi(), genMuEta, muRef->phi());
 	    
 	       // collect this gen tau_had if it satisfies mu and tau pT cutoffs
 	       // and match it to an HPS tau
@@ -431,14 +431,14 @@ CleanJets::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 		 { // if it satisfies the cutoffs
 		   tausFromTMTH.push_back(tauRef);
 		   //cout << "We have found a tau_had whose sister was a tau_mu" << endl;
-		   double mindelR_tm = 100.;
+// 		   double mindelR_tm = 100.;
 		   double delR_tm = 100.;
 		   double mindelR_th = 100.;
 		   double delR_th = 100.;
 		   unsigned int jetIterator = 0;
 		   unsigned int jetPointer = 0;
-		   bool tmMatched = false;
-		   bool thMatched = false;
+// 		   bool tmMatched = false;
+// 		   bool thMatched = false;
 		
 		   // loop over PFJets
 		   for(std::vector<reco::PFJet>::const_iterator iJet = pfjetVector.begin(); iJet != pfjetVector.end(); ++iJet)
@@ -454,12 +454,15 @@ CleanJets::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 		   if (mindelR_th < 0.3)
 		     { // if mindelR_th < 0.3
 		       //cout << "Jet matched to this tau_had! Match to tau_mu now." << endl;
-		       thMatched = true;
-		       delR_tm = deltaR(pfjetVector[jetPointer].p4().eta(), pfjetVector[jetPointer].p4().phi(),muTauEta, muTauPhi);
+// 		       thMatched = true;
+		       if (iGenMu != -1) {
+			 delR_tm = deltaR(pfjetVector[jetPointer].p4().eta(), 
+					  pfjetVector[jetPointer].p4().phi(),muTauEta, muTauPhi);
+		       }
 		       if (delR_tm < 0.3)
 			 { // if delR_tm < 0.3
 			   //cout << "Jet matched to sister tau_mu too!" << endl;
-			   tmMatched = true;
+// 			   tmMatched = true;
 			   //look at pfjet candidates before erasing the jet
 			   std::vector<reco::PFCandidatePtr> jetcands = pfjetVector[jetPointer].getPFConstituents();
 			   for(std::vector<reco::PFCandidatePtr>::const_iterator cand = jetcands.begin(); cand != jetcands.end(); ++cand)
