@@ -38,6 +38,8 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   canvasNames1D.push_back("muHadMassReweightErrSqCanvas");
   canvasNames1D.push_back("muHadChargeCanvas");
   canvasNames1D.push_back("METCanvas");
+  canvasNames1D.push_back("bTagDiscrimCanvas");
+  canvasNames1D.push_back("WMuIsoCanvas");
   canvasNames1D.push_back("WMuMTCanvas");
   canvasNames1D.push_back("tauMuMTCanvas");
   canvasNames1D.push_back("tauHadMTCanvas");
@@ -138,6 +140,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   canvasNames2D.push_back("mWMuTauMuVsMWMuTauMuTauHadCanvas");
   canvasNames2D.push_back("mWMuTauMuVsMWMuTauMuTauHadGenFSRCanvas");
   canvasNames2D.push_back("muHadMassVsMWMuTauMuTauHadCanvas");
+  canvasNames2D.push_back("WMuMTVsMETCanvas");
   canvasNames2D.push_back("muHad_t3t1VsptmjCanvas");
   canvasNames2D.push_back("muHad_t3t1VsDecayModeCanvas");
   canvasNames2D.push_back("muHadMassVsNAddlJetsCanvas");
@@ -147,6 +150,8 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   graphNames1D.push_back("muHadMassReweightErrSq");
   graphNames1D.push_back("muHadCharge");
   graphNames1D.push_back("MET");
+  graphNames1D.push_back("bTagDiscrim");
+  graphNames1D.push_back("WMuIso");
   graphNames1D.push_back("WMuMT");
   graphNames1D.push_back("tauMuMT");
   graphNames1D.push_back("tauHadMT");
@@ -247,6 +252,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   graphNames2D.push_back("mWMuTauMuVsMWMuTauMuTauHad");
   graphNames2D.push_back("mWMuTauMuVsMWMuTauMuTauHadGenFSR");
   graphNames2D.push_back("muHadMassVsMWMuTauMuTauHad");
+  graphNames2D.push_back("WMuMTVsMET");
   graphNames2D.push_back("muHad_t3t1Vsptmj");
   graphNames2D.push_back("muHad_t3t1VsDecayMode");
   graphNames2D.push_back("muHadMassVsNAddlJets");
@@ -555,7 +561,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 		 vector<float>(4, 1.0), canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, 
 		 nullBlindLow, nullBlindHigh);
   }
-
+  
   //"hadd" Wh1 sample just to get the formatting of the 2D plots the same
   cout << "...Wh1\n";
   string Wh1Suffix(Wh1SigVTag + fileExt);
