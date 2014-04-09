@@ -1288,7 +1288,6 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 				canvasNames1D, graphNames1D, legendHeaders19p7InvFb, colors, 
 				styles, legendEntriesMCData, weightsMCData, setLogY, sigBkg);
 
-
   //compute data-driven QCD estimate in signal (i.e. isolated W muon + isolated tau) region
   string outputFileNameA(analysisFilePath + "results/dataVsMC_RegionAQCDEstimate" + dataVTag + 
 			 fileExt);

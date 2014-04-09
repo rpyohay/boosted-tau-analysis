@@ -35,6 +35,13 @@ METFilter = cms.EDFilter(
     METTag = cms.InputTag("pfMet")
     )
 
+MTFilter = cms.EDFilter(
+    'MTFilter',
+    minMT = cms.double(40.),
+    METTag = cms.InputTag("pfMet"),
+    muonTag = cms.InputTag("WIsoMuonSelector")
+    )
+
 DelPhiFilter = cms.EDFilter(
     'DelPhiFilter',
     delPhiCut = cms.double(0.5),

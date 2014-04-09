@@ -358,6 +358,9 @@ process.output = cms.OutputModule(
 #MET filter
 process.METFilter.minMET = cms.double(0.)
 
+#MT filter
+process.MTFilter.minMT = cms.double(50.)
+
 #OS filter for tau_mu W_mu charge product
 process.OSSFFilterIso = cms.EDFilter('OSSFFilter',
                                   WMuonTag = cms.InputTag('WIsoMuonSelector'),

@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
-// Package:    METFilter
-// Class:      METFilter
+// Package:    MTFilter
+// Class:      MTFilter
 // 
-/**\class METFilter METFilter.cc BoostedTauAnalysis/METFilter/src/METFilter.cc
+/**\class MTFilter MTFilter.cc BoostedTauAnalysis/MTFilter/src/MTFilter.cc
 
  Description: [one line class summary]
 
@@ -33,6 +33,9 @@
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/METReco/interface/PFMETFwd.h"
 #include "DataFormats/METReco/interface/PFMET.h"
+#include "DataFormats/MuonReco/interface/MuonFwd.h"
+#include "DataFormats/MuonReco/interface/Muon.h"
+#include "BoostedTauAnalysis/Common/interface/Common.h"
 
 using namespace edm;
 using namespace reco;
@@ -42,10 +45,10 @@ using namespace std;
 // class declaration
 //
 
-class METFilter : public edm::EDFilter {
+class MTFilter : public edm::EDFilter {
    public:
-      explicit METFilter(const edm::ParameterSet&);
-      ~METFilter();
+      explicit MTFilter(const edm::ParameterSet&);
+      ~MTFilter();
 
       static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
@@ -61,8 +64,9 @@ class METFilter : public edm::EDFilter {
 
       // ----------member data ---------------------------
 
-  double minMET_;
+  double minMT_;
   edm::InputTag METTag_;
+  edm::InputTag muonTag_;
 
 };
 
@@ -77,15 +81,16 @@ class METFilter : public edm::EDFilter {
 //
 // constructors and destructor
 //
-METFilter::METFilter(const edm::ParameterSet& iConfig) :
-  minMET_(iConfig.getParameter<double>("minMET")),
-  METTag_(iConfig.getParameter<edm::InputTag>("METTag"))
+MTFilter::MTFilter(const edm::ParameterSet& iConfig) :
+  minMT_(iConfig.getParameter<double>("minMT")),
+  METTag_(iConfig.getParameter<edm::InputTag>("METTag")),
+  muonTag_(iConfig.getParameter<edm::InputTag>("muonTag"))
 {
   //now do what ever initialization is needed
 }
 
 
-METFilter::~METFilter()
+MTFilter::~MTFilter()
 {
  
    // do anything here that needs to be done at desctruction time
@@ -100,12 +105,27 @@ METFilter::~METFilter()
 
 // ------------ method called on each new Event  ------------
 bool
-METFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
+MTFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {   
   //get MET
   edm::Handle<edm::View<reco::PFMET> > pMET;
   iEvent.getByLabel(METTag_, pMET);
-  if (pMET->refAt(0)->et() > minMET_)
+  edm::RefToBase<reco::PFMET> METRefToBase = pMET->refAt(0);
+  //get W muons
+  edm::Handle<reco::MuonRefVector> pMuons;
+  iEvent.getByLabel(muonTag_, pMuons);
+
+  //find the highest pT W muon
+  std::vector<reco::MuonRef> WMuonRefs;
+  for (reco::MuonRefVector::const_iterator iMuon = pMuons->begin(); iMuon != pMuons->end(); 
+       ++iMuon) { WMuonRefs.push_back(*iMuon); }
+  Common::sortByPT(WMuonRefs);
+
+
+  double MT = sqrt(2*WMuonRefs[WMuonRefs.size() - 1]->pt()*METRefToBase->et()*
+		   (1.0 - cos(reco::deltaPhi(WMuonRefs[WMuonRefs.size() - 1]->phi(), METRefToBase->phi()))));
+
+  if (MT > minMT_)
     return true;
   else
     return false;
@@ -113,46 +133,46 @@ METFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 // ------------ method called once each job just before starting event loop  ------------
 void 
-METFilter::beginJob()
+MTFilter::beginJob()
 {
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
 void 
-METFilter::endJob() {
+MTFilter::endJob() {
 }
 
 // ------------ method called when starting to processes a run  ------------
 bool 
-METFilter::beginRun(edm::Run&, edm::EventSetup const&)
+MTFilter::beginRun(edm::Run&, edm::EventSetup const&)
 { 
   return true;
 }
 
 // ------------ method called when ending the processing of a run  ------------
 bool 
-METFilter::endRun(edm::Run&, edm::EventSetup const&)
+MTFilter::endRun(edm::Run&, edm::EventSetup const&)
 {
   return true;
 }
 
 // ------------ method called when starting to processes a luminosity block  ------------
 bool 
-METFilter::beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
+MTFilter::beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
 {
   return true;
 }
 
 // ------------ method called when ending the processing of a luminosity block  ------------
 bool 
-METFilter::endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
+MTFilter::endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
 {
   return true;
 }
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
 void
-METFilter::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+MTFilter::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   //The following says we do not know what parameters are allowed so do no validation
   // Please change this to state exactly what you do use, even if it is no parameters
   edm::ParameterSetDescription desc;
@@ -160,4 +180,4 @@ METFilter::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   descriptions.addDefault(desc);
 }
 //define this as a plug-in
-DEFINE_FWK_MODULE(METFilter);
+DEFINE_FWK_MODULE(MTFilter);
