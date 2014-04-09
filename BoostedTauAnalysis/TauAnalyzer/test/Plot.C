@@ -631,8 +631,8 @@ void draw(const vector<string>& canvasNames, TFile& outStream, vector<TCanvas*>&
 //       hists[canvasIndex]->GetZaxis()->SetRangeUser(0.00001, 1.0);
       hists[canvasIndex]->GetZaxis()->SetRangeUser(0.1, 10000.0);
       hists[canvasIndex]->Draw("COLZ");
-      TProfile* profileX = 
-	hists[canvasIndex]->ProfileX((string(hists[canvasIndex]->GetName()) + "_pfx").c_str());
+//       TProfile* profileX = 
+// 	hists[canvasIndex]->ProfileX((string(hists[canvasIndex]->GetName()) + "_pfx").c_str());
 //       profileX->SetLineWidth(3);
 //       profileX->Draw("HISTSAME");
 //       profileX->Draw("ESAME");
@@ -745,8 +745,8 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 			    "p_{T}/m" : pHist->GetXaxis()->GetTitle(), 
 			    pHist->GetYaxis()->GetTitle());
 	if (string(pHist->GetName()) == "muHadMass"/*"tauHadIso"*/) {
-	  cout << *iInputFile << endl;
-	  cout << "Integral: " << pHist->Integral(5, -1)/*pHist->Integral(0, -1)*/ << endl;
+	  cout << "Processing file " << *iInputFile << endl;
+	  cout << "m > 4 GeV: " << pHist->Integral(5, -1) << endl;
 	}
 	string histName(pHist->GetName());
 	if (histName == "jet_pt_etacut") pHist->GetXaxis()->SetTitle("p_{T} (GeV)");
@@ -756,9 +756,6 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 	if (histName == "jet_ptmj_etacut") {
 	  pHist->GetXaxis()->SetTitle("#frac{p_{T}}{m}");
 	}
-// 	if (string(pHist->GetName()) == "jet_ptmj_etacut") {
-// 	  cout << "Integral(second jet pT/m > 13): " << pHist->Integral(14, -1) << endl;
-// 	}
 	if (setLogY) pHist->GetYaxis()->SetRangeUser(0.1, 10000.0);
 	string legendStyle("l");
 	if (drawStack) {
@@ -1039,10 +1036,6 @@ void drawDifferenceGraphsOn1Canvas(const string& outputFileName,
       }
       else {
 	pHist = (TH1F*)pCanvas->GetPrimitive(graphNames[canvasIndex].c_str());
-// 	if (string(pHist->GetName()) == "tauHadIso") {
-// 	  cout << *iInputFile << endl;
-// 	  cout << "Integral: " << pHist->Integral(0, -1) << endl;
-// 	}
 	float weight = weights[fileIndex] == 0.0 ? 1.0/pHist->Integral(0, -1) : weights[fileIndex];
 	setHistogramOptions(pHist, colors[fileIndex], 0.7, styles[fileIndex], 
 			    weight, 
@@ -1057,15 +1050,6 @@ void drawDifferenceGraphsOn1Canvas(const string& outputFileName,
 	if (histName == "jet_ptmj_etacut") {
 	  pHist->GetXaxis()->SetTitle("#frac{p_{T}}{m}");
 	}
-// 	if (string(pHist->GetName()) == "muHadPTOverMuHadMass") {
-// 	  cout << *iInputFile << endl;
-// 	  cout << "Integral(pT/m > 13): " << pHist->Integral(14, -1) << endl;
-// 	}
-// 	if (string(pHist->GetName()) == "tauHadIso") {
-// 	  cout << *iInputFile << endl;
-// 	  cout << "Integral: " << pHist->Integral(0, -1) << endl;
-// 	  cout << "Weight: " << weight << endl;
-// 	}
 	if (setLogY) pHist->GetYaxis()->SetRangeUser(0.1, 10000.0);
 	string legendStyle("l");
 	hists[canvasIndex][fileIndex] = pHist;
@@ -1366,16 +1350,16 @@ void addClosurePlot(TFile& sigVsBkgIsoStream, const string& var, const string& u
   setCanvasOptions(*outCanvas.cd(2), 1, 0, 0);
   setCanvasMargins(*outCanvas.cd(2), 0.2, 0.2, 0.2, 0.2);
   outCanvas.cd(1);
-  Double_t histBkgIsoErr = -1.0;
-  Double_t histBkgNonIsoErr = -1.0;
+//   Double_t histBkgIsoErr = -1.0;
+//   Double_t histBkgNonIsoErr = -1.0;
   histSig->Draw("HIST");
-  cout << histSig->Integral(5, -1) << endl;
+//   cout << histSig->Integral(5, -1) << endl;
   histBkgIso->Draw("HISTE");
-  cout << histBkgIso->IntegralAndError(5, -1, histBkgIsoErr) << "+/-";
-  cout << histBkgIsoErr << endl;
+//   cout << histBkgIso->IntegralAndError(5, -1, histBkgIsoErr) << "+/-";
+//   cout << histBkgIsoErr << endl;
   histBkgNonIso->Draw("HISTESAME");
-  cout << histBkgNonIso->IntegralAndError(5, -1, histBkgNonIsoErr) << "+/-";
-  cout << histBkgNonIsoErr << endl;
+//   cout << histBkgNonIso->IntegralAndError(5, -1, histBkgNonIsoErr) << "+/-";
+//   cout << histBkgNonIsoErr << endl;
   outCanvas.cd(2);
   TH1F* isoOverNonIso = (TH1F*)histBkgIso->Clone();
   isoOverNonIso->Divide(histBkgNonIso);
@@ -1736,7 +1720,7 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
 	sum+=hist->GetBinContent(iBin);
       }
     }
-    cerr << "Region A MC + data-driven QCD, m > 4: " << sum << endl;
+    cout << "Region A MC + data-driven QCD, m > 4: " << sum << endl;
     isoBkgMain5.SetMinimum(0.01);
     isoBkgMain5.SetMaximum(10000.0);
     isoBkgMain5.GetHistogram()->GetXaxis()->SetTitle(unit.c_str());
@@ -1750,15 +1734,15 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
   nonIsoData->Draw("HISTESAME");
   Double_t statErr;
   nonIsoData->IntegralAndError(5, -1, statErr);
-  cerr << "Region B data, m > 4: " << nonIsoData->Integral(5, -1) << " +/- " << statErr << endl;
+  cout << "Region B data, m > 4: " << nonIsoData->Integral(5, -1) << " +/- " << statErr << endl;
   for (vector<TH1F*>::iterator iIsoSig = isoSig.begin(); iIsoSig != isoSig.end(); 
        ++iIsoSig) {
     (*iIsoSig)->Draw("HISTSAME");
-    cerr << "Region A signal " << iIsoSig - isoSig.begin() << ", m > 4: ";
-    cerr << (*iIsoSig)->Integral(5, -1) << endl;
+    cout << "Region A signal " << iIsoSig - isoSig.begin() << ", m > 4: ";
+    cout << (*iIsoSig)->Integral(5, -1) << endl;
   }
   isoData->Draw("ESAME");
-  cerr << "Region A data, m < 2: " << isoData->Integral(1, 2) << endl;
+  cout << "Region A data, m < 2: " << isoData->Integral(1, 2) << endl;
   if (option == "separate") legendBkgSep.Draw();
   else if (option == "main 5") legendBkgMain5.Draw();
   else if (option == "combined") legendBkgAll.Draw();
@@ -2181,39 +2165,46 @@ void format(TH1* hist, const float yAxisLow, const float yAxisHigh)
 
 //plot ratio of 2 histograms and fit
 void divideAndFit(const string& fileName1, const string& fileName2, const string& outputFileName, 
-		  const string& outputCanvasName, const bool stack, const string& histName1, 
-		  const string& histName2, const string& canvasName1, const string& canvasName2, 
-		  const unsigned int pad, const double scale, const vector<double>& bins, 
+		  const vector<string>& outputCanvasName, const bool stack, 
+		  const vector<string>& histName1, const vector<string>& histName2, 
+		  const vector<string>& canvasName1, const vector<string>& canvasName2, 
+		  const unsigned int pad, const double scale, const vector<vector<double> >& bins, 
 		  const string& fitFunction, const float yAxisLow, const float yAxisHigh)
 {
   TFile file1(fileName1.c_str());
   TFile file2(fileName2.c_str());
   TFile outputFile(outputFileName.c_str(), "RECREATE");
-  TCanvas outputCanvas(outputCanvasName.c_str(), "", 600, 600);
-  setCanvasOptions(outputCanvas, 1, 0, 0);
   if (file1.IsOpen() && file2.IsOpen()) {
-    TH1F* hist1 = NULL;
-    TH1F* hist2 = NULL;
-    if (stack) {
-      hist1 = getStackSumHist<TH1F>(file1, histName1.c_str(), canvasName1.c_str(), pad);
-      hist2 = getStackSumHist<TH1F>(file2, histName2.c_str(), canvasName2.c_str(), pad);
-    }
-    else {
-      hist1 = getObjectFromCanvas<TH1F>(file1, histName1.c_str(), canvasName1.c_str(), pad);
-      hist2 = getObjectFromCanvas<TH1F>(file2, histName2.c_str(), canvasName2.c_str(), pad);
-    }
-    if ((hist1 != NULL) && (hist2 != NULL)) {
-      TH1* outputHist = divideAndScale(hist1, hist2, scale, bins);
-      draw(outputFile, outputCanvas, outputHist, fitFunction.c_str());
-      format(outputHist, yAxisLow, yAxisHigh);
-      outputCanvas.Write();
-//       cerr << "-------\n";
-//       for (Int_t iBin = 1; iBin <= outputHist->GetNbinsX(); ++iBin) {
-// 	cerr << iBin << " " << outputHist->GetBinContent(iBin) << " +/- ";
-// 	cerr << outputHist->GetBinError(iBin) << endl;
-//       }
-//       cerr << "-------\n";
-//       outputFile.Write();
+    for (vector<string>::const_iterator iHist = histName1.begin(); iHist != histName1.end(); 
+	 ++iHist) {
+      const unsigned int i = iHist - histName1.begin();
+      TH1F* hist1 = NULL;
+      TH1F* hist2 = NULL;
+      if (stack) {
+	hist1 = getStackSumHist<TH1F>(file1, histName1[i].c_str(), canvasName1[i].c_str(), pad);
+	hist2 = getStackSumHist<TH1F>(file2, histName2[i].c_str(), canvasName2[i].c_str(), pad);
+      }
+      else {
+	hist1 = 
+	  getObjectFromCanvas<TH1F>(file1, histName1[i].c_str(), canvasName1[i].c_str(), pad);
+	hist2 = 
+	  getObjectFromCanvas<TH1F>(file2, histName2[i].c_str(), canvasName2[i].c_str(), pad);
+      }
+      if ((hist1 != NULL) && (hist2 != NULL)) {
+	TH1* outputHist = divideAndScale(hist1, hist2, scale, bins[i]);
+	TCanvas outputCanvas(outputCanvasName[i].c_str(), "", 600, 600);
+	setCanvasOptions(outputCanvas, 1, 0, 0);
+	draw(outputFile, outputCanvas, outputHist, fitFunction.c_str());
+	format(outputHist, yAxisLow, yAxisHigh);
+	outputCanvas.Write();
+	//       cerr << "-------\n";
+	//       for (Int_t iBin = 1; iBin <= outputHist->GetNbinsX(); ++iBin) {
+	// 	cerr << iBin << " " << outputHist->GetBinContent(iBin) << " +/- ";
+	// 	cerr << outputHist->GetBinError(iBin) << endl;
+	//       }
+	//       cerr << "-------\n";
+	//       outputFile.Write();
+      }
     }
   }
   else cerr << "Error: could not open files " << fileName1 << " or " << fileName2 << ".\n";
@@ -2229,44 +2220,71 @@ void calculateTauPTWeightsFromFit(const string& regionCDataFileName,
 {
   const string histName("tauHadPT");
   const string canvasName(histName + "Canvas");
+  const vector<string> histNames(1, histName);
+  const vector<string> canvasNames(1, canvasName);
   divideAndFit(regionCDataFileName, regionBDataFileName, tauPTWeightsFileName, 
-	       "tauPTWeightsCanvas", false, histName, histName, canvasName, canvasName, 1, 0.0, 
-	       vector<double>(), "expo", 0.0, 2.0);
+	       vector<string>(1, "tauPTWeightsCanvas"), false, histNames, histNames, canvasNames, 
+	       canvasNames, 1, 0.0, vector<vector<double> >(1, vector<double>()), "expo", 0.0, 
+	       2.0);
 }
 
 //plot fake rate (ratio of isolated to non-isolated tau events)
 void plotFakeRate(const string& isoFileName, const string& nonIsoFileName, 
 		  const string& fakeRateFileName, const bool stack = false)
 {
-  string histName("tauHadPT");
-  const string canvasName(histName + "Canvas");
-  if (stack) histName+="Stack";
-  vector<double> bins;
-  bins.push_back(0.0);
-  bins.push_back(5.0);
-  bins.push_back(10.0);
-  bins.push_back(15.0);
-  bins.push_back(20.0);
-  bins.push_back(25.0);
-  bins.push_back(30.0);
-  bins.push_back(35.0);
-  bins.push_back(40.0);
-  bins.push_back(45.0);
-  bins.push_back(50.0);
-  bins.push_back(600.0);
-  divideAndFit(isoFileName, nonIsoFileName, fakeRateFileName, "fakeRateCanvas", stack, histName, 
-	       histName, canvasName, canvasName, 1, 1.0, /*bins*/vector<double>(), "", 0.0001, 0.3);
+  vector<string> histNames;
+  histNames.push_back("tauHadPT");
+  histNames.push_back("tauHadEta");
+  vector<string> canvasNames;
+  vector<string> outputCanvasNames;
+  for (vector<string>::const_iterator iHist = histNames.begin(); iHist != histNames.end(); 
+       ++iHist) {
+    const unsigned int i = iHist - histNames.begin();
+    canvasNames.push_back(histNames[i] + "Canvas");
+    outputCanvasNames.push_back(histNames[i] + "FakeRateCanvas");
+    if (stack) {
+      histNames[i]+="Stack";
+    }
+  }
+  vector<double> tauHadEtaBins;
+  tauHadEtaBins.push_back(-2.3);
+  tauHadEtaBins.push_back(-1.9);
+  tauHadEtaBins.push_back(-1.5);
+  tauHadEtaBins.push_back(-1.1);
+  tauHadEtaBins.push_back(-0.7);
+  tauHadEtaBins.push_back(-0.3);
+  tauHadEtaBins.push_back(0.1);
+  tauHadEtaBins.push_back(0.5);
+  tauHadEtaBins.push_back(0.9);
+  tauHadEtaBins.push_back(1.3);
+  tauHadEtaBins.push_back(1.7);
+  tauHadEtaBins.push_back(2.1);
+  tauHadEtaBins.push_back(2.3);
+  vector<vector<double> > bins;
+  bins.push_back(vector<double>());
+  bins.push_back(tauHadEtaBins);
+  divideAndFit(isoFileName, nonIsoFileName, fakeRateFileName, outputCanvasNames, stack, histNames, 
+	       histNames, canvasNames, canvasNames, 1, 1.0, bins, "", 0.0001, 0.3);
 }
 
 //plot ratio between two fake rates
 void plotFakeRateRatio(const string& dataFileName, const string& MCFileName, 
 		       const string& fakeRateRatioFileName)
 {
-  const string histName("tauHadPT");
-  const string canvasName("fakeRateCanvas");
-  divideAndFit(dataFileName, MCFileName, fakeRateRatioFileName, "fakeRateRatioCanvas", false, 
-	       histName, histName, canvasName, canvasName, 1, 1.0, vector<double>(), "", 0.1, 
-	       10.0);
+  vector<string> histNames;
+  histNames.push_back("tauHadPT");
+  histNames.push_back("tauHadEta");
+  vector<string> canvasNames;
+  vector<string> outputCanvasNames;
+  for (vector<string>::const_iterator iHist = histNames.begin(); iHist != histNames.end(); 
+       ++iHist) {
+    const unsigned int i = iHist - histNames.begin();
+    canvasNames.push_back(histNames[i] + "FakeRateCanvas");
+    outputCanvasNames.push_back(histNames[i] + "FakeRateRatioCanvas");
+  }
+  divideAndFit(dataFileName, MCFileName, fakeRateRatioFileName, outputCanvasNames, false, 
+	       histNames, histNames, canvasNames, canvasNames, 1, 1.0, 
+	       vector<vector<double> >(histNames.size(), vector<double>()), "", 0.1, 10.0);
 }
 
 //plot fit information for different selections
