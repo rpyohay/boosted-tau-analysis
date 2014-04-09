@@ -8,8 +8,10 @@
 <use name="DataFormats/Common"/>
 <use name="BoostedTauAnalysis/Common"/>
 <use name="JetMETCorrections/Objects"/>
+<use name="JetMETCorrections/Type1MET"/>
 <use name="PhysicsTools/Utilities"/>
 <use name="HLTrigger/HLTcore"/>
+<use name="DataFormats/BTauReco"/>
 <use name="root"/>
 <use name="rootgraphics"/>
 <use name="fastjet"/>
