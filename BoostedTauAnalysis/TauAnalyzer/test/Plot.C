@@ -1096,10 +1096,6 @@ void drawDifferenceGraphsOn1Canvas(const string& outputFileName,
 		{ // do nothing
 		  if (graphNames[canvasIndex].find("muHadMass") != string::npos)
 		    {
-// 		      double integral = hists[canvasIndex][fileIndex]->Integral();
-		      //cout << "Integrated number of events for " << graphNames[canvasIndex];//.c_str;
-		      //cout << " in sample " << inputFiles[fileIndex];//.c_str;
-		      //cout << " = " << integral << endl;
 		    }
 		  
 		} // do nothing
@@ -1107,10 +1103,6 @@ void drawDifferenceGraphsOn1Canvas(const string& outputFileName,
 		{
 		  if (graphNames[canvasIndex].find("muHadMass") != string::npos)
 		    {
-// 		      double integral = hists[canvasIndex][fileIndex]->Integral();
-		      //cout << "Integrated number of events for " << graphNames[canvasIndex];//.c_str;
-		      //cout << " in sample " << inputFiles[fileIndex];//.c_str;
-		      //cout << " = " << integral << endl;
 		    }
 		  histDiff[canvasIndex]->Add(hists[canvasIndex][fileIndex], -1.); // subtract from data
 		}
@@ -1193,20 +1185,7 @@ void drawQCDRegionAHistograms(const string& outputFileA,
     pHistB = (TH1F*)pCanvasB->GetPrimitive(graphNames[canvasIndex].c_str())->Clone();
     pHistC = (TH1F*)pCanvasC->GetPrimitive(graphNames[canvasIndex].c_str())->Clone();
     pHistD = (TH1F*)pCanvasD->GetPrimitive(graphNames[canvasIndex].c_str())->Clone();
-    //cout << "graph: " << graphNames[canvasIndex].c_str() << endl;
-    //cout << "pHistB integral = " << pHistB->Integral() << endl;
-    //cout << "pHistB integral > 4 = " << pHistB->Integral(5,100) << endl;
-    //cout << "pHistC integral = " << pHistC->Integral() << endl;
-    //cout << "pHistC integral > 4 = " << pHistC->Integral(5,100) << endl;
-    //cout << "pHistD integral = " << pHistD->Integral() << endl;
-    //cout << "pHistD integral > 4 = " << pHistD->Integral(5,100) << endl;
-    //cout << "pHistB minimum = " << pHistB->GetMinimum() << endl;
-//     pHistB->Multiply(pHistC);
     pHistB->Scale(pHistC->Integral(0, -1)/pHistD->Integral(0, -1));
-    //cout << "pHistBC integral = " << pHistB->Integral() << endl;
-//     pHistB->Divide(pHistD);
-    //cout << "pHistBC/D integral > 4 = " << pHistB->Integral(5,100) << endl;
-    //cout << "pHistBC/D minimum = " << pHistB->GetMinimum() << endl;
     float weight = 1.0;
     setHistogramOptions(pHistB, colors[0], 0.7, styles[0], 
 			weight, 
