@@ -238,7 +238,7 @@ void TagAndProbeEfficiencyAnalyzer<T>::beginJob()
   out_ = new TFile(outFileName_.c_str(), "RECREATE");
 
   //book pT histograms
-  const Double_t bins[11] = {0.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 100.0};
+//   const Double_t bins[11] = {0.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 100.0};
   denominatorPT_ = new TH1F("denominatorPT", "", 20, 0.0, 100.0/*10, bins*/);
   numeratorPT_ = new TH1F("numeratorPT", "", 20, 0.0, 100.0/*10, bins*/);
 
