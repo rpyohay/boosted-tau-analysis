@@ -1412,7 +1412,6 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       plotMT(removedMuonRefs[removedMuonRefs.size() - 1], pMET, tauMuMT_, PUWeight);
 
       //plot the transverse mass for the hadronic tau
-      edm::RefToBase<reco::PFMET> METRefToBase = pMET->refAt(0);
       double tauHad_TransverseMass = 
 	sqrt(2*(*iTau)->pt()*METRefToBase->et()*
 	     (1.0 - cos(reco::deltaPhi((*iTau)->phi(), METRefToBase->phi()))));
@@ -1858,6 +1857,23 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       }
       tauHadPhotonEnergyFraction_->Fill(tauHadPhotonEnergy/(*iTau)->et(), PUWeight);
 
+      //plot dPhi(W muon, leading soft muon per jet)
+//       double PhiW = (*WMuonRefs[WMuonRefs.size()-1]).phi();
+//       double PhiTau = (*removedMuonRefs[removedMuonRefs.size() - 1]).phi();
+      double dPhi = 
+	/*PhiW - PhiTau*/fabs(reco::deltaPhi(WMuonRefs[WMuonRefs.size()-1]->phi(), 
+					     removedMuonRefs[removedMuonRefs.size() - 1]->phi()));
+//       const double Pi = 3.14159265359;
+//       while (dPhi > Pi)
+// 	dPhi -= 2.0*Pi;
+//       while (dPhi < -1.0*Pi)
+// 	dPhi += 2.0*Pi;
+      dPhiWMuSoftMu_->Fill(dPhi, PUWeight);
+//       double Mass_WMuTauMu = (WMuonRefs[WMuonRefs.size() - 1]->p4() + 
+// 			      removedMuonRefs[removedMuonRefs.size() - 1]->p4()).M();
+      if (/*Mass_WMuTauMu*/mWMuTauMu > 20.)
+	dPhiWMuSoftMu_withCut_->Fill(dPhi, PUWeight);
+
       //plot cleaned jet pT vs. cleaned tau pT
       cleanedJetPTVsCleanedTauPT_->Fill((*iTau)->pt(), tauJetRef->pt(), PUWeight);
 
@@ -2144,13 +2160,15 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	  Fill(fabs(reco::deltaPhi(tauOldJetRef->phi(), secondJetRef->phi())), PUWeight);
 
 	// plot dPhi between W muon and second jet
-	double Pi = 3.14159265359;
-	double deltaphi = secondJetRef->phi() - WMuonRefs[WMuonRefs.size() - 1]->phi();
-	while (deltaphi > Pi)
-	  deltaphi -= 2.0*Pi;
-	while (deltaphi < -1.0*Pi)
-	  deltaphi += 2.0*Pi;
-	dPhiWMuSecJet_->Fill(deltaphi, PUWeight);
+// 	double Pi = 3.14159265359;
+// 	double deltaphi = secondJetRef->phi() - WMuonRefs[WMuonRefs.size() - 1]->phi();
+// 	while (deltaphi > Pi)
+// 	  deltaphi -= 2.0*Pi;
+// 	while (deltaphi < -1.0*Pi)
+// 	  deltaphi += 2.0*Pi;
+	dPhiWMuSecJet_->
+	  Fill(/*deltaphi*/fabs(reco::deltaPhi(secondJetRef->phi(), 
+					       WMuonRefs[WMuonRefs.size() - 1]->phi())), PUWeight);
 
 	//       // plot N-subjettiness of second jet
 	//       fastjet::Pruner pruner(fastjet::kt_algorithm, zCut_, RcutFactor_);
@@ -2257,21 +2275,6 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       if (std::find(genMatchedMuonRefs.begin(), genMatchedMuonRefs.end(), 
 		    removedMuonRefs[removedMuonRefs.size() - 1].key()) != 
 	  genMatchedMuonRefs.end()) dRWMuSoftGenMatchedMu_->Fill(dR, PUWeight);
-
-      // plot dPhi(W muon, leading soft muon per jet)
-      double PhiW = (*WMuonRefs[WMuonRefs.size()-1]).phi();
-      double PhiTau = (*removedMuonRefs[removedMuonRefs.size() - 1]).phi();
-      double dPhi = PhiW - PhiTau;
-      const double Pi = 3.14159265359;
-      while (dPhi > Pi)
-	dPhi -= 2.0*Pi;
-      while (dPhi < -1.0*Pi)
-	dPhi += 2.0*Pi;
-      dPhiWMuSoftMu_->Fill(dPhi, PUWeight);
-      double Mass_WMuTauMu = (WMuonRefs[WMuonRefs.size() - 1]->p4() + 
-			      removedMuonRefs[removedMuonRefs.size() - 1]->p4()).M();
-      if (Mass_WMuTauMu > 20.)
-	dPhiWMuSoftMu_withCut_->Fill(dPhi, PUWeight);
     }
   }
 
