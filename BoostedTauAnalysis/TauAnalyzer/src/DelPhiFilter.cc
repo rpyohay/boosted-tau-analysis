@@ -37,6 +37,7 @@
 #include "DataFormats/TauReco/interface/PFTauFwd.h"
 #include "DataFormats/TauReco/interface/PFTau.h"
 #include "DataFormats/JetReco/interface/PFJetCollection.h"
+#include "DataFormats/Math/interface/deltaR.h"
 
 using namespace std;
 using namespace edm;
