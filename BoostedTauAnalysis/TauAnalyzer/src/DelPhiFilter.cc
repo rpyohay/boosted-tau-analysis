@@ -142,7 +142,7 @@ DelPhiFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
     { // if >1 tau muons
       for (reco::MuonRefVector::const_iterator iMuon = tauMuons->begin(); iMuon != tauMuons->end(); ++iMuon)
 	{ // loop to find highest-pT
-	  if ((*iMuon)->pt() > Wmu_pt)
+	  if ((*iMuon)->pt() > taumu_pt)
 	    {
 	      taumu_pt = (*iMuon)->pt();
 	      taumu_phi = (*iMuon)->phi();
@@ -151,7 +151,7 @@ DelPhiFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
     } // if >1 tau muons
 
   double Pi = 3.14159265359;
-  double deltaphi = Wmu_pt - taumu_pt;
+  double deltaphi = Wmu_phi - taumu_phi;
   while (deltaphi > Pi)
     deltaphi -= 2.0*Pi;
   while (deltaphi < -1.0*Pi)
