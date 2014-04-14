@@ -2457,6 +2457,8 @@ void TauAnalyzer::beginJob()
 				    16, -1.5, 14.5, 500, 0.0, 2.0);
   muHadMassVsNAddlJets_ = 
     new TH2F("muHadMassVsNAddlJets", ";N_{j};m_{#mu+had} (GeV)", 10, -0.5, 9.5, 20, 0.0, 20.0);
+  WMuMTVsMET_ = new TH2F("WMuMTVsMET", ";#slash{E}_{T} (GeV);W muon M_{T} (GeV)", 40, 0.0, 200.0, 
+			 100, 0.0, 400.0);
   jet_eta = new TH1F("jet_eta", "#eta", 70, -3.5, 3.5);
   jet_phi = new TH1F("jet_phi", "#phi", 14, -3.5, 3.5);
   jet_mass_etacut = new TH1F("jet_mass_etacut", "m (GeV)", 20, 0., 200.);
