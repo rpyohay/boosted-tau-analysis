@@ -518,7 +518,7 @@ template<typename T>
 void setup(const vector<string>& canvasNames, vector<TCanvas*>& outputCanvases, 
 	   const bool setLogY, vector<TLegend*>& legends, vector<THStack*>& stacks, 
 	   const vector<string>& legendHeaders, vector<vector<T*> >& hists, 
-	   const unsigned int size, const bool dataMC)
+	   const unsigned int size, const bool dataMC, const bool twoDim)
 {
   for (vector<string>::const_iterator iCanvasName = canvasNames.begin(); 
        iCanvasName != canvasNames.end(); ++iCanvasName) {
@@ -528,15 +528,15 @@ void setup(const vector<string>& canvasNames, vector<TCanvas*>& outputCanvases,
       outputCanvases[outputCanvases.size() - 1]->Divide(1, 2);
       outputCanvases[outputCanvases.size() - 1]->cd(1)->SetPad(0.0, 0.33, 1.0, 1.0);
       setCanvasOptions(*outputCanvases[outputCanvases.size() - 1]->cd(1), 1, setLogY, 0);
-      setCanvasMargins(*outputCanvases[outputCanvases.size() - 1]->cd(1), 0.2, 0.2, 0.2, 0.2);
+      if (twoDim) setCanvasMargins(*outputCanvases[outputCanvases.size() - 1]->cd(1), 0.2, 0.2, 0.2, 0.2);
       outputCanvases[outputCanvases.size() - 1]->cd(2)->SetPad(0.0, 0.0, 1.0, 0.33);
       setCanvasOptions(*outputCanvases[outputCanvases.size() - 1]->cd(2), 1, 0, 0);
-      setCanvasMargins(*outputCanvases[outputCanvases.size() - 1]->cd(2), 0.2, 0.2, 0.2, 0.2);
+      if (twoDim) setCanvasMargins(*outputCanvases[outputCanvases.size() - 1]->cd(2), 0.2, 0.2, 0.2, 0.2);
     }
     else {
       outputCanvases.push_back(new TCanvas(iCanvasName->c_str(), "", 600, 600));
       setCanvasOptions(*outputCanvases[outputCanvases.size() - 1], 1, setLogY, 0);
-      setCanvasMargins(*outputCanvases[outputCanvases.size() - 1], 0.2, 0.2, 0.2, 0.2);
+      if (twoDim) setCanvasMargins(*outputCanvases[outputCanvases.size() - 1], 0.2, 0.2, 0.2, 0.2);
     }
     legends.push_back(new TLegend(0.4, 0.55, 0.8, 0.75));
     string stackName(*iCanvasName);
@@ -550,13 +550,13 @@ void setup(const vector<string>& canvasNames, vector<TCanvas*>& outputCanvases,
 
 template<typename T>
 void setup(const vector<string>& canvasNames, vector<TCanvas*>& outputCanvases, 
-	   vector<T*>& hists)
+	   vector<T*>& hists, const bool twoDim = false)
 {
   vector<TLegend*> legends;
   vector<THStack*> stacks;
   vector<string> legendHeaders;
   vector<vector<TH1F*> > dummyHists;
-  setup(canvasNames, outputCanvases, false, legends, stacks, legendHeaders, dummyHists, 1, false);
+  setup(canvasNames, outputCanvases, false, legends, stacks, legendHeaders, dummyHists, 1, false, twoDim);
   for (vector<string>::const_iterator iCanvasName = canvasNames.begin(); 
        iCanvasName != canvasNames.end(); ++iCanvasName) { hists.push_back(NULL); }
 }
@@ -716,7 +716,7 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
   vector<THStack*> stacks;
   vector<vector<TH1F*> > hists;
   setup(canvasNames, outputCanvases, setLogY, legends, stacks, legendHeaders, hists, 
-	inputFiles.size(), dataMC);
+	inputFiles.size(), dataMC, false);
   bool data = true;
   for (vector<string>::const_iterator iInputFile = inputFiles.begin(); 
        iInputFile != inputFiles.end(); ++iInputFile) {
@@ -896,7 +896,7 @@ void haddCanvases(const string& outputFileName, const vector<string>& inputFiles
   vector<TH1F*> hists1D;
   vector<TH2F*> hists2D;
   setup(canvasNames1D, outputCanvases1D, hists1D);
-  setup(canvasNames2D, outputCanvases2D, hists2D);
+  setup(canvasNames2D, outputCanvases2D, hists2D, true);
   vector<Int_t> nullBlindLow(canvasNames2D.size(), 0);
   vector<Int_t> nullBlindHigh(canvasNames2D.size(), -2);
   for (vector<string>::const_iterator iInputFile = inputFiles.begin(); 
@@ -1016,7 +1016,7 @@ void drawDifferenceGraphsOn1Canvas(const string& outputFileName,
   vector<vector<TH1F*> > hists;
   vector<TH1F*> histDiff(canvasNames.size());
   setup(canvasNames, outputCanvases, setLogY, legends, stacks, legendHeaders, hists, 
-	inputFiles.size(), dataMC);
+	inputFiles.size(), dataMC, false);
   for (vector<string>::const_iterator iInputFile = inputFiles.begin(); 
        iInputFile != inputFiles.end(); ++iInputFile) {
     const unsigned int fileIndex = iInputFile - inputFiles.begin();
@@ -1165,7 +1165,7 @@ void drawQCDRegionAHistograms(const string& outputFileA,
   vector<TLegend*> legends;
   vector<THStack*> stacks;
   vector<vector<TH1F*> > hists;
-  setup(canvasNames, outputCanvases, setLogY, legends, stacks, legendHeaders, hists, 3, dataMC);
+  setup(canvasNames, outputCanvases, setLogY, legends, stacks, legendHeaders, hists, 3, dataMC, false);
   
   for (vector<string>::const_iterator iCanvasName = canvasNames.begin(); 
        iCanvasName != canvasNames.end(); ++iCanvasName) { // loop over canvases
@@ -1236,13 +1236,16 @@ void addClosurePlot(TFile& sigVsBkgIsoStream, const string& var, const string& u
   TCanvas* canvasIso = NULL;
   sigVsBkgIsoStream.GetObject(canvasName.c_str(), canvasIso);
 
-  //get the signal histogram
-  TH1F* histSig = NULL;
+  //get the signal histograms
+  TH1F* histSig1 = NULL;
+  TH1F* histSig2 = NULL;
   THStack* stackBkgIso = NULL;
   if (canvasIso != NULL) {
-    histSig = (TH1F*)canvasIso->GetPrimitive(var.c_str());
-    setHistogramOptions(histSig, kBlack, 0.7, 20, 1.0, unit.c_str(), "");
-    histSig->GetYaxis()->SetRangeUser(0.1, 10000.0);
+    TList* sigs = canvasIso->GetListOfPrimitives();
+    histSig1 = (TH1F*)sigs->At(2)->Clone();
+    histSig2 = (TH1F*)sigs->At(3)->Clone();
+    histSig1->GetYaxis()->SetRangeUser(0.1, 10000.0);
+    histSig2->GetYaxis()->SetRangeUser(0.1, 10000.0);
 
     /*get the background stack histogram in the signal region (isolated taus) and convert it to a 
       TH1*/
@@ -1324,15 +1327,14 @@ void addClosurePlot(TFile& sigVsBkgIsoStream, const string& var, const string& u
   outCanvas.Divide(1, 2);
   outCanvas.cd(1)->SetPad(0.0, 0.33, 1.0, 1.0);
   setCanvasOptions(*outCanvas.cd(1), 1, 1, 0);
-  setCanvasMargins(*outCanvas.cd(1), 0.2, 0.2, 0.2, 0.2);
   outCanvas.cd(2)->SetPad(0.0, 0.0, 1.0, 0.33);
   setCanvasOptions(*outCanvas.cd(2), 1, 0, 0);
-  setCanvasMargins(*outCanvas.cd(2), 0.2, 0.2, 0.2, 0.2);
   outCanvas.cd(1);
 //   Double_t histBkgIsoErr = -1.0;
 //   Double_t histBkgNonIsoErr = -1.0;
-  histSig->Draw("HIST");
-//   cout << histSig->Integral(5, -1) << endl;
+//   histSig1->Draw("HISTE");
+//   cout << histSig1->Integral(5, -1) << endl;
+//   histSig2->Draw("HISTESAME");
   histBkgIso->Draw("HISTE");
 //   cout << histBkgIso->IntegralAndError(5, -1, histBkgIsoErr) << "+/-";
 //   cout << histBkgIsoErr << endl;
@@ -1679,10 +1681,8 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
   outCanvas.Divide(1, 2);
   outCanvas.cd(1)->SetPad(0.0, 0.33, 1.0, 1.0);
   setCanvasOptions(*outCanvas.cd(1), 1, 1, 0);
-  setCanvasMargins(*outCanvas.cd(1), 0.2, 0.2, 0.2, 0.2);
   outCanvas.cd(2)->SetPad(0.0, 0.0, 1.0, 0.33);
   setCanvasOptions(*outCanvas.cd(2), 1, 0, 0);
-  setCanvasMargins(*outCanvas.cd(2), 0.2, 0.2, 0.2, 0.2);
   outCanvas.cd(1);
   if (option == "separate") {
     isoBkgSep.Draw();
@@ -2008,7 +2008,6 @@ void plotTauHadPT(const vector<string>& fileNames, const vector<pair<Color_t, Co
     //plot region A background MC vs. region B background MC
     TCanvas AMCVsBMCCanvas("AMCVsBMCCanvas", "", 600, 600);
     setCanvasOptions(AMCVsBMCCanvas, 1, 0, 0);
-    setCanvasMargins(AMCVsBMCCanvas, 0.2, 0.2, 0.2, 0.2);
     TLegend AMCVsBMCLegend(0.35, 0.55, 0.75, 0.75);
     setLegendOptions(AMCVsBMCLegend, "MC (excluding QCD) normalized to 1");
     AMCVsBMCLegend.AddEntry(histograms[0].second, "Signal region", "lp");
@@ -2025,7 +2024,6 @@ void plotTauHadPT(const vector<string>& fileNames, const vector<pair<Color_t, Co
     //plot region A background MC vs. region C data
     TCanvas AMCVsCDataCanvas("AMCVsCDataCanvas", "", 600, 600);
     setCanvasOptions(AMCVsCDataCanvas, 1, 0, 0);
-    setCanvasMargins(AMCVsCDataCanvas, 0.2, 0.2, 0.2, 0.2);
     TLegend AMCVsCDataLegend(0.35, 0.55, 0.75, 0.75);
     setLegendOptions(AMCVsCDataLegend, "Normalized to 1");
     AMCVsCDataLegend.AddEntry(histograms[0].second, "Signal region", "lp");
@@ -2042,7 +2040,6 @@ void plotTauHadPT(const vector<string>& fileNames, const vector<pair<Color_t, Co
     //plot region A background MC vs. region B background MC vs. region B data
     TCanvas AMCVsBMCVsBDataCanvas("AMCVsBMCVsBDataCanvas", "", 600, 600);
     setCanvasOptions(AMCVsBMCVsBDataCanvas, 1, 0, 0);
-    setCanvasMargins(AMCVsBMCVsBDataCanvas, 0.2, 0.2, 0.2, 0.2);
     TLegend AMCVsBMCVsBDataLegend(0.35, 0.55, 0.75, 0.75);
     setLegendOptions(AMCVsBMCVsBDataLegend, "Normalized to 1");
     AMCVsBMCVsBDataLegend.AddEntry(histograms[1].first, "Data control region", "lp");
