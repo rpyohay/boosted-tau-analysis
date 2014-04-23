@@ -5,7 +5,7 @@ Setup (only needs to be done once)
 2. Execute
 
 cmsrel CMSSW_5_3_3
-cd CMSSW_5_3_3
+cd CMSSW_5_3_3/src
 cmsenv
 git init
 git pull git@github.com:rpyohay/boosted-tau-analysis
