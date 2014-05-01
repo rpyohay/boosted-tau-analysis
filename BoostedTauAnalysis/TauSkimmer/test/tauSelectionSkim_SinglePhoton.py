@@ -57,7 +57,7 @@ process.source = cms.Source(
     "PoolSource",
     fileNames = cms.untracked.vstring(
     ),
-    skipEvents = cms.untracked.uint32(312)
+    skipEvents = cms.untracked.uint32(0)
     )
 
 process.source.inputCommands = cms.untracked.vstring("keep *", "drop *_MEtoEDMConverter_*_*")
@@ -342,7 +342,7 @@ process.muHadIsoTauSelector = cms.EDFilter(
     ),
     jetTag = cms.InputTag('CleanJets', 'ak5PFJetsNoMu', 'SKIM'),
     muonRemovalDecisionTag = cms.InputTag('CleanJets'),
-    muonTag = cms.InputTag('photonSelector'),
+    overlapCandTag = cms.InputTag('photonSelector'),
     passDiscriminator = cms.bool(True),
     etaMax = cms.double(2.4),
     isoMax = cms.double(-1.0),
@@ -362,7 +362,7 @@ process.muHadTauSelector = cms.EDFilter(
     ),
     jetTag = cms.InputTag('CleanJets', 'ak5PFJetsNoMu', 'SKIM'),
     muonRemovalDecisionTag = cms.InputTag('CleanJets'),
-    muonTag = cms.InputTag('photonSelector'),
+    overlapCandTag = cms.InputTag('photonSelector'),
     passDiscriminator = cms.bool(True),
     pTMin = cms.double(10.0),
     etaMax = cms.double(2.4),
@@ -385,7 +385,7 @@ process.muHadNonIsoTauSelector = cms.EDFilter(
     ),
     jetTag = cms.InputTag('CleanJets', 'ak5PFJetsNoMu', 'SKIM'),
     muonRemovalDecisionTag = cms.InputTag('CleanJets'),
-    muonTag = cms.InputTag('photonSelector'),
+    overlapCandTag = cms.InputTag('photonSelector'),
     passDiscriminator = cms.bool(False),
     etaMax = cms.double(2.4),
     isoMax = cms.double(-1.0),
@@ -416,21 +416,32 @@ process.noSelectedOutput = cms.OutputModule(
 #sequences
 process.antiSelectionSequence = cms.Sequence(process.singlePhotonHLTSelector*
                                              process.pfParticleSelectionSequence*
-                                             process.phoIsoSequence*process.photonSelector*
-                                             process.tauMuonPTSelector*process.tauMuonSelector*
-                                             process.PFTau*process.muHadTauSelector*
-                                             process.muHadNonIsoTauSelector*process.btagging)
+                                             process.phoIsoSequence*
+                                             process.photonSelector*
+                                             process.tauMuonPTSelector*
+                                             process.tauMuonSelector*
+                                             process.PFTau*
+                                             process.muHadTauSelector*
+                                             process.muHadNonIsoTauSelector*
+                                             process.btagging)
 process.selectionSequence = cms.Sequence(process.singlePhotonHLTSelector*
                                          process.pfParticleSelectionSequence*
-                                         process.phoIsoSequence*process.photonSelector*
-                                         process.tauMuonPTSelector*process.tauMuonSelector*
-                                         process.PFTau*process.muHadIsoTauSelector*
+                                         process.phoIsoSequence*
+                                         process.photonSelector*
+                                         process.tauMuonPTSelector*
+                                         process.tauMuonSelector*
+                                         process.PFTau*
+                                         process.muHadIsoTauSelector*
                                          process.btagging)
 process.noSelectionSequence = cms.Sequence(process.singlePhotonHLTSelector*
                                            process.pfParticleSelectionSequence*
-                                           process.phoIsoSequence*process.photonSelector*
-                                           process.tauMuonPTSelector*process.tauMuonSelector*
-                                           process.PFTau*process.muHadTauSelector*process.btagging)
+                                           process.phoIsoSequence*
+                                           process.photonSelector*
+                                           process.tauMuonPTSelector*
+                                           process.tauMuonSelector*
+                                           process.PFTau*
+                                           process.muHadTauSelector*
+                                           process.btagging)
 
 ## #selection path
 ## process.p = cms.Path(process.selectionSequence)

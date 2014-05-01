@@ -232,7 +232,7 @@ process.PFTau = cms.Sequence(process.recoTauCommonSequence*process.recoTauClassi
 #discriminator
 #this will produce a ref to the cleaned tau collection
 process.muHadIsoTauSelector = cms.EDFilter(
-    'CustomTauSelector',
+    'CustomTauSepFromMuonSelector',
     baseTauTag = cms.InputTag('hpsPFTauProducer', '', 'SKIM'),
     tauDiscriminatorTags = cms.VInputTag(
     cms.InputTag('hpsPFTauDiscriminationByDecayModeFinding', '', 'SKIM'), 
@@ -240,7 +240,7 @@ process.muHadIsoTauSelector = cms.EDFilter(
     ),
     jetTag = cms.InputTag('CleanJets', 'ak5PFJetsNoMu', 'SKIM'),
     muonRemovalDecisionTag = cms.InputTag('CleanJets'),
-    muonTag = cms.InputTag('WIsoMuonSelector'),
+    overlapCandTag = cms.InputTag('WIsoMuonSelector'),
     passDiscriminator = cms.bool(True),
     etaMax = cms.double(2.4),
     dR = cms.double(0.5),
@@ -250,14 +250,14 @@ process.muHadIsoTauSelector = cms.EDFilter(
 #find taus in |eta| < 2.4 matched to muon-tagged cleaned jets
 #this will produce a ref to the cleaned tau collection
 process.muHadTauSelector = cms.EDFilter(
-    'CustomTauSelector',
+    'CustomTauSepFromMuonSelector',
     baseTauTag = cms.InputTag('hpsPFTauProducer', '', 'SKIM'),
     tauDiscriminatorTags = cms.VInputTag(
     cms.InputTag('hpsPFTauDiscriminationByDecayModeFinding', '', 'SKIM')
     ),
     jetTag = cms.InputTag('CleanJets', 'ak5PFJetsNoMu', 'SKIM'),
     muonRemovalDecisionTag = cms.InputTag('CleanJets'),
-    muonTag = cms.InputTag('WIsoMuonSelector'),
+    overlapCandTag = cms.InputTag('WIsoMuonSelector'),
     passDiscriminator = cms.bool(True),
     pTMin = cms.double(10.0),
     etaMax = cms.double(2.4),
@@ -269,7 +269,7 @@ process.muHadTauSelector = cms.EDFilter(
 #discriminator
 #this will produce a ref to the cleaned tau collection
 process.muHadNonIsoTauSelector = cms.EDFilter(
-    'CustomTauSelector',
+    'CustomTauSepFromMuonSelector',
     tauTag = cms.InputTag('muHadTauSelector'),
     baseTauTag = cms.InputTag('hpsPFTauProducer', '', 'SKIM'),
     tauDiscriminatorTags = cms.VInputTag(
@@ -277,7 +277,7 @@ process.muHadNonIsoTauSelector = cms.EDFilter(
     ),
     jetTag = cms.InputTag('CleanJets', 'ak5PFJetsNoMu', 'SKIM'),
     muonRemovalDecisionTag = cms.InputTag('CleanJets'),
-    muonTag = cms.InputTag('WIsoMuonSelector'),
+    overlapCandTag = cms.InputTag('WIsoMuonSelector'),
     passDiscriminator = cms.bool(False),
     etaMax = cms.double(2.4),
     dR = cms.double(0.5),
