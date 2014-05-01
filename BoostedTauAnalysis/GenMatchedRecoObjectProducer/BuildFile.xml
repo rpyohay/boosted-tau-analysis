@@ -2,7 +2,6 @@
 <use name="FWCore/PluginManager"/>
 <use name="FWCore/ParameterSet"/>
 <use name="DataFormats/VertexReco"/>
-<use name="DataFormats/JetReco"/>
 <use name="DataFormats/TauReco"/>
 <use name="BoostedTauAnalysis/Common"/>
 <use name="JetMETCorrections/Objects"/>
