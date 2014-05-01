@@ -144,6 +144,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   canvasNames2D.push_back("muHad_t3t1VsptmjCanvas");
   canvasNames2D.push_back("muHad_t3t1VsDecayModeCanvas");
   canvasNames2D.push_back("muHadMassVsNAddlJetsCanvas");
+  canvasNames2D.push_back("muHadMassVsCSVScoreCanvas");
   vector<string> graphNames1D;
   graphNames1D.push_back("hadTauAssociatedMuMultiplicity");
   graphNames1D.push_back("muHadMass");
@@ -256,6 +257,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   graphNames2D.push_back("muHad_t3t1Vsptmj");
   graphNames2D.push_back("muHad_t3t1VsDecayMode");
   graphNames2D.push_back("muHadMassVsNAddlJets");
+  graphNames2D.push_back("muHadMassVsCSVScore");
   vector<Int_t> nullBlindLow(canvasNames1D.size(), 0);
   vector<Int_t> nullBlindHigh(canvasNames1D.size(), -2);
   vector<Int_t> dataBlindLow(canvasNames1D.size(), 0);
@@ -1290,7 +1292,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 					legendEntriesMCData, weightsMCData, setLogY, drawStack, 
 					dataMC);
   cout << "\nPlot data minus MC normalized to data luminosity\n---\n";
-  drawDifferenceGraphsOn1Canvas(dataVsMCOutputDiff, dataVsMCReweightInputFiles, 
+  drawDifferenceGraphsOn1Canvas(dataVsMCOutputDiff, dataVsMCInputFiles, 
 				canvasNames1D, graphNames1D, legendHeaders19p7InvFb, colors, 
 				styles, legendEntriesMCData, weightsMCData, setLogY, sigBkg);
 
@@ -1650,7 +1652,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   //make the final plot showing all background methods, signals, data, and errors
   makeFinalPlot(pair<string, float>(sigVsBkgQCDFromDataOutputFile, 1.0), 
 		dataIsoHaddOutputFile, 
-		pair<string, float>(dataVsMCReweightOutputFile, 1.0), 
+		pair<string, float>(dataVsMCOutputFile, 1.0), 
 		vector<string>(1, "muHadMass"), vector<string>(1, "m_{#mu+had} (GeV)"), 
 		vector<int>(1, 1), vector<int>(1, 2), 
 		analysisFilePath + "results/final" + outputVTag + fileExt, "main 5");
@@ -1663,19 +1665,27 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   vars.push_back("muHadMass");
   vars.push_back("tauHadPT");
   vars.push_back("tauHadEta");
+  vars.push_back("bTagDiscrim");
+  vars.push_back("MET");
   vector<string> units;
   units.push_back("m_{#mu+had} (GeV)");
   units.push_back("p_{T} (GeV)");
   units.push_back("#eta");
+  units.push_back("CSV discriminant");
+  units.push_back("#slash{E}_{T} (GeV)");
   vector<int> normRegionLowerBins;
   normRegionLowerBins.push_back(1);
   normRegionLowerBins.push_back(1);
   normRegionLowerBins.push_back(1);
+  normRegionLowerBins.push_back(50);
+  normRegionLowerBins.push_back(7);
   vector<int> normRegionUpperBins;
   normRegionUpperBins.push_back(2);
   normRegionUpperBins.push_back(3);
   normRegionUpperBins.push_back(46);
-  makeMCClosurePlots(sigVsBkgOutputFile, vars, units, dataVsMCReweightOutputFile, 1.0, 
+  normRegionUpperBins.push_back(50);
+  normRegionUpperBins.push_back(9);
+  makeMCClosurePlots(sigVsBkgOutputFile, vars, units, dataVsMCOutputFile, 1.0, 
 		     normRegionLowerBins, normRegionUpperBins, 
 		     analysisFilePath + "results/MC_closure_" + outputVersion + fileExt);
 
