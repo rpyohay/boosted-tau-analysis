@@ -102,30 +102,27 @@ process.impactParameterTagInfos.jetTracks = cms.InputTag("ak5JetTracksAssociator
 process.ak5JetTracksAssociatorAtVertex.jets = cms.InputTag("ak5PFJets")
 process.ak5JetTracksAssociatorAtVertex.tracks = cms.InputTag("generalTracks")
 process.btagging = cms.Sequence(
-    (
     process.ak5JetTracksAssociatorAtVertex*
-      # impact parameters and IP-only algorithms
-      process.impactParameterTagInfos *
-      ( process.trackCountingHighEffBJetTags +
-        process.trackCountingHighPurBJetTags +
-        process.jetProbabilityBJetTags +
-        process.jetBProbabilityBJetTags +
-        # SV tag infos depending on IP tag infos, and SV (+IP) based algos
-        process.secondaryVertexTagInfos *
-        ( process.simpleSecondaryVertexHighEffBJetTags +
-          process.simpleSecondaryVertexHighPurBJetTags +
-          process.combinedSecondaryVertexBJetTags +
-          process.combinedSecondaryVertexMVABJetTags
-        ) +
-       process.ghostTrackVertexTagInfos *
-          process.ghostTrackBJetTags
-      ) #+
-#process.softPFMuonsTagInfos*
-#process.softPFMuonBJetTags *
-#process.softPFElectronsTagInfos*
-#process.softPFElectronBJetTags
+    # impact parameters and IP-only algorithms
+    process.impactParameterTagInfos*
+    (process.trackCountingHighEffBJetTags +
+     process.trackCountingHighPurBJetTags +
+     process.jetProbabilityBJetTags +
+     process.jetBProbabilityBJetTags +
+     # SV tag infos depending on IP tag infos, and SV (+IP) based algos
+     process.secondaryVertexTagInfos*
+     (process.simpleSecondaryVertexHighEffBJetTags +
+      process.simpleSecondaryVertexHighPurBJetTags +
+      process.combinedSecondaryVertexBJetTags +
+      process.combinedSecondaryVertexMVABJetTags) +
+     process.ghostTrackVertexTagInfos*
+     process.ghostTrackBJetTags)##  +
+##     process.softPFMuonsTagInfos*
+##     process.softPFMuonBJetTags *
+##     process.softPFElectronsTagInfos*
+##     process.softPFElectronBJetTags
     )
-)
+
 #define a parameter set to be passed to all modules that utilize GenTauDecayID for signal taus
 commonGenTauDecayIDPSet = cms.PSet(momPDGID = cms.vint32(A_PDGID),
                                    chargedHadronPTMin = cms.double(0.0),
@@ -258,7 +255,7 @@ process.PFTau = cms.Sequence(process.recoTauCommonSequence*process.recoTauClassi
 #discriminator
 #this will produce a ref to the cleaned tau collection
 process.muHadIsoTauSelector = cms.EDFilter(
-    'CustomTauSelector',
+    'CustomTauSepFromMuonSelector',
     baseTauTag = cms.InputTag('hpsPFTauProducer', '', 'SKIM'),
     tauHadIsoTag = cms.InputTag('hpsPFTauDiscriminationByRawCombinedIsolationDBSumPtCorr', '',
                                 'SKIM'),
@@ -268,7 +265,7 @@ process.muHadIsoTauSelector = cms.EDFilter(
     ),
     jetTag = cms.InputTag('CleanJets', 'ak5PFJetsNoMu', 'SKIM'),
     muonRemovalDecisionTag = cms.InputTag('CleanJets', '', 'SKIM'),
-    muonTag = cms.InputTag('WIsoMuonSelector'),
+    overlapCandTag = cms.InputTag('WIsoMuonSelector'),
     passDiscriminator = cms.bool(True),
     pTMin = cms.double(10.0),
     etaMax = cms.double(2.4),
@@ -293,23 +290,25 @@ process.muHadNonIsoTauSelector.tauDiscriminatorTags = cms.VInputTag(
     cms.InputTag('hpsPFTauDiscriminationByMediumCombinedIsolationDBSumPtCorr', '', 'SKIM')
     )
 process.muHadNonIsoTauSelector.passDiscriminator = cms.bool(False)
+process.muHadNonIsoTauSelector.isoMax = cms.double(5.0) #GeV
 
 #produce AK5PFchs L1FastL2L3 corrected jets
 
 #create a collection of corrected jets with pT > 20 GeV and |eta| < 2.4 distinct from the W muon
 #and isolated tau
 #this collection has no memory of the uncorrected jets
-process.corrJetDistinctIsoTauSelector = cms.EDFilter('CustomJetSelector',
-                                                     tauTag = cms.InputTag('muHadIsoTauSelector'),
-                                                     muonTag = cms.InputTag('WIsoMuonSelector'),
-                                                     oldJetTag = cms.InputTag('ak5PFJets'),
-                                                     jetMuonMapTag = cms.InputTag('CleanJets'),
-                                                     pTMin = cms.double(30.0),
-                                                     absEtaMax = cms.double(2.4),
-                                                     dR = cms.double(0.3),
-                                                     minNumObjsToPassFilter = cms.uint32(0),
-                                                     maxNumObjsToPassFilter = cms.int32(-1)
-                                                     )
+process.corrJetDistinctIsoTauSelector = cms.EDFilter(
+    'CustomJetSelector',
+    tauTag = cms.InputTag('muHadIsoTauSelector'),
+    overlapCandTag = cms.InputTag('WIsoMuonSelector'),
+    oldJetTag = cms.InputTag('ak5PFJets'),
+    jetMuonMapTag = cms.InputTag('CleanJets'),
+    pTMin = cms.double(30.0),
+    absEtaMax = cms.double(2.4),
+    dR = cms.double(0.3),
+    minNumObjsToPassFilter = cms.uint32(0),
+    maxNumObjsToPassFilter = cms.int32(-1)
+    )
 
 #create a collection of corrected jets with pT > 20 GeV and |eta| < 2.4 distinct from the W muon
 #and non-isolated tau
@@ -405,7 +404,8 @@ process.output = cms.OutputModule(
     )
 
 #MET filter
-process.METFilter.minMET = cms.double(0.)
+process.METFilter.minMET = cms.double(30.)
+process.METFilter.METTag = cms.InputTag("pfMetType1")
 
 #MT filter
 process.MTFilter.minMT = cms.double(50.)
@@ -438,8 +438,8 @@ process.SSSFFilter.tauTag = cms.InputTag('muHadTauSelector')
 
 #Trigger object filter
 process.TriggerObjectFilter = cms.EDFilter(
-    'TriggerObjectFilter',
-    WMuonTag = cms.InputTag("WIsoMuonSelector"),
+    'MuonTriggerObjectFilter',
+    recoObjTag = cms.InputTag("WIsoMuonSelector"),
     triggerEventTag = cms.untracked.InputTag("hltTriggerSummaryAOD", "", "HLT"),
     triggerResultsTag = cms.untracked.InputTag("TriggerResults", "", "HLT"),
     triggerDelRMatch = cms.untracked.double(0.1),
