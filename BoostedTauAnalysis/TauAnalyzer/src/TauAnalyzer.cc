@@ -543,6 +543,9 @@ private:
   //histogram of mu+had mass vs. Nj
   TH2F* muHadMassVsNAddlJets_;
 
+  //histogram of mu+had mass vs. CSV score
+  TH2F* muHadMassVsCSVScore_;
+
   //PU reweighting object
   edm::LumiReWeighting PUReweight_;
 
@@ -939,9 +942,16 @@ TauAnalyzer::TauAnalyzer(const edm::ParameterSet& iConfig) :
   muHadMassBins_.push_back(4.0);
   muHadMassBins_.push_back(5.0);
   muHadMassBins_.push_back(6.0);
+  muHadMassBins_.push_back(7.0);
   muHadMassBins_.push_back(8.0);
-//   muHadMassBins_.push_back(10.0);
-  muHadMassBins_.push_back(60.0); //maximum over all MC and full 2012 dataset
+  muHadMassBins_.push_back(9.0);
+  muHadMassBins_.push_back(10.0);
+  muHadMassBins_.push_back(11.0);
+  muHadMassBins_.push_back(12.0);
+  muHadMassBins_.push_back(15.0);
+  muHadMassBins_.push_back(18.0);
+  muHadMassBins_.push_back(21.0); /*maximum over all MC and full 2012 dataset for MET > 30 and 
+				    CSVM b veto*/
 
   //fill hadronic tau pT bins for isolated MC fake rate correction
   fakeRateTauHadPTBins_.push_back(0.0);
@@ -1364,6 +1374,9 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	passThirdMuonCut = passThirdMuonCut && (chargeProduct[chargeProduct.size() - 1] == 1.0);
       }
     }
+
+    //plot mu+had mass vs. CSV score
+    muHadMassVsCSVScore_->Fill(b_discriminant, muHadMass, PUWeight);
 
     //impose pT and decay mode cut on tau
     if (((*iTau)->pt() > tauPTMin_) && 
@@ -1858,20 +1871,11 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       tauHadPhotonEnergyFraction_->Fill(tauHadPhotonEnergy/(*iTau)->et(), PUWeight);
 
       //plot dPhi(W muon, leading soft muon per jet)
-//       double PhiW = (*WMuonRefs[WMuonRefs.size()-1]).phi();
-//       double PhiTau = (*removedMuonRefs[removedMuonRefs.size() - 1]).phi();
       double dPhi = 
-	/*PhiW - PhiTau*/fabs(reco::deltaPhi(WMuonRefs[WMuonRefs.size()-1]->phi(), 
-					     removedMuonRefs[removedMuonRefs.size() - 1]->phi()));
-//       const double Pi = 3.14159265359;
-//       while (dPhi > Pi)
-// 	dPhi -= 2.0*Pi;
-//       while (dPhi < -1.0*Pi)
-// 	dPhi += 2.0*Pi;
+	fabs(reco::deltaPhi(WMuonRefs[WMuonRefs.size()-1]->phi(), 
+			    removedMuonRefs[removedMuonRefs.size() - 1]->phi()));
       dPhiWMuSoftMu_->Fill(dPhi, PUWeight);
-//       double Mass_WMuTauMu = (WMuonRefs[WMuonRefs.size() - 1]->p4() + 
-// 			      removedMuonRefs[removedMuonRefs.size() - 1]->p4()).M();
-      if (/*Mass_WMuTauMu*/mWMuTauMu > 20.)
+      if (mWMuTauMu > 20.)
 	dPhiWMuSoftMu_withCut_->Fill(dPhi, PUWeight);
 
       //plot cleaned jet pT vs. cleaned tau pT
@@ -2160,15 +2164,9 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	  Fill(fabs(reco::deltaPhi(tauOldJetRef->phi(), secondJetRef->phi())), PUWeight);
 
 	// plot dPhi between W muon and second jet
-// 	double Pi = 3.14159265359;
-// 	double deltaphi = secondJetRef->phi() - WMuonRefs[WMuonRefs.size() - 1]->phi();
-// 	while (deltaphi > Pi)
-// 	  deltaphi -= 2.0*Pi;
-// 	while (deltaphi < -1.0*Pi)
-// 	  deltaphi += 2.0*Pi;
 	dPhiWMuSecJet_->
-	  Fill(/*deltaphi*/fabs(reco::deltaPhi(secondJetRef->phi(), 
-					       WMuonRefs[WMuonRefs.size() - 1]->phi())), PUWeight);
+	  Fill(fabs(reco::deltaPhi(secondJetRef->phi(), 
+				   WMuonRefs[WMuonRefs.size() - 1]->phi())), PUWeight);
 
 	//       // plot N-subjettiness of second jet
 	//       fastjet::Pruner pruner(fastjet::kt_algorithm, zCut_, RcutFactor_);
@@ -2298,7 +2296,7 @@ void TauAnalyzer::beginJob()
   muHadMassReweightErrSq_ = new TH1F("muHadMassReweightErrSq", ";m_{#mu+had} (GeV);", 
 				     muHadMassBins_.size() - 1, &muHadMassBins_[0]);
   muHadCharge_ = new TH1F("muHadCharge", ";q_{#mu} + q_{had};", 5, -2.5, 2.5);
-  bTagDiscrim_ = new TH1F("bTagDiscrim", ";b-tag discriminator;", 50, 0.0, 1.0);
+  bTagDiscrim_ = new TH1F("bTagDiscrim", ";b-tag discriminator;", 25, 0.0, 1.0);
   WMuIso_ = new TH1F("WMuIso", ";W muon PFRelIso;", 4000, 0.0, 40.0);
   WMuMT_ = new TH1F("WMuMT", ";W muon M_{T} (GeV);", 100, 0.0, 400.0);
   tauMuMT_ = new TH1F("tauMuMT", ";#tau muon M_{T} (GeV);", 50, 0.0, 200.0);
@@ -2457,6 +2455,8 @@ void TauAnalyzer::beginJob()
 				    16, -1.5, 14.5, 500, 0.0, 2.0);
   muHadMassVsNAddlJets_ = 
     new TH2F("muHadMassVsNAddlJets", ";N_{j};m_{#mu+had} (GeV)", 10, -0.5, 9.5, 20, 0.0, 20.0);
+  muHadMassVsCSVScore_ = new TH2F("muHadMassVsCSVScore", ";CSV score;m_{#mu+had} (GeV)", 25, 0.0, 
+				  1.0, muHadMassBins_.size() - 1, &muHadMassBins_[0]);
   WMuMTVsMET_ = new TH2F("WMuMTVsMET", ";#slash{E}_{T} (GeV);W muon M_{T} (GeV)", 40, 0.0, 200.0, 
 			 100, 0.0, 400.0);
   jet_eta = new TH1F("jet_eta", "#eta", 70, -3.5, 3.5);
@@ -2664,6 +2664,7 @@ void TauAnalyzer::beginJob()
   mWMuTauMuVsMWMuTauMuTauHadGenFSR_->Sumw2();
   muHadMassVsMWMuTauMuTauHad_->Sumw2();
   muHadMassVsNAddlJets_->Sumw2();
+  muHadMassVsCSVScore_->Sumw2();
   WMuMTVsMET_->Sumw2();
   jet_pt_etacut->Sumw2();
   jet_eta->Sumw2();
@@ -2812,6 +2813,7 @@ void TauAnalyzer::endJob()
     mWMuTauMuVsMWMuTauMuTauHadGenFSRCanvas("mWMuTauMuVsMWMuTauMuTauHadGenFSRCanvas", "", 600, 600);
   TCanvas muHadMassVsMWMuTauMuTauHadCanvas("muHadMassVsMWMuTauMuTauHadCanvas", "", 600, 600);
   TCanvas muHadMassVsNAddlJetsCanvas("muHadMassVsNAddlJetsCanvas", "", 600, 600);
+  TCanvas muHadMassVsCSVScoreCanvas("muHadMassVsCSVScoreCanvas", "", 600, 600);
   TCanvas WMuMTVsMETCanvas("WMuMTVsMETCanvas", "", 600, 600);
   TCanvas jet_pt_etacutCanvas("jet_pt_etacutCanvas", "", 600, 600);
   TCanvas jet_etaCanvas("jet_etaCanvas", "", 600, 600);
@@ -2949,6 +2951,7 @@ void TauAnalyzer::endJob()
   Common::draw2DHistograms(muHad_t3t1VsptmjCanvas, muHad_t3t1Vsptmj_);
   Common::draw2DHistograms(muHad_t3t1VsDecayModeCanvas, muHad_t3t1VsDecayMode_);
   Common::draw2DHistograms(muHadMassVsNAddlJetsCanvas, muHadMassVsNAddlJets_);
+  Common::draw2DHistograms(muHadMassVsCSVScoreCanvas, muHadMassVsCSVScore_);
 
   //set custom options
 
@@ -3059,6 +3062,7 @@ void TauAnalyzer::endJob()
   mWMuTauMuVsMWMuTauMuTauHadGenFSRCanvas.Write();
   muHadMassVsMWMuTauMuTauHadCanvas.Write();
   muHadMassVsNAddlJetsCanvas.Write();
+  muHadMassVsCSVScoreCanvas.Write();
   WMuMTVsMETCanvas.Write();
   jet_pt_etacutCanvas.Write();
   jet_etaCanvas.Write();
@@ -3359,6 +3363,8 @@ void TauAnalyzer::reset(const bool doDelete)
   muHadMassVsMWMuTauMuTauHad_ = NULL;
   if (doDelete && (muHadMassVsNAddlJets_ != NULL)) delete muHadMassVsNAddlJets_;
   muHadMassVsNAddlJets_ = NULL;
+  if (doDelete && (muHadMassVsCSVScore_ != NULL)) delete muHadMassVsCSVScore_;
+  muHadMassVsCSVScore_ = NULL;
   if (doDelete && (jet_pt_etacut != NULL)) delete jet_pt_etacut;
   jet_pt_etacut = NULL;
   if (doDelete && (jet_eta != NULL)) delete jet_eta;
