@@ -2173,6 +2173,22 @@ void format(TH1* hist, const float yAxisLow, const float yAxisHigh, const Color_
   hist->Scale(scale == 0.0 ? 1.0/hist->Integral(0, -1) : scale);
 }
 
+//get version from file name
+string version(const string& fileName)
+{
+  string retVal;
+  const size_t begPos = fileName.find("_v");
+  const size_t endPos1 = fileName.find("_", begPos + 1);
+  const size_t endPos2 = fileName.find(".root", begPos + 1);
+  if (begPos != string::npos) {
+    size_t endPos = string::npos;
+    if (endPos1 != string::npos) endPos = endPos1;
+    else if (endPos2 != string::npos) endPos = endPos2;
+    if (endPos != string::npos) retVal = fileName.substr(begPos + 1, endPos - begPos - 1);
+  }
+  return retVal;
+}
+
 //plot ratio of 2 histograms and fit
 void divideAndFit(const string& fileName1, const string& fileName2, const string& outputFileName, 
 		  const vector<string>& outputCanvasName, const bool stack, 
@@ -2316,10 +2332,15 @@ void plot2Histograms(const vector<string>& fileName1, const vector<string>& file
 	  TCanvas 
 	    outputCanvas((string(hist1->GetName()) + outputCanvasTags[i]).c_str(), "", 600, 600);
 	  setCanvasOptions(outputCanvas, 1, 0, 0);
+	  TLegend outputLegend(0.4, 0.55, 0.8, 0.75);
+	  setLegendOptions(outputLegend, (string(hist1->GetName()) + outputCanvasTags[i]).c_str());
+	  outputLegend.AddEntry(hist1, version(*iFileName1).c_str(), "lp");
+	  outputLegend.AddEntry(hist2, version(fileName2[i]).c_str(), "lp");
 	  draw(outputFile, outputCanvas, hist1, "", "E");
 	  draw(outputFile, outputCanvas, hist2, "", "ESAME");
 	  format(hist1, yAxisLow[j], yAxisHigh[j], kBlack, scale);
 	  format(hist2, yAxisLow[j], yAxisHigh[j], kRed, scale);
+	  outputLegend.Draw();
 	  outputCanvas.Write();
 	}
       }
