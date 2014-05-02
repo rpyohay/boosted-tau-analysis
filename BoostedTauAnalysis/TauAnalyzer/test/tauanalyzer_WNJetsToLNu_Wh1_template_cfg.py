@@ -396,6 +396,7 @@ process.muHadIsoTauAnalyzer = cms.EDAnalyzer(
     PUScenario = cms.string("PUSCENARIO"),
     zCut = cms.double(0.1),
     RcutFactor = cms.double(0.5),
+    CSVMax = cms.double(0.679),
     MC = cms.bool(True),
     reweight = cms.bool(False),
     pTRankColors = cms.vuint32(1, 2, 4, 6),

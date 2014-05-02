@@ -224,6 +224,9 @@ private:
   //RcutFactor for jet pruning
   double RcutFactor_;
 
+  //maximum CSV score for the parent jet of the mu+had object
+  double CSVMax_;
+
   //MC flag
   bool MC_;
 
@@ -649,6 +652,7 @@ TauAnalyzer::TauAnalyzer(const edm::ParameterSet& iConfig) :
   PUScenario_(iConfig.getParameter<std::string>("PUScenario")),
   zCut_(iConfig.getParameter<double>("zCut")),
   RcutFactor_(iConfig.getParameter<double>("RcutFactor")),
+  CSVMax_(iConfig.getParameter<double>("CSVMax")),
   MC_(iConfig.getParameter<bool>("MC")),
   reweight_(iConfig.getParameter<bool>("reweight")),
   pTRankColors_(iConfig.getParameter<std::vector<unsigned int> >("pTRankColors")),
@@ -1423,7 +1427,7 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     //impose pT and decay mode cut on tau
     if (((*iTau)->pt() > tauPTMin_) && 
 	((tauDecayMode_ == reco::PFTau::kNull) || ((*iTau)->decayMode() == tauDecayMode_)) && 
-	(b_discriminant < 0.679)) {
+	(b_discriminant < CSVMax_)) {
 
       //plot the number of good vertices
       nGoodVtx_->Fill(Common::numGoodVertices(pVtx)/*trueNInt*/, PUWeight);
