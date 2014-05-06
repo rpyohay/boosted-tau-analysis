@@ -738,7 +738,12 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
       }
       else {
 	pHist = (TH1F*)pCanvas->GetPrimitive(graphNames[canvasIndex].c_str());
-	float weight = weights[fileIndex] == 0.0 ? 1.0/pHist->Integral(0, -1) : weights[fileIndex];
+	float weight = weights[fileIndex];
+	if (weights[fileIndex] == 0.0) weight = 1.0/pHist->Integral(0, -1);
+	if (weights[fileIndex] == -1.0) {
+	  if (fileIndex == 0) weight = 1.0;
+	  else weight = hists[canvasIndex][0]->Integral(0, -1)/pHist->Integral(0, -1);
+	}
 	setHistogramOptions(pHist, colors[fileIndex], 0.7, styles[fileIndex], 
 			    weight, 
 			    string(pHist->GetName()) == "muHadPTOverMuHadMass" ? 
