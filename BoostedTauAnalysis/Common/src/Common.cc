@@ -159,7 +159,7 @@ bool Common::isGoodVertex(const reco::Vertex* pVtx)
   bool retVal = false;
   if (!pVtx->isFake() && 
       (pVtx->ndof() > 4) && 
-      (fabs(pVtx->x()) <= 24.0/*cm*/) && 
+      (fabs(pVtx->z()) <= 24.0/*cm*/) && 
       (fabs(pVtx->position().Rho()) <= 2.0/*cm*/)) retVal = true;
   return retVal;
 }
