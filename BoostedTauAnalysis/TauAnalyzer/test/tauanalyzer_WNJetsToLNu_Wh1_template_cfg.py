@@ -464,8 +464,8 @@ process.SSSFFilterNonIso.tauTag = cms.InputTag('muHadNonIsoTauSelector')
 process.SSSFFilter = process.SSSFFilterIso.clone()
 process.SSSFFilter.tauTag = cms.InputTag('muHadTauSelector')
 
-#Trigger object filter
-process.TriggerObjectFilter = cms.EDFilter(
+#muon trigger object filter
+process.muonTriggerObjectFilter = cms.EDFilter(
     'MuonTriggerObjectFilter',
     recoObjTag = cms.InputTag("WIsoMuonSelector"),
     triggerEventTag = cms.untracked.InputTag("hltTriggerSummaryAOD", "", "HLT"),
@@ -493,46 +493,63 @@ process.TriggerObjectFilter = cms.EDFilter(
     )
 
 #sequences
-process.beginSequence = cms.Sequence(process.genWMuNuSelector*process.genWTauNuSelector*
-                                     process.genPartonSelector*process.genMuSelector*
-                                     process.genTauMuSelector)
-process.isoTauAnalysisSequence = cms.Sequence(process.btagging*process.muHadIsoTauSelector*
-                                              process.corrJetDistinctIsoTauSelector*
-                                              process.TriggerObjectFilter*
-                                              process.producePFMETCorrections*
-                                              process.OSSFFilterIso*
-                                              process.SSSFFilterIso*
-                                              process.METFilter*
-                                              process.muHadIsoTauAnalyzer)
-process.signalIsoTauAnalysisSequence = cms.Sequence(process.genWMuNuSelector*
-                                                    process.IsoMu24eta2p1Selector*
-                                                    process.WMuonPTSelector*
-                                                    process.WIsoMuonSelector*
-                                                    process.tauMuonPTSelector*
-                                                    process.tauMuonSelector*process.PFTau*
-                                                    process.btagging*
-                                                    process.muHadIsoTauSelector*
-                                                    process.TriggerObjectFilter*
-                                                    process.producePFMETCorrections*
-                                                    process.OSSFFilterIso*
-                                                    process.SSSFFilterIso*
-                                                    process.METFilter*
-                                                    process.muHadIsoTauAnalyzer)
-process.nonIsoTauAnalysisSequence = cms.Sequence(process.btagging*
-                                                 process.muHadTauSelector*
-                                                 process.muHadNonIsoTauSelector*
-                                                 process.corrJetDistinctNonIsoTauSelector*
-                                                 process.TriggerObjectFilter*
-                                                 process.producePFMETCorrections*
-                                                 process.OSSFFilterNonIso*
-                                                 process.SSSFFilterNonIso*
-                                                 process.METFilter*
-                                                 process.muHadNonIsoTauAnalyzer)
-process.tauAnalysisSequence = cms.Sequence(process.btagging*process.muHadTauSelector*
-                                           process.corrJetDistinctTauSelector*
-                                           process.TriggerObjectFilter*process.OSSFFilter*
-                                           process.SSSFFilter*process.METFilter*
-                                           process.muHadTauAnalyzer)
+process.beginSequence = cms.Sequence(
+    process.genWMuNuSelector*
+    process.genWTauNuSelector*
+    process.genPartonSelector*
+    process.genMuSelector*
+    process.genTauMuSelector
+    )
+process.isoTauAnalysisSequence = cms.Sequence(
+    process.btagging*
+    process.muHadIsoTauSelector*
+    process.corrJetDistinctIsoTauSelector*
+    process.muonTriggerObjectFilter*
+    process.producePFMETCorrections*
+    process.OSSFFilterIso*
+    process.SSSFFilterIso*
+    process.METFilter*
+    process.muHadIsoTauAnalyzer
+    )
+process.signalIsoTauAnalysisSequence = cms.Sequence(
+    process.genWMuNuSelector*
+    process.IsoMu24eta2p1Selector*
+    process.WMuonPTSelector*
+    process.WIsoMuonSelector*
+    process.tauMuonPTSelector*
+    process.tauMuonSelector*
+    process.PFTau*
+    process.btagging*
+    process.muHadIsoTauSelector*
+    process.muonTriggerObjectFilter*
+    process.producePFMETCorrections*
+    process.OSSFFilterIso*
+    process.SSSFFilterIso*
+    process.METFilter*
+    process.muHadIsoTauAnalyzer
+    )
+process.nonIsoTauAnalysisSequence = cms.Sequence(
+    process.btagging*
+##     process.muHadTauSelector*
+    process.muHadNonIsoTauSelector*
+    process.corrJetDistinctNonIsoTauSelector*
+    process.muonTriggerObjectFilter*
+    process.producePFMETCorrections*
+    process.OSSFFilterNonIso*
+    process.SSSFFilterNonIso*
+    process.METFilter*
+    process.muHadNonIsoTauAnalyzer
+    )
+process.tauAnalysisSequence = cms.Sequence(
+    process.btagging*
+    process.muHadTauSelector*
+    process.corrJetDistinctTauSelector*
+    process.muonTriggerObjectFilter*
+    process.OSSFFilter*
+    process.SSSFFilter*
+    process.METFilter*
+    process.muHadTauAnalyzer
+    )
 
 #path
 process.p = cms.Path(process.beginSequence*SEQUENCE)
