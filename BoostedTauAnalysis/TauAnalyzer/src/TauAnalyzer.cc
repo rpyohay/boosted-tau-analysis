@@ -251,6 +251,18 @@ private:
   //histogram of mu+had mass
   TH1F* muHadMass_;
 
+  //histogram of mu+had mass for 1-prong taus
+  TH1F* muHadMass1Prong_;
+
+  //histogram of mu+had mass for 1-prong + 1 pi0 taus
+  TH1F* muHadMass1Prong1Pi0_;
+
+  //histogram of mu+had mass for 1-prong + 2 pi0 taus
+  TH1F* muHadMass1Prong2Pi0_;
+
+  //histogram of mu+had mass for 3-prong taus
+  TH1F* muHadMass3Prong_;
+
   /*histogram of mu+had mass weighted by the stat. error on hadronic tau pT weights (i.e. each 
     event is filled with a weight of sigma_w, where sigma_w is the stat. error on the hadronic tau 
     pT weight for that event)*/
@@ -322,6 +334,18 @@ private:
 
   //histogram of hadronic tau pT
   TH1F* tauHadPT_;
+
+  //histogram of hadronic tau pT for 1-prong taus
+  TH1F* tauHadPT1Prong_;
+
+  //histogram of hadronic tau pT for 1-prong + 1 pi0 taus
+  TH1F* tauHadPT1Prong1Pi0_;
+
+  //histogram of hadronic tau pT for 1-prong + 2 pi0 taus
+  TH1F* tauHadPT1Prong2Pi0_;
+
+  //histogram of hadronic tau pT for 3-prong taus
+  TH1F* tauHadPT3Prong_;
 
   //histogram of hadronic tau deltaBeta corrected isolation
   TH1F* tauHadIso_;
@@ -553,6 +577,13 @@ private:
 
   //histogram of mu+had mass vs. CSV score
   TH2F* muHadMassVsCSVScore_;
+
+  //histogram of the jet energy fraction carried by the hadronic tau vs. hadronic tau isolation
+  TH2F* tauHadJetEnergyFractionVsTauHadIso_;
+
+  /*histogram of the cleaned jet energy fraction carried by the hadronic tau vs. hadronic tau 
+    isolation*/
+  TH2F* tauHadCleanedJetEnergyFractionVsTauHadIso_;
 
   //PU reweighting object
   edm::LumiReWeighting PUReweight_;
@@ -1375,6 +1406,26 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 //       	tauHadPTWeight = tauHadPTWeights_[tauHadPTBin];
 //       	tauHadPTWeightErr = tauHadPTWeightErrs_[tauHadPTBin];
 //       }
+//       switch ((*iTau)->decayMode()) {
+//       case reco::PFTau::kOneProng0PiZero:
+// 	tauHadPTWeight = 0.745345;
+// 	tauHadPTWeightErr = 0.161436;
+// 	break;
+//       case reco::PFTau::kOneProng1PiZero:
+// 	tauHadPTWeight = 1.00453;
+// 	tauHadPTWeightErr = 0.118923;
+// 	break;
+//       case reco::PFTau::kOneProng2PiZero:
+// 	tauHadPTWeight = 14.4981;
+// 	tauHadPTWeightErr = 13.0877;
+// 	break;
+//       case reco::PFTau::kThreeProng0PiZero:
+// 	tauHadPTWeight = 1.66185;
+// 	tauHadPTWeightErr = 0.352122;
+// 	break;
+//       default:
+// 	break;
+//       }
     }
 
     //find the highest pT associated muon
@@ -1457,6 +1508,26 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
       //plot the mu + tau invariant mass for the highest pT muon
       muHadMass_->Fill(muHadMass, PUWeight*tauHadPTWeight);
+
+      //plot the mu + 1-prong tau invariant mass for the highest pT muon
+      if ((*iTau)->decayMode() == reco::PFTau::kOneProng0PiZero) {
+	muHadMass1Prong_->Fill(muHadMass, PUWeight);
+      }
+
+      //plot the mu + 1-prong + 1 pi0 tau invariant mass for the highest pT muon
+      if ((*iTau)->decayMode() == reco::PFTau::kOneProng1PiZero) {
+	muHadMass1Prong1Pi0_->Fill(muHadMass, PUWeight);
+      }
+
+      //plot the mu + 1-prong + 2 pi0 tau invariant mass for the highest pT muon
+      if ((*iTau)->decayMode() == reco::PFTau::kOneProng2PiZero) {
+	muHadMass1Prong2Pi0_->Fill(muHadMass, PUWeight);
+      }
+
+      //plot the mu + 3-prong tau invariant mass for the highest pT muon
+      if ((*iTau)->decayMode() == reco::PFTau::kThreeProng0PiZero) {
+	muHadMass3Prong_->Fill(muHadMass, PUWeight);
+      }
 
       //track maximum mu+had mass
       if (muHadMass > maxMuHadMass_) maxMuHadMass_ = muHadMass;
@@ -1606,6 +1677,26 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
       //plot hadronic tau pT
       tauHadPT_->Fill((*iTau)->pt(), PUWeight);
+
+      //plot the hadronic 1-prong tau pT
+      if ((*iTau)->decayMode() == reco::PFTau::kOneProng0PiZero) {
+	tauHadPT1Prong_->Fill((*iTau)->pt(), PUWeight);
+      }
+
+      //plot the hadronic 1-prong + 1 pi0 tau pT
+      if ((*iTau)->decayMode() == reco::PFTau::kOneProng1PiZero) {
+	tauHadPT1Prong1Pi0_->Fill((*iTau)->pt(), PUWeight);
+      }
+
+      //plot the hadronic 1-prong + 2 pi0 tau pT
+      if ((*iTau)->decayMode() == reco::PFTau::kOneProng2PiZero) {
+	tauHadPT1Prong2Pi0_->Fill((*iTau)->pt(), PUWeight);
+      }
+
+      //plot the hadronic 3-prong tau pT
+      if ((*iTau)->decayMode() == reco::PFTau::kThreeProng0PiZero) {
+	tauHadPT3Prong_->Fill((*iTau)->pt(), PUWeight);
+      }
 
       //track maximum hadronic tau pT
       if ((*iTau)->pt() > maxTauHadPT_) maxTauHadPT_ = (*iTau)->pt();
@@ -2179,6 +2270,15 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       //plot mu+had mass vs. Nj
       muHadMassVsNAddlJets_->Fill(pCorrJets->size(), muHadMass, PUWeight);
 
+      //plot the jet energy fraction carried by the hadronic tau vs. hadronic tau isolation
+      tauHadJetEnergyFractionVsTauHadIso_->
+	Fill((*pTauHadIso)[*iTau], (*iTau)->energy()/tauOldJetRef->energy(), PUWeight);
+
+      /*plot the cleaned jet energy fraction carried by the hadronic tau vs. hadronic tau 
+	isolation*/
+      tauHadCleanedJetEnergyFractionVsTauHadIso_->
+	Fill((*pTauHadIso)[*iTau], (*iTau)->energy()/tauJetRef->energy(), PUWeight);
+
       //increment mu+had multiplicity counter
       ++nMuHad;
 
@@ -2354,6 +2454,14 @@ void TauAnalyzer::beginJob()
     new TH1F("hadTauAssociatedMuMultiplicity", ";N_{#mu}/#tau;", 2, 0.5, 2.5);
   muHadMass_ = 
     new TH1F("muHadMass", ";m_{#mu+had} (GeV);", muHadMassBins_.size() - 1, &muHadMassBins_[0]);
+  muHadMass1Prong_ = new TH1F("muHadMass1Prong", ";m_{#mu+had} (GeV);", 
+			      muHadMassBins_.size() - 1, &muHadMassBins_[0]);
+  muHadMass1Prong1Pi0_ = new TH1F("muHadMass1Prong1Pi0", ";m_{#mu+had} (GeV);", 
+				  muHadMassBins_.size() - 1, &muHadMassBins_[0]);
+  muHadMass1Prong2Pi0_ = new TH1F("muHadMass1Prong2Pi0", ";m_{#mu+had} (GeV);", 
+				  muHadMassBins_.size() - 1, &muHadMassBins_[0]);
+  muHadMass3Prong_ = new TH1F("muHadMass3Prong", ";m_{#mu+had} (GeV);", 
+			      muHadMassBins_.size() - 1, &muHadMassBins_[0]);
   muHadMassReweightErrSq_ = new TH1F("muHadMassReweightErrSq", ";m_{#mu+had} (GeV);", 
 				     muHadMassBins_.size() - 1, &muHadMassBins_[0]);
   muHadCharge_ = new TH1F("muHadCharge", ";q_{#mu} + q_{had};", 5, -2.5, 2.5);
@@ -2382,6 +2490,14 @@ void TauAnalyzer::beginJob()
     new TH1F("dRWMuSoftMuMuHadMassGe2", ";#DeltaR(W muon, soft muon);", 30, 0.0, 3.0);
   tauMuPT_ = new TH1F("tauMuPT", ";p_{T} (GeV);", 20, 0.0, 100.0);
   tauHadPT_ = new TH1F("tauHadPT", ";p_{T} (GeV);", tauHadPTBins_.size() - 1, &tauHadPTBins_[0]);
+  tauHadPT1Prong_ = new TH1F("tauHadPT1Prong", ";p_{T} (GeV);", 
+			     tauHadPTBins_.size() - 1, &tauHadPTBins_[0]);
+  tauHadPT1Prong1Pi0_ = new TH1F("tauHadPT1Prong1Pi0", ";p_{T} (GeV);", 
+				 tauHadPTBins_.size() - 1, &tauHadPTBins_[0]);
+  tauHadPT1Prong2Pi0_ = new TH1F("tauHadPT1Prong2Pi0", ";p_{T} (GeV);", 
+				 tauHadPTBins_.size() - 1, &tauHadPTBins_[0]);
+  tauHadPT3Prong_ = new TH1F("tauHadPT3Prong", ";p_{T} (GeV);", 
+			     tauHadPTBins_.size() - 1, &tauHadPTBins_[0]);
   tauHadIso_ = new TH1F("tauHadIso", ";Isolation energy (GeV);", 20, 0.0, 20.0);
   WMuLeptonRelIso_ = new TH1F("WMuLeptonRelIso", ";Relative isolation;", 100, 0.0, 2.0);
   tauHadEta_ = new TH1F("tauHadEta", ";#eta;", 46, -2.3, 2.3);
@@ -2519,6 +2635,12 @@ void TauAnalyzer::beginJob()
 				  1.0, muHadMassBins_.size() - 1, &muHadMassBins_[0]);
   WMuMTVsMET_ = new TH2F("WMuMTVsMET", ";#slash{E}_{T} (GeV);W muon M_{T} (GeV)", 40, 0.0, 200.0, 
 			 100, 0.0, 400.0);
+  tauHadJetEnergyFractionVsTauHadIso_ = 
+    new TH2F("tauHadJetEnergyFractionVsTauHadIso", 
+	     ";Isolation energy (GeV);#frac{E_{#tau}}{E_{j}}", 20, 0.0, 20.0, 20, 0.0, 1.0);
+  tauHadCleanedJetEnergyFractionVsTauHadIso_ = 
+    new TH2F("tauHadCleanedJetEnergyFractionVsTauHadIso", 
+	     ";Isolation energy (GeV);#frac{E_{#tau}}{E_{j}}", 20, 0.0, 20.0, 20, 0.0, 1.0);
   jet_eta = new TH1F("jet_eta", "#eta", 70, -3.5, 3.5);
   jet_phi = new TH1F("jet_phi", "#phi", 14, -3.5, 3.5);
   jet_mass_etacut = new TH1F("jet_mass_etacut", "m (GeV)", 20, 0., 200.);
@@ -2628,6 +2750,10 @@ void TauAnalyzer::beginJob()
   MET_->Sumw2();
   hadTauAssociatedMuMultiplicity_->Sumw2();
   muHadMass_->Sumw2();
+  muHadMass1Prong_->Sumw2();
+  muHadMass1Prong1Pi0_->Sumw2();
+  muHadMass1Prong2Pi0_->Sumw2();
+  muHadMass3Prong_->Sumw2();
   muHadMassReweightErrSq_->Sumw2();
   muHadCharge_->Sumw2();
   bTagDiscrim_->Sumw2();
@@ -2651,6 +2777,10 @@ void TauAnalyzer::beginJob()
   dRWMuSoftMuMuHadMassGe2_->Sumw2();
   tauMuPT_->Sumw2();
   tauHadPT_->Sumw2();
+  tauHadPT1Prong_->Sumw2();
+  tauHadPT1Prong1Pi0_->Sumw2();
+  tauHadPT1Prong2Pi0_->Sumw2();
+  tauHadPT3Prong_->Sumw2();
   tauHadIso_->Sumw2();
   WMuLeptonRelIso_->Sumw2();
   tauHadEta_->Sumw2();
@@ -2726,6 +2856,8 @@ void TauAnalyzer::beginJob()
   muHadMassVsNAddlJets_->Sumw2();
   muHadMassVsCSVScore_->Sumw2();
   WMuMTVsMET_->Sumw2();
+  tauHadJetEnergyFractionVsTauHadIso_->Sumw2();
+  tauHadCleanedJetEnergyFractionVsTauHadIso_->Sumw2();
   jet_pt_etacut->Sumw2();
   jet_eta->Sumw2();
   jet_phi->Sumw2();
@@ -2757,6 +2889,10 @@ void TauAnalyzer::endJob()
   TCanvas hadTauAssociatedMuMultiplicityCanvas("hadTauAssociatedMuMultiplicityCanvas", "", 
 					       600, 600);
   TCanvas muHadMassCanvas("muHadMassCanvas", "", 600, 600);
+  TCanvas muHadMass1ProngCanvas("muHadMass1ProngCanvas", "", 600, 600);
+  TCanvas muHadMass1Prong1Pi0Canvas("muHadMass1Prong1Pi0Canvas", "", 600, 600);
+  TCanvas muHadMass1Prong2Pi0Canvas("muHadMass1Prong2Pi0Canvas", "", 600, 600);
+  TCanvas muHadMass3ProngCanvas("muHadMass3ProngCanvas", "", 600, 600);
   TCanvas muHadMassReweightErrSqCanvas("muHadMassReweightErrSqCanvas", "", 600, 600);
   TCanvas muHadChargeCanvas("muHadChargeCanvas", "", 600, 600);
   TCanvas bTagDiscrimCanvas("bTagDiscrimCanvas", "", 600, 600);
@@ -2780,6 +2916,10 @@ void TauAnalyzer::endJob()
   TCanvas dRWMuSoftMuMuHadMassGe2Canvas("dRWMuSoftMuMuHadMassGe2Canvas", "", 600, 600);
   TCanvas tauMuPTCanvas("tauMuPTCanvas", "", 600, 600);
   TCanvas tauHadPTCanvas("tauHadPTCanvas", "", 600, 600);
+  TCanvas tauHadPT1ProngCanvas("tauHadPT1ProngCanvas", "", 600, 600);
+  TCanvas tauHadPT1Prong1Pi0Canvas("tauHadPT1Prong1Pi0Canvas", "", 600, 600);
+  TCanvas tauHadPT1Prong2Pi0Canvas("tauHadPT1Prong2Pi0Canvas", "", 600, 600);
+  TCanvas tauHadPT3ProngCanvas("tauHadPT3ProngCanvas", "", 600, 600);
   TCanvas tauHadIsoCanvas("tauHadIsoCanvas", "", 600, 600);
   TCanvas WMuLeptonRelIsoCanvas("WMuLeptonRelIsoCanvas", "", 600, 600);
   TCanvas tauHadEtaCanvas("tauHadEtaCanvas", "", 600, 600);
@@ -2875,6 +3015,10 @@ void TauAnalyzer::endJob()
   TCanvas muHadMassVsNAddlJetsCanvas("muHadMassVsNAddlJetsCanvas", "", 600, 600);
   TCanvas muHadMassVsCSVScoreCanvas("muHadMassVsCSVScoreCanvas", "", 600, 600);
   TCanvas WMuMTVsMETCanvas("WMuMTVsMETCanvas", "", 600, 600);
+  TCanvas tauHadJetEnergyFractionVsTauHadIsoCanvas
+    ("tauHadJetEnergyFractionVsTauHadIsoCanvas", "", 600, 600);
+  TCanvas tauHadCleanedJetEnergyFractionVsTauHadIsoCanvas
+    ("tauHadCleanedJetEnergyFractionVsTauHadIsoCanvas", "", 600, 600);
   TCanvas jet_pt_etacutCanvas("jet_pt_etacutCanvas", "", 600, 600);
   TCanvas jet_etaCanvas("jet_etaCanvas", "", 600, 600);
   TCanvas jet_phiCanvas("jet_phiCanvas", "", 600, 600);
@@ -2888,6 +3032,10 @@ void TauAnalyzer::endJob()
   Common::draw1DHistograms(METCanvas, MET_);
   Common::draw1DHistograms(hadTauAssociatedMuMultiplicityCanvas, hadTauAssociatedMuMultiplicity_);
   Common::draw1DHistograms(muHadMassCanvas, muHadMass_);
+  Common::draw1DHistograms(muHadMass1ProngCanvas, muHadMass1Prong_);
+  Common::draw1DHistograms(muHadMass1Prong1Pi0Canvas, muHadMass1Prong1Pi0_);
+  Common::draw1DHistograms(muHadMass1Prong2Pi0Canvas, muHadMass1Prong2Pi0_);
+  Common::draw1DHistograms(muHadMass3ProngCanvas, muHadMass3Prong_);
   Common::draw1DHistograms(muHadMassReweightErrSqCanvas, muHadMassReweightErrSq_);
   Common::draw1DHistograms(muHadChargeCanvas, muHadCharge_);
   Common::draw1DHistograms(bTagDiscrimCanvas, bTagDiscrim_);
@@ -2911,6 +3059,10 @@ void TauAnalyzer::endJob()
   Common::draw1DHistograms(dRWMuSoftMuMuHadMassGe2Canvas, dRWMuSoftMuMuHadMassGe2_);
   Common::draw1DHistograms(tauMuPTCanvas, tauMuPT_);
   Common::draw1DHistograms(tauHadPTCanvas, tauHadPT_);
+  Common::draw1DHistograms(tauHadPT1ProngCanvas, tauHadPT1Prong_);
+  Common::draw1DHistograms(tauHadPT1Prong1Pi0Canvas, tauHadPT1Prong1Pi0_);
+  Common::draw1DHistograms(tauHadPT1Prong2Pi0Canvas, tauHadPT1Prong2Pi0_);
+  Common::draw1DHistograms(tauHadPT3ProngCanvas, tauHadPT3Prong_);
   Common::draw1DHistograms(tauHadIsoCanvas, tauHadIso_);
   Common::draw1DHistograms(WMuLeptonRelIsoCanvas, WMuLeptonRelIso_);
   Common::draw1DHistograms(tauHadEtaCanvas, tauHadEta_);
@@ -3012,6 +3164,10 @@ void TauAnalyzer::endJob()
   Common::draw2DHistograms(muHad_t3t1VsDecayModeCanvas, muHad_t3t1VsDecayMode_);
   Common::draw2DHistograms(muHadMassVsNAddlJetsCanvas, muHadMassVsNAddlJets_);
   Common::draw2DHistograms(muHadMassVsCSVScoreCanvas, muHadMassVsCSVScore_);
+  Common::draw2DHistograms(tauHadJetEnergyFractionVsTauHadIsoCanvas, 
+			   tauHadJetEnergyFractionVsTauHadIso_);
+  Common::draw2DHistograms(tauHadCleanedJetEnergyFractionVsTauHadIsoCanvas, 
+			   tauHadCleanedJetEnergyFractionVsTauHadIso_);
 
   //set custom options
 
@@ -3020,6 +3176,10 @@ void TauAnalyzer::endJob()
   METCanvas.Write();
   hadTauAssociatedMuMultiplicityCanvas.Write();
   muHadMassCanvas.Write();
+  muHadMass1ProngCanvas.Write();
+  muHadMass1Prong1Pi0Canvas.Write();
+  muHadMass1Prong2Pi0Canvas.Write();
+  muHadMass3ProngCanvas.Write();
   muHadMassReweightErrSqCanvas.Write();
   muHadChargeCanvas.Write();
   bTagDiscrimCanvas.Write();
@@ -3043,6 +3203,10 @@ void TauAnalyzer::endJob()
   dRWMuSoftMuMuHadMassGe2Canvas.Write();
   tauMuPTCanvas.Write();
   tauHadPTCanvas.Write();
+  tauHadPT1ProngCanvas.Write();
+  tauHadPT1Prong1Pi0Canvas.Write();
+  tauHadPT1Prong2Pi0Canvas.Write();
+  tauHadPT3ProngCanvas.Write();
   tauHadIsoCanvas.Write();
   WMuLeptonRelIsoCanvas.Write();
   tauHadEtaCanvas.Write();
@@ -3124,6 +3288,8 @@ void TauAnalyzer::endJob()
   muHadMassVsNAddlJetsCanvas.Write();
   muHadMassVsCSVScoreCanvas.Write();
   WMuMTVsMETCanvas.Write();
+  tauHadJetEnergyFractionVsTauHadIsoCanvas.Write();
+  tauHadCleanedJetEnergyFractionVsTauHadIsoCanvas.Write();
   jet_pt_etacutCanvas.Write();
   jet_etaCanvas.Write();
   jet_phiCanvas.Write();
@@ -3255,6 +3421,14 @@ void TauAnalyzer::reset(const bool doDelete)
   hadTauAssociatedMuMultiplicity_ = NULL;
   if (doDelete && (muHadMass_ != NULL)) delete muHadMass_;
   muHadMass_ = NULL;
+  if (doDelete && (muHadMass1Prong_ != NULL)) delete muHadMass1Prong_;
+  muHadMass1Prong_ = NULL;
+  if (doDelete && (muHadMass1Prong1Pi0_ != NULL)) delete muHadMass1Prong1Pi0_;
+  muHadMass1Prong1Pi0_ = NULL;
+  if (doDelete && (muHadMass1Prong2Pi0_ != NULL)) delete muHadMass1Prong2Pi0_;
+  muHadMass1Prong2Pi0_ = NULL;
+  if (doDelete && (muHadMass3Prong_ != NULL)) delete muHadMass3Prong_;
+  muHadMass3Prong_ = NULL;
   if (doDelete && (muHadMassReweightErrSq_ != NULL)) delete muHadMassReweightErrSq_;
   muHadMassReweightErrSq_ = NULL;
   if (doDelete && (muHadCharge_ != NULL)) delete muHadCharge_;
@@ -3289,6 +3463,14 @@ void TauAnalyzer::reset(const bool doDelete)
   tauMuPT_ = NULL;
   if (doDelete && (tauHadPT_ != NULL)) delete tauHadPT_;
   tauHadPT_ = NULL;
+  if (doDelete && (tauHadPT1Prong_ != NULL)) delete tauHadPT1Prong_;
+  tauHadPT1Prong_ = NULL;
+  if (doDelete && (tauHadPT1Prong1Pi0_ != NULL)) delete tauHadPT1Prong1Pi0_;
+  tauHadPT1Prong1Pi0_ = NULL;
+  if (doDelete && (tauHadPT1Prong2Pi0_ != NULL)) delete tauHadPT1Prong2Pi0_;
+  tauHadPT1Prong2Pi0_ = NULL;
+  if (doDelete && (tauHadPT3Prong_ != NULL)) delete tauHadPT3Prong_;
+  tauHadPT3Prong_ = NULL;
   if (doDelete && (tauHadIso_ != NULL)) delete tauHadIso_;
   tauHadIso_ = NULL;
   if (doDelete && (WMuLeptonRelIso_ != NULL)) delete WMuLeptonRelIso_;
@@ -3425,6 +3607,14 @@ void TauAnalyzer::reset(const bool doDelete)
   muHadMassVsNAddlJets_ = NULL;
   if (doDelete && (muHadMassVsCSVScore_ != NULL)) delete muHadMassVsCSVScore_;
   muHadMassVsCSVScore_ = NULL;
+  if (doDelete && (tauHadJetEnergyFractionVsTauHadIso_ != NULL)) {
+    delete tauHadJetEnergyFractionVsTauHadIso_;
+  }
+  tauHadJetEnergyFractionVsTauHadIso_ = NULL;
+  if (doDelete && (tauHadCleanedJetEnergyFractionVsTauHadIso_ != NULL)) {
+    delete tauHadCleanedJetEnergyFractionVsTauHadIso_;
+  }
+  tauHadCleanedJetEnergyFractionVsTauHadIso_ = NULL;
   if (doDelete && (jet_pt_etacut != NULL)) delete jet_pt_etacut;
   jet_pt_etacut = NULL;
   if (doDelete && (jet_eta != NULL)) delete jet_eta;
