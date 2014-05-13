@@ -528,17 +528,21 @@ void setup(const vector<string>& canvasNames, vector<TCanvas*>& outputCanvases,
       outputCanvases[outputCanvases.size() - 1]->Divide(1, 2);
       outputCanvases[outputCanvases.size() - 1]->cd(1)->SetPad(0.0, 0.33, 1.0, 1.0);
       setCanvasOptions(*outputCanvases[outputCanvases.size() - 1]->cd(1), 1, setLogY, 0);
-      if (twoDim) setCanvasMargins(*outputCanvases[outputCanvases.size() - 1]->cd(1), 0.2, 0.2, 0.2, 0.2);
+      if (twoDim) {
+	setCanvasMargins(*outputCanvases[outputCanvases.size() - 1]->cd(1), 0.2, 0.2, 0.2, 0.2);
+      }
       outputCanvases[outputCanvases.size() - 1]->cd(2)->SetPad(0.0, 0.0, 1.0, 0.33);
       setCanvasOptions(*outputCanvases[outputCanvases.size() - 1]->cd(2), 1, 0, 0);
-      if (twoDim) setCanvasMargins(*outputCanvases[outputCanvases.size() - 1]->cd(2), 0.2, 0.2, 0.2, 0.2);
+      if (twoDim) {
+	setCanvasMargins(*outputCanvases[outputCanvases.size() - 1]->cd(2), 0.2, 0.2, 0.2, 0.2);
+      }
     }
     else {
       outputCanvases.push_back(new TCanvas(iCanvasName->c_str(), "", 600, 600));
       setCanvasOptions(*outputCanvases[outputCanvases.size() - 1], 1, setLogY, 0);
       if (twoDim) setCanvasMargins(*outputCanvases[outputCanvases.size() - 1], 0.2, 0.2, 0.2, 0.2);
     }
-    legends.push_back(new TLegend(0.4, 0.55, 0.8, 0.75));
+    legends.push_back(new TLegend(0.4, 0.5, 0.8, 0.9));
     string stackName(*iCanvasName);
     stackName.replace(stackName.find("Canvas"), 6, "Stack");
     stacks.push_back(new THStack(stackName.c_str(), ""));
@@ -556,7 +560,8 @@ void setup(const vector<string>& canvasNames, vector<TCanvas*>& outputCanvases,
   vector<THStack*> stacks;
   vector<string> legendHeaders;
   vector<vector<TH1F*> > dummyHists;
-  setup(canvasNames, outputCanvases, false, legends, stacks, legendHeaders, dummyHists, 1, false, twoDim);
+  setup(canvasNames, outputCanvases, false, legends, stacks, legendHeaders, dummyHists, 1, false, 
+	twoDim);
   for (vector<string>::const_iterator iCanvasName = canvasNames.begin(); 
        iCanvasName != canvasNames.end(); ++iCanvasName) { hists.push_back(NULL); }
 }
@@ -645,7 +650,10 @@ void write(vector<TCanvas*>& outputCanvases)
   for (vector<TCanvas*>::iterator iOutputCanvas = outputCanvases.begin(); 
        iOutputCanvas != outputCanvases.end(); ++iOutputCanvas) {
     (*iOutputCanvas)->Write();
-//     (*iOutputCanvas)->SaveAs((string((*iOutputCanvas)->GetName()) + "_nonIso.pdf").c_str());
+//     stringstream fileName;
+//     fileName << "/afs/cern.ch/user/y/yohay/AN-13-254/notes/AN-13-254/trunk/regB-data-MC-v149-";
+//     fileName << (*iOutputCanvas)->GetName() << ".pdf";
+//     (*iOutputCanvas)->SaveAs(fileName.str().c_str());
   }
 }
 
@@ -1647,8 +1655,11 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
   const TH1* nonIsoDataReweightErrSqPtrCast = dynamic_cast<const TH1*>(nonIsoDataReweightErrSq);
   vector<Double_t> nonIsoDataStatErrSq;
   for (Int_t iBin = 1; iBin <= nonIsoData->GetNbinsX(); ++iBin) {
+//     const Double_t theNormErrSq = normErrSq(dynamic_cast<const TH1*>(isoData), nonIsoDataPtrCast, 
+// 					    nonIsoDataReweightErrSqPtrCast, normRegionLowerBin, 
+// 					    normRegionUpperBin, norm);
 //     nonIsoDataStatErrSq.
-//       push_back(bkgErrSqFromNorm(nonIsoDataPtrCast->GetBinContent(iBin), normErrSq) + 
+//       push_back(bkgErrSqFromNorm(nonIsoDataPtrCast->GetBinContent(iBin), theNormErrSq) + 
 // 		bkgErrSqFromStats(norm, nonIsoDataPtrCast->GetBinError(iBin)) + 
 // 		bkgErrSqFromReweight(norm, reweightErrSq));
     nonIsoDataStatErrSq.
@@ -2228,13 +2239,13 @@ void divideAndFit(const string& fileName1, const string& fileName2, const string
 	draw(outputFile, outputCanvas, outputHist, fitFunction.c_str(), "");
 	format(outputHist, yAxisLow, yAxisHigh, kBlack, 1.0);
 	outputCanvas.Write();
-	//       cerr << "-------\n";
-	//       for (Int_t iBin = 1; iBin <= outputHist->GetNbinsX(); ++iBin) {
-	// 	cerr << iBin << " " << outputHist->GetBinContent(iBin) << " +/- ";
-	// 	cerr << outputHist->GetBinError(iBin) << endl;
-	//       }
-	//       cerr << "-------\n";
-	//       outputFile.Write();
+// 	cerr << "-------\n";
+// 	for (Int_t iBin = 1; iBin <= outputHist->GetNbinsX(); ++iBin) {
+// 	  cerr << iBin << " " << outputHist->GetBinContent(iBin) << " +/- ";
+// 	  cerr << outputHist->GetBinError(iBin) << endl;
+// 	}
+// 	cerr << "-------\n";
+	outputFile.Write();
       }
     }
   }
@@ -2344,7 +2355,8 @@ void plot2Histograms(const vector<string>& fileName1, const vector<string>& file
 	  draw(outputFile, outputCanvas, hist1, "", "E");
 	  draw(outputFile, outputCanvas, hist2, "", "ESAME");
 	  format(hist1, yAxisLow[j], yAxisHigh[j], kBlack, scale);
-	  format(hist2, yAxisLow[j], yAxisHigh[j], kRed, scale);
+	  format(hist2, yAxisLow[j], yAxisHigh[j], kRed, 
+		 hist1->GetBinContent(1)/hist2->GetBinContent(1));
 	  outputLegend.Draw();
 	  outputCanvas.Write();
 	}
@@ -2379,6 +2391,8 @@ void plotFakeRate(const string& isoFileName, const string& nonIsoFileName,
   vector<string> histNames;
   histNames.push_back("tauHadPT");
   histNames.push_back("tauHadEta");
+  histNames.push_back("muHadMass");
+  histNames.push_back("tauHadDecayMode");
   vector<string> canvasNames;
   vector<string> outputCanvasNames;
   for (vector<string>::const_iterator iHist = histNames.begin(); iHist != histNames.end(); 
@@ -2407,6 +2421,8 @@ void plotFakeRate(const string& isoFileName, const string& nonIsoFileName,
   vector<vector<double> > bins;
   bins.push_back(vector<double>());
   bins.push_back(tauHadEtaBins);
+  bins.push_back(vector<double>());
+  bins.push_back(vector<double>());
   divideAndFit(isoFileName, nonIsoFileName, fakeRateFileName, outputCanvasNames, stack, histNames, 
 	       histNames, canvasNames, canvasNames, 1, 1.0, bins, "", 0.0001, 0.3);
 }
@@ -2418,6 +2434,8 @@ void plotFakeRateRatio(const string& dataFileName, const string& MCFileName,
   vector<string> histNames;
   histNames.push_back("tauHadPT");
   histNames.push_back("tauHadEta");
+  histNames.push_back("muHadMass");
+  histNames.push_back("tauHadDecayMode");
   vector<string> canvasNames;
   vector<string> outputCanvasNames;
   for (vector<string>::const_iterator iHist = histNames.begin(); iHist != histNames.end(); 
@@ -2450,8 +2468,8 @@ void compare2Versions(const vector<string>& fileName1, const vector<string>& fil
   const string canvasName(histName + "Canvas");
   plot2Histograms(fileName1, fileName2, outputFileName, outputCanvasTags, stack, 
 		  vector<string>(1, histName), vector<string>(1, histName), 
-		  vector<string>(1, canvasName), vector<string>(1, canvasName), pad, 0.0, 
-		  vector<float>(1, 0.001), vector<float>(1, 1.0));
+		  vector<string>(1, canvasName), vector<string>(1, canvasName), pad, 1.0, 
+		  vector<float>(1, 0.001), vector<float>(1, 1000.0));
 }
 
 //plot fit information for different selections
