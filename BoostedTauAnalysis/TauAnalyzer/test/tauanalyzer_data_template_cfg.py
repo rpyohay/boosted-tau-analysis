@@ -524,6 +524,7 @@ process.tauAnalysisSequence = cms.Sequence(
     BTAGGINGprocess.corrJetDistinctTauSelector*
     process.TRIGGEROBJECTFILTER*
     OSSFFILTERprocess.SSSFFilter*
+    process.producePFMETCorrections*
     process.METFilter*
     process.muHadTauAnalyzer
     )

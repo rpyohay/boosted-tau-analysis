@@ -547,6 +547,7 @@ process.tauAnalysisSequence = cms.Sequence(
     process.muonTriggerObjectFilter*
     process.OSSFFilter*
     process.SSSFFilter*
+    process.producePFMETCorrections*
     process.METFilter*
     process.muHadTauAnalyzer
     )
