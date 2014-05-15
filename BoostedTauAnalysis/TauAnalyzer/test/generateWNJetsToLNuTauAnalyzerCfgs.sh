@@ -149,7 +149,7 @@ cat <<EOF > submitWNJetsToLNuTauAnalyzerJobs.sh
 for file in \`ls -alh tauanalyzer*W[0-9]JetsToLNu*.sh | grep -v all | awk '{ print \$9 }'\`
   do
   jobName=\`echo \$file | sed -e "s%\(.*\)\.sh%\1%"\`
-  bsub -q 8nh -J \$jobName < \$file
+  bsub -q 1nd -J \$jobName < \$file
 done
 
 exit 0
@@ -163,7 +163,7 @@ cat <<EOF > submitWNJetsToLNuAllTauAnalyzerJobs.sh
 for file in \`ls -alh tauanalyzer*W[0-9]JetsToLNu*all*.sh | awk '{ print \$9 }'\`
   do
   jobName=\`echo \$file | sed -e "s%\(.*\)\.sh%\1%"\`
-  bsub -q 8nh -J \$jobName < \$file
+  bsub -q 1nd -J \$jobName < \$file
 done
 
 exit 0

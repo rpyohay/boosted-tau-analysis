@@ -321,6 +321,7 @@ process.muHadNonIsoTauSelector.tauDiscriminatorTags = cms.VInputTag(
     cms.InputTag('hpsPFTauDiscriminationByMediumCombinedIsolationDBSumPtCorr', '', 'SKIM')
     )
 process.muHadNonIsoTauSelector.passDiscriminator = cms.bool(False)
+process.muHadNonIsoTauSelector.isoMax = cms.double(5.0)
 
 #produce AK5PFchs L1FastL2L3 corrected jets
 
@@ -402,7 +403,28 @@ process.muHadIsoTauAnalyzer = cms.EDAnalyzer(
     pTRankColors = cms.vuint32(1, 2, 4, 6),
     pTRankStyles = cms.vuint32(20, 21, 22, 23),
     pTRankEntries = cms.vstring('Highest p_{T}', 'Second highest p_{T}', 'Third highest p_{T}',
-                                'Lowest p_{T}')
+                                'Lowest p_{T}'),
+    triggerEventTag = cms.untracked.InputTag("hltTriggerSummaryAOD", "", "HLT"),
+    triggerResultsTag = cms.untracked.InputTag("TriggerResults", "", "HLT"),
+    hltTags = cms.VInputTag(cms.InputTag("HLT_IsoMu24_eta2p1_v1", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v2", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v3", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v4", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v5", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v6", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v7", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v8", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v9", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v10", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v11", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v12", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v13", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v14", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v15", "", "HLT")
+                            ),
+    theRightHLTTag = cms.InputTag("HLT_IsoMu24_eta2p1"),
+    theRightHLTSubFilter = cms.InputTag("hltL3crIsoL1sMu16Eta2p1L1f0L2f16QL3f24QL3cr"),
+    HLTSubFilters = cms.untracked.VInputTag("")
     )
 
 #analyze non-isolated taus
@@ -432,10 +454,11 @@ process.output = cms.OutputModule(
     )
 
 #MET filter
-process.METFilter.minMET = cms.double(0.)
+process.METFilter.minMET = cms.double(30.)
+process.METFilter.METTag = cms.InputTag("pfMetType1")
 
 #MT filter
-process.MTFilter.minMT = cms.double(50.)
+process.MTFilter.minMT = cms.double(40.)
 process.MTFilter.METTag = cms.InputTag("pfMetType1")
 
 #OS filter for tau_mu W_mu charge product
@@ -529,8 +552,10 @@ process.nonIsoTauAnalysisSequence = cms.Sequence(process.btagging*
                                                  process.muHadNonIsoTauAnalyzer)
 process.tauAnalysisSequence = cms.Sequence(process.muHadTauSelector*
                                            process.corrJetDistinctTauSelector*
-                                           process.TriggerObjectFilter*process.OSSFFilter*
-                                           process.SSSFFilter*process.METFilter*
+                                           process.TriggerObjectFilter*
+                                           process.OSSFFilter*
+                                           process.SSSFFilter
+                                           *process.METFilter*
                                            process.muHadTauAnalyzer)
 
 #path

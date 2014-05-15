@@ -214,6 +214,14 @@ bool CustomTauSelector::filter(edm::Event& iEvent, const edm::EventSetup& iSetup
 			passDiscriminator_, isoMax_) : 
     Common::getRecoTaus(pBaseTaus, pTauDiscriminators, pTauHadIso, pTMin_, etaMax_, 
 			passDiscriminator_, isoMax_);
+  
+  /*
+  std::vector<reco::PFTauRef> taus = pTaus.isValid() ?
+    Common::getRecoTaus(pTaus, pBaseTaus, pTauDiscriminators, pTMin_, etaMax_,
+			passDiscriminator_) :
+    Common::getRecoTaus(pBaseTaus, pTauDiscriminators, pTMin_, etaMax_, passDiscriminator_);
+  */
+
 
   //loop over selected taus
   unsigned int nPassingTaus = 0;
