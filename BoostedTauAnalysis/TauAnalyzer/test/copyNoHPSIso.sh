@@ -29,6 +29,7 @@ cd $version
 ./copyAllQCDBFromEOS.sh
 ./copyAllQCDBMuFromEOS.sh
 ./copyAllNonIsoWDataFromEOS.sh
+./copyAllSinglePhotonDataFromEOS.sh
 cd ..
 
 exit 0

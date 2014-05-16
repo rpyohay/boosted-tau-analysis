@@ -518,7 +518,7 @@ template<typename T>
 void setup(const vector<string>& canvasNames, vector<TCanvas*>& outputCanvases, 
 	   const bool setLogY, vector<TLegend*>& legends, vector<THStack*>& stacks, 
 	   const vector<string>& legendHeaders, vector<vector<T*> >& hists, 
-	   const unsigned int size, const bool dataMC)
+	   const unsigned int size, const bool dataMC, const bool twoDim)
 {
   for (vector<string>::const_iterator iCanvasName = canvasNames.begin(); 
        iCanvasName != canvasNames.end(); ++iCanvasName) {
@@ -528,17 +528,21 @@ void setup(const vector<string>& canvasNames, vector<TCanvas*>& outputCanvases,
       outputCanvases[outputCanvases.size() - 1]->Divide(1, 2);
       outputCanvases[outputCanvases.size() - 1]->cd(1)->SetPad(0.0, 0.33, 1.0, 1.0);
       setCanvasOptions(*outputCanvases[outputCanvases.size() - 1]->cd(1), 1, setLogY, 0);
-      setCanvasMargins(*outputCanvases[outputCanvases.size() - 1]->cd(1), 0.2, 0.2, 0.2, 0.2);
+      if (twoDim) {
+	setCanvasMargins(*outputCanvases[outputCanvases.size() - 1]->cd(1), 0.2, 0.2, 0.2, 0.2);
+      }
       outputCanvases[outputCanvases.size() - 1]->cd(2)->SetPad(0.0, 0.0, 1.0, 0.33);
       setCanvasOptions(*outputCanvases[outputCanvases.size() - 1]->cd(2), 1, 0, 0);
-      setCanvasMargins(*outputCanvases[outputCanvases.size() - 1]->cd(2), 0.2, 0.2, 0.2, 0.2);
+      if (twoDim) {
+	setCanvasMargins(*outputCanvases[outputCanvases.size() - 1]->cd(2), 0.2, 0.2, 0.2, 0.2);
+      }
     }
     else {
       outputCanvases.push_back(new TCanvas(iCanvasName->c_str(), "", 600, 600));
       setCanvasOptions(*outputCanvases[outputCanvases.size() - 1], 1, setLogY, 0);
-      setCanvasMargins(*outputCanvases[outputCanvases.size() - 1], 0.2, 0.2, 0.2, 0.2);
+      if (twoDim) setCanvasMargins(*outputCanvases[outputCanvases.size() - 1], 0.2, 0.2, 0.2, 0.2);
     }
-    legends.push_back(new TLegend(0.4, 0.55, 0.8, 0.75));
+    legends.push_back(new TLegend(0.4, 0.5, 0.8, 0.9));
     string stackName(*iCanvasName);
     stackName.replace(stackName.find("Canvas"), 6, "Stack");
     stacks.push_back(new THStack(stackName.c_str(), ""));
@@ -550,13 +554,14 @@ void setup(const vector<string>& canvasNames, vector<TCanvas*>& outputCanvases,
 
 template<typename T>
 void setup(const vector<string>& canvasNames, vector<TCanvas*>& outputCanvases, 
-	   vector<T*>& hists)
+	   vector<T*>& hists, const bool twoDim = false)
 {
   vector<TLegend*> legends;
   vector<THStack*> stacks;
   vector<string> legendHeaders;
   vector<vector<TH1F*> > dummyHists;
-  setup(canvasNames, outputCanvases, false, legends, stacks, legendHeaders, dummyHists, 1, false);
+  setup(canvasNames, outputCanvases, false, legends, stacks, legendHeaders, dummyHists, 1, false, 
+	twoDim);
   for (vector<string>::const_iterator iCanvasName = canvasNames.begin(); 
        iCanvasName != canvasNames.end(); ++iCanvasName) { hists.push_back(NULL); }
 }
@@ -645,7 +650,10 @@ void write(vector<TCanvas*>& outputCanvases)
   for (vector<TCanvas*>::iterator iOutputCanvas = outputCanvases.begin(); 
        iOutputCanvas != outputCanvases.end(); ++iOutputCanvas) {
     (*iOutputCanvas)->Write();
-//     (*iOutputCanvas)->SaveAs((string((*iOutputCanvas)->GetName()) + "_nonIso.pdf").c_str());
+//     stringstream fileName;
+//     fileName << "/afs/cern.ch/user/y/yohay/AN-13-254/notes/AN-13-254/trunk/regB-data-MC-v149-";
+//     fileName << (*iOutputCanvas)->GetName() << ".pdf";
+//     (*iOutputCanvas)->SaveAs(fileName.str().c_str());
   }
 }
 
@@ -716,7 +724,7 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
   vector<THStack*> stacks;
   vector<vector<TH1F*> > hists;
   setup(canvasNames, outputCanvases, setLogY, legends, stacks, legendHeaders, hists, 
-	inputFiles.size(), dataMC);
+	inputFiles.size(), dataMC, false);
   bool data = true;
   for (vector<string>::const_iterator iInputFile = inputFiles.begin(); 
        iInputFile != inputFiles.end(); ++iInputFile) {
@@ -738,7 +746,12 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
       }
       else {
 	pHist = (TH1F*)pCanvas->GetPrimitive(graphNames[canvasIndex].c_str());
-	float weight = weights[fileIndex] == 0.0 ? 1.0/pHist->Integral(0, -1) : weights[fileIndex];
+	float weight = weights[fileIndex];
+	if (weights[fileIndex] == 0.0) weight = 1.0/pHist->Integral(0, -1);
+	if (weights[fileIndex] == -1.0) {
+	  if (fileIndex == 0) weight = 1.0;
+	  else weight = hists[canvasIndex][0]->Integral(0, -1)/pHist->Integral(0, -1);
+	}
 	setHistogramOptions(pHist, colors[fileIndex], 0.7, styles[fileIndex], 
 			    weight, 
 			    string(pHist->GetName()) == "muHadPTOverMuHadMass" ? 
@@ -896,7 +909,7 @@ void haddCanvases(const string& outputFileName, const vector<string>& inputFiles
   vector<TH1F*> hists1D;
   vector<TH2F*> hists2D;
   setup(canvasNames1D, outputCanvases1D, hists1D);
-  setup(canvasNames2D, outputCanvases2D, hists2D);
+  setup(canvasNames2D, outputCanvases2D, hists2D, true);
   vector<Int_t> nullBlindLow(canvasNames2D.size(), 0);
   vector<Int_t> nullBlindHigh(canvasNames2D.size(), -2);
   for (vector<string>::const_iterator iInputFile = inputFiles.begin(); 
@@ -1016,7 +1029,7 @@ void drawDifferenceGraphsOn1Canvas(const string& outputFileName,
   vector<vector<TH1F*> > hists;
   vector<TH1F*> histDiff(canvasNames.size());
   setup(canvasNames, outputCanvases, setLogY, legends, stacks, legendHeaders, hists, 
-	inputFiles.size(), dataMC);
+	inputFiles.size(), dataMC, false);
   for (vector<string>::const_iterator iInputFile = inputFiles.begin(); 
        iInputFile != inputFiles.end(); ++iInputFile) {
     const unsigned int fileIndex = iInputFile - inputFiles.begin();
@@ -1165,7 +1178,7 @@ void drawQCDRegionAHistograms(const string& outputFileA,
   vector<TLegend*> legends;
   vector<THStack*> stacks;
   vector<vector<TH1F*> > hists;
-  setup(canvasNames, outputCanvases, setLogY, legends, stacks, legendHeaders, hists, 3, dataMC);
+  setup(canvasNames, outputCanvases, setLogY, legends, stacks, legendHeaders, hists, 3, dataMC, false);
   
   for (vector<string>::const_iterator iCanvasName = canvasNames.begin(); 
        iCanvasName != canvasNames.end(); ++iCanvasName) { // loop over canvases
@@ -1236,13 +1249,16 @@ void addClosurePlot(TFile& sigVsBkgIsoStream, const string& var, const string& u
   TCanvas* canvasIso = NULL;
   sigVsBkgIsoStream.GetObject(canvasName.c_str(), canvasIso);
 
-  //get the signal histogram
-  TH1F* histSig = NULL;
+  //get the signal histograms
+  TH1F* histSig1 = NULL;
+  TH1F* histSig2 = NULL;
   THStack* stackBkgIso = NULL;
   if (canvasIso != NULL) {
-    histSig = (TH1F*)canvasIso->GetPrimitive(var.c_str());
-    setHistogramOptions(histSig, kBlack, 0.7, 20, 1.0, unit.c_str(), "");
-    histSig->GetYaxis()->SetRangeUser(0.1, 10000.0);
+    TList* sigs = canvasIso->GetListOfPrimitives();
+    histSig1 = (TH1F*)sigs->At(2)->Clone();
+    histSig2 = (TH1F*)sigs->At(3)->Clone();
+    histSig1->GetYaxis()->SetRangeUser(0.1, 10000.0);
+    histSig2->GetYaxis()->SetRangeUser(0.1, 10000.0);
 
     /*get the background stack histogram in the signal region (isolated taus) and convert it to a 
       TH1*/
@@ -1324,15 +1340,14 @@ void addClosurePlot(TFile& sigVsBkgIsoStream, const string& var, const string& u
   outCanvas.Divide(1, 2);
   outCanvas.cd(1)->SetPad(0.0, 0.33, 1.0, 1.0);
   setCanvasOptions(*outCanvas.cd(1), 1, 1, 0);
-  setCanvasMargins(*outCanvas.cd(1), 0.2, 0.2, 0.2, 0.2);
   outCanvas.cd(2)->SetPad(0.0, 0.0, 1.0, 0.33);
   setCanvasOptions(*outCanvas.cd(2), 1, 0, 0);
-  setCanvasMargins(*outCanvas.cd(2), 0.2, 0.2, 0.2, 0.2);
   outCanvas.cd(1);
 //   Double_t histBkgIsoErr = -1.0;
 //   Double_t histBkgNonIsoErr = -1.0;
-  histSig->Draw("HIST");
-//   cout << histSig->Integral(5, -1) << endl;
+//   histSig1->Draw("HISTE");
+//   cout << histSig1->Integral(5, -1) << endl;
+//   histSig2->Draw("HISTESAME");
   histBkgIso->Draw("HISTE");
 //   cout << histBkgIso->IntegralAndError(5, -1, histBkgIsoErr) << "+/-";
 //   cout << histBkgIsoErr << endl;
@@ -1640,8 +1655,11 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
   const TH1* nonIsoDataReweightErrSqPtrCast = dynamic_cast<const TH1*>(nonIsoDataReweightErrSq);
   vector<Double_t> nonIsoDataStatErrSq;
   for (Int_t iBin = 1; iBin <= nonIsoData->GetNbinsX(); ++iBin) {
+//     const Double_t theNormErrSq = normErrSq(dynamic_cast<const TH1*>(isoData), nonIsoDataPtrCast, 
+// 					    nonIsoDataReweightErrSqPtrCast, normRegionLowerBin, 
+// 					    normRegionUpperBin, norm);
 //     nonIsoDataStatErrSq.
-//       push_back(bkgErrSqFromNorm(nonIsoDataPtrCast->GetBinContent(iBin), normErrSq) + 
+//       push_back(bkgErrSqFromNorm(nonIsoDataPtrCast->GetBinContent(iBin), theNormErrSq) + 
 // 		bkgErrSqFromStats(norm, nonIsoDataPtrCast->GetBinError(iBin)) + 
 // 		bkgErrSqFromReweight(norm, reweightErrSq));
     nonIsoDataStatErrSq.
@@ -1679,10 +1697,8 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
   outCanvas.Divide(1, 2);
   outCanvas.cd(1)->SetPad(0.0, 0.33, 1.0, 1.0);
   setCanvasOptions(*outCanvas.cd(1), 1, 1, 0);
-  setCanvasMargins(*outCanvas.cd(1), 0.2, 0.2, 0.2, 0.2);
   outCanvas.cd(2)->SetPad(0.0, 0.0, 1.0, 0.33);
   setCanvasOptions(*outCanvas.cd(2), 1, 0, 0);
-  setCanvasMargins(*outCanvas.cd(2), 0.2, 0.2, 0.2, 0.2);
   outCanvas.cd(1);
   if (option == "separate") {
     isoBkgSep.Draw();
@@ -2009,7 +2025,6 @@ void plotTauHadPT(const vector<string>& fileNames, const vector<pair<Color_t, Co
     //plot region A background MC vs. region B background MC
     TCanvas AMCVsBMCCanvas("AMCVsBMCCanvas", "", 600, 600);
     setCanvasOptions(AMCVsBMCCanvas, 1, 0, 0);
-    setCanvasMargins(AMCVsBMCCanvas, 0.2, 0.2, 0.2, 0.2);
     TLegend AMCVsBMCLegend(0.35, 0.55, 0.75, 0.75);
     setLegendOptions(AMCVsBMCLegend, "MC (excluding QCD) normalized to 1");
     AMCVsBMCLegend.AddEntry(histograms[0].second, "Signal region", "lp");
@@ -2026,7 +2041,6 @@ void plotTauHadPT(const vector<string>& fileNames, const vector<pair<Color_t, Co
     //plot region A background MC vs. region C data
     TCanvas AMCVsCDataCanvas("AMCVsCDataCanvas", "", 600, 600);
     setCanvasOptions(AMCVsCDataCanvas, 1, 0, 0);
-    setCanvasMargins(AMCVsCDataCanvas, 0.2, 0.2, 0.2, 0.2);
     TLegend AMCVsCDataLegend(0.35, 0.55, 0.75, 0.75);
     setLegendOptions(AMCVsCDataLegend, "Normalized to 1");
     AMCVsCDataLegend.AddEntry(histograms[0].second, "Signal region", "lp");
@@ -2043,7 +2057,6 @@ void plotTauHadPT(const vector<string>& fileNames, const vector<pair<Color_t, Co
     //plot region A background MC vs. region B background MC vs. region B data
     TCanvas AMCVsBMCVsBDataCanvas("AMCVsBMCVsBDataCanvas", "", 600, 600);
     setCanvasOptions(AMCVsBMCVsBDataCanvas, 1, 0, 0);
-    setCanvasMargins(AMCVsBMCVsBDataCanvas, 0.2, 0.2, 0.2, 0.2);
     TLegend AMCVsBMCVsBDataLegend(0.35, 0.55, 0.75, 0.75);
     setLegendOptions(AMCVsBMCVsBDataLegend, "Normalized to 1");
     AMCVsBMCVsBDataLegend.AddEntry(histograms[1].first, "Data control region", "lp");
@@ -2124,8 +2137,38 @@ TH1* divideAndScale(TH1* hist1, TH1* hist2, const double scale, const vector<dou
   return rebinnedHist1;
 }
 
+//plot the fraction of events in one part of histogram to the total vs. x
+TH1* integralRatioX(TH2* hist, const double scale, const unsigned int factor, const int yBinLow, 
+		    const int yBinHigh)
+{
+  TH1D* integralRatioHist = NULL;
+  TH2* rebinnedHist = NULL;
+  if (factor > 1) rebinnedHist = hist->RebinX(factor, hist->GetName());
+  else rebinnedHist = hist;
+  if (rebinnedHist != NULL) {
+    rebinnedHist->Scale(scale == 0.0 ? 1.0/rebinnedHist->Integral(0, -1, 0, -1, "") : scale);
+    integralRatioHist = 
+      rebinnedHist->ProjectionX((string(rebinnedHist->GetName()) + "IntegralRatio").c_str(), 
+				yBinLow, yBinHigh, "e");
+    for (Int_t iXBin = 1; iXBin <= rebinnedHist->GetNbinsX(); ++iXBin) {
+      Double_t partIntegralErr = integralRatioHist->GetBinError(iXBin);
+      Double_t partIntegral = integralRatioHist->GetBinContent(iXBin);
+      Double_t fullIntegralErr = 0.0;
+      Double_t fullIntegral = 
+	rebinnedHist->IntegralAndError(iXBin, iXBin, 0, -1, fullIntegralErr, "");
+      integralRatioHist->SetBinContent(iXBin, partIntegral/fullIntegral);
+      integralRatioHist->
+	SetBinError(iXBin, (partIntegral/fullIntegral)*
+		    sqrt((partIntegralErr*partIntegralErr)/(partIntegral*partIntegral) + 
+			 (fullIntegralErr*fullIntegralErr)/(fullIntegral*fullIntegral)));
+    }
+  }
+  return integralRatioHist;
+}
+
 //draw histogram
-void draw(TFile& file, TCanvas& canvas, TH1* hist, const string& fitFunction)
+void draw(TFile& file, TCanvas& canvas, TH1* hist, const string& fitFunction, 
+	  const string& drawOpt)
 {
   file.cd();
   canvas.cd();
@@ -2134,13 +2177,33 @@ void draw(TFile& file, TCanvas& canvas, TH1* hist, const string& fitFunction)
 //   fit.SetParameter(1, -0.05);
 //   fit.SetParameter(2, 3.0);
   if (fitFunction != "") hist->Fit(fitFunction.c_str());
-  hist->Draw();
+  hist->Draw(drawOpt.c_str());
 }
 
 //format histogram
-void format(TH1* hist, const float yAxisLow, const float yAxisHigh)
+void format(TH1* hist, const float yAxisLow, const float yAxisHigh, const Color_t color, 
+	    const double scale)
 {
   hist->GetYaxis()->SetRangeUser(yAxisLow, yAxisHigh);
+  hist->SetMarkerColor(color);
+  hist->SetLineColor(color);
+  hist->Scale(scale == 0.0 ? 1.0/hist->Integral(0, -1) : scale);
+}
+
+//get version from file name
+string version(const string& fileName)
+{
+  string retVal;
+  const size_t begPos = fileName.find("_v");
+  const size_t endPos1 = fileName.find("_", begPos + 1);
+  const size_t endPos2 = fileName.find(".root", begPos + 1);
+  if (begPos != string::npos) {
+    size_t endPos = string::npos;
+    if (endPos1 != string::npos) endPos = endPos1;
+    else if (endPos2 != string::npos) endPos = endPos2;
+    if (endPos != string::npos) retVal = fileName.substr(begPos + 1, endPos - begPos - 1);
+  }
+  return retVal;
 }
 
 //plot ratio of 2 histograms and fit
@@ -2174,22 +2237,136 @@ void divideAndFit(const string& fileName1, const string& fileName2, const string
 	TH1* outputHist = divideAndScale(hist1, hist2, scale, bins[i]);
 	TCanvas outputCanvas(outputCanvasName[i].c_str(), "", 600, 600);
 	setCanvasOptions(outputCanvas, 1, 0, 0);
-	draw(outputFile, outputCanvas, outputHist, fitFunction.c_str());
-	format(outputHist, yAxisLow, yAxisHigh);
+	draw(outputFile, outputCanvas, outputHist, fitFunction.c_str(), "");
+	format(outputHist, yAxisLow, yAxisHigh, kBlack, 1.0);
 	outputCanvas.Write();
-	//       cerr << "-------\n";
-	//       for (Int_t iBin = 1; iBin <= outputHist->GetNbinsX(); ++iBin) {
-	// 	cerr << iBin << " " << outputHist->GetBinContent(iBin) << " +/- ";
-	// 	cerr << outputHist->GetBinError(iBin) << endl;
-	//       }
-	//       cerr << "-------\n";
-	//       outputFile.Write();
+// 	cerr << "-------\n";
+// 	for (Int_t iBin = 1; iBin <= outputHist->GetNbinsX(); ++iBin) {
+// 	  cerr << iBin << " " << outputHist->GetBinContent(iBin) << " +/- ";
+// 	  cerr << outputHist->GetBinError(iBin) << endl;
+// 	}
+// 	cerr << "-------\n";
+	outputFile.Write();
       }
     }
   }
   else cerr << "Error: could not open files " << fileName1 << " or " << fileName2 << ".\n";
   file1.Close();
   file2.Close();
+  outputFile.Close();
+}
+
+//plot 1D histogram from 2D histogram
+void plot1DFrom2D(const vector<string>& fileNames, const string& outputFileName, 
+		  const vector<string>& outputCanvasTags, const vector<string>& histNames, 
+		  const vector<string>& canvasNames, const double scale, 
+		  const unsigned int factor, const int yBinLow, const int yBinHigh, 
+		  const float yAxisLow, const float yAxisHigh)
+{
+  if ((fileNames.size() != outputCanvasTags.size()) || (histNames.size() != canvasNames.size())) {
+    cerr << "Error: fileNames.size() = " << fileNames.size() << " but outputCanvasTags.size() = ";
+    cerr << outputCanvasTags.size() << "; histNames.size() = " << histNames.size() << " but ";
+    cerr << "canvasNames.size() = " << canvasNames.size() << ".\n";
+    return;
+  }
+  TFile outputFile(outputFileName.c_str(), "RECREATE");
+  for (vector<string>::const_iterator iFileName = fileNames.begin(); iFileName != fileNames.end(); 
+       ++iFileName) {
+    const unsigned int i = iFileName - fileNames.begin();
+    TFile file(iFileName->c_str());
+    if (file.IsOpen()) {
+      for (vector<string>::const_iterator iHist = histNames.begin(); iHist != histNames.end(); 
+	   ++iHist) {
+	const unsigned int j = iHist - histNames.begin();
+	TH2F* hist = NULL;
+	hist = getObjectFromCanvas<TH2F>(file, histNames[j].c_str(), canvasNames[j].c_str(), 0);
+	if (hist != NULL) {
+	  TH1* outputHist = integralRatioX(hist, scale, factor, yBinLow, yBinHigh);
+	  TCanvas outputCanvas((string(outputHist->GetName()) + outputCanvasTags[i]).c_str(), "", 
+			       600, 600);
+	  setCanvasOptions(outputCanvas, 1, 0, 0);
+	  draw(outputFile, outputCanvas, outputHist, "", "");
+	  format(outputHist, yAxisLow, yAxisHigh, kBlack, 1.0);
+	  outputCanvas.Write();
+	}
+      }
+    }
+    else cerr << "Error: could not open file " << *iFileName << ".\n";
+    file.Close();
+  }
+  outputFile.Close();
+}
+
+//plot 2 histograms on one canvas
+void plot2Histograms(const vector<string>& fileName1, const vector<string>& fileName2, 
+		     const string& outputFileName, const vector<string>& outputCanvasTags, 
+		     const vector<bool>& stack, const vector<string>& histName1, 
+		     const vector<string>& histName2, const vector<string>& canvasName1, 
+		     const vector<string>& canvasName2, const vector<unsigned int>& pad, 
+		     const double scale, const vector<float>& yAxisLow, 
+		     const vector<float>& yAxisHigh)
+{
+  if ((fileName1.size() != fileName2.size()) || (fileName2.size() != outputCanvasTags.size()) || 
+      (outputCanvasTags.size() != stack.size()) || (stack.size() != pad.size()) || 
+      (histName1.size() != histName2.size()) || (histName2.size() != yAxisLow.size()) || 
+      (yAxisLow.size() != yAxisHigh.size())) {
+    cerr << "Error:\nfileName1.size() = " << fileName1.size() << endl;
+    cerr << "fileName2.size() = " << fileName2.size() << endl;
+    cerr << "outputCanvasTags.size() = " << outputCanvasTags.size() << endl;
+    cerr << "stack.size() = " << stack.size() << endl;
+    cerr << "histName1.size() = " << histName1.size() << endl;
+    cerr << "histName2.size() = " << histName2.size() << endl;
+    cerr << "pad.size() = " << pad.size() << endl;
+    cerr << "yAxisLow.size() = " << yAxisLow.size() << endl;
+    cerr << "yAxisHigh.size() = " << yAxisHigh.size() << endl;
+    return;
+  }
+  TFile outputFile(outputFileName.c_str(), "RECREATE");
+  for (vector<string>::const_iterator iFileName1 = fileName1.begin(); 
+       iFileName1 != fileName1.end(); ++iFileName1) {
+    const unsigned int i = iFileName1 - fileName1.begin();
+    TFile file1(iFileName1->c_str());
+    TFile file2(fileName2[i].c_str());
+    if (file1.IsOpen() && file2.IsOpen()) {
+      for (vector<string>::const_iterator iHist = histName1.begin(); iHist != histName1.end(); 
+	   ++iHist) {
+	const unsigned int j = iHist - histName1.begin();
+	TH1F* hist1 = NULL;
+	TH1F* hist2 = NULL;
+	if (stack[i]) {
+	  hist1 = getStackSumHist<TH1F>(file1, (histName1[j] + "Stack").c_str(), 
+					canvasName1[j].c_str(), pad[i]);
+	  hist2 = getStackSumHist<TH1F>(file2, (histName2[j] + "Stack").c_str(), 
+					canvasName2[j].c_str(), pad[i]);
+	}
+	else {
+	  hist1 = 
+	    getObjectFromCanvas<TH1F>(file1, histName1[j].c_str(), canvasName1[j].c_str(), pad[i]);
+	  hist2 = 
+	    getObjectFromCanvas<TH1F>(file2, histName2[j].c_str(), canvasName2[j].c_str(), pad[i]);
+	}
+	if ((hist1 != NULL) && (hist2 != NULL)) {
+	  TCanvas 
+	    outputCanvas((string(hist1->GetName()) + outputCanvasTags[i]).c_str(), "", 600, 600);
+	  setCanvasOptions(outputCanvas, 1, 0, 0);
+	  TLegend outputLegend(0.4, 0.55, 0.8, 0.75);
+	  setLegendOptions(outputLegend, (string(hist1->GetName()) + outputCanvasTags[i]).c_str());
+	  outputLegend.AddEntry(hist1, version(*iFileName1).c_str(), "lp");
+	  outputLegend.AddEntry(hist2, version(fileName2[i]).c_str(), "lp");
+	  draw(outputFile, outputCanvas, hist1, "", "E");
+	  draw(outputFile, outputCanvas, hist2, "", "ESAME");
+	  format(hist1, yAxisLow[j], yAxisHigh[j], kBlack, scale);
+	  format(hist2, yAxisLow[j], yAxisHigh[j], kRed, 
+		 hist1->GetBinContent(1)/hist2->GetBinContent(1));
+	  outputLegend.Draw();
+	  outputCanvas.Write();
+	}
+      }
+    }
+    else cerr << "Error: could not open files " << *iFileName1 << " or " << fileName2[i] << ".\n";
+    file1.Close();
+    file2.Close();
+  }
   outputFile.Close();
 }
 
@@ -2215,6 +2392,8 @@ void plotFakeRate(const string& isoFileName, const string& nonIsoFileName,
   vector<string> histNames;
   histNames.push_back("tauHadPT");
   histNames.push_back("tauHadEta");
+  histNames.push_back("muHadMass");
+  histNames.push_back("tauHadDecayMode");
   vector<string> canvasNames;
   vector<string> outputCanvasNames;
   for (vector<string>::const_iterator iHist = histNames.begin(); iHist != histNames.end(); 
@@ -2243,6 +2422,8 @@ void plotFakeRate(const string& isoFileName, const string& nonIsoFileName,
   vector<vector<double> > bins;
   bins.push_back(vector<double>());
   bins.push_back(tauHadEtaBins);
+  bins.push_back(vector<double>());
+  bins.push_back(vector<double>());
   divideAndFit(isoFileName, nonIsoFileName, fakeRateFileName, outputCanvasNames, stack, histNames, 
 	       histNames, canvasNames, canvasNames, 1, 1.0, bins, "", 0.0001, 0.3);
 }
@@ -2254,6 +2435,8 @@ void plotFakeRateRatio(const string& dataFileName, const string& MCFileName,
   vector<string> histNames;
   histNames.push_back("tauHadPT");
   histNames.push_back("tauHadEta");
+  histNames.push_back("muHadMass");
+  histNames.push_back("tauHadDecayMode");
   vector<string> canvasNames;
   vector<string> outputCanvasNames;
   for (vector<string>::const_iterator iHist = histNames.begin(); iHist != histNames.end(); 
@@ -2265,6 +2448,29 @@ void plotFakeRateRatio(const string& dataFileName, const string& MCFileName,
   divideAndFit(dataFileName, MCFileName, fakeRateRatioFileName, outputCanvasNames, false, 
 	       histNames, histNames, canvasNames, canvasNames, 1, 1.0, 
 	       vector<vector<double> >(histNames.size(), vector<double>()), "", 0.1, 10.0);
+}
+
+//plot ratio of tail of mu+had mass histogram to total vs. CSV score
+void plotMuHadMassTailToFullRatioVsCSVScore(const vector<string>& fileNames, 
+					    const string& outputFileName, 
+					    const vector<string>& outputCanvasTags)
+{
+  plot1DFrom2D(fileNames, outputFileName, outputCanvasTags, 
+	       vector<string>(1, "muHadMassVsCSVScore"), 
+	       vector<string>(1, "muHadMassVsCSVScoreCanvas"), 1.0, 5, 5, -1, 0.0, 0.5);
+}
+
+//compare the same plot from 2 versions of the analysis
+void compare2Versions(const vector<string>& fileName1, const vector<string>& fileName2, 
+		      const string& outputFileName, const vector<string>& outputCanvasTags, 
+		      const vector<bool>& stack, const vector<unsigned int>& pad)
+{
+  const string histName("muHadMass");
+  const string canvasName(histName + "Canvas");
+  plot2Histograms(fileName1, fileName2, outputFileName, outputCanvasTags, stack, 
+		  vector<string>(1, histName), vector<string>(1, histName), 
+		  vector<string>(1, canvasName), vector<string>(1, canvasName), pad, 1.0, 
+		  vector<float>(1, 0.001), vector<float>(1, 1000.0));
 }
 
 //plot fit information for different selections

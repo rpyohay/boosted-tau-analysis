@@ -5,7 +5,7 @@
 // 
 /**\class TriggerObjectFilter TriggerObjectFilter.cc BoostedTauAnalysis/TriggerObjectFilter/src/TriggerObjectFilter.cc
 
- Description: matching the W_mu to the trigger muon
+ Description: matching the reco object to the trigger object
 
  Implementation:
      [Notes on implementation]
@@ -33,6 +33,8 @@
 #include "DataFormats/METReco/interface/PFMET.h"
 #include "DataFormats/MuonReco/interface/MuonFwd.h"
 #include "DataFormats/MuonReco/interface/Muon.h"
+#include "DataFormats/EgammaCandidates/interface/Photon.h"
+#include "DataFormats/EgammaCandidates/interface/PhotonFwd.h"
 #include "BoostedTauAnalysis/Common/interface/Common.h"
 #include "DataFormats/TauReco/interface/PFTauFwd.h"
 #include "DataFormats/TauReco/interface/PFTau.h"
@@ -55,6 +57,7 @@ using namespace trigger;
 // class declaration
 //
 
+template<class T>
 class TriggerObjectFilter : public edm::EDFilter {
    public:
       explicit TriggerObjectFilter(const edm::ParameterSet&);
@@ -74,7 +77,7 @@ class TriggerObjectFilter : public edm::EDFilter {
 
       // ----------member data ---------------------------
 
-  edm::InputTag WMuonTag_;
+  edm::InputTag recoObjTag_;
   edm::InputTag triggerEventTag_;
   edm::InputTag triggerResultsTag_;
   double delRMatchingCut_;
@@ -98,10 +101,11 @@ class TriggerObjectFilter : public edm::EDFilter {
 //
 // constructors and destructor
 //
-TriggerObjectFilter::TriggerObjectFilter(const edm::ParameterSet& iConfig):hltConfig_()
+template<class T>
+TriggerObjectFilter<T>::TriggerObjectFilter(const edm::ParameterSet& iConfig):hltConfig_()
 {
    //now do what ever initialization is needed
-  WMuonTag_ = iConfig.getParameter<edm::InputTag>("WMuonTag");
+  recoObjTag_ = iConfig.getParameter<edm::InputTag>("recoObjTag");
   const edm::InputTag dTriggerEventTag("hltTriggerSummaryAOD","","HLT");
   triggerEventTag_ = iConfig.getUntrackedParameter<edm::InputTag>("triggerEventTag",dTriggerEventTag);
   const edm::InputTag dTriggerResults("TriggerResults","","HLT");
@@ -120,11 +124,11 @@ TriggerObjectFilter::TriggerObjectFilter(const edm::ParameterSet& iConfig):hltCo
   }
   else highestPTOnly_ = true;
 
-  produces<reco::MuonRefVector>();
+  produces<edm::RefVector<std::vector<T> > >();
 }
 
-
-TriggerObjectFilter::~TriggerObjectFilter()
+template<class T>
+TriggerObjectFilter<T>::~TriggerObjectFilter()
 {
  
    // do anything here that needs to be done at desctruction time
@@ -138,18 +142,18 @@ TriggerObjectFilter::~TriggerObjectFilter()
 //
 
 // ------------ method called on each new Event  ------------
-bool
-TriggerObjectFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
+template<class T>
+bool TriggerObjectFilter<T>::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   //create pointer to output collection
-  std::auto_ptr<reco::MuonRefVector> muonColl(new reco::MuonRefVector);
+  std::auto_ptr<edm::RefVector<std::vector<T> > > recoObjColl(new edm::RefVector<std::vector<T> >);
 
   bool trigger_matched = false;
   int index = 9999;
 
-  //get W muons
-  edm::Handle<reco::MuonRefVector> WMuons;
-  iEvent.getByLabel(WMuonTag_, WMuons);
+  //get reco objects
+  edm::Handle<edm::RefVector<std::vector<T> > > recoObjs;
+  iEvent.getByLabel(recoObjTag_, recoObjs);
 
    // Trigger Info
   edm::Handle<trigger::TriggerEvent> trgEvent;
@@ -159,27 +163,28 @@ TriggerObjectFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
   std::map<std::string, bool> triggerInMenu;
   std::string myHLTFilter = "";
 
-  double Wmu_pt = -9999.;
-  double Wmu_phi = 0.;
-  double Wmu_eta = -9999.;
+  double recoObj_pt = -9999.;
+  double recoObj_phi = 0.;
+  double recoObj_eta = -9999.;
 
-  if (WMuons->size() == 1)
+  if (recoObjs->size() == 1)
     {
-      Wmu_eta = WMuons->at(0)->eta();
-      Wmu_phi = WMuons->at(0)->phi();
+      recoObj_eta = recoObjs->at(0)->eta();
+      recoObj_phi = recoObjs->at(0)->phi();
     }
   else
-    { // if >1 W muons
-      for (reco::MuonRefVector::const_iterator iMuon = WMuons->begin(); iMuon != WMuons->end(); ++iMuon)
+    { // if >1 reco objects
+      for (typename edm::RefVector<std::vector<T> >::const_iterator iRecoObj = recoObjs->begin(); 
+	   iRecoObj != recoObjs->end(); ++iRecoObj)
         { // loop to find highest-pT
-          if ((*iMuon)->pt() > Wmu_pt)
+          if ((*iRecoObj)->pt() > recoObj_pt)
             {
-              Wmu_pt = (*iMuon)->pt();
-	      Wmu_eta = (*iMuon)->eta();
-              Wmu_phi = (*iMuon)->phi();
+              recoObj_pt = (*iRecoObj)->pt();
+	      recoObj_eta = (*iRecoObj)->eta();
+              recoObj_phi = (*iRecoObj)->phi();
             }
         } // loop to find highest-pT
-    } // if >1 W muons
+    } // if >1 reco objects
 
 
   // get names of active HLT paths in this event
@@ -257,9 +262,9 @@ TriggerObjectFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 //    cout << "trgIndex = " << trgIndex << " and trgNames size = " << trgNames.size() << endl;
 //    cout << "firedHLT = " << firedHLT << endl;
 
-   /*store ref key of each passing muon so we can check that no muon is written into the 
-     produced collection more than once*/
-   std::vector<unsigned int> passingMuonRefKeys;
+   /*store ref key of each passing reco object so we can check that no reco object is written into 
+     the produced collection more than once*/
+   std::vector<unsigned int> passingRecoObjRefKeys;
 
    // If the event fired the HLT,
    // loop over the trigger object collection 
@@ -272,15 +277,19 @@ TriggerObjectFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
        for(int ipart = 0; ipart != nK; ++ipart) { 
 	 
 	 const trigger::TriggerObject& TO = TOC[KEYS[ipart]];	
-	 double dRval = deltaR(Wmu_eta, Wmu_phi, TO.eta(), TO.phi());
+	 double dRval = deltaR(recoObj_eta, recoObj_phi, TO.eta(), TO.phi());
 	 // cout << "dRval = " << dRval << endl;
 
-	 //save RECO muons matched to trigger objects
-	 for (reco::MuonRefVector::const_iterator iMuon = WMuons->begin(); iMuon != WMuons->end(); 
-	      ++iMuon) {
-	   if ((deltaR(**iMuon, TO) < delRMatchingCut_) && 
-	       (std::find(passingMuonRefKeys.begin(), passingMuonRefKeys.end(), 
-			  iMuon->key()) == passingMuonRefKeys.end())) muonColl->push_back(*iMuon);
+	 //save RECO objects matched to trigger objects
+	 for (typename edm::RefVector<std::vector<T> >::const_iterator iRecoObj = 
+		recoObjs->begin(); iRecoObj != recoObjs->end(); 
+	      ++iRecoObj) {
+	   if ((deltaR(**iRecoObj, TO) < delRMatchingCut_) && 
+	       (std::find(passingRecoObjRefKeys.begin(), passingRecoObjRefKeys.end(), 
+			  iRecoObj->key()) == passingRecoObjRefKeys.end())) {
+	     recoObjColl->push_back(*iRecoObj);
+	     passingRecoObjRefKeys.push_back(iRecoObj->key());
+	   }
 	 }
 
 	 hltTrigger = dRval < delRMatchingCut_;
@@ -292,27 +301,27 @@ TriggerObjectFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
        }        
      } //firedHLT
 
-   //put collection of RECO muons matched to trigger objects into the event
-   iEvent.put(muonColl);
+   //put collection of RECO objects matched to trigger objects into the event
+   iEvent.put(recoObjColl);
 
    return (highestPTOnly_ ? 
-	   trigger_matched : (passingMuonRefKeys.size() >= minNumObjsToPassFilter_));
+	   trigger_matched : (passingRecoObjRefKeys.size() >= minNumObjsToPassFilter_));
 }
 
 // ------------ method called once each job just before starting event loop  ------------
-void 
-TriggerObjectFilter::beginJob()
+template<class T>
+void TriggerObjectFilter<T>::beginJob()
 {
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
-void 
-TriggerObjectFilter::endJob() {
+template<class T>
+void TriggerObjectFilter<T>::endJob() {
 }
 
 // ------------ method called when starting to processes a run  ------------
-bool 
-TriggerObjectFilter::beginRun(edm::Run& iRun, edm::EventSetup const& iSetup)
+template<class T>
+bool TriggerObjectFilter<T>::beginRun(edm::Run& iRun, edm::EventSetup const& iSetup)
 { 
   bool changed_ = true;
   if ( !hltConfig_.init(iRun,iSetup,hltTags_[0].process(),changed_) ){
@@ -324,29 +333,29 @@ TriggerObjectFilter::beginRun(edm::Run& iRun, edm::EventSetup const& iSetup)
 }
 
 // ------------ method called when ending the processing of a run  ------------
-bool 
-TriggerObjectFilter::endRun(edm::Run&, edm::EventSetup const&)
+template<class T>
+bool TriggerObjectFilter<T>::endRun(edm::Run&, edm::EventSetup const&)
 {
   return true;
 }
 
 // ------------ method called when starting to processes a luminosity block  ------------
-bool 
-TriggerObjectFilter::beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
+template<class T>
+bool TriggerObjectFilter<T>::beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
 {
   return true;
 }
 
 // ------------ method called when ending the processing of a luminosity block  ------------
-bool 
-TriggerObjectFilter::endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
+template<class T>
+bool TriggerObjectFilter<T>::endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
 {
   return true;
 }
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
-void
-TriggerObjectFilter::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+template<class T>
+void TriggerObjectFilter<T>::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   //The following says we do not know what parameters are allowed so do no validation
   // Please change this to state exactly what you do use, even if it is no parameters
   edm::ParameterSetDescription desc;
@@ -354,4 +363,7 @@ TriggerObjectFilter::fillDescriptions(edm::ConfigurationDescriptions& descriptio
   descriptions.addDefault(desc);
 }
 //define this as a plug-in
-DEFINE_FWK_MODULE(TriggerObjectFilter);
+typedef TriggerObjectFilter<reco::Muon> MuonTriggerObjectFilter;
+typedef TriggerObjectFilter<reco::Photon> PhotonTriggerObjectFilter;
+DEFINE_FWK_MODULE(MuonTriggerObjectFilter);
+DEFINE_FWK_MODULE(PhotonTriggerObjectFilter);

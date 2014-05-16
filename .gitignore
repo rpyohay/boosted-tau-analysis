@@ -10,6 +10,7 @@
 *.history
 *.__afs*
 NMSSM_Higgs_a9_H1115_H2125_H3500_H2SMLike_WH_Summer12_DR53X/
+NMSSM_Higgs_a9_H1125_H2500_H3500_WH/
 v[0-9]*/
 NMSSMSignal_MuProperties.root
 HPSTauEff.root
@@ -39,3 +40,5 @@ RecoLuminosity/
 RecoTauTag/
 Toolset/
 dummy.root
+gen*root
+iso*root

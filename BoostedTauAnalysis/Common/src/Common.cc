@@ -1,6 +1,9 @@
 #include "BoostedTauAnalysis/Common/interface/Common.h"
 #include "DataFormats/MuonReco/interface/Muon.h"
 #include "DataFormats/MuonReco/interface/MuonSelectors.h"
+#include "DataFormats/EgammaCandidates/interface/Photon.h"
+#include "DataFormats/EgammaCandidates/interface/PhotonFwd.h"
+#include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
 #include "TH1F.h"
 #include "TLegend.h"
 
@@ -92,6 +95,11 @@ void Common::sortByPT(std::vector<reco::PFTauRef>& objects)
   std::sort(objects.begin(), objects.end(), comparePFTauRefPT);
 }
 
+void Common::sortByPT(std::vector<reco::PhotonRef>& objects)
+{
+  std::sort(objects.begin(), objects.end(), comparePhotonRefPT);
+}
+
 void Common::sortByMass(const edm::Handle<edm::ValueMap<reco::MuonRefVector> >& muonJetMap, 
 			std::vector<reco::PFTauRef>& taus)
 {
@@ -141,12 +149,17 @@ bool Common::comparePFTauRefPT(reco::PFTauRef object1, reco::PFTauRef object2)
   return (object1->pt() < object2->pt());
 }
 
+bool Common::comparePhotonRefPT(reco::PhotonRef object1, reco::PhotonRef object2)
+{
+  return (object1->pt() < object2->pt());
+}
+
 bool Common::isGoodVertex(const reco::Vertex* pVtx)
 {
   bool retVal = false;
   if (!pVtx->isFake() && 
       (pVtx->ndof() > 4) && 
-      (fabs(pVtx->x()) <= 24.0/*cm*/) && 
+      (fabs(pVtx->z()) <= 24.0/*cm*/) && 
       (fabs(pVtx->position().Rho()) <= 2.0/*cm*/)) retVal = true;
   return retVal;
 }
@@ -254,15 +267,17 @@ Common::getSoftRecoMuons(const edm::Handle<reco::MuonRefVector>& pMuons,
   for (reco::MuonRefVector::const_iterator iMuon = pMuons->begin(); iMuon != pMuons->end(); 
        ++iMuon) {
     const reco::TrackRef innerTrack = (*iMuon)->innerTrack();
-    const reco::Vertex::Point PVPos = pPV->position();
-    if (muon::isGoodMuon(**iMuon, muon::TMOneStationTight) && 
-	((*iMuon)->track()->hitPattern().trackerLayersWithMeasurement() > 5) && 
-	(innerTrack->hitPattern().pixelLayersWithMeasurement() > 1) && 
-	(innerTrack->normalizedChi2() < 1.8) && 
-	(fabs(innerTrack->dxy(PVPos)) < 3.0) && 
-	(fabs(innerTrack->dz(PVPos)) < 30.0) && 
-	((etaMax == -1.0) || (fabs((*iMuon)->eta()) < etaMax))) {
-      softMuons.push_back(reco::MuonRef(pBaseMuons, iMuon->key()));
+    if (pPV != NULL) {
+      const reco::Vertex::Point PVPos = pPV->position();
+      if (muon::isGoodMuon(**iMuon, muon::TMOneStationTight) && 
+	  ((*iMuon)->track()->hitPattern().trackerLayersWithMeasurement() > 5) && 
+	  (innerTrack->hitPattern().pixelLayersWithMeasurement() > 1) && 
+	  (innerTrack->normalizedChi2() < 1.8) && 
+	  (fabs(innerTrack->dxy(PVPos)) < 3.0) && 
+	  (fabs(innerTrack->dz(PVPos)) < 30.0) && 
+	  ((etaMax == -1.0) || (fabs((*iMuon)->eta()) < etaMax))) {
+	softMuons.push_back(reco::MuonRef(pBaseMuons, iMuon->key()));
+      }
     }
   }
   return softMuons;
@@ -347,32 +362,117 @@ Common::getRecoTaus(const edm::Handle<reco::PFTauRefVector>& pTaus,
   return taus;
 }
 
-/*
-std::vector<reco::PFTauRef>
-Common::getRecoTaus(const edm::Handle<reco::PFTauRefVector>& pTaus,
-const edm::Handle<reco::PFTauCollection>& pBaseTaus,
-const std::vector<edm::Handle<reco::PFTauDiscriminator> >& pTauDiscriminators,
-const double pTMin, const double etaMax, const bool passIso)
+std::vector<reco::PhotonRef> 
+Common::getRecoPhotons(const edm::Handle<reco::PhotonCollection>& pPhotons, 
+		       const edm::Handle<reco::BeamSpot>& pBeamspot, 
+		       const edm::Handle<reco::ConversionCollection>& pConversions, 
+		       const edm::Handle<reco::GsfElectronCollection>& pElectrons, 
+		       const edm::Handle<edm::ValueMap<double> >& pChargedHadronIso, 
+		       const edm::Handle<edm::ValueMap<double> >& pNeutralHadronIso, 
+		       const edm::Handle<edm::ValueMap<double> >& pPhotonIso, 
+		       const edm::Handle<double>& pRho, 
+		       const double pTMin, const double etaMin, const double etaMax, 
+		       const bool passCSEV, 
+		       const double HOverEMax, const bool passHOverE, 
+		       const double sigmaIetaIetaMax, const bool passSigmaIetaIeta, 
+		       const double chargedHadronIsoMax, const bool passChargedHadronIso, 
+		       const double neutralHadronIsoConst, 
+		       const double neutralHadronIsoPTMultiplier, const bool passNeutralHadronIso, 
+		       const double photonIsoConst, 
+		       const double photonIsoPTMultiplier, const bool passPhotonIso)
 {
-  std::vector<reco::PFTauRef> taus;
-  for (reco::PFTauRefVector::const_iterator iTau = pTaus->begin(); iTau != pTaus->end(); ++iTau) {
-    reco::PFTauRef tauRef(pBaseTaus, iTau->key());
-    bool passTauDiscriminators = true;
-    std::vector<edm::Handle<reco::PFTauDiscriminator> >::const_iterator iDiscriminator =
-      pTauDiscriminators.begin();
-    while ((iDiscriminator != pTauDiscriminators.end()) && passTauDiscriminators) {
-      if ((**iDiscriminator)[tauRef] != 1.0) passTauDiscriminators = false;
-      ++iDiscriminator;
-    }
-    if (((passIso && passTauDiscriminators) || (!passIso && !passTauDiscriminators)) &&
-((etaMax == -1.0) || (fabs((*iTau)->eta()) < etaMax)) &&
-((pTMin == -1.0) || ((*iTau)->pt() > pTMin))) {
-      taus.push_back(tauRef);
+  std::vector<reco::PhotonRef> photons;
+  for (reco::PhotonCollection::const_iterator iPhoton = pPhotons->begin(); 
+       iPhoton != pPhotons->end(); ++iPhoton) {
+    reco::PhotonRef photonRef(pPhotons, iPhoton - pPhotons->begin());
+    bool CSEV = !ConversionTools::hasMatchedPromptElectron(iPhoton->superCluster(), pElectrons, 
+							   pConversions, pBeamspot->position());
+    bool HOverE = (iPhoton->hadTowOverEm() < HOverEMax);
+    bool sigmaIetaIeta = (iPhoton->sigmaIetaIeta() < sigmaIetaIetaMax);
+    bool chargedHadronIso = 
+      (rhoCorrChargedHadronIso(pChargedHadronIso, pRho, photonRef) < chargedHadronIsoMax);
+    bool neutralHadronIso = (rhoCorrNeutralHadronIso(pNeutralHadronIso, pRho, photonRef) < 
+			     (neutralHadronIsoConst + neutralHadronIsoPTMultiplier*iPhoton->pt()));
+    bool photonIso = (rhoCorrPhotonIso(pPhotonIso, pRho, photonRef) < 
+		      (photonIsoConst + photonIsoPTMultiplier*iPhoton->pt()));
+    if (((pTMin == -1.0) || (iPhoton->pt() > pTMin)) && 
+	((etaMin == -1.0) || (fabs(iPhoton->eta()) > etaMin)) && 
+	((etaMax == -1.0) || (fabs(iPhoton->eta()) < etaMax)) && 
+	((passCSEV && CSEV) || (!passCSEV && !CSEV)) && 
+	((HOverEMax == -1.0) || (passHOverE && HOverE) || (!passHOverE && !HOverE)) && 
+	((sigmaIetaIetaMax == -1.0) || 
+	 (passSigmaIetaIeta && sigmaIetaIeta) || (!passSigmaIetaIeta && !sigmaIetaIeta)) && 
+	((chargedHadronIsoMax == -1.0) || 
+	 (passChargedHadronIso && chargedHadronIso) || 
+	 (!passChargedHadronIso && !chargedHadronIso)) && 
+	((neutralHadronIsoConst == -1.0) || 
+	 (passNeutralHadronIso && neutralHadronIso) || 
+	 (!passNeutralHadronIso && !neutralHadronIso)) && 
+	((photonIsoConst == -1.0) || 
+	 (passPhotonIso && photonIso) || 
+	 (!passPhotonIso && !photonIso))) {
+      photons.push_back(photonRef);
     }
   }
-  return taus;
+  return photons;
 }
-*/
+
+std::vector<reco::PhotonRef> 
+Common::getRecoPhotons(const edm::Handle<reco::PhotonRefVector>& pPhotons, 
+		       const edm::Handle<reco::PhotonCollection>& pBasePhotons, 
+		       const edm::Handle<reco::BeamSpot>& pBeamspot, 
+		       const edm::Handle<reco::ConversionCollection>& pConversions, 
+		       const edm::Handle<reco::GsfElectronCollection>& pElectrons, 
+		       const edm::Handle<edm::ValueMap<double> >& pChargedHadronIso, 
+		       const edm::Handle<edm::ValueMap<double> >& pNeutralHadronIso, 
+		       const edm::Handle<edm::ValueMap<double> >& pPhotonIso, 
+		       const edm::Handle<double>& pRho, 
+		       const double pTMin, const double etaMin, const double etaMax, 
+		       const bool passCSEV, 
+		       const double HOverEMax, const bool passHOverE, 
+		       const double sigmaIetaIetaMax, const bool passSigmaIetaIeta, 
+		       const double chargedHadronIsoMax, const bool passChargedHadronIso, 
+		       const double neutralHadronIsoConst, 
+		       const double neutralHadronIsoPTMultiplier, const bool passNeutralHadronIso, 
+		       const double photonIsoConst, 
+		       const double photonIsoPTMultiplier, const bool passPhotonIso)
+{
+  std::vector<reco::PhotonRef> photons;
+  for (reco::PhotonRefVector::const_iterator iPhoton = pPhotons->begin(); 
+       iPhoton != pPhotons->end(); ++iPhoton) {
+    reco::PhotonRef photonRef(pBasePhotons, iPhoton->key());
+    bool CSEV = !ConversionTools::hasMatchedPromptElectron((*iPhoton)->superCluster(), pElectrons, 
+							   pConversions, pBeamspot->position());
+    bool HOverE = ((*iPhoton)->hadTowOverEm() < HOverEMax);
+    bool sigmaIetaIeta = ((*iPhoton)->sigmaIetaIeta() < sigmaIetaIetaMax);
+    bool chargedHadronIso = 
+      (rhoCorrChargedHadronIso(pChargedHadronIso, pRho, photonRef) < chargedHadronIsoMax);
+    bool neutralHadronIso = (rhoCorrNeutralHadronIso(pNeutralHadronIso, pRho, photonRef) < 
+			     (neutralHadronIsoConst + 
+			      neutralHadronIsoPTMultiplier*(*iPhoton)->pt()));
+    bool photonIso = (rhoCorrPhotonIso(pPhotonIso, pRho, photonRef) < 
+		      (photonIsoConst + photonIsoPTMultiplier*(*iPhoton)->pt()));
+    if (((pTMin == -1.0) || ((*iPhoton)->pt() > pTMin)) && 
+	((etaMin == -1.0) || (fabs((*iPhoton)->eta()) > etaMin)) && 
+	((etaMax == -1.0) || (fabs((*iPhoton)->eta()) < etaMax)) && 
+	((passCSEV && CSEV) || (!passCSEV && !CSEV)) && 
+	((HOverEMax == -1.0) || (passHOverE && HOverE) || (!passHOverE && !HOverE)) && 
+	((sigmaIetaIetaMax == -1.0) || 
+	 (passSigmaIetaIeta && sigmaIetaIeta) || (!passSigmaIetaIeta && !sigmaIetaIeta)) && 
+	((chargedHadronIsoMax == -1.0) || 
+	 (passChargedHadronIso && chargedHadronIso) || 
+	 (!passChargedHadronIso && !chargedHadronIso)) && 
+	((neutralHadronIsoConst == -1.0) || 
+	 (passNeutralHadronIso && neutralHadronIso) || 
+	 (!passNeutralHadronIso && !neutralHadronIso)) && 
+	((photonIsoConst == -1.0) || 
+	 (passPhotonIso && photonIso) || 
+	 (!passPhotonIso && !photonIso))) {
+      photons.push_back(photonRef);
+    }
+  }
+  return photons;
+}
 
 void Common::setCanvasOptions(TCanvas& canvas, const Int_t grid, const Int_t logY, 
 			      const Int_t logZ)
@@ -600,7 +700,45 @@ Common::getTightIsolatedRecoMuons(const edm::Handle<reco::MuonRefVector>& pMuons
   return tightMuons;
 }
 
-bool Common::hasAncestor(const reco::GenParticleRef& genParticle, const std::vector<int>& momPDGIDs)
+double Common::rhoCorrIso(const edm::Handle<edm::ValueMap<double> >& pIso, 
+			  const edm::Handle<double>& pRho, const reco::PhotonRef& photonRef, 
+			  const std::map<double, double>& EAs)
+{
+  double iso = -1.0;
+  const double photonAbsEta = fabs(photonRef->eta());
+  std::vector<double>::const_iterator iBinEdge = 
+    std::lower_bound(absEtaBinEdges.begin(), absEtaBinEdges.end(), photonAbsEta);
+  if (iBinEdge != absEtaBinEdges.begin()) --iBinEdge;
+  else std::cerr << "Should never get here\n";
+  const double binEdge = *iBinEdge;    
+  iso = std::max((*pIso)[photonRef] - *(pRho.product())*EAs.at(binEdge), 0.0);
+  return iso;
+}
+
+//due to use of lower_bound in rhoCorrIso, these must be sorted in order of ascending abs(eta)
+const std::vector<double> Common::absEtaBinEdges = 
+  boost::assign::list_of(0.0)(1.0)(1.479)(2.0)(2.2)(2.3)(2.4);
+
+//due to use of lower_bound in rhoCorrIso, these must be sorted in order of ascending abs(eta)
+const std::map<double, double> Common::chargedHadronIsoEAs = 
+  boost::assign::map_list_of(absEtaBinEdges[0], 0.012)(absEtaBinEdges[1], 0.010)
+  (absEtaBinEdges[2], 0.014)(absEtaBinEdges[3], 0.012)(absEtaBinEdges[4], 0.016)
+  (absEtaBinEdges[5], 0.020)(absEtaBinEdges[6], 0.012);
+
+//due to use of lower_bound in rhoCorrIso, these must be sorted in order of ascending abs(eta)
+const std::map<double, double> Common::neutralHadronIsoEAs = 
+  boost::assign::map_list_of(absEtaBinEdges[0], 0.030)(absEtaBinEdges[1], 0.057)
+  (absEtaBinEdges[2], 0.039)(absEtaBinEdges[3], 0.015)(absEtaBinEdges[4], 0.024)
+  (absEtaBinEdges[5], 0.039)(absEtaBinEdges[6], 0.072);
+
+//due to use of lower_bound in rhoCorrIso, these must be sorted in order of ascending abs(eta)
+const std::map<double, double> Common::photonIsoEAs = 
+  boost::assign::map_list_of(absEtaBinEdges[0], 0.148)(absEtaBinEdges[1], 0.130)
+  (absEtaBinEdges[2], 0.112)(absEtaBinEdges[3], 0.216)(absEtaBinEdges[4], 0.262)
+  (absEtaBinEdges[5], 0.260)(absEtaBinEdges[6], 0.266);
+
+bool Common::hasAncestor(const reco::GenParticleRef& genParticle, 
+			 const std::vector<int>& momPDGIDs)
 {
   bool hasMother = genParticle->numberOfMothers() > 0;
   bool foundMother = false;
@@ -612,4 +750,25 @@ bool Common::hasAncestor(const reco::GenParticleRef& genParticle, const std::vec
   bool retVal = (foundMother || (genParticle->numberOfMothers() < 1)) ? 
     (hasMother && foundMother) : hasAncestor(genParticle->motherRef(), momPDGIDs);
   return retVal;
+}
+
+double Common::rhoCorrChargedHadronIso(const edm::Handle<edm::ValueMap<double> >& pIso, 
+				       const edm::Handle<double>& pRho, 
+				       const reco::PhotonRef& photonRef)
+{
+  return rhoCorrIso(pIso, pRho, photonRef, chargedHadronIsoEAs);
+}
+
+double Common::rhoCorrNeutralHadronIso(const edm::Handle<edm::ValueMap<double> >& pIso, 
+				       const edm::Handle<double>& pRho, 
+				       const reco::PhotonRef& photonRef)
+{
+  return rhoCorrIso(pIso, pRho, photonRef, neutralHadronIsoEAs);
+}
+
+double Common::rhoCorrPhotonIso(const edm::Handle<edm::ValueMap<double> >& pIso, 
+				const edm::Handle<double>& pRho, 
+				const reco::PhotonRef& photonRef)
+{
+  return rhoCorrIso(pIso, pRho, photonRef, photonIsoEAs);
 }

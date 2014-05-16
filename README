@@ -5,7 +5,7 @@ Setup (only needs to be done once)
 2. Execute
 
 cmsrel CMSSW_5_3_3
-cd CMSSW_5_3_3
+cd CMSSW_5_3_3/src
 cmsenv
 git init
 
@@ -60,6 +60,8 @@ mkdir -p /data1/`whoami`/data/analysis
 mkdir -p /data1/`whoami`/data/EDM_files
 mkdir -p /data1/`whoami`/nonIsoWData/analysis
 mkdir -p /data1/`whoami`/nonIsoWData/EDM_files
+mkdir -p /data1/`whoami`/SinglePhotonParkedData/analysis
+mkdir -p /data1/`whoami`/SinglePhotonParkedData/EDM_files
 mkdir -p /data1/`whoami`/results
 
 4. Execute
@@ -203,9 +205,15 @@ instead of the root command given above.
 /data1/<your_username>/data/analysis/muHadNonIsoAnalysis_SingleMu_v<version_number>.root
 /data1/<your_username>/data/analysis/muHadNonIsoReweightAnalysis_SingleMu_v<version_number>.root
 
+/data1/<your_username>/nonIsoWData/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
 /data1/<your_username>/nonIsoWData/analysis/nonIsoW_muHadIsoAnalysis_SingleMu_v<version_number>.root
 /data1/<your_username>/nonIsoWData/analysis/nonIsoW_muHadNonIsoAnalysis_SingleMu_v<version_number>.root
 /data1/<your_username>/nonIsoWData/analysis/nonIsoW_muHadNonIsoReweightAnalysis_SingleMu_v<version_number>.root
+
+/data1/<your_username>/SinglePhotonParkedData/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
+/data1/<your_username>/SinglePhotonParkedData/analysis/muHadIsoAnalysis_SinglePhotonParked_Run2012D_v<version_number>.root
+/data1/<your_username>/SinglePhotonParkedData/analysis/muHadNonIsoAnalysis_SinglePhotonParked_Run2012D_v<version_number>.root
+/data1/<your_username>/SinglePhotonParkedData/analysis/muHadNonIsoReweightAnalysis_SinglePhotonParked_Run2012D_v<version_number>.root
 
 /data1/<your_username>/results/dataVsMC_muHadNonIsoAnalysis_2p5fb-1_v<version_number>.root
 /data1/<your_username>/results/dataVsMC_muHadNonIsoReweightAnalysis_2p5fb-1_v<version_number>.root
@@ -232,7 +240,7 @@ Skimming BACKGROUND MC SAMPLES ONLY with CRAB
 
 1. In ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test/multicrab.cfg:
 
-Comment out (with the # sign) all datasets and associated paramaters for datasets you DO NOT want to process, including, of course, the SingleMu datasets
+Comment out (with the # sign) all datasets and associated paramaters for datasets you DO NOT want to process, including, of course, the SingleMu and SinglePhotonParked datasets
 Increment the version number on the names of all the tasks in square brackets (e.g. v2 --> v3)
 
 2. Submit your jobs with multicrab from ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauSkimmer/test as you normally would
@@ -327,6 +335,7 @@ to get the processed recorded luminosity per dataset, changing the "_skim_v2" as
 
 ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/generateDataTauAnalyzerCfgs.sh
 ~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/generateNonIsoWDataTauAnalyzerCfgs.sh
+~/CMSSW_5_3_3/src/BoostedTauAnalysis/TauAnalyzer/test/generateSinglePhotonDataTauAnalyzerCfgs.sh
 
 
 

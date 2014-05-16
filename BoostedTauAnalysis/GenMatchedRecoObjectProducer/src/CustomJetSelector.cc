@@ -31,10 +31,6 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
-#include "DataFormats/JetReco/interface/PFJetCollection.h"
-#include "DataFormats/TauReco/interface/PFTauFwd.h"
-#include "DataFormats/MuonReco/interface/MuonFwd.h"
-#include "DataFormats/Common/interface/ValueMap.h"
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
 #include "BoostedTauAnalysis/Common/interface/Common.h"
 #include "DataFormats/MuonReco/interface/Muon.h"
@@ -64,8 +60,8 @@ private:
   //input tag for selected tau collection
   edm::InputTag tauTag_;
 
-  //input tag for W muon collection
-  edm::InputTag muonTag_;
+  //input tag for overlap candidate collection
+  edm::InputTag overlapCandTag_;
 
   //input tag for old jet collection
   edm::InputTag oldJetTag_;
@@ -102,7 +98,7 @@ private:
 //
 CustomJetSelector::CustomJetSelector(const edm::ParameterSet& iConfig) :
   tauTag_(iConfig.getParameter<edm::InputTag>("tauTag")),
-  muonTag_(iConfig.getParameter<edm::InputTag>("muonTag")),
+  overlapCandTag_(iConfig.getParameter<edm::InputTag>("overlapCandTag")),
   oldJetTag_(iConfig.getParameter<edm::InputTag>("oldJetTag")),
   jetMuonMapTag_(iConfig.getParameter<edm::InputTag>("jetMuonMapTag")),
   pTMin_(iConfig.getParameter<double>("pTMin")),
@@ -139,8 +135,8 @@ bool CustomJetSelector::filter(edm::Event& iEvent, const edm::EventSetup& iSetup
   iEvent.getByLabel(tauTag_, pTaus);
 
   //get muons
-  edm::Handle<reco::MuonRefVector> pMuons;
-  iEvent.getByLabel(muonTag_, pMuons);
+  edm::Handle<edm::View<reco::Candidate> > pOverlapCands;
+  iEvent.getByLabel(overlapCandTag_, pOverlapCands);
 
   //get old jets
   edm::Handle<reco::PFJetCollection> pOldJets;
@@ -153,11 +149,14 @@ bool CustomJetSelector::filter(edm::Event& iEvent, const edm::EventSetup& iSetup
   //get AK5 PF L1FastL2L3 jet correction service
   const JetCorrector* corrector = JetCorrector::getJetCorrector("ak5PFL1FastL2L3", iSetup);
 
-  //sort the W muons in ascending order of pT
-  std::vector<reco::MuonRef> WMuonRefs;
-  for (reco::MuonRefVector::const_iterator iMuon = pMuons->begin(); iMuon != pMuons->end(); 
-       ++iMuon) { WMuonRefs.push_back(*iMuon); }
-  Common::sortByPT(WMuonRefs);
+  //sort the overlap candidates in ascending order of pT
+  std::vector<reco::Candidate*> overlapCandPtrs;
+  for (unsigned int iOverlapCand = 0; iOverlapCand < pOverlapCands->size(); 
+       ++iOverlapCand) {
+    overlapCandPtrs.push_back(const_cast<reco::Candidate*>
+			      (pOverlapCands->refAt(iOverlapCand).get()));
+  }
+  Common::sortByPT(overlapCandPtrs);
 
   //sort selected taus by descending order in mu+had mass
   std::vector<reco::PFTauRef> muHadMassSortedTaus;
@@ -165,9 +164,8 @@ bool CustomJetSelector::filter(edm::Event& iEvent, const edm::EventSetup& iSetup
        ++iTau) { muHadMassSortedTaus.push_back(*iTau); }
   Common::sortByMass(pMuonJetMap, muHadMassSortedTaus);
 
-
   /*fill collection of new corrected jets
-    - excluding the highest pT W muon
+    - excluding the highest pT overlap candidate
     - excluding the highest mu+had mass tau
     - passing the pT cut
     - passing the eta cut*/
@@ -177,7 +175,7 @@ bool CustomJetSelector::filter(edm::Event& iEvent, const edm::EventSetup& iSetup
     reco::PFJet correctedJet = *iJet;
     double JEC = corrector->correction(*iJet, iEvent, iSetup);
     correctedJet.scaleEnergy(JEC);
-    if ((reco::deltaR(*WMuonRefs[WMuonRefs.size() - 1], correctedJet) >= dR_) && 
+    if ((reco::deltaR(*overlapCandPtrs[overlapCandPtrs.size() - 1], correctedJet) >= dR_) && 
 	(reco::deltaR(**muHadMassSortedTaus.begin(), correctedJet) >= dR_) && 
 	(correctedJet.pt() > pTMin_) && (fabs(correctedJet.eta()) < absEtaMax_)) {
       jetColl->push_back(correctedJet);

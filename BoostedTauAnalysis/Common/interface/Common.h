@@ -4,6 +4,7 @@
 #include <vector>
 #include <algorithm>
 #include <string>
+#include <boost/assign/list_of.hpp>
 #include "DataFormats/Math/interface/deltaR.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
 #include "DataFormats/TauReco/interface/PFTau.h"
@@ -91,6 +92,8 @@ class Common {
   static void sortByPT(std::vector<reco::PFJetRef>&);
 
   static void sortByPT(std::vector<reco::PFTauRef>&);
+
+  static void sortByPT(std::vector<reco::PhotonRef>&);
 
   template<typename T, typename U>
     static const T* nearestObject(const U& obj, const std::vector<T*>& objs, int& index)
@@ -197,6 +200,43 @@ class Common {
 		const double, const bool);
   */
 
+  //fill STL container with photons passing specified cuts in specified eta range
+  static std::vector<reco::PhotonRef> 
+    getRecoPhotons(const edm::Handle<reco::PhotonCollection>&, 
+		   const edm::Handle<reco::BeamSpot>&, 
+		   const edm::Handle<reco::ConversionCollection>&, 
+		   const edm::Handle<reco::GsfElectronCollection>&, 
+		   const edm::Handle<edm::ValueMap<double> >&, 
+		   const edm::Handle<edm::ValueMap<double> >&, 
+		   const edm::Handle<edm::ValueMap<double> >&, 
+		   const edm::Handle<double>&, 
+		   const double, const double, const double, 
+		   const bool, 
+		   const double, const bool, 
+		   const double, const bool, 
+		   const double, const bool, 
+		   const double, const double, const bool, 
+		   const double, const double, const bool);
+
+  //fill STL container with photons passing specified cuts in specified eta range
+  static std::vector<reco::PhotonRef> 
+    getRecoPhotons(const edm::Handle<reco::PhotonRefVector>&, 
+		   const edm::Handle<reco::PhotonCollection>&, 
+		   const edm::Handle<reco::BeamSpot>&, 
+		   const edm::Handle<reco::ConversionCollection>&, 
+		   const edm::Handle<reco::GsfElectronCollection>&, 
+		   const edm::Handle<edm::ValueMap<double> >&, 
+		   const edm::Handle<edm::ValueMap<double> >&, 
+		   const edm::Handle<edm::ValueMap<double> >&, 
+		   const edm::Handle<double>&, 
+		   const double, const double, const double, 
+		   const bool, 
+		   const double, const bool, 
+		   const double, const bool, 
+		   const double, const bool, 
+		   const double, const double, const bool, 
+		   const double, const double, const bool);
+
   //set canvas drawing options
   static void setCanvasOptions(TCanvas&, const Int_t, const Int_t, const Int_t);
 
@@ -250,6 +290,18 @@ class Common {
   //determine if a particle with a given PDG ID is an ancestor of the given particle
   static bool hasAncestor(const reco::GenParticleRef&, const std::vector<int>&);
 
+  //get rho-corrected charged hadron isolation
+  static double rhoCorrChargedHadronIso(const edm::Handle<edm::ValueMap<double> >&, 
+					const edm::Handle<double>&, const reco::PhotonRef&);
+
+  //get rho-corrected neutral hadron isolation
+  static double rhoCorrNeutralHadronIso(const edm::Handle<edm::ValueMap<double> >&, 
+					const edm::Handle<double>&, const reco::PhotonRef&);
+
+  //get rho-corrected photon isolation
+  static double rhoCorrPhotonIso(const edm::Handle<edm::ValueMap<double> >&, 
+				 const edm::Handle<double>&, const reco::PhotonRef&);
+
  private:
 
   static bool compareCandidatePT(reco::Candidate*, reco::Candidate*);
@@ -268,6 +320,8 @@ class Common {
 
   static bool comparePFTauRefPT(reco::PFTauRef, reco::PFTauRef);
 
+  static bool comparePhotonRefPT(reco::PhotonRef, reco::PhotonRef);
+
   static std::vector<reco::MuonRef> 
     getTightIsolatedRecoMuons(const edm::Handle<reco::MuonCollection>&, const reco::Vertex*, 
 			      const bool, const double, const double, const double, const bool);
@@ -276,6 +330,18 @@ class Common {
     getTightIsolatedRecoMuons(const edm::Handle<reco::MuonRefVector>&, 
 			      const edm::Handle<reco::MuonCollection>&, const reco::Vertex*, 
 			      const bool, const double, const double, const double, const bool);
+
+  static double rhoCorrIso(const edm::Handle<edm::ValueMap<double> >&, 
+			   const edm::Handle<double>&, const reco::PhotonRef&, 
+			   const std::map<double, double>&);
+
+  static const std::vector<double> absEtaBinEdges;
+
+  static const std::map<double, double> chargedHadronIsoEAs;
+
+  static const std::map<double, double> neutralHadronIsoEAs;
+
+  static const std::map<double, double> photonIsoEAs;
 
 };
 

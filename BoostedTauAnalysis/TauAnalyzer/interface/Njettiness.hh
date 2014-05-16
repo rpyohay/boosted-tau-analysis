@@ -106,7 +106,7 @@ public:
 inline double sq(double x) {return x*x;}
 
 // Calculates distance between two points in rapidity-azimuth plane
-double DistanceSq(double rap1, double phi1, double rap2, double phi2) {
+inline double DistanceSq(double rap1, double phi1, double rap2, double phi2) {
    double distRap = rap1-rap2;
    double distPhi = std::fabs(phi1-phi2);
    if (distPhi > M_PI) {distPhi = 2.0*M_PI - distPhi;}
@@ -221,7 +221,7 @@ std::vector<LightLikeAxis> UpdateAxesFast(const std::vector <LightLikeAxis> & ol
 
 // Given starting axes, update to find better axes
 // (This is just a wrapper for the templated version above.)
-std::vector<LightLikeAxis> UpdateAxes(const std::vector <LightLikeAxis> & old_axes, 
+inline std::vector<LightLikeAxis> UpdateAxes(const std::vector <LightLikeAxis> & old_axes, 
                                       const std::vector <fastjet::PseudoJet> & inputJets, NsubParameters paraNsub, double precision) {
    int N = old_axes.size();
    switch (N) {
@@ -254,7 +254,7 @@ std::vector<LightLikeAxis> UpdateAxes(const std::vector <LightLikeAxis> & old_ax
 
 // Go from internal LightLikeAxis to PseudoJet
 // TODO:  Make part of LightLikeAxis class.
-std::vector<fastjet::PseudoJet> ConvertToPseudoJet(const std::vector <LightLikeAxis>& axes) {
+inline std::vector<fastjet::PseudoJet> ConvertToPseudoJet(const std::vector <LightLikeAxis>& axes) {
    
    int n_jets = axes.size();
    
@@ -272,7 +272,7 @@ std::vector<fastjet::PseudoJet> ConvertToPseudoJet(const std::vector <LightLikeA
 }
 
 // N-subjettiness pieces
-std::vector<double> ConstituentTauValue(const std::vector <fastjet::PseudoJet> & particles, const std::vector<fastjet::PseudoJet>& axes, const NsubParameters& paraNsub) {// Returns the sub-tau values, i.e. a std::vector of the contributions to tau_N of each Voronoi region (or region within R_0)
+inline std::vector<double> ConstituentTauValue(const std::vector <fastjet::PseudoJet> & particles, const std::vector<fastjet::PseudoJet>& axes, const NsubParameters& paraNsub) {// Returns the sub-tau values, i.e. a std::vector of the contributions to tau_N of each Voronoi region (or region within R_0)
    double beta = paraNsub.beta();
    double R0 = paraNsub.R0();
    double Rcutoff = paraNsub.Rcutoff();
@@ -298,7 +298,7 @@ std::vector<double> ConstituentTauValue(const std::vector <fastjet::PseudoJet> &
 }
 
 // N-subjettiness values
-double TauValue(const std::vector <fastjet::PseudoJet>& particles, const std::vector<fastjet::PseudoJet>& axes,const NsubParameters& paraNsub) {// Calculates tau_N
+inline double TauValue(const std::vector <fastjet::PseudoJet>& particles, const std::vector<fastjet::PseudoJet>& axes,const NsubParameters& paraNsub) {// Calculates tau_N
    std::vector<double> tau_vec = ConstituentTauValue(particles, axes, paraNsub);
    double tau = 0.0;
    for (unsigned j = 0; j < tau_vec.size(); j++) {tau += tau_vec[j];}
@@ -306,21 +306,21 @@ double TauValue(const std::vector <fastjet::PseudoJet>& particles, const std::ve
 }
 
 // Get exclusive kT subjets
-std::vector<fastjet::PseudoJet> GetKTAxes(int n_jets, const std::vector <fastjet::PseudoJet> & inputJets) {
+inline std::vector<fastjet::PseudoJet> GetKTAxes(int n_jets, const std::vector <fastjet::PseudoJet> & inputJets) {
    fastjet::JetDefinition jet_def = fastjet::JetDefinition(fastjet::kt_algorithm,M_PI/2.0,fastjet::E_scheme,fastjet::Best);
    fastjet::ClusterSequence jet_clust_seq(inputJets, jet_def);
    return jet_clust_seq.exclusive_jets(n_jets);
 }
 
 // Get exclusive CA subjets
-std::vector<fastjet::PseudoJet> GetCAAxes(int n_jets, const std::vector <fastjet::PseudoJet> & inputJets) {
+inline std::vector<fastjet::PseudoJet> GetCAAxes(int n_jets, const std::vector <fastjet::PseudoJet> & inputJets) {
    fastjet::JetDefinition jet_def = fastjet::JetDefinition(fastjet::cambridge_algorithm,M_PI/2.0,fastjet::E_scheme,fastjet::Best);
    fastjet::ClusterSequence jet_clust_seq(inputJets, jet_def);
    return jet_clust_seq.exclusive_jets(n_jets);
 }
 
 // Get inclusive anti kT hardest subjets
-std::vector<fastjet::PseudoJet> GetAntiKTAxes(int n_jets, double R0, const std::vector <fastjet::PseudoJet> & inputJets) {
+inline std::vector<fastjet::PseudoJet> GetAntiKTAxes(int n_jets, double R0, const std::vector <fastjet::PseudoJet> & inputJets) {
    fastjet::JetDefinition jet_def = fastjet::JetDefinition(fastjet::antikt_algorithm,R0,fastjet::E_scheme,fastjet::Best);
    fastjet::ClusterSequence jet_clust_seq(inputJets, jet_def);
    std::vector<fastjet::PseudoJet> myJets = sorted_by_pt(jet_clust_seq.inclusive_jets());
@@ -330,7 +330,7 @@ std::vector<fastjet::PseudoJet> GetAntiKTAxes(int n_jets, double R0, const std::
 
 
 // Get minimization axes
-std::vector<fastjet::PseudoJet> GetMinimumAxes(const std::vector <fastjet::PseudoJet> & seedAxes, const std::vector <fastjet::PseudoJet> & inputJets, KmeansParameters para, 
+inline std::vector<fastjet::PseudoJet> GetMinimumAxes(const std::vector <fastjet::PseudoJet> & seedAxes, const std::vector <fastjet::PseudoJet> & inputJets, KmeansParameters para, 
                                           NsubParameters paraNsub) {
    int n_jets = seedAxes.size();
    double noise = 0, tau = 10000.0, tau_tmp, cmp;
@@ -433,7 +433,7 @@ public:
 
 
 //Use NsubAxesMode to pick which type of axes to use
-void Njettiness::establishAxes(unsigned int n_jets, const std::vector <fastjet::PseudoJet> & inputs) {
+inline void Njettiness::establishAxes(unsigned int n_jets, const std::vector <fastjet::PseudoJet> & inputs) {
    switch (_axes) {
       case kt_axes:
          _currentAxes = GetKTAxes(n_jets,inputs);
@@ -471,7 +471,7 @@ void Njettiness::establishAxes(unsigned int n_jets, const std::vector <fastjet::
 }
 
 //Constructor sets KmeansParameters from NsubAxesMode input
-Njettiness::Njettiness(AxesMode axes, NsubParameters paraNsub) : _axes(axes), _paraNsub(paraNsub), _paraKmeans() {
+inline Njettiness::Njettiness(AxesMode axes, NsubParameters paraNsub) : _axes(axes), _paraNsub(paraNsub), _paraKmeans() {
    switch (_axes) {
       case kt_axes:
       case ca_axes:
@@ -501,7 +501,7 @@ Njettiness::Njettiness(AxesMode axes, NsubParameters paraNsub) : _axes(axes), _p
 // Return a vector of length _currentAxes.size() (which should be N).
 // Each vector element is a list of ints corresponding to the indices in
 // particles of the particles belonging to that jet.
-std::vector<std::list<int> > Njettiness::getPartition(const std::vector<fastjet::PseudoJet> & particles) {
+inline std::vector<std::list<int> > Njettiness::getPartition(const std::vector<fastjet::PseudoJet> & particles) {
    double Rcutoff = _paraNsub.Rcutoff();
    
    std::vector<std::list<int> > partitions(_currentAxes.size());
@@ -529,7 +529,7 @@ std::vector<std::list<int> > Njettiness::getPartition(const std::vector<fastjet:
 
 // Having found axes, assign each particle in particles to an axis, and return a set of jets.
 // Each jet is the sum of particles closest to an axis (Njet = Naxes).
-std::vector<fastjet::PseudoJet> Njettiness::getJets(const std::vector<fastjet::PseudoJet> & particles) {
+inline std::vector<fastjet::PseudoJet> Njettiness::getJets(const std::vector<fastjet::PseudoJet> & particles) {
    
    std::vector<fastjet::PseudoJet> jets(_currentAxes.size());
 

@@ -16,13 +16,14 @@ dataDir=$4
 #macros
 filePrefix="${dataDir}/res/CMSSW_"
 suffix=".stdout"
+isPhotonDataset=`echo $dataDir | grep Photon`
 
 #totals
 nProcessedTot=0
 nWMuNuTot=0
 nHLTTot=0
 nWMuonPTTot=0
-nWMuonIsoTot=0
+nWMuonOrPhotonIsoTot=0
 nJetTot=0
 nTauMuonPTTot=0
 nTauMuonSoftTot=0
@@ -66,10 +67,17 @@ for iJob in `seq $minJob $maxJob`
   #get the numbers of events passing each cut
   if [ $skip -eq 0 ]
       then
-      nProcessed=`grep IsoMu24eta2p1Selector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*\([0-9]*\)[ ]*[0-9]*.*%\1%"`
-      nHLT=`grep IsoMu24eta2p1Selector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*[0-9]*[ ]*\([0-9]*\).*%\1%"`
-      nWMuonPT=`grep WMuonPTSelector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*[0-9]*[ ]*\([0-9]*\).*%\1%"`
-      nWMuonIso=`grep WIsoMuonSelector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*[0-9]*[ ]*\([0-9]*\).*%\1%"`
+      if [ "$isPhotonDataset" = "" ]
+	  then
+	  nProcessed=`grep IsoMu24eta2p1Selector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*\([0-9]*\)[ ]*[0-9]*.*%\1%"`
+	  nHLT=`grep IsoMu24eta2p1Selector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*[0-9]*[ ]*\([0-9]*\).*%\1%"`
+	  nWMuonPT=`grep WMuonPTSelector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*[0-9]*[ ]*\([0-9]*\).*%\1%"`
+	  nWMuonOrPhotonIso=`grep WIsoMuonSelector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*[0-9]*[ ]*\([0-9]*\).*%\1%"`
+      else
+	  nProcessed=`grep singlePhotonHLTSelector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*\([0-9]*\)[ ]*[0-9]*.*%\1%"`
+	  nHLT=`grep singlePhotonHLTSelector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*[0-9]*[ ]*\([0-9]*\).*%\1%"`
+	  nWMuonOrPhotonIso=`grep photonSelector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*[0-9]*[ ]*\([0-9]*\).*%\1%"`
+      fi
       #nJet=`grep jetSelector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*[0-9]*[ ]*\([0-9]*\).*%\1%"`
       nTauMuonPT=`grep tauMuonPTSelector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*[0-9]*[ ]*\([0-9]*\).*%\1%"`
       nTauMuonSoft=`grep tauMuonSelector ${filePrefix}${iJob}${suffix} | head -n 1 | sed -e "s%TrigReport[ ]*1[ ]*0[ ]*[0-9]*[ ]*\([0-9]*\).*%\1%"`
@@ -79,8 +87,11 @@ for iJob in `seq $minJob $maxJob`
       #increment totals
       nProcessedTot=`expr $nProcessedTot + $nProcessed`
       nHLTTot=`expr $nHLTTot + $nHLT`
-      nWMuonPTTot=`expr $nWMuonPTTot + $nWMuonPT`
-      nWMuonIsoTot=`expr $nWMuonIsoTot + $nWMuonIso`
+      if [ "$isPhotonDataset" = "" ]
+	  then
+	  nWMuonPTTot=`expr $nWMuonPTTot + $nWMuonPT`
+      fi
+      nWMuonOrPhotonIsoTot=`expr $nWMuonOrPhotonIsoTot + $nWMuonOrPhotonIso`
       #nJetTot=`expr $nJetTot + $nJet`
       nTauMuonPTTot=`expr $nTauMuonPTTot + $nTauMuonPT`
       nTauMuonSoftTot=`expr $nTauMuonSoftTot + $nTauMuonSoft`
@@ -92,8 +103,11 @@ done
 #print totals
 echo "nProcessedTot = $nProcessedTot"
 echo "nHLTTot = $nHLTTot"
-echo "nWMuonPTTot = $nWMuonPTTot"
-echo "nWMuonIsoTot = $nWMuonIsoTot"
+if [ "$isPhotonDataset" = "" ]
+    then
+    echo "nWMuonPTTot = $nWMuonPTTot"
+fi
+echo "nWMuonOrPhotonIsoTot = $nWMuonOrPhotonIsoTot"
 #echo "nJetTot = $nJetTot"
 echo "nTauMuonPTTot = $nTauMuonPTTot"
 echo "nTauMuonSoftTot = $nTauMuonSoftTot"

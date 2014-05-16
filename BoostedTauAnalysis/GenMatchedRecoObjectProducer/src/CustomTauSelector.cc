@@ -33,11 +33,14 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "BoostedTauAnalysis/Common/interface/Common.h"
 #include "DataFormats/MuonReco/interface/Muon.h"
+#include "DataFormats/EgammaCandidates/interface/Photon.h"
+#include "DataFormats/EgammaCandidates/interface/PhotonFwd.h"
 
 //
 // class declaration
 //
 
+template<class T>
 class CustomTauSelector : public edm::EDFilter {
 public:
   explicit CustomTauSelector(const edm::ParameterSet&);
@@ -70,8 +73,8 @@ private:
   //input tag for map jet muon removal decisions
   edm::InputTag muonRemovalDecisionTag_;
 
-  //input tag for W muon collection
-  edm::InputTag muonTag_;
+  //input tag for overlap candidate collection
+  edm::InputTag overlapCandTag_;
 
   //vector of input tags, 1 for each discriminator the tau should pass
   std::vector<edm::InputTag> tauDiscriminatorTags_;
@@ -88,7 +91,7 @@ private:
   //maximum isolation cut
   double isoMax_;
 
-  //W muon matching cut
+  //overlap candidate matching cut
   double dR_;
 
   //minimum number of objects that must be found to pass the filter
@@ -106,7 +109,8 @@ private:
 //
 // constructors and destructor
 //
-CustomTauSelector::CustomTauSelector(const edm::ParameterSet& iConfig) :
+template<class T>
+CustomTauSelector<T>::CustomTauSelector(const edm::ParameterSet& iConfig) :
   tauTag_(iConfig.existsAs<edm::InputTag>("tauTag") ? 
 	  iConfig.getParameter<edm::InputTag>("tauTag") : edm::InputTag()),
   baseTauTag_(iConfig.getParameter<edm::InputTag>("baseTauTag")),
@@ -116,8 +120,8 @@ CustomTauSelector::CustomTauSelector(const edm::ParameterSet& iConfig) :
   muonRemovalDecisionTag_(iConfig.existsAs<edm::InputTag>("muonRemovalDecisionTag") ? 
 			  iConfig.getParameter<edm::InputTag>("muonRemovalDecisionTag") : 
 			  edm::InputTag()),
-  muonTag_(iConfig.existsAs<edm::InputTag>("muonTag") ? 
-	  iConfig.getParameter<edm::InputTag>("muonTag") : edm::InputTag()),
+  overlapCandTag_(iConfig.existsAs<edm::InputTag>("overlapCandTag") ? 
+		  iConfig.getParameter<edm::InputTag>("overlapCandTag") : edm::InputTag()),
   tauDiscriminatorTags_(iConfig.getParameter<std::vector<edm::InputTag> >("tauDiscriminatorTags")),
   passDiscriminator_(iConfig.getParameter<bool>("passDiscriminator")),
   pTMin_(iConfig.getParameter<double>("pTMin")),
@@ -131,16 +135,16 @@ CustomTauSelector::CustomTauSelector(const edm::ParameterSet& iConfig) :
     std::cerr << "Warning: only one of jetTag or muonRemovalDecisionTag was supplied.  No ";
     std::cerr << "decision on tau seed jet will be made.\n";
   }
-  if ((muonTag_ == edm::InputTag()) && !(jetTag_ == edm::InputTag()) && 
+  if ((overlapCandTag_ == edm::InputTag()) && !(jetTag_ == edm::InputTag()) && 
       !(muonRemovalDecisionTag_ == edm::InputTag())) {
-    std::cerr << "Warning: both jetTag and muonRemovalDecisionTag were supplied, but not muonTag.";
-    std::cerr << "  Overlap with W muons will not be checked.\n";
+    std::cerr << "Warning: both jetTag and muonRemovalDecisionTag were supplied, but not ";
+    std::cerr << "overlapCandTag.  Overlap with overlap candidates will not be checked.\n";
   }
   produces<reco::PFTauRefVector>();
 }
 
-
-CustomTauSelector::~CustomTauSelector()
+template<class T>
+CustomTauSelector<T>::~CustomTauSelector()
 {
  
    // do anything here that needs to be done at desctruction time
@@ -154,7 +158,8 @@ CustomTauSelector::~CustomTauSelector()
 //
 
 // ------------ method called on each new Event  ------------
-bool CustomTauSelector::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
+template<class T>
+bool CustomTauSelector<T>::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   //create pointer to output collection
   std::auto_ptr<reco::PFTauRefVector> tauColl(new reco::PFTauRefVector);
@@ -190,16 +195,17 @@ bool CustomTauSelector::filter(edm::Event& iEvent, const edm::EventSetup& iSetup
   if (muonRemovalDecisionTag_ == edm::InputTag()) {}
   else iEvent.getByLabel(muonRemovalDecisionTag_, pMuonRemovalDecisions);
 
-  //get W muons
-  edm::Handle<reco::MuonRefVector> pMuons;
-  if (muonTag_ == edm::InputTag()) {}
-  else iEvent.getByLabel(muonTag_, pMuons);
+  //get overlap candidates
+  edm::Handle<edm::RefVector<std::vector<T> > > pOverlapCands;
+  if (overlapCandTag_ == edm::InputTag()) {}
+  else iEvent.getByLabel(overlapCandTag_, pOverlapCands);
 
-  //fill STL container of pointers to W muons
-  std::vector<reco::Muon*> muonPtrs;
-  if (pMuons.isValid()) {
-    for (reco::MuonRefVector::const_iterator iMuon = pMuons->begin(); iMuon != pMuons->end(); 
-	 ++iMuon) { muonPtrs.push_back(const_cast<reco::Muon*>(iMuon->get())); }
+  //fill STL container of pointers to overlap candidates
+  std::vector<T*> overlapCandPtrs;
+  if (pOverlapCands.isValid()) {
+    for (typename edm::RefVector<std::vector<T> >::const_iterator iOverlapCand = 
+	   pOverlapCands->begin(); iOverlapCand != pOverlapCands->end(); 
+	 ++iOverlapCand) { overlapCandPtrs.push_back(const_cast<T*>(iOverlapCand->get())); }
   }
 
 //   //debug
@@ -228,13 +234,13 @@ bool CustomTauSelector::filter(edm::Event& iEvent, const edm::EventSetup& iSetup
   for (std::vector<reco::PFTauRef>::const_iterator iTau = taus.begin(); iTau != taus.end(); 
        ++iTau) {
 
-    //find the nearest W muon to the tau
+    //find the nearest overlap candidate to the tau
     int nearestMuonIndex = -1;
-    const reco::Muon* nearestMuon = 
-      Common::nearestObject(*iTau, muonPtrs, nearestMuonIndex);
+    const reco::Candidate* nearestMuon = 
+      Common::nearestObject(*iTau, overlapCandPtrs, nearestMuonIndex);
 
-    //if tau doesn't overlap with W muon (or no overlap checking requested)...
-    if (!(pMuons.isValid()) || 
+    //if tau doesn't overlap with overlap candidate (or no overlap checking requested)...
+    if (!(pOverlapCands.isValid()) || 
 	((nearestMuon != NULL) && (reco::deltaR(**iTau, *nearestMuon) > dR_))) {
 
       /*...if jet collection and muon removal decision map exist, fill output collection if tau is 
@@ -268,47 +274,47 @@ bool CustomTauSelector::filter(edm::Event& iEvent, const edm::EventSetup& iSetup
 }
 
 // ------------ method called once each job just before starting event loop  ------------
-void 
-CustomTauSelector::beginJob()
+template<class T>
+void CustomTauSelector<T>::beginJob()
 {
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
-void 
-CustomTauSelector::endJob() {
+template<class T>
+void CustomTauSelector<T>::endJob() {
 }
 
 // ------------ method called when starting to processes a run  ------------
-bool 
-CustomTauSelector::beginRun(edm::Run&, edm::EventSetup const&)
+template<class T>
+bool CustomTauSelector<T>::beginRun(edm::Run&, edm::EventSetup const&)
 { 
   return true;
 }
 
 // ------------ method called when ending the processing of a run  ------------
-bool 
-CustomTauSelector::endRun(edm::Run&, edm::EventSetup const&)
+template<class T>
+bool CustomTauSelector<T>::endRun(edm::Run&, edm::EventSetup const&)
 {
   return true;
 }
 
 // ------------ method called when starting to processes a luminosity block  ------------
-bool 
-CustomTauSelector::beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
+template<class T>
+bool CustomTauSelector<T>::beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
 {
   return true;
 }
 
 // ------------ method called when ending the processing of a luminosity block  ------------
-bool 
-CustomTauSelector::endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
+template<class T>
+bool CustomTauSelector<T>::endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
 {
   return true;
 }
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
-void
-CustomTauSelector::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+template<class T>
+void CustomTauSelector<T>::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   //The following says we do not know what parameters are allowed so do no validation
   // Please change this to state exactly what you do use, even if it is no parameters
   edm::ParameterSetDescription desc;
@@ -316,4 +322,7 @@ CustomTauSelector::fillDescriptions(edm::ConfigurationDescriptions& descriptions
   descriptions.addDefault(desc);
 }
 //define this as a plug-in
-DEFINE_FWK_MODULE(CustomTauSelector);
+typedef CustomTauSelector<reco::Muon> CustomTauSepFromMuonSelector;
+typedef CustomTauSelector<reco::Photon> CustomTauSepFromPhotonSelector;
+DEFINE_FWK_MODULE(CustomTauSepFromMuonSelector);
+DEFINE_FWK_MODULE(CustomTauSepFromPhotonSelector);

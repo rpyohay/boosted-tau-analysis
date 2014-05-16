@@ -29,6 +29,7 @@ cd $version
 ./submitQCDBTauAnalyzerJobs.sh
 ./submitQCDBMuTauAnalyzerJobs.sh
 ./submitNonIsoWDataTauAnalyzerJobs.sh
+./submitSinglePhotonDataTauAnalyzerJobs.sh
 cd ..
 
 exit 0

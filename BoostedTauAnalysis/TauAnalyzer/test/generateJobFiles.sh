@@ -34,5 +34,6 @@ fi
 ./generateWh1TauAnalyzerCfg.sh $version $MCTemplateCfg
 ./generateggTauAnalyzerCfg.sh $version $MCTemplateCfg
 ./generateNonIsoWDataTauAnalyzerCfgs.sh $version $dataTemplateCfg
+./generateSinglePhotonDataTauAnalyzerCfgs.sh $version $dataTemplateCfg
 
 exit 0
