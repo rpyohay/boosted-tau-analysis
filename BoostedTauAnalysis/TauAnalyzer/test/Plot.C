@@ -1448,9 +1448,9 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
   //get the signal histograms
   vector<TH1F*> isoSig(2, NULL);
   THStack* isoBkg = NULL;
-  TLegend legendBkgSep(0.35, 0.55, 0.75, 0.75);
-  TLegend legendBkgMain5(0.35, 0.55, 0.75, 0.75);
-  TLegend legendBkgAll(0.35, 0.55, 0.75, 0.75);
+  TLegend legendBkgSep(0.35, 0.55, 0.75, 0.95);
+  TLegend legendBkgMain5(0.35, 0.55, 0.75, 0.95);
+  TLegend legendBkgAll(0.35, 0.55, 0.75, 0.95);
   setLegendOptions(legendBkgSep, "CMS 19.7 fb^{-1}");
   setLegendOptions(legendBkgMain5, "CMS 19.7 fb^{-1}");
   setLegendOptions(legendBkgAll, "CMS 19.7 fb^{-1}");
@@ -1709,13 +1709,15 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
   else if (option == "main 5") {
     isoBkgMain5.Draw();
     Float_t sum = 0.0;
+    Float_t err = 0.0;
     for (Int_t iHist = 0; iHist < isoBkgMain5.GetHists()->GetEntries(); ++iHist) {
       TH1F* hist = (TH1F*)isoBkgMain5.GetHists()->At(iHist);
       for (Int_t iBin = 5; iBin <= (hist->GetNbinsX() + 1); ++iBin) {
 	sum+=hist->GetBinContent(iBin);
+	err+=(hist->GetBinError(iBin)*hist->GetBinError(iBin));
       }
     }
-    cout << "Region A MC + data-driven QCD, m > 4: " << sum << endl;
+    cout << "Region A MC + data-driven QCD, m > 4: " << sum << " +/- " << sqrt(err) <<  endl;
     isoBkgMain5.SetMinimum(0.01);
     isoBkgMain5.SetMaximum(10000.0);
     isoBkgMain5.GetHistogram()->GetXaxis()->SetTitle(unit.c_str());
@@ -2464,12 +2466,21 @@ void compare2Versions(const vector<string>& fileName1, const vector<string>& fil
 		      const string& outputFileName, const vector<string>& outputCanvasTags, 
 		      const vector<bool>& stack, const vector<unsigned int>& pad)
 {
-  const string histName("muHadMass");
-  const string canvasName(histName + "Canvas");
+  vector<string> histNames;
+  histNames.push_back("muHadMass");
+  histNames.push_back("muHadMass1Prong");
+  histNames.push_back("muHadMass1Prong1Pi0");
+  histNames.push_back("muHadMass1Prong2Pi0");
+  histNames.push_back("muHadMass3Prong");
+  vector<string> canvasNames;
+  for (vector<string>::const_iterator iHist = histNames.begin(); iHist != histNames.end(); 
+       ++iHist) {
+    const unsigned int i = iHist - histNames.begin();
+    canvasNames.push_back(histNames[i] + "Canvas");
+  }
   plot2Histograms(fileName1, fileName2, outputFileName, outputCanvasTags, stack, 
-		  vector<string>(1, histName), vector<string>(1, histName), 
-		  vector<string>(1, canvasName), vector<string>(1, canvasName), pad, 1.0, 
-		  vector<float>(1, 0.001), vector<float>(1, 1000.0));
+		  histNames, histNames, canvasNames, canvasNames, pad, 1.0, 
+		  vector<float>(5, 0.001), vector<float>(5, 1000.0));
 }
 
 //plot fit information for different selections
