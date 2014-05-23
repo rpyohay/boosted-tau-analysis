@@ -18,18 +18,18 @@ cd $version
 ./copyDYJetsToLLFromEOS.sh
 ./copyDataFromEOS.sh
 ./copyTTJetsFromEOS.sh
-./copyWJetsToLNuFromEOS.sh
+#./copyWJetsToLNuFromEOS.sh
 ./copyWNJetsToLNuFromEOS.sh
-./copyWbbFromEOS.sh
+#./copyWbbFromEOS.sh
 ./copySingleTopFromEOS.sh
 ./copyWZFromEOS.sh
 ./copyWWFromEOS.sh
 ./copyZZFromEOS.sh
-./copyQCDFromEOS.sh
-./copyQCDBFromEOS.sh
-./copyQCDBMuFromEOS.sh
+#./copyQCDFromEOS.sh
+#./copyQCDBFromEOS.sh
+#./copyQCDBMuFromEOS.sh
 ./copyNonIsoWDataFromEOS.sh
-./copySinglePhotonDataFromEOS.sh
+#./copySinglePhotonDataFromEOS.sh
 cd ..
 
 exit 0
