@@ -56,6 +56,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   canvasNames1D.push_back("tauMuTauHadJetWMuMETHTCanvas");
   canvasNames1D.push_back("diJetWMuHTCanvas");
   canvasNames1D.push_back("jetTauJetWMuHTCanvas");
+  canvasNames1D.push_back("dRSoftMuTauHadCanvas");
   canvasNames1D.push_back("tauMuPTCanvas");
   canvasNames1D.push_back("tauHadPTCanvas");
   canvasNames1D.push_back("tauHadPT1ProngCanvas");
@@ -111,9 +112,11 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   canvasNames1D.push_back("secondNchtrk_1_Canvas");
   canvasNames1D.push_back("secondNchtrk_10_Canvas");
   canvasNames1D.push_back("secondNchtrk_30_Canvas");
+  canvasNames1D.push_back("dRWMuSoftMuCanvas");
   canvasNames1D.push_back("dPhiWMuSoftMuCanvas");
   canvasNames1D.push_back("dPhiWMuSoftMuWithCutCanvas");
   canvasNames1D.push_back("dPhiWMuSecJetCanvas");
+//  canvasNames1D.push_back("dRWMuTriggerObjectCanvas");
   canvasNames1D.push_back("WMu3rdTightMuChargeProductCanvas");
   canvasNames1D.push_back("tauHadPhotonEnergyFractionCanvas");
   canvasNames1D.push_back("dThetaPhotonOtherTauConstituentsCanvas");
@@ -179,6 +182,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   graphNames1D.push_back("tauMuTauHadJetWMuMETHT");
   graphNames1D.push_back("diJetWMuHT");
   graphNames1D.push_back("jetTauJetWMuHT");
+  graphNames1D.push_back("dRSoftMuTauHad");
   graphNames1D.push_back("tauMuPT");
   graphNames1D.push_back("tauHadPT");
   graphNames1D.push_back("tauHadPT1Prong");
@@ -234,9 +238,11 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   graphNames1D.push_back("second_Nchtrk_1");
   graphNames1D.push_back("second_Nchtrk_10");
   graphNames1D.push_back("second_Nchtrk_30");
+  graphNames1D.push_back("dRWMuSoftMu");
   graphNames1D.push_back("dPhiWMuSoftMu");
   graphNames1D.push_back("dPhiWMuSoftMu_withCut");
   graphNames1D.push_back("dPhiWMuSecJet");
+//  graphNames1D.push_back("dRWMuTriggerObject");
   graphNames1D.push_back("WMu3rdTightMuChargeProduct");
   graphNames1D.push_back("tauHadPhotonEnergyFraction");
   graphNames1D.push_back("dThetaPhotonOtherTauConstituents");
@@ -693,7 +699,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 		 canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
 		 nullBlindHigh);
   }
-
+  /*
   //hadd QCD Mu-enriched Pt-binned samples
   cout << "...muon-enriched QCD\n";
   string QCDSuffix(QCDVTag + fileExt);
@@ -848,7 +854,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 		 canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
 		 nullBlindHigh);
   }
-
+*/
   //hadd Drell-Yan+jets ml+l- binned samples
   cout << "...Drell-Yan\n";
   string DYJetsToLLSuffix(DYJetsToLLVTag + fileExt);
@@ -1327,6 +1333,8 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   //compare data to MC in control region and compute data - MC for data-driven QCD shape
   string dataVsMCOutputFile(analysisFilePath + "results/dataVsMC_muHadNonIsoAnalysis" + 
 			    tag19p7InvFb + outputVTag + fileExt);
+  /*  string dataVsMCOutputFile33(analysisFilePath + "results/dataVsMC_muHadNonIsoAnalysis" + 
+      tag19p7InvFb + "_v33" + fileExt);*/
   string dataVsMCOutputDiff(analysisFilePath + "results/dataVsMC_muHadNonIsoDifference" + 
 			    tag19p7InvFb + outputVTag + fileExt);
   string dataVsMCReweightOutputFile(analysisFilePath + 
@@ -1441,7 +1449,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 
   cout << "\nBegin region A vs. region B plots, sample by sample...\n\n";
   
-  //compare QCD search sample to control sample
+  /*  //compare QCD search sample to control sample
   cout << "...muon-enriched QCD\n";
   string QCDSearchVsControlOutputFile(analysisFilePath + "QCD/analysis/isoVsNonIsoTaus" + tag1 + 
   				      outputVTag + fileExt);
@@ -1508,11 +1516,11 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   					dataMC);
   cout << "...with reweighting\n";
   drawMultipleEfficiencyGraphsOn1Canvas(QCDBMuSearchVsControlReweightOutputFile, 
-  					QCDBMuSearchVsControlReweightInputFiles, canvasNames1D, 
-  					graphNames1D, legendHeaders1QCDBMu, colors, styles, 
-  					legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
-  					dataMC);
-
+					QCDBMuSearchVsControlReweightInputFiles, canvasNames1D, 
+					graphNames1D, legendHeaders1QCDBMu, colors, styles, 
+					legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
+					dataMC);
+  */
   //compare Drell-Yan+jets search sample to control sample
   cout << "...Drell-Yan\n";
   string DYJetsToLLSearchVsControlOutputFile(analysisFilePath + 

@@ -375,7 +375,28 @@ process.muHadIsoTauAnalyzer = cms.EDAnalyzer(
     pTRankColors = cms.vuint32(1, 2, 4, 6),
     pTRankStyles = cms.vuint32(20, 21, 22, 23),
     pTRankEntries = cms.vstring('Highest p_{T}', 'Second highest p_{T}', 'Third highest p_{T}',
-                                'Lowest p_{T}')
+                                'Lowest p_{T}'),
+    triggerEventTag = cms.untracked.InputTag("hltTriggerSummaryAOD", "", "HLT"),
+    triggerResultsTag = cms.untracked.InputTag("TriggerResults", "", "HLT"),
+    hltTags = cms.VInputTag(cms.InputTag("HLT_IsoMu24_eta2p1_v1", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v2", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v3", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v4", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v5", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v6", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v7", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v8", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v9", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v10", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v11", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v12", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v13", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v14", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v15", "", "HLT")
+                            ),
+    theRightHLTTag = cms.InputTag("HLT_IsoMu24_eta2p1"),
+    theRightHLTSubFilter = cms.InputTag("hltL3crIsoL1sMu16Eta2p1L1f0L2f16QL3f24QL3cr"),
+    HLTSubFilters = cms.untracked.VInputTag("")
     )
 
 #analyze non-isolated taus
@@ -409,7 +430,7 @@ process.METFilter.minMET = cms.double(30.)
 process.METFilter.METTag = cms.InputTag("pfMetType1")
 
 #MT filter
-process.MTFilter.minMT = cms.double(50.)
+process.MTFilter.minMT = cms.double(40.)
 process.MTFilter.METTag = cms.InputTag("pfMetType1")
 
 #OS filter for tau_mu W_mu charge product
@@ -493,7 +514,7 @@ process.isoTauAnalysisSequence = cms.Sequence(
     process.TRIGGEROBJECTFILTER*
     process.producePFMETCorrections*
     OSSFFILTERISOprocess.SSSFFilterIso*
-    process.METFilter*
+    process.MTFilter*
     process.muHadIsoTauAnalyzer
     )
 process.signalIsoTauAnalysisSequence = cms.Sequence(
@@ -508,7 +529,7 @@ process.signalIsoTauAnalysisSequence = cms.Sequence(
     process.TRIGGEROBJECTFILTER*
     process.producePFMETCorrections*
     OSSFFILTERISOprocess.SSSFFilterIso*
-    process.METFilter*
+    process.MTFilter*
     process.muHadIsoTauAnalyzer
     )
 process.nonIsoTauAnalysisSequence = cms.Sequence(
@@ -517,7 +538,7 @@ process.nonIsoTauAnalysisSequence = cms.Sequence(
     process.TRIGGEROBJECTFILTER*
     process.producePFMETCorrections*
     OSSFFILTERNONISOprocess.SSSFFilterNonIso*
-    process.METFilter*
+    process.MTFilter*
     process.muHadNonIsoTauAnalyzer
     )
 process.tauAnalysisSequence = cms.Sequence(
@@ -525,7 +546,7 @@ process.tauAnalysisSequence = cms.Sequence(
     process.TRIGGEROBJECTFILTER*
     OSSFFILTERprocess.SSSFFilter*
     process.producePFMETCorrections*
-    process.METFilter*
+    process.MTFilter*
     process.muHadTauAnalyzer
     )
 

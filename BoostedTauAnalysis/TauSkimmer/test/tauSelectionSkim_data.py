@@ -1,4 +1,5 @@
 import FWCore.ParameterSet.Config as cms
+from subprocess import *
 
 process = cms.Process("SKIM")
 
@@ -90,6 +91,35 @@ WMuNuPSet.momPDGID = cms.vint32(W_PDGID)
 #define a parameter set for background W+jet jet-parton matching
 WRecoilJetPSet = commonGenTauDecayIDPSet.clone()
 WRecoilJetPSet.momPDGID = cms.vint32(ANY_PDGID)
+
+# load the PAT config
+process.load("PhysicsTools.PatAlgos.patSequences_cff")
+
+# Configure PAT to use PF2PAT instead of AOD sources
+# this function will modify the PAT sequences. 
+from PhysicsTools.PatAlgos.tools.pfTools import *
+from PhysicsTools.PatAlgos.tools.metTools import *
+
+postfix = "PFlow" 
+jetAlgo="AK5"
+#addPfMET(process, postfixLabel=postfix)
+
+usePF2PAT(process,runPF2PAT=True,jetAlgo=jetAlgo,runOnMC=True,postfix=postfix,jetCorrections=('AK5PF',['L1FastJet','L2Relative','L3Absolute']),typeIMetCorrections=True,outputModules=[])
+
+# to use tau-cleaned jet collection uncomment the following: 
+#getattr(process,"pfNoTau"+postfix).enable = True
+
+# to switch default tau to HPS tau uncomment the following: 
+#adaptPFTaus(process,"hpsPFTau",postfix=postfix)
+
+from PhysicsTools.PatUtils.tools.metUncertaintyTools import runMEtUncertainties
+runMEtUncertainties(process, electronCollection='selectedPatElectronsPFlow', muonCollection='selectedPatMuonsPFlow', tauCollection='selectedPatTausPFlow', jetCollection='selectedPatJetsPFlow',doApplyType0corr=False)
+
+process.PF2PAT = cms.Sequence(
+#    process.patDefaultSequence +
+    getattr(process,"patPF2PATSequence"+postfix) +
+    process.metUncertaintySequence
+    )
 
 #output commands
 skimEventContent = cms.PSet(
@@ -278,7 +308,7 @@ process.WMuonPTSelector = cms.EDFilter('MuonRefSelector',
 from CommonTools.ParticleFlow.Tools.pfIsolation import setupPFPhotonIso
 process.phoIsoSequence = setupPFPhotonIso(process, 'photons')
 
-#search for a loose PF isolated tight muon in |eta| < 2.1 with pT > 25 GeV
+#search for a tight PF isolated tight muon in |eta| < 2.1 with pT > 25 GeV
 #(see https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Muon_Isolation_AN1 for
 #isolation definition; CMS AN-2012/349 uses loose isolation working point for WHbb muon selection)
 #this will produce a ref to the original muon collection
@@ -287,7 +317,7 @@ process.WIsoMuonSelector = cms.EDFilter('CustomMuonSelector',
                                         muonTag = cms.InputTag('WMuonPTSelector'),
                                         vtxTag = cms.InputTag('offlinePrimaryVertices'),
                                         muonID = cms.string('tight'),
-                                        PFIsoMax = cms.double(0.2),
+                                        PFIsoMax = cms.double(0.12),
                                         detectorIsoMax = cms.double(-1.0),
                                         PUSubtractionCoeff = cms.double(0.5),
                                         usePFIso = cms.bool(True),
@@ -407,6 +437,14 @@ process.muHadNonIsoTauSelector = cms.EDFilter(
     minNumObjsToPassFilter = cms.uint32(1)
     )
 
+process.tauShiftProducer = cms.EDProducer(
+    'TauEnergyShifter',
+#    baseTauTag = cms.InputTag('hpsPFTauProducer', '', 'SKIM'),
+    tauTag = cms.InputTag('muHadTauSelector'),
+    pTMin = cms.double(10.),
+    pTShift = cms.double(0.03)
+    )
+
 #output
 process.selectedOutput = cms.OutputModule(
     "PoolOutputModule",
@@ -452,10 +490,12 @@ process.selectionSequence = cms.Sequence(process.IsoMu24eta2p1Selector*
 process.noSelectionSequence = cms.Sequence(process.IsoMu24eta2p1Selector*
                                            process.WMuonPTSelector*
                                            process.WIsoMuonSelector*
+                                           process.PF2PAT*
                                            process.tauMuonPTSelector*
                                            process.tauMuonSelector*
                                            process.PFTau*
                                            process.muHadTauSelector*
+                                           process.tauShiftProducer*
                                            process.btagging*
                                            process.pfParticleSelectionSequence*
                                            process.phoIsoSequence)

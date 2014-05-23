@@ -62,12 +62,20 @@
 #include "fastjet/tools/Pruner.hh"
 #include "BoostedTauAnalysis/TauAnalyzer/interface/Nsubjettiness.h"
 #include "BoostedTauAnalysis/TauAnalyzer/interface/Njettiness.hh"
+//trigger stuff
+#include "DataFormats/HLTReco/interface/TriggerObject.h"
+#include "DataFormats/Common/interface/TriggerResults.h"
+#include "DataFormats/HLTReco/interface/TriggerEvent.h"
+#include "HLTrigger/HLTanalyzers/interface/HLTInfo.h"
+#include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
+#include "HLTrigger/HLTcore/interface/HLTConfigData.h"
+#include "FWCore/Common/interface/TriggerNames.h"
 
 using namespace std;
 using namespace edm;
 using namespace reco;
 using namespace fastjet;
-
+using namespace trigger;
 
 // class declaration
 
@@ -242,6 +250,15 @@ private:
   //legend entries for histograms with different pT rank
   std::vector<std::string> pTRankEntries_;
 
+  // Trigger stuff
+  //edm::InputTag triggerEventTag_;
+  //edm::InputTag triggerResultsTag_;
+  //std::vector<edm::InputTag> hltTags_;
+  //HLTConfigProvider hltConfig_;
+  //edm::InputTag theRightHLTTag_;
+  //edm::InputTag theRightHLTSubFilter_;
+  //std::vector<edm::InputTag> HLTSubFilters_;
+
   //histogram of MET
   TH1F* MET_;
 
@@ -328,6 +345,9 @@ private:
 
   //histogram of dR(W muon, leading soft muon per jet) when mu+had mass > 2 GeV
   TH1F* dRWMuSoftMuMuHadMassGe2_;
+
+  //histogram of dR(tau muon, hadronic tau)
+  TH1F* dRSoftMuTauHad_;
 
   //histogram of tau muon pT
   TH1F* tauMuPT_;
@@ -525,6 +545,12 @@ private:
   //histogram of W muon isolation vs. hadronic tau isolation
   TH2F* WMuIsoVsTauHadIso_;
 
+  //histogram of uncleaned jet/tau pT fraction vs hadronic tau isolation
+  TH2F* uncleanedJetPTFracVsTauHadIso_;
+
+  //histogram of cleaned jet/tau pT fraction vs hadronic tau isolation
+  TH2F* cleanedJetPTFracVsTauHadIso_;
+
   //histogram of soft muon pT vs. hadronic tau pT
   TH2F* softMuPTVsTauHadPT_;
 
@@ -630,6 +656,9 @@ private:
   //dPhi between W muon and second jet (highest pT jet in the event excluding W muon)
   TH1F *dPhiWMuSecJet_;
 
+  //dR between W muon and trigger object
+  //TH1F *dRWMuTriggerObject_;
+
   //maximum hadronic tau pT
   double maxTauHadPT_;
 
@@ -648,7 +677,7 @@ private:
 
 // constructors and destructor
 
-TauAnalyzer::TauAnalyzer(const edm::ParameterSet& iConfig) :
+TauAnalyzer::TauAnalyzer(const edm::ParameterSet& iConfig):
   outFileName_(iConfig.getParameter<std::string>("outFileName")),
   tauTag_(iConfig.getParameter<edm::InputTag>("tauTag")),
   METTag_(iConfig.getParameter<edm::InputTag>("METTag")),
@@ -689,10 +718,23 @@ TauAnalyzer::TauAnalyzer(const edm::ParameterSet& iConfig) :
   pTRankColors_(iConfig.getParameter<std::vector<unsigned int> >("pTRankColors")),
   pTRankStyles_(iConfig.getParameter<std::vector<unsigned int> >("pTRankStyles")),
   pTRankEntries_(iConfig.getParameter<std::vector<std::string> >("pTRankEntries"))
+  //hltConfig_()
 {
   //now do what ever initialization is needed
   reset(false);
-
+  /*
+  const edm::InputTag dTriggerEventTag("hltTriggerSummaryAOD","","HLT");
+  triggerEventTag_ = iConfig.getUntrackedParameter<edm::InputTag>("triggerEventTag",dTriggerEventTag);
+  const edm::InputTag dTriggerResults("TriggerResults","","HLT");
+  // By default, trigger results are labeled "TriggerResults" with process name "HLT" in the event.
+  triggerResultsTag_ = iConfig.getUntrackedParameter<edm::InputTag>("triggerResultsTag",dTriggerResults);
+  hltTags_ = iConfig.getParameter<std::vector<edm::InputTag> >("hltTags");
+  //hltConfig_ = iConfig.getParameter<HLTConfigProvider>("hltConfig");
+  theRightHLTTag_ = iConfig.getParameter<edm::InputTag>("theRightHLTTag");
+  theRightHLTSubFilter_ = iConfig.getParameter<edm::InputTag>("theRightHLTSubFilter");
+  //Whether using HLT trigger path name or the actual trigger filter name. Trigger path is default.
+  HLTSubFilters_ = iConfig.getUntrackedParameter<std::vector<edm::InputTag> >("HLTSubFilters",std::vector<edm::InputTag>());
+  */
   //check that tau arbitration method is valid
   if ((tauArbitrationMethod_ != "pT") && (tauArbitrationMethod_ != "m") && 
       (tauArbitrationMethod_ != "none")) {
@@ -1175,6 +1217,66 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   iEvent.getByLabel(bJetTag_, bTagHandle);
   const reco::JetTagCollection & bTags = *(bTagHandle.product());
 
+  /*
+   // Trigger Info
+  edm::Handle<trigger::TriggerEvent> trgEvent;
+  iEvent.getByLabel(triggerEventTag_,trgEvent);
+  edm::Handle<edm::TriggerResults> pTrgResults;
+  iEvent.getByLabel(triggerResultsTag_, pTrgResults);
+  std::map<std::string, bool> triggerInMenu;
+  std::string myHLTFilter = "";
+
+  // get names of active HLT paths in this event
+  std::vector<std::string> activeHLTPathsInThisEvent = hltConfig_.triggerNames();
+  // loop over active HLT paths to search for desired path
+  for (std::vector<std::string>::const_iterator iHLT = activeHLTPathsInThisEvent.begin(); 
+       iHLT != activeHLTPathsInThisEvent.end(); ++iHLT) { // active paths loop
+    for (std::vector<edm::InputTag>::const_iterator iMyHLT = hltTags_.begin(); 
+	 iMyHLT != hltTags_.end(); ++iMyHLT) {
+      if ((*iMyHLT).label() == *iHLT) {
+	myHLTFilter = (*iMyHLT).label();
+	triggerInMenu[(*iMyHLT).label()] = true;
+// 	std::cout << "(*iMyHLT).label() = " << (*iMyHLT).label() << std::endl;
+// 	std::cout << "hltConfig_.prescaleValue(iEvent, iSetup, *iHLT) = ";
+// 	std::cout << hltConfig_.prescaleValue(iEvent, iSetup, *iHLT) << std::endl;
+      }
+    }
+  } // active paths loop
+  
+   edm::InputTag filterTag;
+   // loop over these objects to see whether they match
+   const trigger::TriggerObjectCollection& TOC( trgEvent->getObjects() );
+   int index = 9999;
+
+   //choose the right sub-filter depending on the HLT path name
+   std::vector<std::string> filters;
+   try { filters = hltConfig_.moduleLabels( theRightHLTTag_.label() ); }
+   catch (std::exception ex) { }
+   //try { filters = hltConfig_.moduleLabels( myHLTFilter ); }
+   //catch (std::exception ex) { cout << "bad trigger 2\n"; }
+
+   //loop over filterTags of the trgEvent
+   //store the position of the one that matches the right sub-filter
+   for(int i=0; i != trgEvent->sizeFilters(); ++i) {
+     std::string label(trgEvent->filterTag(i).label());
+     if( label.find(theRightHLTSubFilter_.label()) != std::string::npos )
+       {
+	 index = i;
+       }
+   }
+   // find how many objects there are
+   if (index == 9999)
+     index = 0;
+   const trigger::Keys& KEYS(trgEvent->filterKeys(index));
+   //   const size_type nK(KEYS.size());
+   const int nK(KEYS.size());
+
+   //did this event fire the HLT?
+   const edm::TriggerNames &trgNames = iEvent.triggerNames(*pTrgResults);
+   const unsigned int trgIndex = trgNames.triggerIndex(myHLTFilter);
+   bool firedHLT = (trgIndex < trgNames.size()) && (pTrgResults->accept(trgIndex));
+  */
+
   //find the highest pT W muon
   std::vector<reco::MuonRef> WMuonRefs;
   if (pMuons.isValid()) {
@@ -1370,7 +1472,7 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	PFJetRef myBJetRef(pOldJets,i);
 	if (myBJetRef.key() == tauJetRef.key())
 	  {
-	    bTagDiscrim_->Fill(bTags[i].second);
+	    bTagDiscrim_->Fill(bTags[i].second, PUWeight);
 	    b_discriminant = bTags[i].second;
 	    break;
 	  }
@@ -2034,6 +2136,13 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       //plot uncleaned jet pT vs. cleaned tau pT
       uncleanedJetPTVsCleanedTauPT_->Fill((*iTau)->pt(), tauOldJetRef->pt(), PUWeight);
 
+      double uncleanedFraction = (tauOldJetRef->pt() - (*iTau)->pt())/tauOldJetRef->pt();
+      double cleanedFraction = (tauJetRef->pt() - (*iTau)->pt())/tauJetRef->pt();
+
+      uncleanedJetPTFracVsTauHadIso_->Fill((*pTauHadIso)[*iTau], uncleanedFraction, PUWeight);
+      cleanedJetPTFracVsTauHadIso_->Fill((*pTauHadIso)[*iTau], cleanedFraction, PUWeight); 
+      dRSoftMuTauHad_->Fill(reco::deltaR(*removedMuonRefs[removedMuonRefs.size() - 1],**iTau));
+
       //calculate N-subjettiness of cleaned jet
       fastjet::Pruner pruner(fastjet::kt_algorithm, zCut_, RcutFactor_);
       vector<reco::PFCandidatePtr> pfCands = tauJetRef->getPFConstituents();
@@ -2488,6 +2597,8 @@ void TauAnalyzer::beginJob()
     new TH1F("dRWMuSoftGenMatchedMu", ";#DeltaR(W muon, soft muon);", 30, 0.0, 3.0);
   dRWMuSoftMuMuHadMassGe2_ = 
     new TH1F("dRWMuSoftMuMuHadMassGe2", ";#DeltaR(W muon, soft muon);", 30, 0.0, 3.0);
+  dRSoftMuTauHad_ = 
+    new TH1F("dRSoftMuTauHad", ";#DeltaR(#tau_{#mu},#tau_{had});", 60, 0.0, 3.0);
   tauMuPT_ = new TH1F("tauMuPT", ";p_{T} (GeV);", 20, 0.0, 100.0);
   tauHadPT_ = new TH1F("tauHadPT", ";p_{T} (GeV);", tauHadPTBins_.size() - 1, &tauHadPTBins_[0]);
   tauHadPT1Prong_ = new TH1F("tauHadPT1Prong", ";p_{T} (GeV);", 
@@ -2589,6 +2700,14 @@ void TauAnalyzer::beginJob()
     new TH2F("WMuIsoVsTauHadIso", 
 	     ";#tau_{h} Isolation energy (GeV);W_{#mu} PFRelIsolation", 
 	     20, 0.0, 20.0, 400, 0.0, 40.0);
+  uncleanedJetPTFracVsTauHadIso_ = 
+    new TH2F("uncleanedJetPTFracVsTauHadIso", 
+	     ";#tau_{h} Isolation energy (GeV);#frac{p_{T}^{unclJet}-p_{T}^{#tau}}{p_{T}^{unclJet}}", 
+	     20, 0.0, 20.0, 50, 0.0, 1.0);
+  cleanedJetPTFracVsTauHadIso_ = 
+    new TH2F("cleanedJetPTFracVsTauHadIso", 
+	     ";#tau_{h} Isolation energy (GeV);#frac{p_{T}^{clJet}-p_{T}^{#tau}}{p_{T}^{clJet}}", 
+	     20, 0.0, 20.0, 50, 0.0, 1.0);
   softMuPTVsTauHadPT_ = 
     new TH2F("softMuPTVsTauHadPT", ";p_{T}^{#tau} (GeV);p_{T}^{#mu} (GeV)", 
 	     20, 0.0, 100.0, 20, 0.0, 100.0);
@@ -2709,6 +2828,7 @@ void TauAnalyzer::beginJob()
 			       40, -0.5, 39.5);
   dPhiWMuSecJet_ = 
     new TH1F("dPhiWMuSecJet", "#Delta#phi between W muon and second jet", 400, -4., 4.);
+  //dRWMuTriggerObject_ = new TH1F("dRWMuTriggerObject", ";#DeltaR(W muon, trigger object);", 30, 0.0, 3.0);
 
   //set bin labels
   std::stringstream dRStream;
@@ -2775,6 +2895,7 @@ void TauAnalyzer::beginJob()
   dPhiWMuSoftMu_withCut_->Sumw2();
   dRWMuSoftGenMatchedMu_->Sumw2();
   dRWMuSoftMuMuHadMassGe2_->Sumw2();
+  dRSoftMuTauHad_->Sumw2();
   tauMuPT_->Sumw2();
   tauHadPT_->Sumw2();
   tauHadPT1Prong_->Sumw2();
@@ -2825,6 +2946,8 @@ void TauAnalyzer::beginJob()
   avgTauHadSoftMuPTOverMuHadMassVsTauHadIso_->Sumw2();
   muHadPTOverMuHadMassVsTauHadIso_->Sumw2();
   WMuIsoVsTauHadIso_->Sumw2();
+  uncleanedJetPTFracVsTauHadIso_->Sumw2();
+  cleanedJetPTFracVsTauHadIso_->Sumw2();
   softMuPTVsTauHadPT_->Sumw2();
   muHad_t3t1Vsptmj_->Sumw2();
   muHad_t3t1VsDecayMode_->Sumw2();
@@ -2872,6 +2995,7 @@ void TauAnalyzer::beginJob()
   second_Nchtrk_10_->Sumw2();
   second_Nchtrk_30_->Sumw2();
   dPhiWMuSecJet_->Sumw2();
+  //  dRWMuTriggerObject_->Sumw2();
 
   //maximum hadronic tau PT
   maxTauHadPT_ = 0.0;
@@ -2914,6 +3038,7 @@ void TauAnalyzer::endJob()
   TCanvas dPhiWMuSoftMuWithCutCanvas("dPhiWMuSoftMuWithCutCanvas", "", 600, 600);
   TCanvas dRWMuSoftGenMatchedMuCanvas("dRWMuSoftGenMatchedMuCanvas", "", 600, 600);
   TCanvas dRWMuSoftMuMuHadMassGe2Canvas("dRWMuSoftMuMuHadMassGe2Canvas", "", 600, 600);
+  TCanvas dRSoftMuTauHadCanvas("dRSoftMuTauHadCanvas", "", 600, 600);
   TCanvas tauMuPTCanvas("tauMuPTCanvas", "", 600, 600);
   TCanvas tauHadPTCanvas("tauHadPTCanvas", "", 600, 600);
   TCanvas tauHadPT1ProngCanvas("tauHadPT1ProngCanvas", "", 600, 600);
@@ -2975,6 +3100,8 @@ void TauAnalyzer::endJob()
   TCanvas 
     muHadPTOverMuHadMassVsTauHadIsoCanvas("muHadPTOverMuHadMassVsTauHadIsoCanvas", "", 600, 600);
   TCanvas WMuIsoVsTauHadIsoCanvas("WMuIsoVsTauHadIsoCanvas", "", 600, 600);
+  TCanvas uncleanedJetPTFracVsTauHadIsoCanvas("uncleanedJetPTFracVsTauHadIsoCanvas", "", 600, 600);
+  TCanvas cleanedJetPTFracVsTauHadIsoCanvas("cleanedJetPTFracVsTauHadIsoCanvas", "", 600, 600);
   TCanvas softMuPTVsTauHadPTCanvas("softMuPTVsTauHadPTCanvas", "", 600, 600);
   TCanvas muHad_t3t1Canvas("muHad_t3t1Canvas", "", 600, 600);
   TCanvas muHad_t2t1Canvas("muHad_t2t1Canvas", "", 600, 600);
@@ -3027,6 +3154,7 @@ void TauAnalyzer::endJob()
   TCanvas dPhiWMuSecJetCanvas("dPhiWMuSecJetCanvas", "", 600, 600);
   TCanvas muHad_t3t1VsptmjCanvas("muHad_t3t1VsptmjCanvas", "", 600, 600);
   TCanvas muHad_t3t1VsDecayModeCanvas("muHad_t3t1VsDecayModeCanvas", "", 600, 600);
+  //  TCanvas dRWMuTriggerObjectCanvas("dRWMuTriggerObjectCanvas", "", 600, 600);
 
   //format and draw 1D plots
   Common::draw1DHistograms(METCanvas, MET_);
@@ -3057,6 +3185,7 @@ void TauAnalyzer::endJob()
   Common::draw1DHistograms(dPhiWMuSoftMuWithCutCanvas, dPhiWMuSoftMu_withCut_);
   Common::draw1DHistograms(dRWMuSoftGenMatchedMuCanvas, dRWMuSoftGenMatchedMu_);
   Common::draw1DHistograms(dRWMuSoftMuMuHadMassGe2Canvas, dRWMuSoftMuMuHadMassGe2_);
+  Common::draw1DHistograms(dRSoftMuTauHadCanvas, dRSoftMuTauHad_);
   Common::draw1DHistograms(tauMuPTCanvas, tauMuPT_);
   Common::draw1DHistograms(tauHadPTCanvas, tauHadPT_);
   Common::draw1DHistograms(tauHadPT1ProngCanvas, tauHadPT1Prong_);
@@ -3119,6 +3248,7 @@ void TauAnalyzer::endJob()
   Common::draw1DHistograms(tauHadPhotonEnergyFractionCanvas, tauHadPhotonEnergyFraction_);
   Common::draw1DHistograms(dThetaPhotonOtherTauConstituentsCanvas, 
 			   dThetaPhotonOtherTauConstituents_);
+  //  Common::draw1DHistograms(dRWMuTriggerObjectCanvas, dRWMuTriggerObject_);
 
   //format and draw 2D plots
   Common::draw2DHistograms(cleanedJetPTVsCleanedTauPTCanvas, cleanedJetPTVsCleanedTauPT_);
@@ -3145,6 +3275,8 @@ void TauAnalyzer::endJob()
   Common::draw2DHistograms(muHadPTOverMuHadMassVsTauHadIsoCanvas, 
 			   muHadPTOverMuHadMassVsTauHadIso_);
   Common::draw2DHistograms(WMuIsoVsTauHadIsoCanvas, WMuIsoVsTauHadIso_);
+  Common::draw2DHistograms(uncleanedJetPTFracVsTauHadIsoCanvas, uncleanedJetPTFracVsTauHadIso_);
+  Common::draw2DHistograms(cleanedJetPTFracVsTauHadIsoCanvas, cleanedJetPTFracVsTauHadIso_);
   Common::draw2DHistograms(softMuPTVsTauHadPTCanvas, softMuPTVsTauHadPT_);
   Common::draw2DHistograms(muHadPTOverMuHadMassVsMWMuSoftMuCanvas, 
 			   muHadPTOverMuHadMassVsMWMuSoftMu_);
@@ -3201,6 +3333,7 @@ void TauAnalyzer::endJob()
   dPhiWMuSoftMuWithCutCanvas.Write();
   dRWMuSoftGenMatchedMuCanvas.Write();
   dRWMuSoftMuMuHadMassGe2Canvas.Write();
+  dRSoftMuTauHadCanvas.Write();
   tauMuPTCanvas.Write();
   tauHadPTCanvas.Write();
   tauHadPT1ProngCanvas.Write();
@@ -3251,6 +3384,8 @@ void TauAnalyzer::endJob()
   avgTauHadSoftMuPTOverMuHadMassVsTauHadIsoCanvas.Write();
   muHadPTOverMuHadMassVsTauHadIsoCanvas.Write();
   WMuIsoVsTauHadIsoCanvas.Write();
+  uncleanedJetPTFracVsTauHadIsoCanvas.Write();
+  cleanedJetPTFracVsTauHadIsoCanvas.Write();
   softMuPTVsTauHadPTCanvas.Write();
   muHad_t3t1Canvas.Write();
   muHad_t2t1Canvas.Write();
@@ -3298,6 +3433,7 @@ void TauAnalyzer::endJob()
   dPhiWMuSecJetCanvas.Write();
   muHad_t3t1VsptmjCanvas.Write();
   muHad_t3t1VsDecayModeCanvas.Write();
+  //  dRWMuTriggerObjectCanvas.Write();
   out_->Write();
   out_->Close();
 
