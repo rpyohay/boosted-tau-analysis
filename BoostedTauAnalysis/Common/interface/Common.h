@@ -185,7 +185,7 @@ class Common {
 		const std::vector<edm::Handle<reco::PFTauDiscriminator> >&, 
 		const edm::Handle<reco::PFTauDiscriminator>&, const double, const double, 
 		const bool, const double);
-
+  
   //fill STL container with photons passing specified cuts in specified eta range
   static std::vector<reco::PhotonRef> 
     getRecoPhotons(const edm::Handle<reco::PhotonCollection>&, 

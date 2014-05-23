@@ -7,8 +7,14 @@ Setup (only needs to be done once)
 cmsrel CMSSW_5_3_3
 cd CMSSW_5_3_3/src
 cmsenv
+
+For Rachel:
 git init
 git pull git@github.com:rpyohay/boosted-tau-analysis
+
+For everyone else:
+git clone git@github.com:rpyohay/boosted-tau-analysis
+
 cvs co -r CMSSW_5_3_3 DataFormats/HepMCCandidate
 cvs co -r CMSSW_5_3_3 DataFormats/MuonReco
 cvs co -r CMSSW_5_3_3 DataFormats/JetReco

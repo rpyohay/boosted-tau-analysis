@@ -837,7 +837,7 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 	stacks[canvasIndex]->SetMinimum(1.0);
 	stacks[canvasIndex]->SetMaximum(10000000.0);
       }
-      stacks[canvasIndex]->Draw();
+      stacks[canvasIndex]->Draw("e");
       TList* stackedHists = stacks[canvasIndex]->GetHists();
       TH1F* hist = (TH1F*)stackedHists->First();
       stacks[canvasIndex]->GetXaxis()->SetTitle(hist->GetXaxis()->GetTitle());
@@ -862,7 +862,7 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
       stackSumHist->GetYaxis()->SetRangeUser(-1.0, 1.0);
       if (dataMC) {
 	outputCanvases[canvasIndex]->cd(dataMC ? 2 : 0);
-	stackSumHist->Draw();
+	stackSumHist->Draw("e");
       }
     }
     outputCanvases[canvasIndex]->cd(dataMC ? 1 : 0);

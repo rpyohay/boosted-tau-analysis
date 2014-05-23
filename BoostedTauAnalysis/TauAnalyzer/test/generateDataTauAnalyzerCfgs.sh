@@ -181,7 +181,7 @@ cat <<EOF > submitDataTauAnalyzerJobs.sh
 for file in \`ls -alh tauanalyzer*SingleMu*.sh | grep -v all | grep -v nonIsoW | awk '{ print \$9 }'\`
   do
   jobName=\`echo \$file | sed -e "s%\(.*\)\.sh%\1%"\`
-  bsub -q 8nh -J \$jobName < \$file
+  bsub -q 1nd -J \$jobName < \$file
 done
 
 exit 0
@@ -195,7 +195,7 @@ cat <<EOF > submitDataAllTauAnalyzerJobs.sh
 for file in \`ls -alh tauanalyzer*SingleMu*all*.sh | grep -v nonIsoW | awk '{ print \$9 }'\`
   do
   jobName=\`echo \$file | sed -e "s%\(.*\)\.sh%\1%"\`
-  bsub -q 8nh -J \$jobName < \$file
+  bsub -q 1nd -J \$jobName < \$file
 done
 
 exit 0

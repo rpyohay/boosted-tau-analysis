@@ -125,22 +125,22 @@ MTFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
   double MT = sqrt(2*WMuonRefs[WMuonRefs.size() - 1]->pt()*METRefToBase->et()*
 		   (1.0 - cos(reco::deltaPhi(WMuonRefs[WMuonRefs.size() - 1]->phi(), METRefToBase->phi()))));
 
-  /*  if (MT > minMT_)
+  if (MT > minMT_)
     return true;
   else
     return false;
-  */
 
   /* if (MT < minMT_ && METRefToBase->et() < 30.)
     return false;
   else
     return true;
   */
-  if (MT >= (60. - ((60./55.)*METRefToBase->et())))
+
+  /*  if (MT >= (60. - ((60./55.)*METRefToBase->et())))
     return true;
   else
     return false;
-
+  */
 }
 
 // ------------ method called once each job just before starting event loop  ------------
