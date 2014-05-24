@@ -7,9 +7,9 @@ Setup (only needs to be done once)
 cmsrel CMSSW_5_3_3
 cd CMSSW_5_3_3/src
 cmsenv
-git init
 
 For Rachel:
+git init
 git pull git@github.com:rpyohay/boosted-tau-analysis
 
 For everyone else:

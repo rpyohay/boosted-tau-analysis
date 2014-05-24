@@ -309,32 +309,6 @@ Common::getRecoTaus(const edm::Handle<reco::PFTauCollection>& pTaus,
   return taus;
 }
 
-/*
-std::vector<reco::PFTauRef>
-Common::getRecoTaus(const edm::Handle<reco::PFTauCollection>& pTaus,
-const std::vector<edm::Handle<reco::PFTauDiscriminator> >& pTauDiscriminators,
-const double pTMin, const double etaMax, const bool passIso)
-{
-  std::vector<reco::PFTauRef> taus;
-  for (reco::PFTauCollection::const_iterator iTau = pTaus->begin(); iTau != pTaus->end(); ++iTau) {
-    reco::PFTauRef tauRef(pTaus, iTau - pTaus->begin());
-    bool passTauDiscriminators = true;
-    std::vector<edm::Handle<reco::PFTauDiscriminator> >::const_iterator iDiscriminator =
-      pTauDiscriminators.begin();
-    while ((iDiscriminator != pTauDiscriminators.end()) && passTauDiscriminators) {
-      if ((**iDiscriminator)[tauRef] != 1.0) passTauDiscriminators = false;
-      ++iDiscriminator;
-    }
-    if (((passIso && passTauDiscriminators) || (!passIso && !passTauDiscriminators)) &&
-((etaMax == -1.0) || (fabs(iTau->eta()) < etaMax)) &&
-((pTMin == -1.0) || (iTau->pt() > pTMin))) {
-      taus.push_back(tauRef);
-    }
-  }
-  return taus;
-}
-*/
-
 std::vector<reco::PFTauRef> 
 Common::getRecoTaus(const edm::Handle<reco::PFTauRefVector>& pTaus, 
 		    const edm::Handle<reco::PFTauCollection>& pBaseTaus, 

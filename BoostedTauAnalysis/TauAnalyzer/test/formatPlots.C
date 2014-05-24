@@ -1333,8 +1333,6 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   //compare data to MC in control region and compute data - MC for data-driven QCD shape
   string dataVsMCOutputFile(analysisFilePath + "results/dataVsMC_muHadNonIsoAnalysis" + 
 			    tag19p7InvFb + outputVTag + fileExt);
-  /*  string dataVsMCOutputFile33(analysisFilePath + "results/dataVsMC_muHadNonIsoAnalysis" + 
-      tag19p7InvFb + "_v33" + fileExt);*/
   string dataVsMCOutputDiff(analysisFilePath + "results/dataVsMC_muHadNonIsoDifference" + 
 			    tag19p7InvFb + outputVTag + fileExt);
   string dataVsMCReweightOutputFile(analysisFilePath + 

@@ -175,7 +175,20 @@ skimEventContent = cms.PSet(
     "drop *_ghostTrackBJetTags_*_SKIM",
     "drop *_jet*ProbabilityBJetTags_*_SKIM",
     "drop *_simpleSecondaryVertexHigh*BJetTags_*_SKIM",
-    "drop *_trackCountingHigh*BJetTags_*_SKIM"
+    "drop *_trackCountingHigh*BJetTags_*_SKIM",
+    "drop CorrMETData_*_*_SKIM",
+    "drop *_*NoNu_*_*",
+    "drop *_*PFlow_*_*",
+    "drop *_softElectronCands_*_*",
+    "drop *_*_caloTowers_*",
+    "drop *_shiftedPat*_*_*",
+    "drop *_selectedPat*_*_*",
+    "drop *_smearedPat*_*_*",
+    "drop *_pfCandsNotInJet_*_*",
+    "drop *_inclusiveMergedVertices_*_*",
+    "drop *_inclusiveVertexFinder_*_*",
+    "drop *_trackVertexArbitrator_*_*",
+    "drop *_vertexMerger_*_*"
     #added 2-Jul-13 after estimating data skim size
 ##     "drop *_clusterSummaryProducer_*_*",
 ##     "drop *_hcalnoise_*_*",

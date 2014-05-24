@@ -398,7 +398,9 @@ process.muHadIsoTauAnalyzer = cms.EDAnalyzer(
     RcutFactor = cms.double(0.5),
     CSVMax = cms.double(0.679),
     MC = cms.bool(True),
-    reweight = cms.bool(False),
+    reweight = cms.bool(REWEIGHT),
+    bTagScaleShift = cms.string("BTAGSCALESHIFT"),
+    sample = cms.string("SAMPLE"),
     pTRankColors = cms.vuint32(1, 2, 4, 6),
     pTRankStyles = cms.vuint32(20, 21, 22, 23),
     pTRankEntries = cms.vstring('Highest p_{T}', 'Second highest p_{T}', 'Third highest p_{T}',
@@ -433,7 +435,7 @@ process.muHadNonIsoTauAnalyzer.outFileName = cms.string(
     )
 process.muHadNonIsoTauAnalyzer.tauTag = cms.InputTag('muHadNonIsoTauSelector')
 process.muHadNonIsoTauAnalyzer.corrJetTag = cms.InputTag('corrJetDistinctNonIsoTauSelector')
-process.muHadNonIsoTauAnalyzer.reweight = cms.bool(REWEIGHT)
+process.muHadNonIsoTauAnalyzer.reweight = cms.bool(False)
 
 #analyze all taus
 process.muHadTauAnalyzer = process.muHadIsoTauAnalyzer.clone()

@@ -206,6 +206,19 @@ skimEventContent = cms.PSet(
     "drop *_jet*ProbabilityBJetTags_*_SKIM",
     "drop *_simpleSecondaryVertexHigh*BJetTags_*_SKIM",
     "drop *_trackCountingHigh*BJetTags_*_SKIM",
+    "drop CorrMETData_*_*_SKIM",
+    "drop *_*NoNu_*_*",
+    "drop *_*PFlow_*_*",
+    "drop *_softElectronCands_*_*",
+    "drop *_*_caloTowers_*",
+    "drop *_shiftedPat*_*_*",
+    "drop *_selectedPat*_*_*",
+    "drop *_smearedPat*_*_*",
+    "drop *_pfCandsNotInJet_*_*",
+    "drop *_inclusiveMergedVertices_*_*",
+    "drop *_inclusiveVertexFinder_*_*",
+    "drop *_trackVertexArbitrator_*_*",
+    "drop *_vertexMerger_*_*"
     #added 2-Jul-13 after estimating data skim size
 ##     "drop *_clusterSummaryProducer_*_*",
 ##     "drop *_hcalnoise_*_*",
@@ -221,19 +234,6 @@ skimEventContent = cms.PSet(
 ##     "drop *_particleFlowCluster*_*_*",
 ##     "drop *_particleFlowRecHit*_*_*",
 ##     "drop recoPFCandidates_CleanJets_*_SKIM"
-    "drop *_selectedPat*sPFlow_*_SKIM",
-    "drop *_selectedPatJets*_*_SKIM",
-    "drop *_patJetsPFlow_*_SKIM",
-    "drop *_patPFMet*Up_*_SKIM",
-    "drop *_patPFMet*Down_*_SKIM",
-    "drop *_pat*sPFlow_*_SKIM",
-    "drop *_pfCandsNotInJet*_*_SKIM",
-    "drop *_pfMuons*PFlow_*_SKIM",
-    "drop *_pfSelected*sPFlow_*_SKIM",
-    "drop *_pfTaus*PFlow_*_SKIM",
-    "drop *_pfNo*PFlow_*_SKIM",
-    "drop *_shiftedPat*PFlowEn*_*_SKIM",
-    "drop *_patType1p2Corrected*_*_SKIM"
     )
     )
 
