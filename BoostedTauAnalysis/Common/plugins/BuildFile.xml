@@ -9,4 +9,5 @@
   <use   name="FWCore/ServiceRegistry"/>
   <use   name="CommonTools/UtilAlgos"/>
   <use   name="DataFormats/JetReco"/>
+  <use   name="DataFormats/TauReco"/>
 </library>
