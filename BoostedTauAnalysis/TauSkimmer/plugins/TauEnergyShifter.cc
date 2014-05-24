@@ -29,6 +29,7 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "DataFormats/TauReco/interface/PFTauFwd.h"
 #include "DataFormats/TauReco/interface/PFTau.h"
+#include "DataFormats/Common/interface/ValueMap.h"
 #include "Math/PtEtaPhiE4D.h"
 #include "Math/LorentzVector.h"
 
@@ -96,6 +97,8 @@ TauEnergyShifter::TauEnergyShifter(const edm::ParameterSet& iConfig) :
   produces<reco::PFTauCollection>("hpsTausDownShifted");
   produces<reco::PFTauRefVector>("hpsTausUpShifted");
   produces<reco::PFTauRefVector>("hpsTausDownShifted");
+  produces<edm::ValueMap<reco::PFTauRef> >("hpsTausUpShifted");
+  produces<edm::ValueMap<reco::PFTauRef> >("hpsTausDownShifted");
    //now do what ever other initialization is needed
   
 }
@@ -136,6 +139,10 @@ TauEnergyShifter::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   for (reco::PFTauRefVector::const_iterator iTau = pTaus->begin(); iTau != pTaus->end(); ++iTau)
     { taus.push_back(*iTau); }
 
+  //create vectors of tau refs to the original tau that was up- or down-shifted
+  std::vector<reco::PFTauRef> originalUpShiftedTauRefs;
+  std::vector<reco::PFTauRef> originalDownShiftedTauRefs;
+
   for (std::vector<reco::PFTauRef>::const_iterator iTau = taus.begin(); iTau != taus.end(); ++iTau)
     {
       //cerr << "Original pT = " << (*iTau)->pT() << endl;
@@ -154,6 +161,7 @@ TauEnergyShifter::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  //cerr << "Upshifted eta = " << upShiftedTau.eta() << endl;
 	  //cerr << "Upshifted phi = " << upShiftedTau.phi() << endl;
 	  hpsTausUpShifted->push_back(upShiftedTau);
+	  originalUpShiftedTauRefs.push_back(*iTau);
 	}
       // shift down --> still greater than pTMin_?
       if (((*iTau)->pt())*(1.-pTShift_) > pTMin_)
@@ -167,6 +175,7 @@ TauEnergyShifter::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  //cerr << "Downshifted eta = " << downShiftedTau.eta() << endl;
 	  //cerr << "Downshifted phi = " << downShiftedTau.phi() << endl;
 	  hpsTausDownShifted->push_back(downShiftedTau);
+	  originalDownShiftedTauRefs.push_back(*iTau);
 	}
     }
 
@@ -184,8 +193,30 @@ TauEnergyShifter::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     hpsTausDownShiftedRefVector->
       push_back(reco::PFTauRef(downShiftedRefProd, iTau));
   }
-  iEvent.put(hpsTausUpShiftedRefVector, "hpsTausUpShifted");
+//   const edm::OrphanHandle<reco::PFTauRefVector> originalUpShiftedRefProd = 
+    iEvent.put(hpsTausUpShiftedRefVector, "hpsTausUpShifted");
+//   const edm::OrphanHandle<reco::PFTauRefVector> originalDownShiftedRefProd = 
   iEvent.put(hpsTausDownShiftedRefVector, "hpsTausDownShifted");
+
+  //fill the value map of original tau refs for each energy up-shifted tau
+  std::auto_ptr<edm::ValueMap<reco::PFTauRef> > 
+    tauUpShiftedValMap(new edm::ValueMap<reco::PFTauRef>());
+  edm::ValueMap<reco::PFTauRef>::Filler tauUpShiftedFiller(*tauUpShiftedValMap);
+  tauUpShiftedFiller.insert(upShiftedRefProd, 
+			    originalUpShiftedTauRefs.begin(), 
+			    originalUpShiftedTauRefs.end());
+  tauUpShiftedFiller.fill();
+  iEvent.put(tauUpShiftedValMap, "hpsTausUpShifted");
+
+  //fill the value map of original tau refs for each energy down-shifted tau
+  std::auto_ptr<edm::ValueMap<reco::PFTauRef> > 
+    tauDownShiftedValMap(new edm::ValueMap<reco::PFTauRef>());
+  edm::ValueMap<reco::PFTauRef>::Filler tauDownShiftedFiller(*tauDownShiftedValMap);
+  tauDownShiftedFiller.insert(downShiftedRefProd, 
+			      originalDownShiftedTauRefs.begin(), 
+			      originalDownShiftedTauRefs.end());
+  tauDownShiftedFiller.fill();
+  iEvent.put(tauDownShiftedValMap, "hpsTausDownShifted");
 }
 
 // ------------ method called once each job just before starting event loop  ------------
