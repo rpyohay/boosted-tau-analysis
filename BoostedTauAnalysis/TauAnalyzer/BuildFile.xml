@@ -12,6 +12,7 @@
 <use name="PhysicsTools/Utilities"/>
 <use name="HLTrigger/HLTcore"/>
 <use name="DataFormats/BTauReco"/>
+<use name="DataFormats/PatCandidates"/>
 <use name="root"/>
 <use name="rootgraphics"/>
 <use name="fastjet"/>
