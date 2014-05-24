@@ -170,31 +170,22 @@ TauEnergyShifter::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	}
     }
 
-  std::cerr << hpsTausUpShifted->size() << std::endl;
-  std::cerr << hpsTausDownShifted->size() << std::endl;
   const unsigned int nUpShifted = hpsTausUpShifted->size();
   const unsigned int nDownShifted = hpsTausDownShifted->size();
   const edm::OrphanHandle<reco::PFTauCollection> upShiftedRefProd = 
     iEvent.put(hpsTausUpShifted, "hpsTausUpShifted");
-  std::cerr << __LINE__ << std::endl;
   const edm::OrphanHandle<reco::PFTauCollection> downShiftedRefProd = 
     iEvent.put(hpsTausDownShifted, "hpsTausDownShifted");
   for (unsigned int iTau = 0; iTau < nUpShifted; ++iTau) {
-  std::cerr << __LINE__ << std::endl;
     hpsTausUpShiftedRefVector->
       push_back(reco::PFTauRef(upShiftedRefProd, iTau));
-  std::cerr << __LINE__ << std::endl;
   }
   for (unsigned int iTau = 0; iTau < nDownShifted; ++iTau) {
-  std::cerr << __LINE__ << std::endl;
     hpsTausDownShiftedRefVector->
       push_back(reco::PFTauRef(downShiftedRefProd, iTau));
-  std::cerr << __LINE__ << std::endl;
   }
   iEvent.put(hpsTausUpShiftedRefVector, "hpsTausUpShifted");
-  std::cerr << __LINE__ << std::endl;
   iEvent.put(hpsTausDownShiftedRefVector, "hpsTausDownShifted");
-  std::cerr << __LINE__ << std::endl;
 }
 
 // ------------ method called once each job just before starting event loop  ------------
