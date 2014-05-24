@@ -457,7 +457,7 @@ process.METFilter.minMET = cms.double(30.)
 process.METFilter.METTag = cms.InputTag("pfMetType1")
 
 #MT filter
-process.MTFilter.minMT = cms.double(40.)
+process.MTFilter.minMT = cms.double(50.)
 process.MTFilter.METTag = cms.InputTag("pfMetType1")
 
 #OS filter for tau_mu W_mu charge product
@@ -523,7 +523,7 @@ process.beginSequence = cms.Sequence(
     process.genTauMuSelector
     )
 process.isoTauAnalysisSequence = cms.Sequence(
-##    process.btagging*
+    process.btagging*
     process.muHadIsoTauSelector*
     process.corrJetDistinctIsoTauSelector*
     process.muonTriggerObjectFilter*
@@ -551,7 +551,7 @@ process.signalIsoTauAnalysisSequence = cms.Sequence(
     process.muHadIsoTauAnalyzer
     )
 process.nonIsoTauAnalysisSequence = cms.Sequence(
-##    process.btagging*
+    process.btagging*
 ##     process.muHadTauSelector*
     process.muHadNonIsoTauSelector*
     process.corrJetDistinctNonIsoTauSelector*
@@ -563,7 +563,7 @@ process.nonIsoTauAnalysisSequence = cms.Sequence(
     process.muHadNonIsoTauAnalyzer
     )
 process.tauAnalysisSequence = cms.Sequence(
-##    process.btagging*
+    process.btagging*
     process.muHadTauSelector*
     process.corrJetDistinctTauSelector*
     process.muonTriggerObjectFilter*

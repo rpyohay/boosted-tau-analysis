@@ -430,7 +430,7 @@ process.METFilter.minMET = cms.double(30.)
 process.METFilter.METTag = cms.InputTag("pfMetType1")
 
 #MT filter
-process.MTFilter.minMT = cms.double(40.)
+process.MTFilter.minMT = cms.double(50.)
 process.MTFilter.METTag = cms.InputTag("pfMetType1")
 
 #OS filter for tau_mu W_mu charge product
