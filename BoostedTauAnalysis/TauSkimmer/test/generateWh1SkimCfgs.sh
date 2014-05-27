@@ -43,6 +43,9 @@ for i in `seq $iBeg $iEnd`
   elif [ ${samples[${i}]} = "Wh1_a7" ]
       then
       sed -e "s%    'root.*_324\.root',%%" -e "s%a9%${masses[${i}]}%g" -e "s%SAMPLE%${samples[${i}]}%" -e "s%VERSION%${version}%g" -e "s%user\/yohay%group/phys_higgs%" ../${templateCfg} > tauSelectionSkim_${samples[${i}]}.py
+  elif [ ${samples[${i}]} = "Wh1_a9" ]
+      then
+      sed -e "s%SAMPLE%${samples[${i}]}%" -e "s%VERSION%${version}%g" ../${templateCfg} > tauSelectionSkim_${samples[${i}]}.py
   elif [ ${samples[${i}]} = "Wh1_a11" ]
       then
       sed -e "s%    'root.*_18\.root',%%" -e "s%    'root.*_125\.root',%%" -e "s%    'root.*_235\.root',%%" -e "s%    'root.*_359\.root',%%" -e "s%    'root.*_373\.root'.*%%" -e "s%    'root.*_436\.root'.*%%" -e "s%    'root.*_529\.root'.*%%" -e "s%a9%${masses[${i}]}%g" -e "s%SAMPLE%${samples[${i}]}%" -e "s%VERSION%${version}%g" -e "s%user\/yohay%group/phys_higgs%" ../${templateCfg} > tauSelectionSkim_${samples[${i}]}.py
