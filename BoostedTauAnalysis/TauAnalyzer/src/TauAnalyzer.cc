@@ -49,6 +49,7 @@
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 #include "DataFormats/Math/interface/angle.h"
 #include "DataFormats/BTauReco/interface/JetTag.h"
+#include "DataFormats/PatCandidates/interface/MET.h"
 #include "TFile.h"
 #include "TH1F.h"
 #include "TH2F.h"
@@ -116,6 +117,24 @@ private:
     for (unsigned int i = 0; i < pView->size(); ++i) hist->Fill(pView->refAt(i)->et(), weight);
   }
 
+  //plot histogram of dPhi(candidate, MET) for user's choice of candidate
+  template<typename U>
+  void plotDPhiCandMet(const reco::Candidate* candPtr, const edm::Handle<edm::View<U> >& pMET, 
+		       TH1F* hist, const double weight)
+  {
+    hist->Fill(fabs(reco::deltaPhi(candPtr->phi(), pMET->refAt(0)->phi())), weight);
+  }
+
+  //plot histogram of MT for user's choice of candidate
+  template<typename U>
+  void plotMT(const reco::Candidate* candPtr, const edm::Handle<edm::View<U> >& pMET, TH1F* hist, 
+	      const double weight)
+  {
+    edm::RefToBase<U> METRefToBase = pMET->refAt(0);
+    hist->Fill(sqrt(2*candPtr->pt()*METRefToBase->et()*
+		    (1.0 - cos(reco::deltaPhi(candPtr->phi(), METRefToBase->phi())))), weight);
+  }
+
   //fill mistag efficiency plot with hardcoded values depending on the signal MC sample
   void fillMistagEffPlot();
 
@@ -129,14 +148,6 @@ private:
   void drawMultiplePTHistograms(TCanvas&, std::vector<TH1F*>&, const std::vector<unsigned int>&, 
 				const std::vector<unsigned int>&, TLegend&, 
 				const std::vector<std::string>&, const std::string&);
-
-  //plot histogram of dPhi(candidate, MET) for user's choice of candidate
-  void plotDPhiCandMet(const reco::Candidate*, const edm::Handle<edm::View<reco::PFMET> >&, TH1F*, 
-		       const double);
-
-  //plot histogram of MT for user's choice of candidate
-  void plotMT(const reco::Candidate*, const edm::Handle<edm::View<reco::PFMET> >&, TH1F*, 
-	      const double);
 
   //plot histogram of HT for user's choice of input candidates
   void plotHT(const std::vector<reco::Candidate*>&, TH1F*, const double);
@@ -1137,7 +1148,7 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   iEvent.getByLabel(tauTag_, pTaus);
   
   //get MET
-  edm::Handle<edm::View<reco::PFMET> > pMET;
+  edm::Handle<edm::View<pat::MET> > pMET;
   iEvent.getByLabel(METTag_, pMET);
 
   //get W muons
@@ -1726,7 +1737,7 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	     WMuMT_, PUWeight);
 
       //plot W muon or photon MT versus MET
-      edm::RefToBase<reco::PFMET> METRefToBase = pMET->refAt(0);
+      edm::RefToBase<pat::MET> METRefToBase = pMET->refAt(0);
       double MT = 
 	sqrt(2*trgCandPtrs[trgCandPtrs.size() - 1]->pt()*METRefToBase->et()*
 	     (1.0 - cos(reco::deltaPhi(trgCandPtrs[trgCandPtrs.size() - 1]->phi(), 
@@ -1806,7 +1817,7 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
       //plot HT (tau muon + hadronic tau + leading distinct corrected jet + W muon + MET)
       tauMuTauHadJet.push_back(dynamic_cast<reco::Candidate*>
-			       (const_cast<reco::PFMET*>(&*(pMET->refAt(0)))));
+			       (const_cast<pat::MET*>(&*(pMET->refAt(0)))));
       plotHT(tauMuTauHadJet, tauMuTauHadJetWMuMETHT_, PUWeight);
 
       //plot HT (two leading corrected jets if both exist)
@@ -3685,22 +3696,6 @@ void TauAnalyzer::drawMultiplePTHistograms(TCanvas& canvas,
   }
   legend.Draw();
   canvas.Write();
-}
-
-void TauAnalyzer::plotDPhiCandMet(const reco::Candidate* candPtr, 
-				  const edm::Handle<edm::View<reco::PFMET> >& pMET, 
-				  TH1F* hist, const double weight)
-{
-  hist->Fill(fabs(reco::deltaPhi(candPtr->phi(), pMET->refAt(0)->phi())), weight);
-}
-
-void TauAnalyzer::plotMT(const reco::Candidate* candPtr, 
-			 const edm::Handle<edm::View<reco::PFMET> >& pMET, 
-			 TH1F* hist, const double weight)
-{
-  edm::RefToBase<reco::PFMET> METRefToBase = pMET->refAt(0);
-  hist->Fill(sqrt(2*candPtr->pt()*METRefToBase->et()*
-		  (1.0 - cos(reco::deltaPhi(candPtr->phi(), METRefToBase->phi())))), weight);
 }
 
 void TauAnalyzer::plotHT(const std::vector<reco::Candidate*>& cands, TH1F* hist, 

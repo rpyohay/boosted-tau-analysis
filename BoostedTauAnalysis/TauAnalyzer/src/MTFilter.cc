@@ -36,6 +36,7 @@
 #include "DataFormats/MuonReco/interface/MuonFwd.h"
 #include "DataFormats/MuonReco/interface/Muon.h"
 #include "BoostedTauAnalysis/Common/interface/Common.h"
+#include "DataFormats/PatCandidates/interface/MET.h"
 
 using namespace edm;
 using namespace reco;
@@ -45,6 +46,7 @@ using namespace std;
 // class declaration
 //
 
+template<class T>
 class MTFilter : public edm::EDFilter {
    public:
       explicit MTFilter(const edm::ParameterSet&);
@@ -81,7 +83,8 @@ class MTFilter : public edm::EDFilter {
 //
 // constructors and destructor
 //
-MTFilter::MTFilter(const edm::ParameterSet& iConfig) :
+template<class T>
+MTFilter<T>::MTFilter(const edm::ParameterSet& iConfig) :
   minMT_(iConfig.getParameter<double>("minMT")),
   METTag_(iConfig.getParameter<edm::InputTag>("METTag")),
   muonTag_(iConfig.getParameter<edm::InputTag>("muonTag"))
@@ -89,8 +92,8 @@ MTFilter::MTFilter(const edm::ParameterSet& iConfig) :
   //now do what ever initialization is needed
 }
 
-
-MTFilter::~MTFilter()
+template<class T>
+MTFilter<T>::~MTFilter()
 {
  
    // do anything here that needs to be done at desctruction time
@@ -104,13 +107,14 @@ MTFilter::~MTFilter()
 //
 
 // ------------ method called on each new Event  ------------
+template<class T>
 bool
-MTFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
+MTFilter<T>::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {   
   //get MET
-  edm::Handle<edm::View<reco::PFMET> > pMET;
+  edm::Handle<edm::View<T> > pMET;
   iEvent.getByLabel(METTag_, pMET);
-  edm::RefToBase<reco::PFMET> METRefToBase = pMET->refAt(0);
+  edm::RefToBase<T> METRefToBase = pMET->refAt(0);
   //get W muons
   edm::Handle<reco::MuonRefVector> pMuons;
   iEvent.getByLabel(muonTag_, pMuons);
@@ -144,47 +148,54 @@ MTFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 }
 
 // ------------ method called once each job just before starting event loop  ------------
+template<class T>
 void 
-MTFilter::beginJob()
+MTFilter<T>::beginJob()
 {
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
+template<class T>
 void 
-MTFilter::endJob() {
+MTFilter<T>::endJob() {
 }
 
 // ------------ method called when starting to processes a run  ------------
+template<class T>
 bool 
-MTFilter::beginRun(edm::Run&, edm::EventSetup const&)
+MTFilter<T>::beginRun(edm::Run&, edm::EventSetup const&)
 { 
   return true;
 }
 
 // ------------ method called when ending the processing of a run  ------------
+template<class T>
 bool 
-MTFilter::endRun(edm::Run&, edm::EventSetup const&)
+MTFilter<T>::endRun(edm::Run&, edm::EventSetup const&)
 {
   return true;
 }
 
 // ------------ method called when starting to processes a luminosity block  ------------
+template<class T>
 bool 
-MTFilter::beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
+MTFilter<T>::beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
 {
   return true;
 }
 
 // ------------ method called when ending the processing of a luminosity block  ------------
+template<class T>
 bool 
-MTFilter::endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
+MTFilter<T>::endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
 {
   return true;
 }
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
+template<class T>
 void
-MTFilter::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+MTFilter<T>::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   //The following says we do not know what parameters are allowed so do no validation
   // Please change this to state exactly what you do use, even if it is no parameters
   edm::ParameterSetDescription desc;
@@ -192,4 +203,5 @@ MTFilter::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   descriptions.addDefault(desc);
 }
 //define this as a plug-in
-DEFINE_FWK_MODULE(MTFilter);
+typedef MTFilter<pat::MET> PATMTFilter;
+DEFINE_FWK_MODULE(PATMTFilter);
