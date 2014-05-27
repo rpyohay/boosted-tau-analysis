@@ -57,6 +57,7 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 process.source = cms.Source(
     "PoolSource",
     fileNames = cms.untracked.vstring(
+    'file:/afs/cern.ch/work/f/friccita/002F5062-346F-E211-BF00-1CC1DE04DF20.root'
     ),
     skipEvents = cms.untracked.uint32(0)
     )
@@ -94,7 +95,7 @@ WRecoilJetPSet.momPDGID = cms.vint32(ANY_PDGID)
 
 # load the PAT config
 process.load("PhysicsTools.PatAlgos.patSequences_cff")
-
+        
 # Configure PAT to use PF2PAT instead of AOD sources
 # this function will modify the PAT sequences. 
 from PhysicsTools.PatAlgos.tools.pfTools import *
@@ -103,8 +104,7 @@ from PhysicsTools.PatAlgos.tools.metTools import *
 postfix = "PFlow" 
 jetAlgo="AK5"
 #addPfMET(process, postfixLabel=postfix)
-
-usePF2PAT(process,runPF2PAT=True,jetAlgo=jetAlgo,runOnMC=True,postfix=postfix,jetCorrections=('AK5PF',['L1FastJet','L2Relative','L3Absolute']),typeIMetCorrections=True,outputModules=[])
+usePF2PAT(process,runPF2PAT=True,jetAlgo=jetAlgo,runOnMC=False,postfix=postfix,jetCorrections=('AK5PF',['L1FastJet','L2L3Residual']),typeIMetCorrections=True,outputModules=[])
 
 # to use tau-cleaned jet collection uncomment the following: 
 #getattr(process,"pfNoTau"+postfix).enable = True
@@ -113,12 +113,12 @@ usePF2PAT(process,runPF2PAT=True,jetAlgo=jetAlgo,runOnMC=True,postfix=postfix,je
 #adaptPFTaus(process,"hpsPFTau",postfix=postfix)
 
 from PhysicsTools.PatUtils.tools.metUncertaintyTools import runMEtUncertainties
-runMEtUncertainties(process, electronCollection='selectedPatElectronsPFlow', muonCollection='selectedPatMuonsPFlow', tauCollection='selectedPatTausPFlow', jetCollection='selectedPatJetsPFlow',doApplyType0corr=False)
+#runMEtUncertainties(process, electronCollection='selectedPatElectronsPFlow', muonCollection='selectedPatMuonsPFlow', tauCollection='selectedPatTausPFlow', jetCollection='selectedPatJetsPFlow',jetCorrLabel='L2L3Residual',doApplyType0corr=False)
 
 process.PF2PAT = cms.Sequence(
 #    process.patDefaultSequence +
-    getattr(process,"patPF2PATSequence"+postfix) +
-    process.metUncertaintySequence
+    getattr(process,"patPF2PATSequence"+postfix)
+#    process.metUncertaintySequence
     )
 
 #output commands
