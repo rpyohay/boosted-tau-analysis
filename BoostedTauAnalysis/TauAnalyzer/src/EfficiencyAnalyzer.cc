@@ -80,6 +80,9 @@ private:
   //fill eta histogram
   void fillEtaHistogram(edm::Handle<edm::View<T> >&, TH1F*);
 
+  //fill |eta| vs. pT histogram
+  void fillPTAbsEtaHistogram(edm::Handle<edm::View<T> >& pView, TH2F* hist);
+
   // ----------member data ---------------------------
 
   //pointer to output file object
@@ -129,6 +132,12 @@ private:
 
   //histogram of numerator eta
   TH1F* numeratorEta_;
+
+  //histogram of denominator (pT, |eta|)
+  TH2F* denominatorPTAbsEta_;
+
+  //histogram of numerator (pT, |eta|)
+  TH2F* numeratorPTAbsEta_;
 };
 
 //
@@ -193,6 +202,10 @@ void EfficiencyAnalyzer<T>::analyze(const edm::Event& iEvent, const edm::EventSe
   //plot eta distributions
   fillEtaHistogram(pDenominatorView, denominatorEta_);
   fillEtaHistogram(pNumeratorView, numeratorEta_);
+
+  //plot |eta| vs. pT distributions
+  fillPTAbsEtaHistogram(pDenominatorView, denominatorPTAbsEta_);
+  fillPTAbsEtaHistogram(pNumeratorView, numeratorPTAbsEta_);
 }
 
 
@@ -213,6 +226,14 @@ void EfficiencyAnalyzer<T>::beginJob()
   //book eta histograms
   denominatorEta_ = new TH1F("denominatorEta", "", 20, -5.0, 5.0);
   numeratorEta_ = new TH1F("numeratorEta", "", 20, -5.0, 5.0);
+
+  //book |eta| vs. pT histograms
+  const Double_t pTBins[15] = {0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 100.0, 120.0, 
+			       140.0, 160.0, 180.0, 200.0};
+  denominatorPTAbsEta_ = 
+    new TH2F("denominatorPTAbsEta", ";p_{T} (GeV);|#eta|", /*20, 0.0, 200.0*/14, pTBins, 3, 0.0, 2.4);
+  numeratorPTAbsEta_ = 
+    new TH2F("numeratorPTAbsEta", ";p_{T} (GeV);|#eta|", /*20, 0.0, 200.0*/14, pTBins, 3, 0.0, 2.4);
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
@@ -227,6 +248,8 @@ void EfficiencyAnalyzer<T>::endJob()
   numeratorPT1PT2_->Write();
   denominatorEta_->Write();
   numeratorEta_->Write();
+  denominatorPTAbsEta_->Write();
+  numeratorPTAbsEta_->Write();
   out_->Write();
   out_->Close();
 }
@@ -287,6 +310,14 @@ void EfficiencyAnalyzer<T>::fillEtaHistogram(edm::Handle<edm::View<T> >& pView, 
 }
 
 template<class T>
+void EfficiencyAnalyzer<T>::fillPTAbsEtaHistogram(edm::Handle<edm::View<T> >& pView, TH2F* hist)
+{
+  for (unsigned int i = 0; i < pView->size(); ++i) {
+    hist->Fill(pView->refAt(i)->pt(), fabs(pView->refAt(i)->eta()));
+  }
+}
+
+template<class T>
 void EfficiencyAnalyzer<T>::reset(const bool doDelete)
 {
   if ((doDelete) && (out_ != NULL)) delete out_;
@@ -299,6 +330,10 @@ void EfficiencyAnalyzer<T>::reset(const bool doDelete)
   denominatorEta_ = NULL;
   if ((doDelete) && (numeratorEta_ != NULL)) delete numeratorEta_;
   numeratorEta_ = NULL;
+  if (doDelete && (denominatorPTAbsEta_ != NULL)) delete denominatorPTAbsEta_;
+  denominatorPTAbsEta_ = NULL;
+  if (doDelete && (numeratorPTAbsEta_ != NULL)) delete numeratorPTAbsEta_;
+  numeratorPTAbsEta_ = NULL;
 }
 
 //define this as a plug-in

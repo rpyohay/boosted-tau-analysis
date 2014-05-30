@@ -279,6 +279,63 @@ ErrorCode plotEfficiency(TFile& in, TFile& out, const map<string, pair<string, s
   return SUCCESS;
 }
 
+//make efficiency plots from input TH2s and save them to the output file
+ErrorCode plot2DEfficiency(TFile& in, TFile& out, 
+			   const map<pair<string, string>, pair<string, string> >& effHistMap, 
+			   string savePath)
+{
+  string fnName("ErrorCode plot2DEfficiency(const TH1F& in, TH1F& out, const map<pair<string, ");
+  fnName+="string, pair<string, string> >& effHistMap, string savePath)";
+
+  //loop over efficiency histogram map
+  for (map<pair<string, string>, pair<string, string> >::const_iterator iEffHist = 
+	 effHistMap.begin(); iEffHist != effHistMap.end(); ++iEffHist) {
+
+    //get histograms from file
+    TH2F* numeratorHist = NULL;
+    TH2F* denominatorHist = NULL;
+    in.GetObject(iEffHist->first.first.c_str(), numeratorHist);
+    in.GetObject(iEffHist->first.second.c_str(), denominatorHist);
+    if ((numeratorHist == NULL) || (denominatorHist == NULL)) {
+      cerr << errorCannotRetrieveObject(fnName, in.GetName(), iEffHist->first.first + "\" or \"" + 
+					iEffHist->first.second);
+      return CANNOT_RETRIEVE_OBJECT;
+    }
+
+    //set axis labels and titles
+    setHistogramOptions(numeratorHist, kBlack, 0.7, 20, 1.35, 1.0, 
+			iEffHist->second.first.c_str(), iEffHist->second.second.c_str());
+    setHistogramOptions(denominatorHist, kBlack, 0.7, 20, 1.35, 1.0, 
+			iEffHist->second.first.c_str(), iEffHist->second.second.c_str());
+    numeratorHist->GetZaxis()->SetRangeUser(0.0, 1.1);
+    denominatorHist->GetZaxis()->SetRangeUser(0.0, 1.1);
+
+    //make efficiency histogram
+    TH2F* effHist = (TH2F*)numeratorHist->Clone();
+    effHist->Divide(denominatorHist);
+
+    //draw efficiency histogram
+    out.cd();
+    string effCanvasName("eff_" + iEffHist->first.first + "_over_" + iEffHist->first.second);
+    Int_t canvasWidth = defaultCanvasWidth;
+    Int_t canvasHeight = defaultCanvasHeight;
+    TCanvas effCanvas(effCanvasName.c_str(), "", canvasWidth, canvasHeight);
+    setCanvasOptions(effCanvas, 1, 0, 0);
+    setCanvasMargins(effCanvas, 0.125, 0.05, 0.125, 0.1);
+    effHist->Draw("COLZ");
+    effCanvas.Write();
+
+    //save PDF of efficiency plot
+    if (savePath != "noPDF") {
+      formatSavePath(savePath);
+      effCanvas.SaveAs((savePath + effCanvasName + ".pdf").c_str());
+    }
+  }
+
+  //success
+  return SUCCESS;
+}
+
 //make 1D histogram plots from input TH1s and save them to the output file
 ErrorCode plot1DHistograms(TFile& in, TFile& out, const map<string, string>& hist1DMap, 
 			   const map<string, vector<string> >& binLabelMap, string savePath)
@@ -418,13 +475,15 @@ ErrorCode plotMultiple1DHistogramsDifferentFiles(TFile& out, map<pair<string, st
 }
 
 //nicely format plots and save them to an output file, optionally printing them as PDFs
-void plotNice(const string& inputFileName, const map<string, pair<string, string> >& effHistMap, 
+void plotNice(const string& inputFileName, const map<string, pair<string, string> >& effHistMap1D, 
+	      const map<pair<string, string>, pair<string, string> >& effHistMap2D, 
 	      const map<string, vector<string> >& binLabelMap, 
 	      const map<string, string>& hist1DMap, const string& outputFileName, 
 	      const string& savePath)
 {
   string fnName("const string& inputFileName, const map<string, pair<string, string> >& ");
-  fnName+="effHistMap, const map<string, vector<string> >& binLabelMap, ";
+  fnName+="effHistMap1D, const map<pair<string, string>, pair<string, string>& effHistMap2D, ";
+  fnName+="const map<string, vector<string> >& binLabelMap, ";
   fnName+="const map<string, string>& hist1DMap, const string& outputFileName, ";
   fnName+="const string& savePath)";
 
@@ -445,7 +504,8 @@ void plotNice(const string& inputFileName, const map<string, pair<string, string
   }
 
   //make efficiency plots
-  plotEfficiency(in, out, effHistMap, binLabelMap, savePath);
+  plotEfficiency(in, out, effHistMap1D, binLabelMap, savePath);
+  plot2DEfficiency(in, out, effHistMap2D, savePath);
 
   //make 1D histogram plots
   plot1DHistograms(in, out, hist1DMap, binLabelMap, savePath);
