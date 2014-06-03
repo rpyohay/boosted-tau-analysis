@@ -3624,7 +3624,7 @@ void TauAnalyzer::fillDescriptions(edm::ConfigurationDescriptions& descriptions)
 void TauAnalyzer::fillMistagEffPlot()
 {
   mistagEffVsPTAndEta_ = 
-    new TH2F("mistagEffVsPTAndEta", ";|#eta|;p_{T} (GeV)", 4, 0.0, 2.4, 20, 0.0, 200.0);
+    new TH2F("mistagEffVsPTAndEta", ";p_{T} (GeV);|#eta|", 20, 0.0, 200.0, 3, 0.0, 2.4);
   if (sample_ == "Wh1_a5") {
   }
   else if (sample_ == "Wh1_a7") {
