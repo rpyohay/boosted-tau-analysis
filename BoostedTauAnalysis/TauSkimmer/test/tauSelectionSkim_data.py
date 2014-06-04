@@ -57,7 +57,6 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 process.source = cms.Source(
     "PoolSource",
     fileNames = cms.untracked.vstring(
-    'file:/afs/cern.ch/work/f/friccita/002F5062-346F-E211-BF00-1CC1DE04DF20.root'
     ),
     skipEvents = cms.untracked.uint32(0)
     )

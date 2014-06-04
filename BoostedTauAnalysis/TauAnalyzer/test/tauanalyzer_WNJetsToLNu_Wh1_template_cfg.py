@@ -476,6 +476,17 @@ process.METFilter.METTag = cms.InputTag("patType1CorrectedPFMet")
 process.MTFilter.minMT = cms.double(0.)
 process.MTFilter.METTag = cms.InputTag("patType1CorrectedPFMet")
 
+#b-tag filter
+process.IsoBVetoFilter = cms.EDFilter('BVetoFilter',
+                                      tauTag = cms.InputTag('muHadIsoTauSelector'),
+                                      tauJetTag = cms.InputTag('ak5PFJets'),
+                                      jetMuonMaPTag = cms.InputTag('CleanJets', '', 'SKIM'),
+                                      bJetTag = cms.InputTag('combinedSecondaryVertexBJetTags'),
+                                      bTagMax = cms.double(0.679)
+    )
+process.NonIsoBVetoFilter = process.IsoBVetoFilter.clone()
+process.NonIsoBVetoFilter.tauTag = cms.InputTag('muHadNonIsoTauSelector')
+
 #OS filter for tau_mu W_mu charge product
 process.OSSFFilterIso = cms.EDFilter('OSSFFilter',
                                   WMuonTag = cms.InputTag('WIsoMuonSelector'),

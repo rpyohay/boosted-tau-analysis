@@ -1405,6 +1405,20 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   			   legendHeaders19p7InvFb,colors, styles, legendEntriesMCData,
   			   weightsMCData, setLogY, sigBkg);
 
+  //compare Region C to Region D (normalized to first two bins)
+  makeControlComparisonPlot(pair<string, float>(inputFileNameB, 1.0),
+			    pair<string, float>(inputFileNameD, 1.0),
+			    vector<string>(1, "muHadMass"), vector<string>(1, "m_{#mu+had} (GeV)"), 
+			    vector<int>(1, 1), vector<int>(1, 2),
+			    analysisFilePath + "results/RegionCVsRegionD" + outputVTag + fileExt);
+
+  //compare Region B QCD to Region D (normalized to first two bins)
+  makeControlComparisonPlot(pair<string, float>(inputFileNameC, 1.0),
+			    pair<string, float>(inputFileNameD, 1.0),
+			    vector<string>(1, "muHadMass"), vector<string>(1, "m_{#mu+had} (GeV)"), 
+			    vector<int>(1, 1), vector<int>(1, 2),
+			    analysisFilePath + "results/RegionBVsRegionD" + outputVTag + fileExt);
+
   //compare MC signal + data-driven QCD to background
   string sigVsBkgQCDFromDataOutputFile(analysisFilePath + 
 				       "results/sigVsBkgQCDFromData_muHadIsoAnalysis" + 
