@@ -35,10 +35,10 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   vector<string> canvasNames1D;
   canvasNames1D.push_back("hadTauAssociatedMuMultiplicityCanvas");
   canvasNames1D.push_back("muHadMassCanvas");
-  canvasNames1D.push_back("muHadMass1ProngCanvas");
-  canvasNames1D.push_back("muHadMass1Prong1Pi0Canvas");
-  canvasNames1D.push_back("muHadMass1Prong2Pi0Canvas");
-  canvasNames1D.push_back("muHadMass3ProngCanvas");
+  //  canvasNames1D.push_back("muHadMass1ProngCanvas");
+  //  canvasNames1D.push_back("muHadMass1Prong1Pi0Canvas");
+  //  canvasNames1D.push_back("muHadMass1Prong2Pi0Canvas");
+  //  canvasNames1D.push_back("muHadMass3ProngCanvas");
   canvasNames1D.push_back("muHadMassReweightErrSqCanvas");
   canvasNames1D.push_back("muHadChargeCanvas");
   canvasNames1D.push_back("METCanvas");
@@ -56,13 +56,13 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   canvasNames1D.push_back("tauMuTauHadJetWMuMETHTCanvas");
   canvasNames1D.push_back("diJetWMuHTCanvas");
   canvasNames1D.push_back("jetTauJetWMuHTCanvas");
-  canvasNames1D.push_back("dRSoftMuTauHadCanvas");
+  //  canvasNames1D.push_back("dRSoftMuTauHadCanvas");
   canvasNames1D.push_back("tauMuPTCanvas");
   canvasNames1D.push_back("tauHadPTCanvas");
-  canvasNames1D.push_back("tauHadPT1ProngCanvas");
-  canvasNames1D.push_back("tauHadPT1Prong1Pi0Canvas");
-  canvasNames1D.push_back("tauHadPT1Prong2Pi0Canvas");
-  canvasNames1D.push_back("tauHadPT3ProngCanvas");
+  //  canvasNames1D.push_back("tauHadPT1ProngCanvas");
+  //  canvasNames1D.push_back("tauHadPT1Prong1Pi0Canvas");
+  //  canvasNames1D.push_back("tauHadPT1Prong2Pi0Canvas");
+  //  canvasNames1D.push_back("tauHadPT3ProngCanvas");
   canvasNames1D.push_back("tauHadIsoCanvas");
   canvasNames1D.push_back("WMuLeptonRelIsoCanvas");
   canvasNames1D.push_back("tauHadEtaCanvas");
@@ -155,16 +155,16 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   canvasNames2D.push_back("muHad_t3t1VsptmjCanvas");
   canvasNames2D.push_back("muHad_t3t1VsDecayModeCanvas");
   canvasNames2D.push_back("muHadMassVsNAddlJetsCanvas");
-  canvasNames2D.push_back("muHadMassVsCSVScoreCanvas");
-  canvasNames2D.push_back("tauHadJetEnergyFractionVsTauHadIsoCanvas");
-  canvasNames2D.push_back("tauHadCleanedJetEnergyFractionVsTauHadIsoCanvas");
+  //  canvasNames2D.push_back("muHadMassVsCSVScoreCanvas");
+  //  canvasNames2D.push_back("tauHadJetEnergyFractionVsTauHadIsoCanvas");
+  //  canvasNames2D.push_back("tauHadCleanedJetEnergyFractionVsTauHadIsoCanvas");
   vector<string> graphNames1D;
   graphNames1D.push_back("hadTauAssociatedMuMultiplicity");
   graphNames1D.push_back("muHadMass");
-  graphNames1D.push_back("muHadMass1Prong");
-  graphNames1D.push_back("muHadMass1Prong1Pi0");
-  graphNames1D.push_back("muHadMass1Prong2Pi0");
-  graphNames1D.push_back("muHadMass3Prong");
+  //  graphNames1D.push_back("muHadMass1Prong");
+  //  graphNames1D.push_back("muHadMass1Prong1Pi0");
+  //  graphNames1D.push_back("muHadMass1Prong2Pi0");
+  //  graphNames1D.push_back("muHadMass3Prong");
   graphNames1D.push_back("muHadMassReweightErrSq");
   graphNames1D.push_back("muHadCharge");
   graphNames1D.push_back("MET");
@@ -182,13 +182,13 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   graphNames1D.push_back("tauMuTauHadJetWMuMETHT");
   graphNames1D.push_back("diJetWMuHT");
   graphNames1D.push_back("jetTauJetWMuHT");
-  graphNames1D.push_back("dRSoftMuTauHad");
+  //  graphNames1D.push_back("dRSoftMuTauHad");
   graphNames1D.push_back("tauMuPT");
   graphNames1D.push_back("tauHadPT");
-  graphNames1D.push_back("tauHadPT1Prong");
-  graphNames1D.push_back("tauHadPT1Prong1Pi0");
-  graphNames1D.push_back("tauHadPT1Prong2Pi0");
-  graphNames1D.push_back("tauHadPT3Prong");
+  //  graphNames1D.push_back("tauHadPT1Prong");
+  //  graphNames1D.push_back("tauHadPT1Prong1Pi0");
+  //  graphNames1D.push_back("tauHadPT1Prong2Pi0");
+  //  graphNames1D.push_back("tauHadPT3Prong");
   graphNames1D.push_back("tauHadIso");
   graphNames1D.push_back("WMuLeptonRelIso");
   graphNames1D.push_back("tauHadEta");
@@ -281,9 +281,9 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   graphNames2D.push_back("muHad_t3t1Vsptmj");
   graphNames2D.push_back("muHad_t3t1VsDecayMode");
   graphNames2D.push_back("muHadMassVsNAddlJets");
-  graphNames2D.push_back("muHadMassVsCSVScore");
-  graphNames2D.push_back("tauHadJetEnergyFractionVsTauHadIso");
-  graphNames2D.push_back("tauHadCleanedJetEnergyFractionVsTauHadIso");
+  //  graphNames2D.push_back("muHadMassVsCSVScore");
+  //  graphNames2D.push_back("tauHadJetEnergyFractionVsTauHadIso");
+  //  graphNames2D.push_back("tauHadCleanedJetEnergyFractionVsTauHadIso");
   vector<Int_t> nullBlindLow(canvasNames1D.size(), 0);
   vector<Int_t> nullBlindHigh(canvasNames1D.size(), -2);
   vector<Int_t> dataBlindLow(canvasNames1D.size(), 0);
@@ -603,7 +603,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   }
   
   //hadd single photon data samples
-  cout << "...single photon data\n";
+  /*  cout << "...single photon data\n";
   string SinglePhotonDataSuffix(SinglePhotonDataVTag + fileExt);
   string SinglePhotonDataIsoPrefix(analysisFilePath + "SinglePhotonParkedData/analysis/muHadIsoAnalysis_SinglePhotonParked_Run2012D");
   string SinglePhotonDataIsoHaddOutputFile(SinglePhotonDataIsoPrefix + SinglePhotonDataSuffix);
@@ -651,7 +651,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 		 vector<float>(12, 1.0), canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, 
 		 nullBlindLow, nullBlindHigh);
   }
-
+*/
   //"hadd" Wh1 sample just to get the formatting of the 2D plots the same
   cout << "...Wh1\n";
   string Wh1Suffix(Wh1SigVTag + fileExt);
@@ -1405,20 +1405,6 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   			   legendHeaders19p7InvFb,colors, styles, legendEntriesMCData,
   			   weightsMCData, setLogY, sigBkg);
 
-  //compare Region C to Region D (normalized to first two bins)
-  makeControlComparisonPlot(pair<string, float>(inputFileNameB, 1.0),
-			    pair<string, float>(inputFileNameD, 1.0),
-			    vector<string>(1, "muHadMass"), vector<string>(1, "m_{#mu+had} (GeV)"), 
-			    vector<int>(1, 1), vector<int>(1, 2),
-			    analysisFilePath + "results/RegionCVsRegionD" + outputVTag + fileExt);
-
-  //compare Region B QCD to Region D (normalized to first two bins)
-  makeControlComparisonPlot(pair<string, float>(inputFileNameC, 1.0),
-			    pair<string, float>(inputFileNameD, 1.0),
-			    vector<string>(1, "muHadMass"), vector<string>(1, "m_{#mu+had} (GeV)"), 
-			    vector<int>(1, 1), vector<int>(1, 2),
-			    analysisFilePath + "results/RegionBVsRegionD" + outputVTag + fileExt);
-
   //compare MC signal + data-driven QCD to background
   string sigVsBkgQCDFromDataOutputFile(analysisFilePath + 
 				       "results/sigVsBkgQCDFromData_muHadIsoAnalysis" + 
@@ -1458,6 +1444,34 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   					graphNames1D, legendHeaders19p7InvFb, colors, styles, 
   					legendEntriesMCDataQCDFromData, weightsMCDataQCDFromData, 
   					setLogY, drawStack, dataMC);
+
+
+
+  vector<string> RegionBQCDVsMCInputFiles;
+  RegionBQCDVsMCInputFiles.push_back(dataVsMCOutputDiff);
+  RegionBQCDVsMCInputFiles.push_back(DYJetsToLLNonIsoHaddOutputFile);
+  RegionBQCDVsMCInputFiles.push_back(TTJetsNonIsoHaddOutputFile);
+  RegionBQCDVsMCInputFiles.push_back(TNonIsoHaddOutputFile);
+  RegionBQCDVsMCInputFiles.push_back(WNJetsToLNuNonIsoHaddOutputFile);
+  RegionBQCDVsMCInputFiles.push_back(WZNonIsoHaddOutputFile);
+  RegionBQCDVsMCInputFiles.push_back(ZZNonIsoHaddOutputFile);
+  RegionBQCDVsMCInputFiles.push_back(WWNonIsoHaddOutputFile);
+  std::reverse(RegionBQCDVsMCInputFiles.begin() + 1, RegionBQCDVsMCInputFiles.end());
+  string RegionBQCDVsMCOutputFile;
+
+  vector<string>RegionAQCDVsMCInputFiles;
+  RegionAQCDVsBkgInputFiles.push_back(Wh1IsoHaddOutputFile);
+  RegionAQCDVsBkgInputFiles.push_back(DYJetsToLLIsoHaddOutputFile);
+  RegionAQCDVsBkgInputFiles.push_back(TTJetsIsoHaddOutputFile);
+  RegionAQCDVsBkgInputFiles.push_back(TIsoHaddOutputFile);
+  RegionAQCDVsBkgInputFiles.push_back(WNJetsToLNuIsoHaddOutputFile);
+  RegionAQCDVsBkgInputFiles.push_back(WZIsoHaddOutputFile);
+  RegionAQCDVsBkgInputFiles.push_back(ZZIsoHaddOutputFile);
+  RegionAQCDVsBkgInputFiles.push_back(WWIsoHaddOutputFile);
+  std::reverse(RegionAQCDVsBkgInputFiles.begin() + 1, RegionAQCDVsBkgInputFiles.end());
+  string RegionAQCDVsMCOutputFile;
+
+
 
   cout << "\nBegin region A vs. region B plots, sample by sample...\n\n";
   
@@ -1795,12 +1809,16 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   vars.push_back("tauHadEta");
   vars.push_back("bTagDiscrim");
   vars.push_back("MET");
+  vector<string> vars2;
+  vars2.push_back("muHadMass");
   vector<string> units;
   units.push_back("m_{#mu+had} (GeV)");
   units.push_back("p_{T} (GeV)");
   units.push_back("#eta");
   units.push_back("CSV discriminant");
   units.push_back("#slash{E}_{T} (GeV)");
+  vector<string> units2;
+  units2.push_back("m_{#mu+had} (GeV)");
   vector<int> normRegionLowerBins;
   normRegionLowerBins.push_back(1);
   normRegionLowerBins.push_back(1);
@@ -1842,11 +1860,11 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   cout << "---\nCalculating fake rates\n";
 
   //calculate jet-->tau fake rate in data
-  const string 
+  /*  const string 
     dataFakeRateFileName(analysisFilePath + "results/fake_rate_data" + outputVTag + fileExt);
   plotFakeRate(SinglePhotonDataIsoHaddOutputFile, SinglePhotonDataNonIsoHaddOutputFile, 
   	       dataFakeRateFileName);
-
+  */
   //calculate jet-->tau fake rate in Drell-Yan MC
   const string DYJetsToLLFakeRateFileName(analysisFilePath + "results/fake_rate_DYJetsToLL" + 
   					  outputVTag + fileExt);
