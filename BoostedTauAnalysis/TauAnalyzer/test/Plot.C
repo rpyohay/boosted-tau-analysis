@@ -1432,14 +1432,22 @@ void QCDVsMCClosurePlots(const vector<string>& QCDVsMCInputFileNames, const stri
 
   hists[0]->SetLineColor(4); // blue for QCD
   hists[1]->SetLineColor(2); // red for bkg
-  hists[0]->Scale(hists[1]->Integral(normRegionLowerBin,normRegionUpperBin)/hists[0]->Integral(normRegionLowerBin,normRegionUpperBin));
+  //  hists[0]->Scale(hists[1]->Integral(normRegionLowerBin,normRegionUpperBin)/hists[0]->Integral(normRegionLowerBin,normRegionUpperBin));
+  hists[0]->Scale(1./hists[0]->Integral());
+  hists[1]->Scale(1./hists[1]->Integral());
   hists[1]->GetXaxis()->SetTitle(units.c_str());
+
+  TLegend *leg = new TLegend(0.35, 0.55, 0.75, 0.75, "");
+  leg->AddEntry(hists[0], "QCD (data-driven)", "lp");
+  leg->AddEntry(hists[1], "EWK+TOP+DY (MC)", "lp");
 
   //write to file
   outStream.cd();
-  TCanvas outCanvas(canvasName.c_str(), "", 600, 900);
+  TCanvas outCanvas(canvasName.c_str(), "", 600, 600);
   hists[0]->Draw("HISTE");
   hists[1]->Draw("HISTESAME");
+  leg->Draw();
+  outCanvas.Write();
   outStream.Write();
   outStream.Close();
 }

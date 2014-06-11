@@ -1446,8 +1446,10 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   					setLogY, drawStack, dataMC);
 
 
-
+  //compare data-driven QCD to total MC in control region
   vector<string> RegionBQCDVsMCInputFiles;
+  const string variable("muHadMass");
+  const string theunit("m_{#mu+h} (GeV)");
   RegionBQCDVsMCInputFiles.push_back(dataVsMCOutputDiff);
   RegionBQCDVsMCInputFiles.push_back(DYJetsToLLNonIsoHaddOutputFile);
   RegionBQCDVsMCInputFiles.push_back(TTJetsNonIsoHaddOutputFile);
@@ -1457,19 +1459,26 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   RegionBQCDVsMCInputFiles.push_back(ZZNonIsoHaddOutputFile);
   RegionBQCDVsMCInputFiles.push_back(WWNonIsoHaddOutputFile);
   std::reverse(RegionBQCDVsMCInputFiles.begin() + 1, RegionBQCDVsMCInputFiles.end());
-  string RegionBQCDVsMCOutputFile;
+  string RegionBQCDVsMCOutputFile(analysisFilePath + 
+				       "results/QCDVsMC_RegionB" + 
+				       tag19p7InvFb + outputVTag + fileExt);
+  QCDVsMCClosurePlots(RegionBQCDVsMCInputFiles, variable, theunit, 1, 2, RegionBQCDVsMCOutputFile);
 
+  //compare data-driven QCD to total MC in signal region
   vector<string>RegionAQCDVsMCInputFiles;
-  RegionAQCDVsBkgInputFiles.push_back(Wh1IsoHaddOutputFile);
-  RegionAQCDVsBkgInputFiles.push_back(DYJetsToLLIsoHaddOutputFile);
-  RegionAQCDVsBkgInputFiles.push_back(TTJetsIsoHaddOutputFile);
-  RegionAQCDVsBkgInputFiles.push_back(TIsoHaddOutputFile);
-  RegionAQCDVsBkgInputFiles.push_back(WNJetsToLNuIsoHaddOutputFile);
-  RegionAQCDVsBkgInputFiles.push_back(WZIsoHaddOutputFile);
-  RegionAQCDVsBkgInputFiles.push_back(ZZIsoHaddOutputFile);
-  RegionAQCDVsBkgInputFiles.push_back(WWIsoHaddOutputFile);
-  std::reverse(RegionAQCDVsBkgInputFiles.begin() + 1, RegionAQCDVsBkgInputFiles.end());
-  string RegionAQCDVsMCOutputFile;
+  RegionAQCDVsMCInputFiles.push_back(outputFileNameA);
+  RegionAQCDVsMCInputFiles.push_back(DYJetsToLLIsoHaddOutputFile);
+  RegionAQCDVsMCInputFiles.push_back(TTJetsIsoHaddOutputFile);
+  RegionAQCDVsMCInputFiles.push_back(TIsoHaddOutputFile);
+  RegionAQCDVsMCInputFiles.push_back(WNJetsToLNuIsoHaddOutputFile);
+  RegionAQCDVsMCInputFiles.push_back(WZIsoHaddOutputFile);
+  RegionAQCDVsMCInputFiles.push_back(ZZIsoHaddOutputFile);
+  RegionAQCDVsMCInputFiles.push_back(WWIsoHaddOutputFile);
+  std::reverse(RegionAQCDVsMCInputFiles.begin() + 1, RegionAQCDVsMCInputFiles.end());
+  string RegionAQCDVsMCOutputFile(analysisFilePath + 
+				       "results/QCDVsMC_RegionA" + 
+				       tag19p7InvFb + outputVTag + fileExt);
+  QCDVsMCClosurePlots(RegionAQCDVsMCInputFiles, variable, theunit, 1, 2, RegionAQCDVsMCOutputFile);
 
 
 
@@ -1809,16 +1818,12 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   vars.push_back("tauHadEta");
   vars.push_back("bTagDiscrim");
   vars.push_back("MET");
-  vector<string> vars2;
-  vars2.push_back("muHadMass");
   vector<string> units;
   units.push_back("m_{#mu+had} (GeV)");
   units.push_back("p_{T} (GeV)");
   units.push_back("#eta");
   units.push_back("CSV discriminant");
   units.push_back("#slash{E}_{T} (GeV)");
-  vector<string> units2;
-  units2.push_back("m_{#mu+had} (GeV)");
   vector<int> normRegionLowerBins;
   normRegionLowerBins.push_back(1);
   normRegionLowerBins.push_back(1);
@@ -1887,7 +1892,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
     MCFakeRateFileName(analysisFilePath + "results/fake_rate_MC" + outputVTag + fileExt);
   plotFakeRate(sigVsBkgOutputFile, dataVsMCOutputFile, MCFakeRateFileName, true);
 
-  //calculate ratio of jet-->tau fake rate in data and Drell-Yan MC
+  /*  //calculate ratio of jet-->tau fake rate in data and Drell-Yan MC
   plotFakeRateRatio(dataFakeRateFileName, DYJetsToLLFakeRateFileName, analysisFilePath + 
   		    "results/fake_rate_ratio_DYJetsToLL" + outputVTag + fileExt);
 
@@ -1901,7 +1906,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 
   //calculate ratio of jet-->tau fake rate in data and MC
   plotFakeRateRatio(dataFakeRateFileName, MCFakeRateFileName, analysisFilePath + 
-  		    "results/fake_rate_ratio_MC" + outputVTag + fileExt);
+  "results/fake_rate_ratio_MC" + outputVTag + fileExt);*/
 
   // //compare the same plot from 2 versions of the analysis
   // vector<string> fileNamesForComparison1;
