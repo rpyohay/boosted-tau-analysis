@@ -15,6 +15,8 @@
   string macroPath(CMSSWPathCPPString + "/src/BoostedTauAnalysis/TauAnalyzer/test/");
   gROOT->ProcessLine("#include <utility>");
   gSystem->Load((macroPath + "STLDictionary.so").c_str());
+  gSystem->Load((macroPath + "Miscellaneous_C.so").c_str());
+  gSystem->Load((macroPath + "Error_C.so").c_str());
 //   gROOT->LoadMacro((macroPath + "Plot.C++").c_str());
   gSystem->Load((macroPath + "Plot_C.so").c_str());
 
@@ -138,7 +140,13 @@
 
   //make signal b veto efficiency plots
   vector<string> effInputFiles;
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v0/b_veto_eff_gg_a9.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v0/b_veto_eff_Wh1_a5.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v0/b_veto_eff_Wh1_a7.root");
   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v0/b_veto_eff_Wh1_a9.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v0/b_veto_eff_Wh1_a11.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v0/b_veto_eff_Wh1_a13.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v0/b_veto_eff_Wh1_a15.root");
   for (vector<string>::const_iterator iFile = effInputFiles.begin(); iFile != effInputFiles.end(); 
        ++iFile) {
     const unsigned int strLen = iFile->find(".root");

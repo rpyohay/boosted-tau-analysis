@@ -314,6 +314,13 @@ ErrorCode plot2DEfficiency(TFile& in, TFile& out,
     TH2F* effHist = (TH2F*)numeratorHist->Clone();
     effHist->Divide(denominatorHist);
 
+    //print efficiencies
+    for (Int_t iPTBin = 1; iPTBin <= effHist->GetNbinsX(); ++iPTBin) {
+      for (Int_t iAbsEtaBin = 1; iAbsEtaBin <= effHist->GetNbinsY(); ++iAbsEtaBin) {
+	cout << "    mistagEffVsPTAndEta_->SetBinContent(" << iPTBin << ", " << iAbsEtaBin << ", " << effHist->GetBinContent(iPTBin, iAbsEtaBin) << ");\n";
+      }
+    }
+
     //draw efficiency histogram
     out.cd();
     string effCanvasName("eff_" + iEffHist->first.first + "_over_" + iEffHist->first.second);
@@ -494,6 +501,7 @@ void plotNice(const string& inputFileName, const map<string, pair<string, string
     cerr << inputFileName << ".\n";
     return;
   }
+  cout << inputFileName << endl;
 
   //open output file
   TFile out(outputFileName.c_str(), "RECREATE");
