@@ -56,6 +56,7 @@ done
 cat <<EOF > runSigMCBVetoEffCfgs.sh
 #!/bin/bash
 
+eval \`scramv1 runtime -sh\`
 for file in \`ls -alh *.py | awk '{ print \$9 }'\`
   do
   outFile=\`echo \$file | sed -e "s%\.py%.txt%"\`
