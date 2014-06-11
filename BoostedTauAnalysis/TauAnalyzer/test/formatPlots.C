@@ -1450,7 +1450,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   vector<string> RegionBQCDVsMCInputFiles;
   const string variable("muHadMass");
   const string theunit("m_{#mu+h} (GeV)");
-  RegionBQCDVsMCInputFiles.push_back(dataVsMCOutputDiff);
+  RegionBQCDVsMCInputFiles.push_back(inputFileNameD);
   RegionBQCDVsMCInputFiles.push_back(DYJetsToLLNonIsoHaddOutputFile);
   RegionBQCDVsMCInputFiles.push_back(TTJetsNonIsoHaddOutputFile);
   RegionBQCDVsMCInputFiles.push_back(TNonIsoHaddOutputFile);
