@@ -52,10 +52,13 @@ inputFileBlocks=( "readFiles.extend([\n    '${inputFilePrefix1}100_1_t1R.root',\
 cleanJetsOutFiles=( "${cleanJetsOutputFilePrefix}NMSSMSignal_MuProperties_W1JetsToLNu.root" "${cleanJetsOutputFilePrefix}NMSSMSignal_MuProperties_W2JetsToLNu.root" "${cleanJetsOutputFilePrefix}NMSSMSignal_MuProperties_W3JetsToLNu.root" "${cleanJetsOutputFilePrefix}NMSSMSignal_MuProperties_W4JetsToLNu.root" )
 
 #TauAnalyzer output files
-isoTauAnalyzerOutputFiles=( "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_W1JetsToLNu_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_W2JetsToLNu_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_W3JetsToLNu_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_W4JetsToLNu_${version}.root" )
-nonIsoTauAnalyzerOutputFiles=( "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_W1JetsToLNu_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_W2JetsToLNu_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_W3JetsToLNu_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_W4JetsToLNu_${version}.root" )
+highMTIsoTauAnalyzerOutputFiles=( "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_highMT_W1JetsToLNu_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_highMT_W2JetsToLNu_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_highMT_W3JetsToLNu_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_highMT_W4JetsToLNu_${version}.root" )
+lowMTIsoTauAnalyzerOutputFiles=( "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_lowMT_W1JetsToLNu_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_lowMT_W2JetsToLNu_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_lowMT_W3JetsToLNu_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_lowMT_W4JetsToLNu_${version}.root" )
+highMTNonIsoTauAnalyzerOutputFiles=( "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_highMT_W1JetsToLNu_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_highMT_W2JetsToLNu_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_highMT_W3JetsToLNu_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_highMT_W4JetsToLNu_${version}.root" )
+lowMTNonIsoTauAnalyzerOutputFiles=( "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_lowMT_W1JetsToLNu_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_lowMT_W2JetsToLNu_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_lowMT_W3JetsToLNu_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_lowMT_W4JetsToLNu_${version}.root" )
 nonIsoReweightTauAnalyzerOutputFiles=( "${tauAnalyzerOutputFilePrefix}muHadNonIsoReweightAnalysis_W1JetsToLNu_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoReweightAnalysis_W2JetsToLNu_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoReweightAnalysis_W3JetsToLNu_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoReweightAnalysis_W4JetsToLNu_${version}.root" )
-allTauAnalyzerOutputFiles=( "${tauAnalyzerOutputFilePrefix}muHadAnalysis_W1JetsToLNu_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadAnalysis_W2JetsToLNu_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadAnalysis_W3JetsToLNu_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadAnalysis_W4JetsToLNu_${version}.root" )
+highMTAllTauAnalyzerOutputFiles=( "${tauAnalyzerOutputFilePrefix}muHadAnalysis_highMT_W1JetsToLNu_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadAnalysis_highMT_W2JetsToLNu_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadAnalysis_highMT_W3JetsToLNu_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadAnalysis_highMT_W4JetsToLNu_${version}.root" )
+lowMTAllTauAnalyzerOutputFiles=( "${tauAnalyzerOutputFilePrefix}muHadAnalysis_lowMT_W1JetsToLNu_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadAnalysis_lowMT_W2JetsToLNu_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadAnalysis_lowMT_W3JetsToLNu_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadAnalysis_lowMT_W4JetsToLNu_${version}.root" )
 
 #EDM output files
 EDMOutputFiles=( "${EDMOutputFilePrefix}W1JetsToLNu${infoTag}_${version}.root" "${EDMOutputFilePrefix}W2JetsToLNu${infoTag}_${version}.root" "${EDMOutputFilePrefix}W3JetsToLNu${infoTag}_${version}.root" "${EDMOutputFilePrefix}W4JetsToLNu${infoTag}_${version}.root" )
@@ -74,16 +77,16 @@ for i in `seq $iBeg $iEnd`
   do
 
   #generate cfg file for the isolated sample
-  sed -e "s%FILES%${inputFileBlocks[${i}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${i}]}%" -e "s%NONISOTAUANALYZEROUTFILE%${nonIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%ALLTAUANALYZEROUTFILE%${allTauAnalyzerOutputFiles[${i}]}%" -e "s%ISOTAUANALYZEROUTFILE%${isoTauAnalyzerOutputFiles[${i}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${i}]}%" -e "s%SEQUENCE%process.isoTauAnalysisSequence%" -e "s%PUSCENARIO%S10%" -e "s%REWEIGHT%False%" -e "s%BTAGSCALESHIFT%mean%" -e "s%SAMPLE%%" ../${templateCfg} > tauanalyzer_${samples[${i}]}_iso_cfg.py
+  sed -e "s%FILES%${inputFileBlocks[${i}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${i}]}%" -e "s%HIGHMTNONISOTAUANALYZEROUTFILE%${highMTNonIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%HIGHMTALLTAUANALYZEROUTFILE%${highMTAllTauAnalyzerOutputFiles[${i}]}%" -e "s%HIGHMTISOTAUANALYZEROUTFILE%${highMTIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%LOWMTNONISOTAUANALYZEROUTFILE%${lowMTNonIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%LOWMTALLTAUANALYZEROUTFILE%${lowMTAllTauAnalyzerOutputFiles[${i}]}%" -e "s%LOWMTISOTAUANALYZEROUTFILE%${lowMTIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${i}]}%" -e "s%HIGHMTSEQUENCE%process.highMTIsoTauAnalysisSequence%" -e "s%LOWMTSEQUENCE%process.lowMTIsoTauAnalysisSequence%" -e "s%PUSCENARIO%S10%" -e "s%REWEIGHT%False%" -e "s%BTAGSCALESHIFT%mean%" -e "s%SAMPLE%%" ../${templateCfg} > tauanalyzer_${samples[${i}]}_iso_cfg.py
 
   #generate cfg file for the non-isolated sample
-  sed -e "s%FILES%${inputFileBlocks[${i}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${i}]}%" -e "s%NONISOTAUANALYZEROUTFILE%${nonIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%ALLTAUANALYZEROUTFILE%${allTauAnalyzerOutputFiles[${i}]}%" -e "s%ISOTAUANALYZEROUTFILE%${isoTauAnalyzerOutputFiles[${i}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${i}]}%" -e "s%SEQUENCE%process.nonIsoTauAnalysisSequence%" -e "s%PUSCENARIO%S10%" -e "s%REWEIGHT%False%" -e "s%BTAGSCALESHIFT%mean%" -e "s%SAMPLE%%" ../${templateCfg} > tauanalyzer_${samples[${i}]}_nonIso_cfg.py
+  sed -e "s%FILES%${inputFileBlocks[${i}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${i}]}%" -e "s%HIGHMTNONISOTAUANALYZEROUTFILE%${highMTNonIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%HIGHMTALLTAUANALYZEROUTFILE%${highMTAllTauAnalyzerOutputFiles[${i}]}%" -e "s%HIGHMTISOTAUANALYZEROUTFILE%${highMTIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%LOWMTNONISOTAUANALYZEROUTFILE%${lowMTNonIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%LOWMTALLTAUANALYZEROUTFILE%${lowMTAllTauAnalyzerOutputFiles[${i}]}%" -e "s%LOWMTISOTAUANALYZEROUTFILE%${lowMTIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${i}]}%" -e "s%HIGHMTSEQUENCE%process.highMTNonIsoTauAnalysisSequence%" -e "s%LOWMTSEQUENCE%process.lowMTNonIsoTauAnalysisSequence%" -e "s%PUSCENARIO%S10%" -e "s%REWEIGHT%False%" -e "s%BTAGSCALESHIFT%mean%" -e "s%SAMPLE%%" ../${templateCfg} > tauanalyzer_${samples[${i}]}_nonIso_cfg.py
 
   #generate cfg file for the non-isolated, reweighted sample
-  sed -e "s%FILES%${inputFileBlocks[${i}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${i}]}%" -e "s%NONISOTAUANALYZEROUTFILE%${nonIsoReweightTauAnalyzerOutputFiles[${i}]}%" -e "s%ALLTAUANALYZEROUTFILE%${allTauAnalyzerOutputFiles[${i}]}%" -e "s%ISOTAUANALYZEROUTFILE%${isoTauAnalyzerOutputFiles[${i}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${i}]}%" -e "s%SEQUENCE%process.nonIsoTauAnalysisSequence%" -e "s%PUSCENARIO%S10%" -e "s%REWEIGHT%True%" -e "s%BTAGSCALESHIFT%mean%" -e "s%SAMPLE%%" ../${templateCfg} > tauanalyzer_${samples[${i}]}_nonIsoReweight_cfg.py
+  sed -e "s%FILES%${inputFileBlocks[${i}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${i}]}%" -e "s%HIGHMTNONISOTAUANALYZEROUTFILE%${nonIsoReweightTauAnalyzerOutputFiles[${i}]}%" -e "s%HIGHMTALLTAUANALYZEROUTFILE%${highMTAllTauAnalyzerOutputFiles[${i}]}%" -e "s%HIGHMTISOTAUANALYZEROUTFILE%${highMTIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%LOWMTNONISOTAUANALYZEROUTFILE%${lowMTNonIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%LOWMTALLTAUANALYZEROUTFILE%${lowMTAllTauAnalyzerOutputFiles[${i}]}%" -e "s%LOWMTISOTAUANALYZEROUTFILE%${lowMTIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${i}]}%" -e "s%HIGHMTSEQUENCE%process.highMTNonIsoTauAnalysisSequence%" -e "s%LOWMTSEQUENCE%process.lowMTNonIsoTauAnalysisSequence%" -e "s%PUSCENARIO%S10%" -e "s%REWEIGHT%True%" -e "s%BTAGSCALESHIFT%mean%" -e "s%SAMPLE%%" ../${templateCfg} > tauanalyzer_${samples[${i}]}_nonIsoReweight_cfg.py
 
   #generate cfg file for the sample with no isolation cut
-  sed -e "s%FILES%${inputFileBlocks[${i}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${i}]}%" -e "s%NONISOTAUANALYZEROUTFILE%${nonIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%ALLTAUANALYZEROUTFILE%${allTauAnalyzerOutputFiles[${i}]}%" -e "s%ISOTAUANALYZEROUTFILE%${isoTauAnalyzerOutputFiles[${i}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${i}]}%" -e "s%SEQUENCE%process.tauAnalysisSequence%" -e "s%PUSCENARIO%S10%" -e "s%REWEIGHT%False%" -e "s%BTAGSCALESHIFT%mean%" -e "s%SAMPLE%%" ../${templateCfg} > tauanalyzer_${samples[${i}]}_all_cfg.py
+  sed -e "s%FILES%${inputFileBlocks[${i}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${i}]}%" -e "s%HIGHMTNONISOTAUANALYZEROUTFILE%${highMTNonIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%HIGHMTALLTAUANALYZEROUTFILE%${highMTAllTauAnalyzerOutputFiles[${i}]}%" -e "s%HIGHMTISOTAUANALYZEROUTFILE%${highMTIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%LOWMTNONISOTAUANALYZEROUTFILE%${lowMTNonIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%LOWMTALLTAUANALYZEROUTFILE%${lowMTAllTauAnalyzerOutputFiles[${i}]}%" -e "s%LOWMTISOTAUANALYZEROUTFILE%${lowMTIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${i}]}%" -e "s%HIGHMTSEQUENCE%process.highMTTauAnalysisSequence%" -e "s%LOWMTSEQUENCE%process.lowMTTauAnalysisSequence%" -e "s%PUSCENARIO%S10%" -e "s%REWEIGHT%False%" -e "s%BTAGSCALESHIFT%mean%" -e "s%SAMPLE%%" ../${templateCfg} > tauanalyzer_${samples[${i}]}_all_cfg.py
 
   #generate iso+nonIso+reweight job submission script for LSF
   cat <<EOF > tauanalyzer_${samples[${i}]}_cfg.sh
@@ -100,13 +103,15 @@ cmsRun \${fileNamePrefix}_iso_cfg.py
 if [ $reweightOnly -eq 0 ]
     then
     cmsRun \${fileNamePrefix}_nonIso_cfg.py
-    cmsStage -f ${nonIsoTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/
-    rm ${nonIsoTauAnalyzerOutputFiles[${i}]}
+    cmsStage -f ${highMTNonIsoTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/
+    cmsStage -f ${lowMTNonIsoTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/
+    rm ${highMTNonIsoTauAnalyzerOutputFiles[${i}]} ${lowMTNonIsoTauAnalyzerOutputFiles[${i}]}
 fi
 #cmsRun \${fileNamePrefix}_nonIsoReweight_cfg.py
-cmsStage -f ${isoTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/
+cmsStage -f ${highMTIsoTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/
+cmsStage -f ${lowMTIsoTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/
 #cmsStage -f ${nonIsoReweightTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/
-rm ${isoTauAnalyzerOutputFiles[${i}]}
+rm ${highMTIsoTauAnalyzerOutputFiles[${i}]} ${lowMTIsoTauAnalyzerOutputFiles[${i}]}
 #rm ${nonIsoReweightTauAnalyzerOutputFiles[${i}]} 
 
 exit 0
@@ -125,8 +130,9 @@ eval \`scramv1 runtime -sh\`
 cd -
 cp \$jobDir/\${fileNamePrefix}_all_cfg.py .
 cmsRun \${fileNamePrefix}_all_cfg.py
-cmsStage -f ${allTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/
-rm ${allTauAnalyzerOutputFiles[${i}]}
+cmsStage -f ${highMTAllTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/
+cmsStage -f ${lowMTAllTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/
+rm ${highMTAllTauAnalyzerOutputFiles[${i}]} ${lowMTAllTauAnalyzerOutputFiles[${i}]}
 
 exit 0
 EOF
@@ -185,11 +191,14 @@ for sample in \`seq 1 4\`
   #for cut in Iso NonIso NonIsoReweight
   for cut in Iso NonIso
     do
-    if [ "\$cut" != "NonIso" ] || [ $reweightOnly -eq 0 ]
-        then
-        cmsStage -f /store/user/`whoami`/muHad\${cut}Analysis_W\${sample}JetsToLNu_${version}.root /data1/`whoami`/WNJetsToLNu/analysis/
-        cmsRm /store/user/`whoami`/muHad\${cut}Analysis_W\${sample}JetsToLNu_${version}.root
-    fi
+    for MTBin in high low
+      do
+      if [ "\$cut" != "NonIso" ] || [ $reweightOnly -eq 0 ]
+          then
+          cmsStage -f /store/user/`whoami`/muHad\${cut}Analysis_\${MTBin}MT_W\${sample}JetsToLNu_${version}.root /data1/`whoami`/WNJetsToLNu/analysis/
+          cmsRm /store/user/`whoami`/muHad\${cut}Analysis_\${MTBin}MT_W\${sample}JetsToLNu_${version}.root
+      fi
+    done
   done
 done
 
@@ -204,8 +213,11 @@ cat <<EOF > copyAllWNJetsToLNuFromEOS.sh
 eval \`scramv1 runtime -sh\`
 for sample in \`seq 1 4\`
   do
-  cmsStage -f /store/user/`whoami`/muHadAnalysis_W\${sample}JetsToLNu_${version}.root /data1/`whoami`/WNJetsToLNu/analysis/
-  cmsRm /store/user/`whoami`/muHadAnalysis_W\${sample}JetsToLNu_${version}.root
+  for MTBin in high low
+  do
+    cmsStage -f /store/user/`whoami`/muHadAnalysis_\${MTBin}MT_W\${sample}JetsToLNu_${version}.root /data1/`whoami`/WNJetsToLNu/analysis/
+    cmsRm /store/user/`whoami`/muHadAnalysis_\${MTBin}MT_W\${sample}JetsToLNu_${version}.root
+  done
 done
 
 exit 0

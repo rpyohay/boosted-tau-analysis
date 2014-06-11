@@ -46,10 +46,13 @@ inputFileBlocks=( "readFiles.extend([\n    '${inputFilePrefix}SingleMu_Run2012A-
 
 #arrays of output files
 cleanJetsOutFiles=( )
-isoTauAnalyzerOutputFiles=( )
-nonIsoTauAnalyzerOutputFiles=( )
+highMTIsoTauAnalyzerOutputFiles=( )
+lowMTIsoTauAnalyzerOutputFiles=( )
+highMTNonIsoTauAnalyzerOutputFiles=( )
+lowMTNonIsoTauAnalyzerOutputFiles=( )
 nonIsoReweightTauAnalyzerOutputFiles=( )
-allTauAnalyzerOutputFiles=( )
+highMTAllTauAnalyzerOutputFiles=( )
+lowMTAllTauAnalyzerOutputFiles=( )
 EDMOutputFiles=( )
 
 #loop over number of samples
@@ -61,10 +64,13 @@ for iSample in `seq $iBeg $iEndSample`
 
   #TauAnalyzer output files
   sample=`echo ${samples[${iSample}]} | sed -e "s%nonIsoW_\(.*\)%\1%"`
-  isoTauAnalyzerOutputFiles[$iSample]="${tauAnalyzerOutputFilePrefix}nonIsoW_muHadIsoAnalysis_${sample}_${version}.root"
-  nonIsoTauAnalyzerOutputFiles[$iSample]="${tauAnalyzerOutputFilePrefix}nonIsoW_muHadNonIsoAnalysis_${sample}_${version}.root"
+  highMTIsoTauAnalyzerOutputFiles[$iSample]="${tauAnalyzerOutputFilePrefix}nonIsoW_muHadIsoAnalysis_highMT_${sample}_${version}.root"
+  lowMTIsoTauAnalyzerOutputFiles[$iSample]="${tauAnalyzerOutputFilePrefix}nonIsoW_muHadIsoAnalysis_lowMT_${sample}_${version}.root"
+  highMTNonIsoTauAnalyzerOutputFiles[$iSample]="${tauAnalyzerOutputFilePrefix}nonIsoW_muHadNonIsoAnalysis_highMT_${sample}_${version}.root"
+  lowMTNonIsoTauAnalyzerOutputFiles[$iSample]="${tauAnalyzerOutputFilePrefix}nonIsoW_muHadNonIsoAnalysis_lowMT_${sample}_${version}.root"
   nonIsoReweightTauAnalyzerOutputFiles[$iSample]="${tauAnalyzerOutputFilePrefix}nonIsoW_muHadNonIsoReweightAnalysis_${sample}_${version}.root"
-  allTauAnalyzerOutputFiles[$iSample]="${tauAnalyzerOutputFilePrefix}nonIsoW_muHadAnalysis_${sample}_${version}.root"
+  highMTAllTauAnalyzerOutputFiles[$iSample]="${tauAnalyzerOutputFilePrefix}nonIsoW_muHadAnalysis_highMT_${sample}_${version}.root"
+  lowMTAllTauAnalyzerOutputFiles[$iSample]="${tauAnalyzerOutputFilePrefix}nonIsoW_muHadAnalysis_lowMT_${sample}_${version}.root"
 
   #EDM output files
   EDMOutputFiles[$iSample]="${EDMOutputFilePrefix}${samples[${iSample}]}${infoTag}_${version}.root"
@@ -81,16 +87,16 @@ for iSample in `seq $iBeg $iEndSample`
   do
 
   #generate cfg file for the isolated sample
-  sed -e "s%FILES%${inputFileBlocks[${iSample}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${iSample}]}%" -e "s%NONISOTAUANALYZEROUTFILE%${nonIsoTauAnalyzerOutputFiles[${iSample}]}%" -e "s%ALLTAUANALYZEROUTFILE%${allTauAnalyzerOutputFiles[${iSample}]}%" -e "s%ISOTAUANALYZEROUTFILE%${isoTauAnalyzerOutputFiles[${iSample}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${iSample}]}%" -e "s%SEQUENCE%process.isoTauAnalysisSequence%" -e "s%PUSCENARIO%S10%" -e "s%REWEIGHT%False%" -e "s%CUSTOMTAUSELECTOR%CustomTauSepFromMuonSelector%" -e "s%OVERLAPCANDTAG%WIsoMuonSelector%g" -e "s%MUONORPHOTONTAG%muonTag = cms.InputTag('WIsoMuonSelector')%" -e "s%TRIGGEROBJECTFILTER%muonTriggerObjectFilter%g" -e "s%OSSFFILTERISO%process.OSSFFilterIso*\n    %g" -e "s%OSSFFILTERNONISO%process.OSSFFilterNonIso*\n    %g" -e "s%OSSFFILTER%process.OSSFFilter*\n    %g" -e "s%BTAGGING%process.btagging*\n    %g" -e "s%BTAGSCALESHIFT%mean%" -e "s%SAMPLE%%" ../${templateCfg} > tauanalyzer_${samples[${iSample}]}_iso_cfg.py
+  sed -e "s%FILES%${inputFileBlocks[${iSample}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${iSample}]}%" -e "s%HIGHMTNONISOTAUANALYZEROUTFILE%${highMTNonIsoTauAnalyzerOutputFiles[${iSample}]}%" -e "s%HIGHMTALLTAUANALYZEROUTFILE%${highMTAllTauAnalyzerOutputFiles[${iSample}]}%" -e "s%HIGHMTISOTAUANALYZEROUTFILE%${highMTIsoTauAnalyzerOutputFiles[${iSample}]}%" -e "s%LOWMTNONISOTAUANALYZEROUTFILE%${lowMTNonIsoTauAnalyzerOutputFiles[${iSample}]}%" -e "s%LOWMTALLTAUANALYZEROUTFILE%${lowMTAllTauAnalyzerOutputFiles[${iSample}]}%" -e "s%LOWMTISOTAUANALYZEROUTFILE%${lowMTIsoTauAnalyzerOutputFiles[${iSample}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${iSample}]}%" -e "s%HIGHMTSEQUENCE%process.highMTIsoTauAnalysisSequence%" -e "s%LOWMTSEQUENCE%process.lowMTIsoTauAnalysisSequence%" -e "s%PUSCENARIO%S10%" -e "s%REWEIGHT%False%" -e "s%CUSTOMTAUSELECTOR%CustomTauSepFromMuonSelector%" -e "s%OVERLAPCANDTAG%WIsoMuonSelector%g" -e "s%MUONORPHOTONTAG%muonTag = cms.InputTag('WIsoMuonSelector')%" -e "s%TRIGGEROBJECTFILTER%muonTriggerObjectFilter%g" -e "s%OSSFFILTERISO%process.OSSFFilterIso*\n    %g" -e "s%OSSFFILTERNONISO%process.OSSFFilterNonIso*\n    %g" -e "s%OSSFFILTER%process.OSSFFilter*\n    %g" -e "s%BTAGGING%process.btagging*\n    %g" -e "s%BTAGSCALESHIFT%mean%" -e "s%SAMPLE%%" ../${templateCfg} > tauanalyzer_${samples[${iSample}]}_iso_cfg.py
 
   #generate cfg file for the non-isolated sample
-  sed -e "s%FILES%${inputFileBlocks[${iSample}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${iSample}]}%" -e "s%NONISOTAUANALYZEROUTFILE%${nonIsoTauAnalyzerOutputFiles[${iSample}]}%" -e "s%ALLTAUANALYZEROUTFILE%${allTauAnalyzerOutputFiles[${iSample}]}%" -e "s%ISOTAUANALYZEROUTFILE%${isoTauAnalyzerOutputFiles[${iSample}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${iSample}]}%" -e "s%SEQUENCE%process.nonIsoTauAnalysisSequence%" -e "s%PUSCENARIO%S10%" -e "s%REWEIGHT%False%" -e "s%CUSTOMTAUSELECTOR%CustomTauSepFromMuonSelector%" -e "s%OVERLAPCANDTAG%WIsoMuonSelector%g" -e "s%MUONORPHOTONTAG%muonTag = cms.InputTag('WIsoMuonSelector')%" -e "s%TRIGGEROBJECTFILTER%muonTriggerObjectFilter%g" -e "s%OSSFFILTERISO%process.OSSFFilterIso*\n    %g" -e "s%OSSFFILTERNONISO%process.OSSFFilterNonIso*\n    %g" -e "s%OSSFFILTER%process.OSSFFilter*\n    %g" -e "s%BTAGGING%process.btagging*\n    %g" -e "s%BTAGSCALESHIFT%mean%" -e "s%SAMPLE%%" ../${templateCfg} > tauanalyzer_${samples[${iSample}]}_nonIso_cfg.py
+  sed -e "s%FILES%${inputFileBlocks[${iSample}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${iSample}]}%" -e "s%HIGHMTNONISOTAUANALYZEROUTFILE%${highMTNonIsoTauAnalyzerOutputFiles[${iSample}]}%" -e "s%HIGHMTALLTAUANALYZEROUTFILE%${highMTAllTauAnalyzerOutputFiles[${iSample}]}%" -e "s%HIGHMTISOTAUANALYZEROUTFILE%${highMTIsoTauAnalyzerOutputFiles[${iSample}]}%" -e "s%LOWMTNONISOTAUANALYZEROUTFILE%${lowMTNonIsoTauAnalyzerOutputFiles[${iSample}]}%" -e "s%LOWMTALLTAUANALYZEROUTFILE%${lowMTAllTauAnalyzerOutputFiles[${iSample}]}%" -e "s%LOWMTISOTAUANALYZEROUTFILE%${lowMTIsoTauAnalyzerOutputFiles[${iSample}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${iSample}]}%" -e "s%HIGHMTSEQUENCE%process.highMTNonIsoTauAnalysisSequence%" -e "s%LOWMTSEQUENCE%process.lowMTNonIsoTauAnalysisSequence%" -e "s%PUSCENARIO%S10%" -e "s%REWEIGHT%False%" -e "s%CUSTOMTAUSELECTOR%CustomTauSepFromMuonSelector%" -e "s%OVERLAPCANDTAG%WIsoMuonSelector%g" -e "s%MUONORPHOTONTAG%muonTag = cms.InputTag('WIsoMuonSelector')%" -e "s%TRIGGEROBJECTFILTER%muonTriggerObjectFilter%g" -e "s%OSSFFILTERISO%process.OSSFFilterIso*\n    %g" -e "s%OSSFFILTERNONISO%process.OSSFFilterNonIso*\n    %g" -e "s%OSSFFILTER%process.OSSFFilter*\n    %g" -e "s%BTAGGING%process.btagging*\n    %g" -e "s%BTAGSCALESHIFT%mean%" -e "s%SAMPLE%%" ../${templateCfg} > tauanalyzer_${samples[${iSample}]}_nonIso_cfg.py
 
   #generate cfg file for the non-isolated, reweighted sample
-  sed -e "s%FILES%${inputFileBlocks[${iSample}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${iSample}]}%" -e "s%NONISOTAUANALYZEROUTFILE%${nonIsoReweightTauAnalyzerOutputFiles[${iSample}]}%" -e "s%ALLTAUANALYZEROUTFILE%${allTauAnalyzerOutputFiles[${iSample}]}%" -e "s%ISOTAUANALYZEROUTFILE%${isoTauAnalyzerOutputFiles[${iSample}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${iSample}]}%" -e "s%SEQUENCE%process.nonIsoTauAnalysisSequence%" -e "s%PUSCENARIO%S10%" -e "s%REWEIGHT%True%" -e "s%CUSTOMTAUSELECTOR%CustomTauSepFromMuonSelector%" -e "s%OVERLAPCANDTAG%WIsoMuonSelector%g" -e "s%MUONORPHOTONTAG%muonTag = cms.InputTag('WIsoMuonSelector')%" -e "s%TRIGGEROBJECTFILTER%muonTriggerObjectFilter%g" -e "s%OSSFFILTERISO%process.OSSFFilterIso*\n    %g" -e "s%OSSFFILTERNONISO%process.OSSFFilterNonIso*\n    %g" -e "s%OSSFFILTER%process.OSSFFilter*\n    %g" -e "s%BTAGGING%process.btagging*\n    %g" -e "s%BTAGSCALESHIFT%mean%" -e "s%SAMPLE%%" ../${templateCfg} > tauanalyzer_${samples[${iSample}]}_nonIsoReweight_cfg.py
+  sed -e "s%FILES%${inputFileBlocks[${iSample}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${iSample}]}%" -e "s%HIGHMTNONISOTAUANALYZEROUTFILE%${nonIsoReweightTauAnalyzerOutputFiles[${iSample}]}%" -e "s%HIGHMTALLTAUANALYZEROUTFILE%${highMTAllTauAnalyzerOutputFiles[${iSample}]}%" -e "s%HIGHMTISOTAUANALYZEROUTFILE%${highMTIsoTauAnalyzerOutputFiles[${iSample}]}%" -e "s%LOWMTNONISOTAUANALYZEROUTFILE%${lowMTNonIsoTauAnalyzerOutputFiles[${iSample}]}%" -e "s%LOWMTALLTAUANALYZEROUTFILE%${lowMTAllTauAnalyzerOutputFiles[${iSample}]}%" -e "s%LOWMTISOTAUANALYZEROUTFILE%${lowMTIsoTauAnalyzerOutputFiles[${iSample}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${iSample}]}%" -e "s%HIGHMTSEQUENCE%process.highMTNonIsoTauAnalysisSequence%" -e "s%LOWMTSEQUENCE%process.lowMTNonIsoTauAnalysisSequence%" -e "s%PUSCENARIO%S10%" -e "s%REWEIGHT%True%" -e "s%CUSTOMTAUSELECTOR%CustomTauSepFromMuonSelector%" -e "s%OVERLAPCANDTAG%WIsoMuonSelector%g" -e "s%MUONORPHOTONTAG%muonTag = cms.InputTag('WIsoMuonSelector')%" -e "s%TRIGGEROBJECTFILTER%muonTriggerObjectFilter%g" -e "s%OSSFFILTERISO%process.OSSFFilterIso*\n    %g" -e "s%OSSFFILTERNONISO%process.OSSFFilterNonIso*\n    %g" -e "s%OSSFFILTER%process.OSSFFilter*\n    %g" -e "s%BTAGGING%process.btagging*\n    %g" -e "s%BTAGSCALESHIFT%mean%" -e "s%SAMPLE%%" ../${templateCfg} > tauanalyzer_${samples[${iSample}]}_nonIsoReweight_cfg.py
 
   #generate cfg file for the sample with no isolation cut
-  sed -e "s%FILES%${inputFileBlocks[${iSample}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${iSample}]}%" -e "s%NONISOTAUANALYZEROUTFILE%${nonIsoTauAnalyzerOutputFiles[${iSample}]}%" -e "s%ALLTAUANALYZEROUTFILE%${allTauAnalyzerOutputFiles[${iSample}]}%" -e "s%ISOTAUANALYZEROUTFILE%${isoTauAnalyzerOutputFiles[${iSample}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${iSample}]}%" -e "s%SEQUENCE%process.tauAnalysisSequence%" -e "s%PUSCENARIO%S10%" -e "s%REWEIGHT%False%" -e "s%CUSTOMTAUSELECTOR%CustomTauSepFromMuonSelector%" -e "s%OVERLAPCANDTAG%WIsoMuonSelector%g" -e "s%MUONORPHOTONTAG%muonTag = cms.InputTag('WIsoMuonSelector')%" -e "s%TRIGGEROBJECTFILTER%muonTriggerObjectFilter%g" -e "s%OSSFFILTERISO%process.OSSFFilterIso*\n    %g" -e "s%OSSFFILTERNONISO%process.OSSFFilterNonIso*\n    %g" -e "s%OSSFFILTER%process.OSSFFilter*\n    %g" -e "s%BTAGGING%process.btagging*\n    %g" -e "s%BTAGSCALESHIFT%mean%" -e "s%SAMPLE%%" ../${templateCfg} > tauanalyzer_${samples[${iSample}]}_all_cfg.py
+  sed -e "s%FILES%${inputFileBlocks[${iSample}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${iSample}]}%" -e "s%HIGHMTNONISOTAUANALYZEROUTFILE%${highMTNonIsoTauAnalyzerOutputFiles[${iSample}]}%" -e "s%HIGHMTALLTAUANALYZEROUTFILE%${highMTAllTauAnalyzerOutputFiles[${iSample}]}%" -e "s%HIGHMTISOTAUANALYZEROUTFILE%${highMTIsoTauAnalyzerOutputFiles[${iSample}]}%" -e "s%LOWMTNONISOTAUANALYZEROUTFILE%${lowMTNonIsoTauAnalyzerOutputFiles[${iSample}]}%" -e "s%LOWMTALLTAUANALYZEROUTFILE%${lowMTAllTauAnalyzerOutputFiles[${iSample}]}%" -e "s%LOWMTISOTAUANALYZEROUTFILE%${lowMTIsoTauAnalyzerOutputFiles[${iSample}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${iSample}]}%" -e "s%HIGHMTSEQUENCE%process.highMTTauAnalysisSequence%" -e "s%LOWMTSEQUENCE%process.lowMTTauAnalysisSequence%" -e "s%PUSCENARIO%S10%" -e "s%REWEIGHT%False%" -e "s%CUSTOMTAUSELECTOR%CustomTauSepFromMuonSelector%" -e "s%OVERLAPCANDTAG%WIsoMuonSelector%g" -e "s%MUONORPHOTONTAG%muonTag = cms.InputTag('WIsoMuonSelector')%" -e "s%TRIGGEROBJECTFILTER%muonTriggerObjectFilter%g" -e "s%OSSFFILTERISO%process.OSSFFilterIso*\n    %g" -e "s%OSSFFILTERNONISO%process.OSSFFilterNonIso*\n    %g" -e "s%OSSFFILTER%process.OSSFFilter*\n    %g" -e "s%BTAGGING%process.btagging*\n    %g" -e "s%BTAGSCALESHIFT%mean%" -e "s%SAMPLE%%" ../${templateCfg} > tauanalyzer_${samples[${iSample}]}_all_cfg.py
 
   #generate iso+nonIso+reweight job submission script for LSF
   cat <<EOF > tauanalyzer_${samples[${iSample}]}_cfg.sh
@@ -106,13 +112,15 @@ cmsRun \${fileNamePrefix}_iso_cfg.py
 if [ $reweightOnly -eq 0 ]
     then
     cmsRun \${fileNamePrefix}_nonIso_cfg.py
-    cmsStage -f ${nonIsoTauAnalyzerOutputFiles[${iSample}]} /store/user/`whoami`/
-    rm ${nonIsoTauAnalyzerOutputFiles[${iSample}]}
+    cmsStage -f ${highMTNonIsoTauAnalyzerOutputFiles[${iSample}]} /store/user/`whoami`/
+    cmsStage -f ${lowMTNonIsoTauAnalyzerOutputFiles[${iSample}]} /store/user/`whoami`/
+    rm ${highMTNonIsoTauAnalyzerOutputFiles[${iSample}]} ${lowMTNonIsoTauAnalyzerOutputFiles[${iSample}]}
 fi
 #cmsRun \${fileNamePrefix}_nonIsoReweight_cfg.py
-cmsStage -f ${isoTauAnalyzerOutputFiles[${iSample}]} /store/user/`whoami`/
+cmsStage -f ${highMTIsoTauAnalyzerOutputFiles[${iSample}]} /store/user/`whoami`/
+cmsStage -f ${lowMTIsoTauAnalyzerOutputFiles[${iSample}]} /store/user/`whoami`/
 #cmsStage -f ${nonIsoReweightTauAnalyzerOutputFiles[${iSample}]} /store/user/`whoami`/
-rm ${isoTauAnalyzerOutputFiles[${iSample}]}
+rm ${highMTIsoTauAnalyzerOutputFiles[${iSample}]} ${lowMTIsoTauAnalyzerOutputFiles[${iSample}]}
 #rm ${nonIsoReweightTauAnalyzerOutputFiles[${iSample}]} 
 
 exit 0
@@ -131,8 +139,9 @@ eval \`scramv1 runtime -sh\`
 cd -
 cp \$jobDir/\${fileNamePrefix}_all_cfg.py .
 cmsRun \${fileNamePrefix}_all_cfg.py
-cmsStage -f ${allTauAnalyzerOutputFiles[${iSample}]} /store/user/`whoami`/
-rm ${allTauAnalyzerOutputFiles[${iSample}]}
+cmsStage -f ${highMTAllTauAnalyzerOutputFiles[${iSample}]} /store/user/`whoami`/
+cmsStage -f ${lowMTAllTauAnalyzerOutputFiles[${iSample}]} /store/user/`whoami`/
+rm ${highMTAllTauAnalyzerOutputFiles[${iSample}]} ${lowMTAllTauAnalyzerOutputFiles[${iSample}]}
 
 exit 0
 EOF
@@ -191,11 +200,14 @@ for sample in "A" "B" "C" "D"
   #for cut in Iso NonIso NonIsoReweight
   for cut in Iso NonIso
     do
-    if [ "\$cut" != "NonIso" ] || [ $reweightOnly -eq 0 ]
-        then
-        cmsStage -f /store/user/`whoami`/nonIsoW_muHad\${cut}Analysis_SingleMu_Run2012\${sample}_${version}.root /data1/`whoami`/nonIsoWData/analysis/
-        cmsRm /store/user/`whoami`/nonIsoW_muHad\${cut}Analysis_SingleMu_Run2012\${sample}_${version}.root
-    fi
+    for MTBin in high low
+      do
+      if [ "\$cut" != "NonIso" ] || [ $reweightOnly -eq 0 ]
+          then
+          cmsStage -f /store/user/`whoami`/nonIsoW_muHad\${cut}Analysis_\${MTBin}MT_SingleMu_Run2012\${sample}_${version}.root /data1/`whoami`/nonIsoWData/analysis/
+          cmsRm /store/user/`whoami`/nonIsoW_muHad\${cut}Analysis_\${MTBin}MT_SingleMu_Run2012\${sample}_${version}.root
+      fi
+    done
   done
 done
 
@@ -210,8 +222,11 @@ cat <<EOF > copyAllNonIsoWDataFromEOS.sh
 eval \`scramv1 runtime -sh\`
 for sample in "A" "B" "C" "D"
   do
-  cmsStage -f /store/user/`whoami`/nonIsoW_muHadAnalysis_SingleMu_Run2012\${sample}_${version}.root /data1/`whoami`/nonIsoWData/analysis/
-  cmsRm /store/user/`whoami`/nonIsoW_muHadAnalysis_SingleMu_Run2012\${sample}_${version}.root
+  for MTBin in high low
+    do
+    cmsStage -f /store/user/`whoami`/nonIsoW_muHadAnalysis_\${MTBin}MT_SingleMu_Run2012\${sample}_${version}.root /data1/`whoami`/nonIsoWData/analysis/
+    cmsRm /store/user/`whoami`/nonIsoW_muHadAnalysis_\${MTBin}MT_SingleMu_Run2012\${sample}_${version}.root
+  done
 done
 
 exit 0

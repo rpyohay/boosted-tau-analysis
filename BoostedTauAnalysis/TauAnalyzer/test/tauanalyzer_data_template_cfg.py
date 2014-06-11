@@ -349,10 +349,10 @@ process.producePFMETCorrections = cms.Sequence(
 )
 
 #analyze isolated taus
-process.muHadIsoTauAnalyzer = cms.EDAnalyzer(
+process.highMTMuHadIsoTauAnalyzer = cms.EDAnalyzer(
     'TauAnalyzer',
     outFileName = cms.string(
-    'ISOTAUANALYZEROUTFILE'
+    'HIGHMTISOTAUANALYZEROUTFILE'
     ),
     tauTag = cms.InputTag('muHadIsoTauSelector'),
     METTag = cms.InputTag('patType1CorrectedPFMet'),
@@ -414,23 +414,29 @@ process.muHadIsoTauAnalyzer = cms.EDAnalyzer(
     theRightHLTSubFilter = cms.InputTag("hltL3crIsoL1sMu16Eta2p1L1f0L2f16QL3f24QL3cr"),
     HLTSubFilters = cms.untracked.VInputTag("")
     )
+process.lowMTMuHadIsoTauAnalyzer = process.highMTMuHadIsoTauAnalyzer.clone()
+process.lowMTMuHadIsoTauAnalyzer.outFileName = cms.string('LOWMTISOTAUANALYZEROUTFILE')
 
 #analyze non-isolated taus
-process.muHadNonIsoTauAnalyzer = process.muHadIsoTauAnalyzer.clone()
-process.muHadNonIsoTauAnalyzer.outFileName = cms.string(
-    'NONISOTAUANALYZEROUTFILE'
+process.highMTMuHadNonIsoTauAnalyzer = process.highMTMuHadIsoTauAnalyzer.clone()
+process.highMTMuHadNonIsoTauAnalyzer.outFileName = cms.string(
+    'HIGHMTNONISOTAUANALYZEROUTFILE'
     )
-process.muHadNonIsoTauAnalyzer.tauTag = cms.InputTag('muHadNonIsoTauSelector')
-process.muHadNonIsoTauAnalyzer.corrJetTag = cms.InputTag('corrJetDistinctNonIsoTauSelector')
-process.muHadNonIsoTauAnalyzer.reweight = cms.bool(REWEIGHT)
+process.highMTMuHadNonIsoTauAnalyzer.tauTag = cms.InputTag('muHadNonIsoTauSelector')
+process.highMTMuHadNonIsoTauAnalyzer.corrJetTag = cms.InputTag('corrJetDistinctNonIsoTauSelector')
+process.highMTMuHadNonIsoTauAnalyzer.reweight = cms.bool(REWEIGHT)
+process.lowMTMuHadNonIsoTauAnalyzer = process.highMTMuHadNonIsoTauAnalyzer.clone()
+process.lowMTMuHadNonIsoTauAnalyzer.outFileName = cms.string('LOWMTNONISOTAUANALYZEROUTFILE')
 
 #analyze all taus
-process.muHadTauAnalyzer = process.muHadIsoTauAnalyzer.clone()
-process.muHadTauAnalyzer.outFileName = cms.string(
-    'ALLTAUANALYZEROUTFILE'
+process.highMTMuHadTauAnalyzer = process.highMTMuHadIsoTauAnalyzer.clone()
+process.highMTMuHadTauAnalyzer.outFileName = cms.string(
+    'HIGHMTALLTAUANALYZEROUTFILE'
     )
-process.muHadTauAnalyzer.tauTag = cms.InputTag('muHadTauSelector', '', 'MUHADANALYSIS')
-process.muHadTauAnalyzer.corrJetTag = cms.InputTag('corrJetDistinctTauSelector')
+process.highMTMuHadTauAnalyzer.tauTag = cms.InputTag('muHadTauSelector', '', 'MUHADANALYSIS')
+process.highMTMuHadTauAnalyzer.corrJetTag = cms.InputTag('corrJetDistinctTauSelector')
+process.lowMTMuHadTauAnalyzer = process.highMTMuHadTauAnalyzer.clone()
+process.lowMTMuHadTauAnalyzer.outFileName = cms.string('LOWMTALLTAUANALYZEROUTFILE')
 
 #output
 process.output = cms.OutputModule(
@@ -446,8 +452,9 @@ process.METFilter.minMET = cms.double(30.)
 process.METFilter.METTag = cms.InputTag("patType1CorrectedPFMet")
 
 #MT filter
-process.MTFilter.minMT = cms.double(50.)
-process.MTFilter.METTag = cms.InputTag("patType1CorrectedPFMet")
+process.highMTFilter = process.MTFilter.clone()
+process.lowMTFilter = process.MTFilter.clone()
+process.lowMTFilter.passFilter = cms.bool(False)
 
 #OS filter for tau_mu W_mu charge product
 process.OSSFFilterIso = cms.EDFilter('OSSFFilter',
@@ -524,15 +531,23 @@ process.photonTriggerObjectFilter = cms.EDFilter(
 
 #sequences
 process.beginSequence = cms.Sequence(process.genPartonSelector*process.genMuSelector)
-process.isoTauAnalysisSequence = cms.Sequence(
+process.baseIsoTauAnalysisSequence = cms.Sequence(
     process.muHadIsoTauSelector*
     process.corrJetDistinctIsoTauSelector*
     process.TRIGGEROBJECTFILTER*
-    OSSFFILTERISOprocess.SSSFFilterIso*
-    process.MTFilter*
-    BTAGGINGprocess.muHadIsoTauAnalyzer
+    OSSFFILTERISOprocess.SSSFFilterIso
     )
-process.signalIsoTauAnalysisSequence = cms.Sequence(
+process.highMTIsoTauAnalysisSequence = cms.Sequence(
+    process.baseIsoTauAnalysisSequence*
+    process.highMTFilter*
+    BTAGGINGprocess.highMTMuHadIsoTauAnalyzer
+    )
+process.lowMTIsoTauAnalysisSequence = cms.Sequence(
+    process.baseIsoTauAnalysisSequence*
+    process.lowMTFilter*
+    BTAGGINGprocess.lowMTMuHadIsoTauAnalyzer
+    )
+process.baseSignalIsoTauAnalysisSequence = cms.Sequence(
     process.genWMuNuSelector*
     process.IsoMu24eta2p1Selector*
     process.WMuonPTSelector*
@@ -542,27 +557,53 @@ process.signalIsoTauAnalysisSequence = cms.Sequence(
     process.PFTau*
     process.muHadIsoTauSelector*
     process.TRIGGEROBJECTFILTER*
-    OSSFFILTERISOprocess.SSSFFilterIso*
-    process.MTFilter*
-    BTAGGINGprocess.muHadIsoTauAnalyzer
+    OSSFFILTERISOprocess.SSSFFilterIso
     )
-process.nonIsoTauAnalysisSequence = cms.Sequence(
+process.highMTSignalIsoTauAnalysisSequence = cms.Sequence(
+    process.baseSignalIsoTauAnalysisSequence*
+    process.highMTFilter*
+    BTAGGINGprocess.highMTMuHadIsoTauAnalyzer
+    )
+process.lowMTSignalIsoTauAnalysisSequence = cms.Sequence(
+    process.baseSignalIsoTauAnalysisSequence*
+    process.lowMTFilter*
+    BTAGGINGprocess.lowMTMuHadIsoTauAnalyzer
+    )
+process.baseNonIsoTauAnalysisSequence = cms.Sequence(
     process.muHadNonIsoTauSelector*
     process.corrJetDistinctNonIsoTauSelector*
     process.TRIGGEROBJECTFILTER*
-    OSSFFILTERNONISOprocess.SSSFFilterNonIso*
-    process.MTFilter*
-    BTAGGINGprocess.muHadNonIsoTauAnalyzer
+    OSSFFILTERNONISOprocess.SSSFFilterNonIso
     )
-process.tauAnalysisSequence = cms.Sequence(
+process.highMTNonIsoTauAnalysisSequence = cms.Sequence(
+    process.baseNonIsoTauAnalysisSequence*
+    process.highMTFilter*
+    BTAGGINGprocess.highMTMuHadNonIsoTauAnalyzer
+    )
+process.lowMTNonIsoTauAnalysisSequence = cms.Sequence(
+    process.baseNonIsoTauAnalysisSequence*
+    process.lowMTFilter*
+    BTAGGINGprocess.lowMTMuHadNonIsoTauAnalyzer
+    )
+process.baseTauAnalysisSequence = cms.Sequence(
     process.muHadTauSelector*
     process.corrJetDistinctTauSelector*
     process.TRIGGEROBJECTFILTER*
-    OSSFFILTERprocess.SSSFFilter*
-    process.MTFilter*
-    BTAGGINGprocess.muHadTauAnalyzer
+    OSSFFILTERprocess.SSSFFilter
+    )
+process.highMTTauAnalysisSequence = cms.Sequence(
+    process.baseTauAnalysisSequence*
+    process.highMTFilter*
+    BTAGGINGprocess.highMTMuHadTauAnalyzer
+    )
+process.lowMTTauAnalysisSequence = cms.Sequence(
+    process.baseTauAnalysisSequence*
+    process.lowMTFilter*
+    BTAGGINGprocess.lowMTMuHadTauAnalyzer
     )
 
 #path
-process.p = cms.Path(SEQUENCE)
+process.highMT = cms.Path(HIGHMTSEQUENCE)
+process.lowMT = cms.Path(LOWMTSEQUENCE)
+process.schedule = cms.Schedule(process.highMT,process.lowMT)
 ## process.e = cms.EndPath(process.output)

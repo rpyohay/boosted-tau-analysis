@@ -37,8 +37,9 @@ METFilter = cms.EDFilter(
 
 MTFilter = cms.EDFilter(
     'PATMTFilter',
-    minMT = cms.double(40.),
-    METTag = cms.InputTag("pfMet"),
+    minMT = cms.double(50.),
+    passFilter = cms.bool(True),
+    METTag = cms.InputTag("patType1CorrectedPFMet"),
     muonTag = cms.InputTag("WIsoMuonSelector")
     )
 
