@@ -15,8 +15,8 @@
   string macroPath(CMSSWPathCPPString + "/src/BoostedTauAnalysis/TauAnalyzer/test/");
   gROOT->ProcessLine("#include <utility>");
   gSystem->Load((macroPath + "STLDictionary.so").c_str());
-  gROOT->LoadMacro((macroPath + "Plot.C++").c_str());
-//   gSystem->Load((macroPath + "Plot_C.so").c_str());
+//   gROOT->LoadMacro((macroPath + "Plot.C++").c_str());
+  gSystem->Load((macroPath + "Plot_C.so").c_str());
 
   //needed so vector<Color_t> and vector<Style_t> work
   vector<short> dummy;
@@ -26,6 +26,7 @@
   string unitPTTau("Reco #tau p_{T} (GeV)");
   string unitPTMu("Reco #mu p_{T} (GeV)");
   string unitEta("#eta");
+  string unitAbsEta("|#eta|");
   string unitEtaTau("Reco #tau #eta");
   string unitEtaMu("Reco #mu #eta");
   string unitDR("#DeltaR(visible gen #tau, gen #mu)");
@@ -58,16 +59,21 @@
   binLabelMap["muHadGen1Prong1Pi0RecoDecayMode"] = binLabels;
   binLabelMap["muHadGen3ProngRecoDecayMode"] = binLabels;
 
-  //map of inputs to efficiency histograms
-  map<string, pair<string, string> > effHistMap;
-  effHistMap["numeratorPT"] = make_pair(string("denominatorPT"), unitPT);
-  effHistMap["numeratorEta"] = make_pair(string("denominatorEta"), unitEta);
-  map<string, pair<string, string> > effHistMapMu;
-  effHistMapMu["numeratorPT"] = make_pair(string("denominatorPT"), unitPTMu);
-  effHistMapMu["numeratorEta"] = make_pair(string("denominatorEta"), unitEtaMu);
-  map<string, pair<string, string> > effHistMapTau;
-  effHistMapTau["numeratorPT"] = make_pair(string("denominatorPT"), unitPTTau);
-  effHistMapTau["numeratorEta"] = make_pair(string("denominatorEta"), unitEtaTau);
+  //map of inputs to 1D efficiency histograms
+  map<string, pair<string, string> > effHistMap1D;
+  effHistMap1D["numeratorPT"] = make_pair(string("denominatorPT"), unitPT);
+  effHistMap1D["numeratorEta"] = make_pair(string("denominatorEta"), unitEta);
+  map<string, pair<string, string> > effHistMap1DMu;
+  effHistMap1DMu["numeratorPT"] = make_pair(string("denominatorPT"), unitPTMu);
+  effHistMap1DMu["numeratorEta"] = make_pair(string("denominatorEta"), unitEtaMu);
+  map<string, pair<string, string> > effHistMap1DTau;
+  effHistMap1DTau["numeratorPT"] = make_pair(string("denominatorPT"), unitPTTau);
+  effHistMap1DTau["numeratorEta"] = make_pair(string("denominatorEta"), unitEtaTau);
+
+  //map of inputs to 2D efficiency histograms
+  map<pair<string, string>, pair<string, string> > effHistMap2D;
+  effHistMap2D[pair<string, string>("numeratorPTAbsEta", "denominatorPTAbsEta")] = 
+    make_pair(unitPT, unitAbsEta);
 
   //map of inputs to 1D histograms
   map<string, string> hist1DMap;
@@ -118,15 +124,25 @@
 //     plotNice(*iFile, effHistMap, binLabelMap, hist1DMap, outputFileName, "noPDF");
 //   }
 
-  //make HLT efficiency plots for Z-->tautau
+//   //make HLT efficiency plots for Z-->tautau
+//   vector<string> effInputFiles;
+//   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/testoutput_mi_had_muHLT.root");
+//   effInputFiles.
+//     push_back("../../GenMatchedRecoObjectProducer/test/all_dmf_rerun_had_muHLT.root");
+//   for (vector<string>::const_iterator iFile = effInputFiles.begin(); iFile != effInputFiles.end(); 
+//        ++iFile) {
+//     const unsigned int strLen = iFile->find(".root");
+//     const string outputFileName(iFile->substr(0, strLen) + "_final.root");
+//     plotNice(*iFile, effHistMap, binLabelMap, hist1DMap, outputFileName, "noPDF");
+//   }
+
+  //make signal b veto efficiency plots
   vector<string> effInputFiles;
-  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/testoutput_mi_had_muHLT.root");
-  effInputFiles.
-    push_back("../../GenMatchedRecoObjectProducer/test/all_dmf_rerun_had_muHLT.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v0/b_veto_eff_Wh1_a9.root");
   for (vector<string>::const_iterator iFile = effInputFiles.begin(); iFile != effInputFiles.end(); 
        ++iFile) {
     const unsigned int strLen = iFile->find(".root");
     const string outputFileName(iFile->substr(0, strLen) + "_final.root");
-    plotNice(*iFile, effHistMap, binLabelMap, hist1DMap, outputFileName, "noPDF");
+    plotNice(*iFile, effHistMap1D, effHistMap2D, binLabelMap, hist1DMap, outputFileName, "noPDF");
   }
 }

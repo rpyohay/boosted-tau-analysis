@@ -446,7 +446,7 @@ process.METFilter.minMET = cms.double(30.)
 process.METFilter.METTag = cms.InputTag("patType1CorrectedPFMet")
 
 #MT filter
-process.MTFilter.minMT = cms.double(0.)
+process.MTFilter.minMT = cms.double(50.)
 process.MTFilter.METTag = cms.InputTag("patType1CorrectedPFMet")
 
 #b-tag filter

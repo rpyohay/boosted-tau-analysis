@@ -2,7 +2,7 @@
 
 if [ $# -ne 2 ]
     then
-    echo "Usage: ./generateWh1SkimCfgs.sh <version> <template cfg>"
+    echo "Usage: ./generateggSkimCfgs.sh <version> <template cfg>"
     exit 0
 fi
 
@@ -21,7 +21,7 @@ iEnd=`expr $nSamples - 1`
 ####VECTORS OF QUANTITIES FOR EACH SAMPLE####
 
 #samples
-samples=( "Wh1_a5" "Wh1_a7" "Wh1_a9" "Wh1_a11" "Wh1_a13" "Wh1_a15" )
+samples=( "gg_a5" "gg_a7" "gg_a9" "gg_a11" "gg_a13" "gg_a15" )
 
 #a1 masses
 masses=( "a5" "a7" "a9" "a11" "a13" "a15" )
@@ -37,22 +37,22 @@ for i in `seq $iBeg $iEnd`
   do
 
     #generate cfg file
-  if [ ${samples[${i}]} = "Wh1_a5" ]
+  if [ ${samples[${i}]} = "gg_a5" ]
       then
       sed -e "s%    'root.*_150\.root',%%" -e "s%    'root.*_368\.root',%%" -e "s%    'root.*_41\.root',%%" -e "s%    'root.*_487\.root',%%" -e "s%    'root.*_[5-9][0-9][1-9]\.root'.*%%" -e "s%    'root.*_[5-9][1-9][0-9]\.root'.*%%" -e "s%    'root.*_[6-9][0-9][0-9]\.root'.*%%" -e "s%    'root.*_1000\.root'.*%%" -e "s%a9%${masses[${i}]}%g" -e "s%SAMPLE%${samples[${i}]}%" -e "s%VERSION%${version}%g" ../${templateCfg} > tauSelectionSkim_${samples[${i}]}.py
-  elif [ ${samples[${i}]} = "Wh1_a7" ]
+  elif [ ${samples[${i}]} = "gg_a7" ]
       then
       sed -e "s%    'root.*_324\.root',%%" -e "s%a9%${masses[${i}]}%g" -e "s%SAMPLE%${samples[${i}]}%" -e "s%VERSION%${version}%g" -e "s%user\/yohay%group/phys_higgs%" ../${templateCfg} > tauSelectionSkim_${samples[${i}]}.py
-  elif [ ${samples[${i}]} = "Wh1_a9" ]
+  elif [ ${samples[${i}]} = "gg_a9" ]
       then
       sed -e "s%SAMPLE%${samples[${i}]}%" -e "s%VERSION%${version}%g" ../${templateCfg} > tauSelectionSkim_${samples[${i}]}.py
-  elif [ ${samples[${i}]} = "Wh1_a11" ]
+  elif [ ${samples[${i}]} = "gg_a11" ]
       then
       sed -e "s%    'root.*_18\.root',%%" -e "s%    'root.*_125\.root',%%" -e "s%    'root.*_235\.root',%%" -e "s%    'root.*_359\.root',%%" -e "s%    'root.*_373\.root'.*%%" -e "s%    'root.*_436\.root'.*%%" -e "s%    'root.*_529\.root'.*%%" -e "s%a9%${masses[${i}]}%g" -e "s%SAMPLE%${samples[${i}]}%" -e "s%VERSION%${version}%g" -e "s%user\/yohay%group/phys_higgs%" ../${templateCfg} > tauSelectionSkim_${samples[${i}]}.py
-  elif [ ${samples[${i}]} = "Wh1_a13" ]
+  elif [ ${samples[${i}]} = "gg_a13" ]
       then
       sed -e "s%    'root.*_914\.root',%%" -e "s%a9%${masses[${i}]}%g" -e "s%SAMPLE%${samples[${i}]}%" -e "s%VERSION%${version}%g" ../${templateCfg} > tauSelectionSkim_${samples[${i}]}.py
-  elif [ ${samples[${i}]} = "Wh1_a15" ]
+  elif [ ${samples[${i}]} = "gg_a15" ]
       then
       sed -e "s%    'root.*_661\.root',%%" -e "s%    'root.*_761\.root',%%" -e "s%a9%${masses[${i}]}%g" -e "s%SAMPLE%${samples[${i}]}%" -e "s%VERSION%${version}%g" ../${templateCfg} > tauSelectionSkim_${samples[${i}]}.py
   else
@@ -61,10 +61,10 @@ for i in `seq $iBeg $iEnd`
 done
 
 #generate run cfg that runs all skim files in the directory
-cat <<EOF > runWh1SkimCfgs.sh
+cat <<EOF > runggSkimCfgs.sh
 #!/bin/bash
 
-for file in \`ls -alh *Wh1*.py | awk '{ print \$9 }'\`
+for file in \`ls -alh *gg*.py | awk '{ print \$9 }'\`
   do
   outFile=\`echo \$file | sed -e "s%\.py%.txt%"\`
   cmsRun \$file >& \$outFile &
@@ -72,6 +72,6 @@ done
 
 exit 0
 EOF
-chmod a+x runWh1SkimCfgs.sh
+chmod a+x runggSkimCfgs.sh
 
 exit 0

@@ -9,6 +9,8 @@
 #pragma link C++ function pair<string, string>::operator=(const pair<string, string>&);
 #pragma link C++ class map<string, string>+;
 #pragma link C++ class map<string, pair<string, string> >+;
+#pragma link C++ class map<pair<string, string>, pair<string, string> >+;
+#pragma link C++ function map<pair<string, string>, pair<string, string> >::operator[](const pair<string, string>&);
 #pragma link C++ class map<string, vector<string> >+;
 #pragma link C++ function std::reverse(vector<string>::iterator, vector<string>::iterator);
 #pragma link C++ class pair<short, short>+;

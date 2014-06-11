@@ -3298,6 +3298,7 @@ void TauAnalyzer::endJob()
   TCanvas muHad_t3t1VsptmjCanvas("muHad_t3t1VsptmjCanvas", "", 600, 600);
   TCanvas muHad_t3t1VsDecayModeCanvas("muHad_t3t1VsDecayModeCanvas", "", 600, 600);
   //  TCanvas dRWMuTriggerObjectCanvas("dRWMuTriggerObjectCanvas", "", 600, 600);
+  TCanvas mistagEffVsPTAndEtaCanvas("mistagEffVsPTAndEtaCanvas", "", 600, 600);
 
   //format and draw 1D plots
   Common::draw1DHistograms(METCanvas, MET_);
@@ -3443,6 +3444,9 @@ void TauAnalyzer::endJob()
 			   tauHadJetEnergyFractionVsTauHadIso_);
   Common::draw2DHistograms(tauHadCleanedJetEnergyFractionVsTauHadIsoCanvas, 
 			   tauHadCleanedJetEnergyFractionVsTauHadIso_);
+  if (mistagEffVsPTAndEta_ != NULL) {
+    Common::draw2DHistograms(mistagEffVsPTAndEtaCanvas, mistagEffVsPTAndEta_);
+  }
 
   //set custom options
 
@@ -3577,6 +3581,7 @@ void TauAnalyzer::endJob()
   muHad_t3t1VsptmjCanvas.Write();
   muHad_t3t1VsDecayModeCanvas.Write();
   //  dRWMuTriggerObjectCanvas.Write();
+  mistagEffVsPTAndEtaCanvas.Write();
   out_->Write();
   out_->Close();
 
@@ -3618,6 +3623,8 @@ void TauAnalyzer::fillDescriptions(edm::ConfigurationDescriptions& descriptions)
 
 void TauAnalyzer::fillMistagEffPlot()
 {
+  mistagEffVsPTAndEta_ = 
+    new TH2F("mistagEffVsPTAndEta", ";p_{T} (GeV);|#eta|", 20, 0.0, 200.0, 3, 0.0, 2.4);
   if (sample_ == "Wh1_a5") {
   }
   else if (sample_ == "Wh1_a7") {
@@ -4162,6 +4169,8 @@ void TauAnalyzer::reset(const bool doDelete)
   jet_mass_etacut = NULL;
   if (doDelete && (jet_ptmj_etacut != NULL)) delete jet_ptmj_etacut;
   jet_ptmj_etacut = NULL;
+  if (doDelete && (mistagEffVsPTAndEta_ != NULL)) delete mistagEffVsPTAndEta_;
+  mistagEffVsPTAndEta_ = NULL;
 }
 
 //define this as a plug-in

@@ -1381,7 +1381,7 @@ process.tauMuonSelector = cms.EDFilter('CustomMuonSelector',
 process.CleanJets.muonSrc = cms.InputTag('tauMuonSelector')
 process.CleanJets.PFCandSrc = cms.InputTag('particleFlow')
 process.CleanJets.cutOnGenMatches = cms.bool(False)
-process.CleanJets.outFileName = cms.string('NMSSMSignal_MuProperties.root')
+process.CleanJets.outFileName = cms.string('NMSSMSignal_MuProperties_SAMPLE_VERSION.root')
 process.recoTauAK5PFJets08Region.src = cms.InputTag("CleanJets", "ak5PFJetsNoMu", "SKIM")
 process.ak5PFJetsRecoTauPiZeros.jetSrc = cms.InputTag("CleanJets", "ak5PFJetsNoMu", "SKIM")
 process.combinatoricRecoTaus.jetSrc = cms.InputTag("CleanJets", "ak5PFJetsNoMu", "SKIM")
@@ -1474,14 +1474,16 @@ process.selectedOutput = cms.OutputModule(
     "PoolOutputModule",
     SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring('p')),
     outputCommands = skimEventContent.outputCommands,
-    fileName = cms.untracked.string('/data1/' + USER + '/gg/EDM_files/data_selected.root')
+    fileName = cms.untracked.string(
+        '/data1/' + USER + '/gg/EDM_files/data_selected_a9_VERSION.root'
+        )
     )
 process.antiSelectedOutput = cms.OutputModule(
     "PoolOutputModule",
     SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring('p')),
     outputCommands = skimEventContent.outputCommands,
     fileName = cms.untracked.string(
-    '/data1/' + USER + '/gg/EDM_files/data_anti-selected.root'
+    '/data1/' + USER + '/gg/EDM_files/data_anti-selected_a9_VERSION.root'
     )
     )
 process.noSelectedOutput = cms.OutputModule(
@@ -1489,7 +1491,7 @@ process.noSelectedOutput = cms.OutputModule(
     SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring('p')),
     outputCommands = skimEventContent.outputCommands,
     fileName = cms.untracked.string(
-    '/data1/' + USER + '/gg/EDM_files/data_no_selection.root'
+    '/data1/' + USER + '/gg/EDM_files/data_no_selection_a9_VERSION.root'
     )
     )
 
