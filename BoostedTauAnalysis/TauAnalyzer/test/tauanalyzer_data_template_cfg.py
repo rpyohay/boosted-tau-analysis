@@ -540,7 +540,6 @@ process.photonTriggerObjectFilter = cms.EDFilter(
 #sequences
 process.beginSequence = cms.Sequence(process.genPartonSelector*process.genMuSelector)
 process.isoTauAnalysisSequence = cms.Sequence(
-    process.PF2PAT*
     process.muHadIsoTauSelector*
     process.corrJetDistinctIsoTauSelector*
     process.TRIGGEROBJECTFILTER*
