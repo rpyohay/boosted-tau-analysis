@@ -195,7 +195,7 @@ process.genTauMuMatchedRecoTauBVetoSelector = cms.EDFilter(
     jetMuonMapTag = cms.InputTag('CleanJets'),
     bTagInfoTag = cms.InputTag('combinedSecondaryVertexBJetTags'),
     CSVMax = cms.double(0.679),
-    passFilter = cms.bool(True),
+    passFilter = cms.bool(False),
     minNumObjsToPassFilter = cms.uint32(0)
     )
 
