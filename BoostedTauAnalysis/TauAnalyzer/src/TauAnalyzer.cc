@@ -308,6 +308,9 @@ private:
   //histogram of mu+had mass
   TH1F* muHadMass_;
 
+  //histogram of mu+had mass for shape error calculation
+  TH1F* muHadMassFinalSel_;
+
   //histogram of mu+had mass for 1-prong taus
   TH1F* muHadMass1Prong_;
 
@@ -1720,7 +1723,7 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     //impose pT and decay mode cut on tau
     if (((*iTau)->pt() > tauPTMin_) && 
 	((tauDecayMode_ == reco::PFTau::kNull) || ((*iTau)->decayMode() == tauDecayMode_)) && 
-	(b_discriminant < CSVMax_)) {
+	(fabs(tauOldJetRef->eta()) < 2.4)) {
 
       //plot the number of good vertices
       nGoodVtx_->Fill(Common::numGoodVertices(pVtx)/*trueNInt*/, PUWeight);
@@ -1749,7 +1752,11 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       hadTauAssociatedMuMultiplicity_->Fill(removedMuons.size(), PUWeight);
 
       //plot the mu + tau invariant mass for the highest pT muon
-      muHadMass_->Fill(muHadMass, PUWeight*tauHadPTWeight);
+      muHadMass_->Fill(muHadMass, PUWeight);
+
+     //plot the mu + tau invariant mass for the highest pT muon
+      if (muHadMass >= 4.)
+	muHadMassFinalSel_->Fill(muHadMass, PUWeight);
 
       //plot the mu + 1-prong tau invariant mass for the highest pT muon
       if ((*iTau)->decayMode() == reco::PFTau::kOneProng0PiZero) {
@@ -2703,6 +2710,8 @@ void TauAnalyzer::beginJob()
     new TH1F("hadTauAssociatedMuMultiplicity", ";N_{#mu}/#tau;", 2, 0.5, 2.5);
   muHadMass_ = 
     new TH1F("muHadMass", ";m_{#mu+had} (GeV);", muHadMassBins_.size() - 1, &muHadMassBins_[0]);
+  muHadMassFinalSel_ = 
+    new TH1F("muHadMassFinalSel", ";m_{#mu+had} (GeV);", 1, 4., 21.);
   muHadMass1Prong_ = new TH1F("muHadMass1Prong", ";m_{#mu+had} (GeV);", 
 			      muHadMassBins_.size() - 1, &muHadMassBins_[0]);
   muHadMass1Prong1Pi0_ = new TH1F("muHadMass1Prong1Pi0", ";m_{#mu+had} (GeV);", 
@@ -3010,6 +3019,7 @@ void TauAnalyzer::beginJob()
   MET_->Sumw2();
   hadTauAssociatedMuMultiplicity_->Sumw2();
   muHadMass_->Sumw2();
+  muHadMassFinalSel_->Sumw2();
   muHadMass1Prong_->Sumw2();
   muHadMass1Prong1Pi0_->Sumw2();
   muHadMass1Prong2Pi0_->Sumw2();
@@ -3156,6 +3166,7 @@ void TauAnalyzer::endJob()
   TCanvas hadTauAssociatedMuMultiplicityCanvas("hadTauAssociatedMuMultiplicityCanvas", "", 
 					       600, 600);
   TCanvas muHadMassCanvas("muHadMassCanvas", "", 600, 600);
+  TCanvas muHadMassFinalSelCanvas("muHadMassFinalSelCanvas", "", 600, 600);
   TCanvas muHadMass1ProngCanvas("muHadMass1ProngCanvas", "", 600, 600);
   TCanvas muHadMass1Prong1Pi0Canvas("muHadMass1Prong1Pi0Canvas", "", 600, 600);
   TCanvas muHadMass1Prong2Pi0Canvas("muHadMass1Prong2Pi0Canvas", "", 600, 600);
@@ -3304,6 +3315,7 @@ void TauAnalyzer::endJob()
   Common::draw1DHistograms(METCanvas, MET_);
   Common::draw1DHistograms(hadTauAssociatedMuMultiplicityCanvas, hadTauAssociatedMuMultiplicity_);
   Common::draw1DHistograms(muHadMassCanvas, muHadMass_);
+  Common::draw1DHistograms(muHadMassFinalSelCanvas, muHadMassFinalSel_);
   Common::draw1DHistograms(muHadMass1ProngCanvas, muHadMass1Prong_);
   Common::draw1DHistograms(muHadMass1Prong1Pi0Canvas, muHadMass1Prong1Pi0_);
   Common::draw1DHistograms(muHadMass1Prong2Pi0Canvas, muHadMass1Prong2Pi0_);
@@ -3455,6 +3467,7 @@ void TauAnalyzer::endJob()
   METCanvas.Write();
   hadTauAssociatedMuMultiplicityCanvas.Write();
   muHadMassCanvas.Write();
+  muHadMassFinalSelCanvas.Write();
   muHadMass1ProngCanvas.Write();
   muHadMass1Prong1Pi0Canvas.Write();
   muHadMass1Prong2Pi0Canvas.Write();

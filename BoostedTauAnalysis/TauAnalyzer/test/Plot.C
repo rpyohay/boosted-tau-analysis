@@ -1454,6 +1454,65 @@ void makeMCClosurePlots(const string& sigVsBkgIsoFileName, const vector<string>&
   bkgNonIsoStream.Close();
 }
 
+void QCDVsMCClosurePlots(const vector<string>& QCDVsMCInputFileNames, const string& var, 
+			 const string& units, 
+			 const int normRegionLowerBin, 
+			 const int normRegionUpperBin, const string& outputFileName)
+{
+
+  TFile outStream(outputFileName.c_str(), "RECREATE");
+  vector<TFile*> inputStreams;
+  vector<TCanvas*> outputCanvases;
+  vector<TH1F*> hists(2);
+  string canvasName(var + "Canvas");
+
+  for (vector<string>::const_iterator iInputFile = QCDVsMCInputFileNames.begin(); 
+       iInputFile != QCDVsMCInputFileNames.end(); ++iInputFile) { // loop over input files
+    const unsigned int fileIndex = iInputFile - QCDVsMCInputFileNames.begin();
+    inputStreams.push_back(new TFile(iInputFile->c_str()));
+    TCanvas* pCanvas;
+    inputStreams[inputStreams.size() - 1]->GetObject(canvasName.c_str(), pCanvas);
+    cout << "QCDVSMC pCanvas: " << pCanvas << endl;
+    TH1F* pHist = (TH1F*)pCanvas->GetPrimitive(var.c_str());
+    cout << "QCDVsMC pHist: " << pHist << endl;
+    if (fileIndex == 0)
+      { // if this is the QCD file
+	hists[0] = (TH1F*)pHist->Clone();
+      } // if this is the QCD file
+    else if (fileIndex == 1)
+      { // if this is the first MC bkg file
+	hists[1] = (TH1F*)pHist->Clone();
+      } // if this is the first MC bkg file
+    else
+      { // if this is another MC bkg file
+	hists[1]->Add(pHist,1.);
+      } // if this is another MC bkg file
+    
+  } // loop over input files
+
+  hists[0]->SetLineColor(4); // blue for QCD
+  hists[1]->SetLineColor(2); // red for bkg
+  //  hists[0]->Scale(hists[1]->Integral(normRegionLowerBin,normRegionUpperBin)/hists[0]->Integral(normRegionLowerBin,normRegionUpperBin));
+  hists[0]->Scale(1./hists[0]->Integral());
+  hists[1]->Scale(1./hists[1]->Integral());
+  hists[1]->GetXaxis()->SetTitle(units.c_str());
+
+  TLegend *leg = new TLegend(0.35, 0.55, 0.75, 0.75, "");
+  leg->AddEntry(hists[0], "QCD (data-driven)", "lp");
+  leg->AddEntry(hists[1], "EWK+TOP+DY (MC)", "lp");
+
+  //write to file
+  outStream.cd();
+  TCanvas outCanvas(canvasName.c_str(), "", 600, 600);
+  hists[0]->Draw("HISTE");
+  hists[1]->Draw("HISTESAME");
+  leg->Draw();
+  outCanvas.Write();
+  outStream.Write();
+  outStream.Close();
+}
+
+  
 //structs defining the draw options for each sample
 struct drawOptions {
   string sampleName;

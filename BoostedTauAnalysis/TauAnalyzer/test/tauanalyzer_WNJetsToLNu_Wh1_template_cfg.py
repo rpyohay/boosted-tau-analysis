@@ -476,6 +476,21 @@ process.METFilter.METTag = cms.InputTag("patType1CorrectedPFMet")
 process.MTFilter.minMT = cms.double(50.)
 process.MTFilter.METTag = cms.InputTag("patType1CorrectedPFMet")
 
+#b-tag filter
+process.IsoBVetoFilter = cms.EDFilter('BVetoFilter',
+                                      tauTag = cms.InputTag('muHadIsoTauSelector'),
+                                      oldJetTag = cms.InputTag('ak5PFJets'),
+                                      jetMuonMapTag = cms.InputTag('CleanJets', '', 'SKIM'),
+                                      bTagInfoTag = cms.InputTag('combinedSecondaryVertexBJetTags'),
+                                      CSVMax = cms.double(0.679),
+                                      passFilter = cms.bool(True),
+                                      minNumObjsToPassFilter = cms.uint32(1)
+    )
+process.NonIsoBVetoFilter = process.IsoBVetoFilter.clone()
+process.NonIsoBVetoFilter.tauTag = cms.InputTag('muHadNonIsoTauSelector')
+process.AllBVetoFilter = process.IsoBVetoFilter.clone()
+process.AllBVetoFilter.tauTag = cms.InputTag('muHadTauSelector')
+
 #OS filter for tau_mu W_mu charge product
 process.OSSFFilterIso = cms.EDFilter('OSSFFilter',
                                   WMuonTag = cms.InputTag('WIsoMuonSelector'),
@@ -545,6 +560,7 @@ process.isoTauAnalysisSequence = cms.Sequence(
     process.OSSFFilterIso*
     process.SSSFFilterIso*
     process.MTFilter*
+    process.IsoBVetoFilter*
     process.muHadIsoTauAnalyzer
     )
 process.signalIsoTauAnalysisSequence = cms.Sequence(
@@ -560,7 +576,7 @@ process.signalIsoTauAnalysisSequence = cms.Sequence(
     process.OSSFFilterIso*
     process.SSSFFilterIso*
     process.MTFilter*
-    process.btagging*
+    process.IsoBVetoFilter*
     process.muHadIsoTauAnalyzer
     )
 process.nonIsoTauAnalysisSequence = cms.Sequence(
@@ -570,6 +586,7 @@ process.nonIsoTauAnalysisSequence = cms.Sequence(
     process.OSSFFilterNonIso*
     process.SSSFFilterNonIso*
     process.MTFilter*
+    process.NonIsoBVetoFilter*
     process.muHadNonIsoTauAnalyzer
     )
 process.tauAnalysisSequence = cms.Sequence(
@@ -579,6 +596,7 @@ process.tauAnalysisSequence = cms.Sequence(
     process.OSSFFilter*
     process.SSSFFilter*
     process.MTFilter*
+    process.AllBVetoFilter*
     process.muHadTauAnalyzer
     )
 
