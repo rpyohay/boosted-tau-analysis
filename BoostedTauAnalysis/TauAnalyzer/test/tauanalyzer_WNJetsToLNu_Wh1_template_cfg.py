@@ -483,6 +483,21 @@ process.highMTFilter = process.MTFilter.clone()
 process.lowMTFilter = process.MTFilter.clone()
 process.lowMTFilter.passFilter = cms.bool(False)
 
+#b-tag filter
+process.IsoBVetoFilter = cms.EDFilter('BVetoFilter',
+                                      tauTag = cms.InputTag('muHadIsoTauSelector'),
+                                      oldJetTag = cms.InputTag('ak5PFJets'),
+                                      jetMuonMapTag = cms.InputTag('CleanJets', '', 'SKIM'),
+                                      bTagInfoTag = cms.InputTag('combinedSecondaryVertexBJetTags'),
+                                      CSVMax = cms.double(0.679),
+                                      passFilter = cms.bool(True),
+                                      minNumObjsToPassFilter = cms.uint32(1)
+    )
+process.NonIsoBVetoFilter = process.IsoBVetoFilter.clone()
+process.NonIsoBVetoFilter.tauTag = cms.InputTag('muHadNonIsoTauSelector')
+process.AllBVetoFilter = process.IsoBVetoFilter.clone()
+process.AllBVetoFilter.tauTag = cms.InputTag('muHadTauSelector')
+
 #OS filter for tau_mu W_mu charge product
 process.OSSFFilterIso = cms.EDFilter('OSSFFilter',
                                   WMuonTag = cms.InputTag('WIsoMuonSelector'),
@@ -549,7 +564,8 @@ process.baseIsoTauAnalysisSequence = cms.Sequence(
     process.corrJetDistinctIsoTauSelector*
     process.muonTriggerObjectFilter*
     process.OSSFFilterIso*
-    process.SSSFFilterIso
+    process.SSSFFilterIso*
+    process.IsoBVetoFilter
     )
 process.highMTIsoTauAnalysisSequence = cms.Sequence(
     process.baseIsoTauAnalysisSequence*
@@ -572,7 +588,8 @@ process.baseSignalIsoTauAnalysisSequence = cms.Sequence(
     process.muHadIsoTauSelector*
     process.muonTriggerObjectFilter*
     process.OSSFFilterIso*
-    process.SSSFFilterIso
+    process.SSSFFilterIso*
+    process.IsoBVetoFilter
     )
 process.highMTSignalIsoTauAnalysisSequence = cms.Sequence(
     process.baseSignalIsoTauAnalysisSequence*
@@ -589,7 +606,8 @@ process.baseNonIsoTauAnalysisSequence = cms.Sequence(
     process.corrJetDistinctNonIsoTauSelector*
     process.muonTriggerObjectFilter*
     process.OSSFFilterNonIso*
-    process.SSSFFilterNonIso
+    process.SSSFFilterNonIso*
+    process.NonIsoBVetoFilter
     )
 process.highMTNonIsoTauAnalysisSequence = cms.Sequence(
     process.baseNonIsoTauAnalysisSequence*
@@ -606,7 +624,8 @@ process.baseTauAnalysisSequence = cms.Sequence(
     process.corrJetDistinctTauSelector*
     process.muonTriggerObjectFilter*
     process.OSSFFilter*
-    process.SSSFFilter
+    process.SSSFFilter*
+    process.AllBVetoFilter
     )
 process.highMTTauAnalysisSequence = cms.Sequence(
     process.baseTauAnalysisSequence*
