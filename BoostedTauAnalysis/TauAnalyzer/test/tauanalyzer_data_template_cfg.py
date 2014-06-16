@@ -449,7 +449,7 @@ process.output = cms.OutputModule(
 
 #MET filter
 process.METFilter.minMET = cms.double(30.)
-process.METFilter.METTag = cms.InputTag("patType1CorrectedPFMet")
+process.METFilter.METTag = cms.InputTag("patType1CorrectedPFMetPFlow")
 
 #MT filter
 process.highMTFilter = process.MTFilter.clone()
