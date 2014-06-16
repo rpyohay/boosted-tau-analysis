@@ -310,8 +310,8 @@ process.muHadIsoTauSelector = cms.EDFilter(
     muonRemovalDecisionTag = cms.InputTag('CleanJets', '', 'SKIM'),
     overlapCandTag = cms.InputTag('WIsoMuonSelector'),
     passDiscriminator = cms.bool(True),
-    pTMin = cms.double(20.0),
-    etaMax = cms.double(2.3),
+    pTMin = cms.double(10.0),
+    etaMax = cms.double(2.4),
     isoMax = cms.double(-1.0),
     dR = cms.double(0.5),
     minNumObjsToPassFilter = cms.uint32(1)
@@ -479,15 +479,17 @@ process.MTFilter.METTag = cms.InputTag("patType1CorrectedPFMet")
 #b-tag filter
 process.IsoBVetoFilter = cms.EDFilter('BVetoFilter',
                                       tauTag = cms.InputTag('muHadIsoTauSelector'),
-                                      tauJetTag = cms.InputTag('ak5PFJets'),
-                                      jetMuonMaPTag = cms.InputTag('CleanJets', '', 'SKIM'),
-                                      bJetTag = cms.InputTag('combinedSecondaryVertexBJetTags'),
-                                      bTagMax = cms.double(0.679)
+                                      oldJetTag = cms.InputTag('ak5PFJets'),
+                                      jetMuonMapTag = cms.InputTag('CleanJets', '', 'SKIM'),
+                                      bTagInfoTag = cms.InputTag('combinedSecondaryVertexBJetTags'),
+                                      CSVMax = cms.double(0.679),
+                                      passFilter = cms.bool(True),
+                                      minNumObjsToPassFilter = cms.uint32(1)
     )
 process.NonIsoBVetoFilter = process.IsoBVetoFilter.clone()
 process.NonIsoBVetoFilter.tauTag = cms.InputTag('muHadNonIsoTauSelector')
-process.BVetoFilter = process.IsoBVetoFilter.clone()
-process.BVetoFilter.tauTag = cms.InputTag('muHadTauSelector')
+process.AllBVetoFilter = process.IsoBVetoFilter.clone()
+process.AllBVetoFilter.tauTag = cms.InputTag('muHadTauSelector')
 
 #OS filter for tau_mu W_mu charge product
 process.OSSFFilterIso = cms.EDFilter('OSSFFilter',
@@ -594,7 +596,7 @@ process.tauAnalysisSequence = cms.Sequence(
     process.OSSFFilter*
     process.SSSFFilter*
     process.MTFilter*
-    process.BVetoFilter*
+    process.AllBVetoFilter*
     process.muHadTauAnalyzer
     )
 

@@ -103,7 +103,7 @@ from PhysicsTools.PatAlgos.tools.metTools import *
 postfix = "PFlow" 
 jetAlgo="AK5"
 #addPfMET(process, postfixLabel=postfix)
-usePF2PAT(process,runPF2PAT=True,jetAlgo=jetAlgo,runOnMC=False,postfix=postfix,jetCorrections=('AK5PF',['L1FastJet','L2L3Residual']),typeIMetCorrections=True,outputModules=[])
+usePF2PAT(process,runPF2PAT=True,jetAlgo=jetAlgo,runOnMC=False,postfix=postfix,jetCorrections=('AK5PF',['L1FastJet','L2Relative','L3Absolute','L2L3Residual']),typeIMetCorrections=True,outputModules=[])
 
 # to use tau-cleaned jet collection uncomment the following: 
 #getattr(process,"pfNoTau"+postfix).enable = True
@@ -207,7 +207,7 @@ skimEventContent = cms.PSet(
     "drop *_trackCountingHigh*BJetTags_*_SKIM",
     "drop CorrMETData_*_*_SKIM",
     "drop *_*NoNu_*_*",
-    "drop *_*PFlow_*_*",
+#    "drop *_*PFlow_*_*",
     "drop *_softElectronCands_*_*",
     "drop *_*_caloTowers_*",
     "drop *_shiftedPat*_*_*",
@@ -333,7 +333,7 @@ process.WIsoMuonSelector = cms.EDFilter('CustomMuonSelector',
                                         detectorIsoMax = cms.double(-1.0),
                                         PUSubtractionCoeff = cms.double(0.5),
                                         usePFIso = cms.bool(True),
-                                        passIso = cms.bool(False),
+                                        passIso = cms.bool(True),
                                         etaMax = cms.double(2.1),
                                         minNumObjsToPassFilter = cms.uint32(1)
                                         )
