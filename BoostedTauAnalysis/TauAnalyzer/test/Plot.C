@@ -1687,77 +1687,26 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
   Double_t norm = isoData->Integral(normRegionLowerBin, normRegionUpperBin)/
     nonIsoData->Integral(normRegionLowerBin, normRegionUpperBin);
 
-//   //debug
-//   cerr << "Norm bin 1\n";
-//   cerr << "----------\n";
-//   cerr << "NIso = " << isoData->GetBinContent(1) << ", errIso = " << isoData->GetBinError(1);
-//   cerr << "\n";
-//   cerr << "NNonIso = " << nonIsoData->GetBinContent(1) << ", errNonIso = ";
-//   cerr << nonIsoData->GetBinError(1) << "\n";
-//   cerr << "reweight error squared = ";
-//   cerr << nonIsoDataReweightErrSq->GetBinError(1)*nonIsoDataReweightErrSq->GetBinError(1) << endl;
-//   cerr << endl;
-//   cerr << "Norm bin 2\n";
-//   cerr << "----------\n";
-//   cerr << "NIso = " << isoData->GetBinContent(2) << ", errIso = " << isoData->GetBinError(2);
-//   cerr << "\n";
-//   cerr << "NNonIso = " << nonIsoData->GetBinContent(2) << ", errNonIso = ";
-//   cerr << nonIsoData->GetBinError(2) << "\n";
-//   cerr << "reweight error squared = ";
-//   cerr << nonIsoDataReweightErrSq->GetBinError(2)*nonIsoDataReweightErrSq->GetBinError(2) << endl;
-//   cerr << endl;
-//   cerr << "Search bin 1\n";
-//   cerr << "----------\n";
-//   cerr << "NIso = " << isoData->GetBinContent(5) << ", errIso = " << isoData->GetBinError(5);
-//   cerr << "\n";
-//   cerr << "NNonIso = " << nonIsoData->GetBinContent(5) << ", errNonIso = ";
-//   cerr << nonIsoData->GetBinError(5) << "\n";
-//   cerr << "reweight error squared = ";
-//   cerr << nonIsoDataReweightErrSq->GetBinError(5)*nonIsoDataReweightErrSq->GetBinError(5) << endl;
-//   cerr << endl;
-//   cerr << "norm = " << norm << endl << endl;
-
   /*calculate the statistical error on the background prediction from the non-isolated data, 
     including the term from the error on the normalization factor*/
   const TH1* nonIsoDataPtrCast = dynamic_cast<const TH1*>(nonIsoData);
   const TH1* nonIsoDataReweightErrSqPtrCast = dynamic_cast<const TH1*>(nonIsoDataReweightErrSq);
   vector<Double_t> nonIsoDataStatErrSq;
   for (Int_t iBin = 1; iBin <= nonIsoData->GetNbinsX(); ++iBin) {
-//     const Double_t theNormErrSq = normErrSq(dynamic_cast<const TH1*>(isoData), nonIsoDataPtrCast, 
-// 					    nonIsoDataReweightErrSqPtrCast, normRegionLowerBin, 
-// 					    normRegionUpperBin, norm);
-//     nonIsoDataStatErrSq.
-//       push_back(bkgErrSqFromNorm(nonIsoDataPtrCast->GetBinContent(iBin), theNormErrSq) + 
-// 		bkgErrSqFromStats(norm, nonIsoDataPtrCast->GetBinError(iBin)) + 
-// 		bkgErrSqFromReweight(norm, reweightErrSq));
     nonIsoDataStatErrSq.
       push_back(bkgErrSq(nonIsoDataPtrCast, nonIsoDataReweightErrSqPtrCast, iBin, norm, 
 			 normErrSq(dynamic_cast<const TH1*>(isoData), nonIsoDataPtrCast, 
 				   nonIsoDataReweightErrSqPtrCast, normRegionLowerBin, 
 				   normRegionUpperBin, norm)));
-    /*normerrsq = 1.150853756e-5 + 7.886904069e-9 + 6.778838651e-7 dominated by the term coming 
-      from stats. in region A data, as expected
-      normerrsq = 1.219430833e-5
-      bkgerrsq = 2.648612772 (norm) + 1.200894736 (stat) + 0.0189198162 (reweight) = 3.868427324
-      rel. error ~doubles due to reweighting and normalization (0.05-->0.09)*/
   }
-
-//   //debug
-//   cerr << endl << "nonIsoDataStatErrSq[4] = " << nonIsoDataStatErrSq[4] << endl;
 
   //normalize non-isolated data histogram to isolated data in signal-depleted region
   nonIsoData->Scale(norm);
-
-//   //debug
-//   cerr << "Search bin 1 NNonIso = " << nonIsoData->GetBinContent(5) << endl;
 
   //set statistical error in each bin of the non-isolated data histogram
   for (Int_t iBin = 1; iBin <= nonIsoData->GetNbinsX(); ++iBin) {
     nonIsoData->SetBinError(iBin, sqrt(nonIsoDataStatErrSq[iBin - 1]));
   }
-
-//   //debug
-//   cerr << "Search bin 1 errNonIso = " << nonIsoData->GetBinError(5) << endl;
 
   //write to file
   outStream.cd();
