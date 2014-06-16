@@ -21,19 +21,19 @@ fi
 ./generateDYJetsToLLTauAnalyzerCfgs.sh $version $MCTemplateCfg
 ./generateDataTauAnalyzerCfgs.sh $version $dataTemplateCfg
 ./generateTTJetsTauAnalyzerCfgs.sh $version $MCTemplateCfg
-./generateWJetsToLNuTauAnalyzerCfgs.sh $version $MCTemplateCfg
+#./generateWJetsToLNuTauAnalyzerCfgs.sh $version $MCTemplateCfg
 ./generateWNJetsToLNuTauAnalyzerCfgs.sh $version $MCTemplateCfg
-./generateWbbTauAnalyzerCfgs.sh $version $MCTemplateCfg
+#./generateWbbTauAnalyzerCfgs.sh $version $MCTemplateCfg
 ./generateSingleTopTauAnalyzerCfgs.sh $version $MCTemplateCfg
 ./generateWZTauAnalyzerCfgs.sh $version $MCTemplateCfg
 ./generateWWTauAnalyzerCfgs.sh $version $MCTemplateCfg
 ./generateZZTauAnalyzerCfgs.sh $version $MCTemplateCfg
-./generateQCDTauAnalyzerCfgs.sh $version $MCTemplateCfg
-./generateQCDBTauAnalyzerCfgs.sh $version $MCTemplateCfg
-./generateQCDBMuTauAnalyzerCfgs.sh $version $MCTemplateCfg
+#./generateQCDTauAnalyzerCfgs.sh $version $MCTemplateCfg
+#./generateQCDBTauAnalyzerCfgs.sh $version $MCTemplateCfg
+#./generateQCDBMuTauAnalyzerCfgs.sh $version $MCTemplateCfg
 ./generateWh1TauAnalyzerCfg.sh $version $MCTemplateCfg
 ./generateggTauAnalyzerCfg.sh $version $MCTemplateCfg
 ./generateNonIsoWDataTauAnalyzerCfgs.sh $version $dataTemplateCfg
-./generateSinglePhotonDataTauAnalyzerCfgs.sh $version $dataTemplateCfg
+#./generateSinglePhotonDataTauAnalyzerCfgs.sh $version $dataTemplateCfg
 
 exit 0
