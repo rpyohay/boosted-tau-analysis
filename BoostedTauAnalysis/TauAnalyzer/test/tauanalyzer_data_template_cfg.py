@@ -355,7 +355,7 @@ process.muHadIsoTauAnalyzer = cms.EDAnalyzer(
     'ISOTAUANALYZEROUTFILE'
     ),
     tauTag = cms.InputTag('muHadIsoTauSelector'),
-    METTag = cms.InputTag('patType1CorrectedPFMet'),
+    METTag = cms.InputTag('patType1CorrectedPFMetPFlow'),
     MUONORPHOTONTAG,
     muonPFIsoPUSubtractionCoeff = cms.double(0.5),
     genMatchedMuonTag = cms.InputTag('WIsoMuonSelector'),
@@ -443,11 +443,11 @@ process.output = cms.OutputModule(
 
 #MET filter
 process.METFilter.minMET = cms.double(30.)
-process.METFilter.METTag = cms.InputTag("patType1CorrectedPFMet")
+process.METFilter.METTag = cms.InputTag("patType1CorrectedPFMetPFlow")
 
 #MT filter
 process.MTFilter.minMT = cms.double(50.)
-process.MTFilter.METTag = cms.InputTag("patType1CorrectedPFMet")
+process.MTFilter.METTag = cms.InputTag("patType1CorrectedPFMetPFlow")
 
 #b-tag filter
 process.IsoBVetoFilter = cms.EDFilter('BVetoFilter',
