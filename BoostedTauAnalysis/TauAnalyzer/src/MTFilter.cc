@@ -67,6 +67,7 @@ class MTFilter : public edm::EDFilter {
       // ----------member data ---------------------------
 
   double minMT_;
+  bool passFilter_;
   edm::InputTag METTag_;
   edm::InputTag muonTag_;
 
@@ -86,6 +87,7 @@ class MTFilter : public edm::EDFilter {
 template<class T>
 MTFilter<T>::MTFilter(const edm::ParameterSet& iConfig) :
   minMT_(iConfig.getParameter<double>("minMT")),
+  passFilter_(iConfig.getParameter<bool>("passFilter")),
   METTag_(iConfig.getParameter<edm::InputTag>("METTag")),
   muonTag_(iConfig.getParameter<edm::InputTag>("muonTag"))
 {
@@ -129,7 +131,7 @@ MTFilter<T>::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
   double MT = sqrt(2*WMuonRefs[WMuonRefs.size() - 1]->pt()*METRefToBase->et()*
 		   (1.0 - cos(reco::deltaPhi(WMuonRefs[WMuonRefs.size() - 1]->phi(), METRefToBase->phi()))));
 
-  if (MT > minMT_)
+  if ((passFilter_ && (MT > minMT_)) || (!passFilter_ && (MT <= minMT_)))
     return true;
   else
     return false;

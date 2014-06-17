@@ -179,6 +179,7 @@ skimEventContent = cms.PSet(
     "drop CorrMETData_*_*_SKIM",
     "drop *_*NoNu_*_*",
     "drop *_*PFlow_*_*",
+    "keep *_patType1CorrectedPFMetPFlow_*_*",
     "drop *_softElectronCands_*_*",
     "drop *_*_caloTowers_*",
     "drop *_shiftedPat*_*_*",

@@ -228,12 +228,11 @@ void EfficiencyAnalyzer<T>::beginJob()
   numeratorEta_ = new TH1F("numeratorEta", "", 20, -5.0, 5.0);
 
   //book |eta| vs. pT histograms
-  const Double_t pTBins[15] = {0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 100.0, 120.0, 
-			       140.0, 160.0, 180.0, 200.0};
+  const Double_t pTBins[11] = {0.0, 10.0, 20.0, 30.0, 40.0, 60.0, 80.0, 100.0, 150.0, 200.0, 300.0};
   denominatorPTAbsEta_ = 
-    new TH2F("denominatorPTAbsEta", ";p_{T} (GeV);|#eta|", /*20, 0.0, 200.0*/14, pTBins, 3, 0.0, 2.4);
+    new TH2F("denominatorPTAbsEta", ";p_{T} (GeV);|#eta|", /*20, 0.0, 200.0*/10, pTBins, 3, 0.0, 2.4);
   numeratorPTAbsEta_ = 
-    new TH2F("numeratorPTAbsEta", ";p_{T} (GeV);|#eta|", /*20, 0.0, 200.0*/14, pTBins, 3, 0.0, 2.4);
+    new TH2F("numeratorPTAbsEta", ";p_{T} (GeV);|#eta|", /*20, 0.0, 200.0*/10, pTBins, 3, 0.0, 2.4);
 }
 
 // ------------ method called once each job just after ending the event loop  ------------

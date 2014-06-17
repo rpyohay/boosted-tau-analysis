@@ -553,9 +553,9 @@
     for (vector<string>::const_iterator iVersion = versions.begin(); iVersion != versions.end(); 
          ++iVersion) {
       string Wh1Suffix(*iVersion + fileExt);
-      string Wh1IsoPrefix(analysisFilePath + "Wh1_Medium/muHadIsoAnalysis_Wh1");
+      string Wh1IsoPrefix(analysisFilePath + "Wh1_Medium/muHadIsoAnalysis_highMT_Wh1_a9");
       string Wh1IsoHaddOutputFile(Wh1IsoPrefix + "_hadd" + Wh1Suffix);
-      string Wh1AllPrefix(analysisFilePath + "Wh1_Medium/muHadAnalysis_Wh1");
+      string Wh1AllPrefix(analysisFilePath + "Wh1_Medium/muHadAnalysis_highMT_Wh1_a9");
       string Wh1AllHaddOutputFile(Wh1AllPrefix + "_hadd" + Wh1Suffix);
       vector<string> Wh1IsoHaddInputFiles;
       vector<string> Wh1AllHaddInputFiles;
@@ -577,9 +577,9 @@
     for (vector<string>::const_iterator iVersion = versions.begin(); iVersion != versions.end(); 
          ++iVersion) {
       string ggSuffix(*iVersion + fileExt);
-      string ggIsoPrefix(analysisFilePath + "gg/muHadIsoAnalysis_gg");
+      string ggIsoPrefix(analysisFilePath + "gg/muHadIsoAnalysis_highMT_gg_a9");
       string ggIsoHaddOutputFile(ggIsoPrefix + "_hadd" + ggSuffix);
-      string ggAllPrefix(analysisFilePath + "gg/muHadAnalysis_gg");
+      string ggAllPrefix(analysisFilePath + "gg/muHadAnalysis_highMT_gg_a9");
       string ggAllHaddOutputFile(ggAllPrefix + "_hadd" + ggSuffix);
       vector<string> ggIsoHaddInputFiles;
       vector<string> ggAllHaddInputFiles;

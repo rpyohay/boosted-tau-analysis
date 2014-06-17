@@ -1219,7 +1219,7 @@ skimEventContent = cms.PSet(
     "drop *_trackCountingHigh*BJetTags_*_SKIM",
     "drop CorrMETData_*_*_SKIM",
     "drop *_*NoNu_*_*",
-    "drop *_*PFlow_*_*",
+##     "drop *_*PFlow_*_*",
     "drop *_softElectronCands_*_*",
     "drop *_*_caloTowers_*",
     "drop *_shiftedPat*_*_*",
