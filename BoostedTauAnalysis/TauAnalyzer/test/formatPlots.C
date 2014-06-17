@@ -1389,9 +1389,9 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   //compute data-driven QCD estimate in signal (i.e. isolated W muon + isolated tau) region
   string outputFileNameA(analysisFilePath + "results/dataVsMC_RegionAQCDEstimate" + dataVTag + 
 			 fileExt);
-  string inputFileNameB(nonIsoWDataIsoHaddOutputFile);
-  string inputFileNameC(dataVsMCOutputDiff);
-  string inputFileNameD(nonIsoWDataNonIsoHaddOutputFile);
+  string inputFileNameB(nonIsoWDataIsoHaddOutputFile); // Region C
+  string inputFileNameC(dataVsMCOutputDiff); // Region B
+  string inputFileNameD(nonIsoWDataNonIsoHaddOutputFile); //Region D
   cout << "\nPlot data-driven QCD estimate for region A\n---\n";
   drawQCDRegionAHistograms(outputFileNameA,inputFileNameB,inputFileNameC,
   			   inputFileNameD,canvasNames1D, graphNames1D,

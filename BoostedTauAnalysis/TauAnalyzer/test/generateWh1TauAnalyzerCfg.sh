@@ -36,7 +36,7 @@ EDMOutputFilePrefix="/data1/`whoami`/Wh1_Medium/EDM_files/"
 ####VECTORS OF QUANTITIES FOR EACH SAMPLE####
 
 #vector of input file blocks for each sample
-inputFileBlocks=( "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a5_v0.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a7_v0.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a9_v0.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a11_v0.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a13_v0.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a15_v0.root'\n    ])" )
+inputFileBlocks=( "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a5_v1.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a7_v1.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a9_v1.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a11_v1.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a13_v1.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a15_v1.root'\n    ])" )
 
 #CleanJets output file
 cleanJetsOutFiles=( "${cleanJetsOutputFilePrefix}NMSSMSignal_MuProperties_Wh1_a5.root" "${cleanJetsOutputFilePrefix}NMSSMSignal_MuProperties_Wh1_a7.root" "${cleanJetsOutputFilePrefix}NMSSMSignal_MuProperties_Wh1_a9.root" "${cleanJetsOutputFilePrefix}NMSSMSignal_MuProperties_Wh1_a11.root" "${cleanJetsOutputFilePrefix}NMSSMSignal_MuProperties_Wh1_a13.root" "${cleanJetsOutputFilePrefix}NMSSMSignal_MuProperties_Wh1_a15.root" )
