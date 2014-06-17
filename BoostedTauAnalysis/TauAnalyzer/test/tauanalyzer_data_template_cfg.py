@@ -355,7 +355,7 @@ process.highMTMuHadIsoTauAnalyzer = cms.EDAnalyzer(
     'HIGHMTISOTAUANALYZEROUTFILE'
     ),
     tauTag = cms.InputTag('muHadIsoTauSelector'),
-    METTag = cms.InputTag('patType1CorrectedPFMet'),
+    METTag = cms.InputTag('patType1CorrectedPFMetPFlow'),
     MUONORPHOTONTAG,
     muonPFIsoPUSubtractionCoeff = cms.double(0.5),
     genMatchedMuonTag = cms.InputTag('WIsoMuonSelector'),
@@ -452,6 +452,8 @@ process.METFilter.minMET = cms.double(30.)
 process.METFilter.METTag = cms.InputTag("patType1CorrectedPFMetPFlow")
 
 #MT filter
+process.MTFilter.minMT = cms.double(50.)
+process.MTFilter.METTag = cms.InputTag("patType1CorrectedPFMetPFlow")
 process.highMTFilter = process.MTFilter.clone()
 process.lowMTFilter = process.MTFilter.clone()
 process.lowMTFilter.passFilter = cms.bool(False)
