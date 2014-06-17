@@ -667,7 +667,6 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   string Wh1IsoPrefix(analysisFilePath + "Wh1_Medium/muHadIsoAnalysis_Wh1_a9");
   string Wh1IsoHaddOutputFile(Wh1IsoPrefix + "_hadd" + Wh1Suffix);
   string Wh1AllPrefix(analysisFilePath + "Wh1_Medium/muHadAnalysis_Wh1_a9");
->>>>>>> db6e253259e2fdd84748c667a6e0af55dc5acc50
   string Wh1AllHaddOutputFile(Wh1AllPrefix + "_hadd" + Wh1Suffix);
   vector<string> Wh1IsoHaddInputFiles;
   vector<string> Wh1AllHaddInputFiles;
