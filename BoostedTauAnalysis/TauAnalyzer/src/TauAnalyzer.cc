@@ -1753,7 +1753,7 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       hadTauAssociatedMuMultiplicity_->Fill(removedMuons.size(), PUWeight);
 
       //plot the mu + tau invariant mass for the highest pT muon
-      muHadMass_->Fill(muHadMass, PUWeight);
+      muHadMass_->Fill(muHadMass, PUWeight*tauHadPTWeight);
 
      //plot the mu + tau invariant mass for the highest pT muon
       if (muHadMass >= 4.)

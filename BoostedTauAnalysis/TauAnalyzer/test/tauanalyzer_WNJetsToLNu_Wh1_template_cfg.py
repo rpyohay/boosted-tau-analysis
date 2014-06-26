@@ -566,7 +566,7 @@ process.baseIsoTauAnalysisSequence = cms.Sequence(
     process.corrJetDistinctIsoTauSelector*
     process.muonTriggerObjectFilter*
     process.OSSFFilterIso*
-    process.SSSFFilterIso*
+#    process.SSSFFilterIso*
     process.IsoBVetoFilter
     )
 process.highMTIsoTauAnalysisSequence = cms.Sequence(
@@ -590,7 +590,7 @@ process.baseSignalIsoTauAnalysisSequence = cms.Sequence(
     process.muHadIsoTauSelector*
     process.muonTriggerObjectFilter*
     process.OSSFFilterIso*
-    process.SSSFFilterIso*
+#    process.SSSFFilterIso*
     process.IsoBVetoFilter
     )
 process.highMTSignalIsoTauAnalysisSequence = cms.Sequence(
@@ -608,7 +608,7 @@ process.baseNonIsoTauAnalysisSequence = cms.Sequence(
     process.corrJetDistinctNonIsoTauSelector*
     process.muonTriggerObjectFilter*
     process.OSSFFilterNonIso*
-    process.SSSFFilterNonIso*
+#    process.SSSFFilterNonIso*
     process.NonIsoBVetoFilter
     )
 process.highMTNonIsoTauAnalysisSequence = cms.Sequence(
@@ -626,7 +626,7 @@ process.baseTauAnalysisSequence = cms.Sequence(
     process.corrJetDistinctTauSelector*
     process.muonTriggerObjectFilter*
     process.OSSFFilter*
-    process.SSSFFilter*
+#    process.SSSFFilter*
     process.AllBVetoFilter
     )
 process.highMTTauAnalysisSequence = cms.Sequence(
