@@ -664,10 +664,9 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   //"hadd" Wh1 sample just to get the formatting of the 2D plots the same
   cout << "...Wh1\n";
   string Wh1Suffix(Wh1SigVTag + fileExt);
-  string Wh1IsoPrefix(analysisFilePath + "Wh1_Medium/muHadIsoAnalysis_Wh1_a9");
+  string Wh1IsoPrefix(analysisFilePath + "Wh1_Medium/muHadIsoAnalysis" + MTBin + uncTag + "_Wh1_a9");
   string Wh1IsoHaddOutputFile(Wh1IsoPrefix + "_hadd" + Wh1Suffix);
-  string Wh1AllPrefix(analysisFilePath + "Wh1_Medium/muHadAnalysis_Wh1_a9");
->>>>>>> db6e253259e2fdd84748c667a6e0af55dc5acc50
+  string Wh1AllPrefix(analysisFilePath + "Wh1_Medium/muHadAnalysis" + MTBin + uncTag + "_Wh1_a9");
   string Wh1AllHaddOutputFile(Wh1AllPrefix + "_hadd" + Wh1Suffix);
   vector<string> Wh1IsoHaddInputFiles;
   vector<string> Wh1AllHaddInputFiles;
@@ -1476,7 +1475,6 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 					  setLogY, drawStack, dataMC);
   }
 
-
   //compare data-driven QCD to total MC in control region
   vector<string> RegionBQCDVsMCInputFiles;
   const string variable("muHadMass");
@@ -1697,13 +1695,13 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   cout << "...Wbb\n";
   string WbbSearchVsControlOutputFile(analysisFilePath + "Wbb/analysis/isoVsNonIsoTaus" + MTBin + tag1 + 
   				      outputVTag + fileExt);
-  string WbbSearchVsControlReweightOutputFile = 
-    smartReplace(WbbSearchVsControlOutputFile, "NonIso", "NonIsoReweight");
+  //string WbbSearchVsControlReweightOutputFile = 
+  // smartReplace(WbbSearchVsControlOutputFile, "NonIso", "NonIsoReweight");
   vector<string> WbbSearchVsControlInputFiles;
   //WbbSearchVsControlInputFiles.push_back(WbbIsoHaddOutputFile);
   //WbbSearchVsControlInputFiles.push_back(WbbNonIsoHaddOutputFile);
-  vector<string> WbbSearchVsControlReweightInputFiles(WbbSearchVsControlInputFiles);
-  WbbSearchVsControlReweightInputFiles[1] = WbbNonIsoReweightHaddOutputFile;
+  // vector<string> WbbSearchVsControlReweightInputFiles(WbbSearchVsControlInputFiles);
+  //WbbSearchVsControlReweightInputFiles[1] = WbbNonIsoReweightHaddOutputFile;
   // cout << "...without reweighting\n";
   // drawMultipleEfficiencyGraphsOn1Canvas(WbbSearchVsControlOutputFile, 
   // 					WbbSearchVsControlInputFiles, canvasNames1D, graphNames1D, 
@@ -1722,13 +1720,13 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   string WJetsToLNuSearchVsControlOutputFile(analysisFilePath + 
   					     "WJetsToLNu/analysis/isoVsNonIsoTaus" + MTBin + tag1 + 
   					     outputVTag + fileExt);
-  string WJetsToLNuSearchVsControlReweightOutputFile = 
-    smartReplace(WJetsToLNuSearchVsControlOutputFile, "NonIso", "NonIsoReweight");
+  //string WJetsToLNuSearchVsControlReweightOutputFile = 
+  // smartReplace(WJetsToLNuSearchVsControlOutputFile, "NonIso", "NonIsoReweight");
   vector<string> WJetsToLNuSearchVsControlInputFiles;
   // WJetsToLNuSearchVsControlInputFiles.push_back(WJetsToLNuIsoHaddOutputFile);
   // WJetsToLNuSearchVsControlInputFiles.push_back(WJetsToLNuNonIsoHaddOutputFile);
-  vector<string> WJetsToLNuSearchVsControlReweightInputFiles(WJetsToLNuSearchVsControlInputFiles);
-  WJetsToLNuSearchVsControlReweightInputFiles[1] = WJetsToLNuNonIsoReweightHaddOutputFile;
+  //vector<string> WJetsToLNuSearchVsControlReweightInputFiles(WJetsToLNuSearchVsControlInputFiles);
+  //WJetsToLNuSearchVsControlReweightInputFiles[1] = WJetsToLNuNonIsoReweightHaddOutputFile;
   // cout << "...without reweighting\n";
   // drawMultipleEfficiencyGraphsOn1Canvas(WJetsToLNuSearchVsControlOutputFile, 
   // 					WJetsToLNuSearchVsControlInputFiles, canvasNames1D, 
@@ -1955,44 +1953,45 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   plotFakeRateRatio(dataFakeRateFileName, MCFakeRateFileName, analysisFilePath + 
   "results/fake_rate_ratio_MC" + outputVTag + fileExt);*/
 
+
   // //compare the same plot from 2 versions of the analysis
   // vector<string> fileNamesForComparison1;
-  // fileNamesForComparison1.push_back(analysisFilePath + "results/dataVsMC_muHadNonIsoAnalysis" + 
-  // 				    tag19p7InvFb + "_v149" + fileExt);
+  //fileNamesForComparison1.push_back(analysisFilePath + "results/dataVsMCQCDFromData_muHadNonIsoAnalysis" + MTBin +
+   				    tag19p7InvFb + "_v35" + fileExt);
   // fileNamesForComparison1.push_back(analysisFilePath + "results/dataVsMC_muHadNonIsoAnalysis" + 
   // 				    tag19p7InvFb + "_v149" + fileExt);
   // fileNamesForComparison1.push_back(analysisFilePath + "results/sigVsBkg_muHadIsoAnalysis" + 
   // 				    tag19p7InvFb + "_v149" + fileExt);
   // fileNamesForComparison1.push_back(nonIsoWDataIsoPrefix + "_v149" + fileExt);
   // fileNamesForComparison1.push_back(nonIsoWDataNonIsoPrefix + "_v149" + fileExt);
-  // vector<string> fileNamesForComparison2;
-  // fileNamesForComparison2.push_back(analysisFilePath + "results/dataVsMC_muHadNonIsoAnalysis" + 
-  // 				    tag19p7InvFb + "_v152" + fileExt);
+// vector<string> fileNamesForComparison2;
+// fileNamesForComparison2.push_back(analysisFilePath + "results/dataVsMCQCDFromData_muHadNonIsoAnalysis" + MTBin +
+   				    tag19p7InvFb + "_v41" + fileExt);
   // fileNamesForComparison2.push_back(analysisFilePath + "results/dataVsMC_muHadNonIsoAnalysis" + 
   // 				    tag19p7InvFb + "_v152" + fileExt);
   // fileNamesForComparison2.push_back(analysisFilePath + "results/sigVsBkg_muHadIsoAnalysis" + 
   // 				    tag19p7InvFb + "_v152" + fileExt);
   // fileNamesForComparison2.push_back(nonIsoWDataIsoPrefix + "_v152" + fileExt);
   // fileNamesForComparison2.push_back(nonIsoWDataNonIsoPrefix + "_v152" + fileExt);
-  // vector<string> outputCanvasTagsForComparison;
+//vector<string> outputCanvasTagsForComparison;
   // outputCanvasTagsForComparison.push_back("_regionBData");
-  // outputCanvasTagsForComparison.push_back("_regionBMC");
+//outputCanvasTagsForComparison.push_back("_regionBMC");
   // outputCanvasTagsForComparison.push_back("_regionAMC");
   // outputCanvasTagsForComparison.push_back("_regionCData");
   // outputCanvasTagsForComparison.push_back("_regionDData");
   // vector<bool> stack;
   // stack.push_back(false);
-  // stack.push_back(true);
+//stack.push_back(true);
   // stack.push_back(true);
   // stack.push_back(false);
   // stack.push_back(false);
-  // vector<unsigned int> pad;
+//vector<unsigned int> pad;
   // pad.push_back(1);
   // pad.push_back(1);
-  // pad.push_back(1);
+//pad.push_back(1);
   // pad.push_back(0);
   // pad.push_back(0);
-  // compare2Versions(fileNamesForComparison1, fileNamesForComparison2, analysisFilePath + 
-  // 		   "results/comparison_v149_v152" + fileExt, outputCanvasTagsForComparison, stack, 
-  // 		   pad);
+//compare2Versions(fileNamesForComparison1, fileNamesForComparison2, analysisFilePath + 
+//		   "results/comparison_v35_v41" + fileExt, outputCanvasTagsForComparison, stack, 
+//  		   pad);
 }
