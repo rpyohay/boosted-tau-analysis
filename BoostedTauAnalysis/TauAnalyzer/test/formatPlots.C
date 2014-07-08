@@ -1442,6 +1442,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 					tag1 + outputVTag + fileExt);
   vector<string> sigVsBkgQCDFromDataInputFiles(sigVsBkgInputFiles);
   sigVsBkgQCDFromDataInputFiles.push_back(outputFileNameA);
+  //sigVsBkgQCDFromDataInputFiles.push_back("/data1/friccita/results/dataVsMC_RegionAQCDEstimate_v43.root");
   cout << "\nPlot signal vs. background with data-driven QCD estimate ";
   cout << "normalized to data luminosity\n---\n";
   drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgQCDFromDataOutputFile, 
@@ -1489,13 +1490,14 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   RegionBQCDVsMCInputFiles.push_back(WWNonIsoHaddOutputFile);
   std::reverse(RegionBQCDVsMCInputFiles.begin() + 1, RegionBQCDVsMCInputFiles.end());
   string RegionBQCDVsMCOutputFile(analysisFilePath + 
-				       "results/QCDVsMC_RegionB" + 
+				       "results/QCDVsMC_RegionB" + MTBin +
 				       tag19p7InvFb + outputVTag + fileExt);
   QCDVsMCClosurePlots(RegionBQCDVsMCInputFiles, variable, theunit, 1, 2, RegionBQCDVsMCOutputFile);
 
   //compare data-driven QCD to total MC in signal region
   vector<string>RegionAQCDVsMCInputFiles;
   RegionAQCDVsMCInputFiles.push_back(outputFileNameA);
+  //RegionAQCDVsMCInputFiles.push_back("/data1/friccita/results/dataVsMC_RegionAQCDEstimate_v43.root");
   RegionAQCDVsMCInputFiles.push_back(DYJetsToLLIsoHaddOutputFile);
   RegionAQCDVsMCInputFiles.push_back(TTJetsIsoHaddOutputFile);
   RegionAQCDVsMCInputFiles.push_back(TIsoHaddOutputFile);
@@ -1505,7 +1507,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   RegionAQCDVsMCInputFiles.push_back(WWIsoHaddOutputFile);
   std::reverse(RegionAQCDVsMCInputFiles.begin() + 1, RegionAQCDVsMCInputFiles.end());
   string RegionAQCDVsMCOutputFile(analysisFilePath + 
-				       "results/QCDVsMC_RegionA" + 
+				       "results/QCDVsMC_RegionA" + MTBin +
 				       tag19p7InvFb + outputVTag + fileExt);
   QCDVsMCClosurePlots(RegionAQCDVsMCInputFiles, variable, theunit, 1, 2, RegionAQCDVsMCOutputFile);
 
@@ -1957,7 +1959,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   // //compare the same plot from 2 versions of the analysis
   // vector<string> fileNamesForComparison1;
   //fileNamesForComparison1.push_back(analysisFilePath + "results/dataVsMCQCDFromData_muHadNonIsoAnalysis" + MTBin +
-   				    tag19p7InvFb + "_v35" + fileExt);
+  //				    tag19p7InvFb + "_v35" + fileExt);
   // fileNamesForComparison1.push_back(analysisFilePath + "results/dataVsMC_muHadNonIsoAnalysis" + 
   // 				    tag19p7InvFb + "_v149" + fileExt);
   // fileNamesForComparison1.push_back(analysisFilePath + "results/sigVsBkg_muHadIsoAnalysis" + 
@@ -1966,7 +1968,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   // fileNamesForComparison1.push_back(nonIsoWDataNonIsoPrefix + "_v149" + fileExt);
 // vector<string> fileNamesForComparison2;
 // fileNamesForComparison2.push_back(analysisFilePath + "results/dataVsMCQCDFromData_muHadNonIsoAnalysis" + MTBin +
-   				    tag19p7InvFb + "_v41" + fileExt);
+  //				    tag19p7InvFb + "_v41" + fileExt);
   // fileNamesForComparison2.push_back(analysisFilePath + "results/dataVsMC_muHadNonIsoAnalysis" + 
   // 				    tag19p7InvFb + "_v152" + fileExt);
   // fileNamesForComparison2.push_back(analysisFilePath + "results/sigVsBkg_muHadIsoAnalysis" + 

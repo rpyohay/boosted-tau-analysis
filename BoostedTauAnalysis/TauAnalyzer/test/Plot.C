@@ -1500,9 +1500,9 @@ void QCDVsMCClosurePlots(const vector<string>& QCDVsMCInputFileNames, const stri
 
   hists[0]->SetLineColor(4); // blue for QCD
   hists[1]->SetLineColor(2); // red for bkg
-  //  hists[0]->Scale(hists[1]->Integral(normRegionLowerBin,normRegionUpperBin)/hists[0]->Integral(normRegionLowerBin,normRegionUpperBin));
-  hists[0]->Scale(1./hists[0]->Integral());
-  hists[1]->Scale(1./hists[1]->Integral());
+  hists[0]->Scale(hists[1]->Integral(normRegionLowerBin,normRegionUpperBin)/hists[0]->Integral(normRegionLowerBin,normRegionUpperBin));
+  //hists[0]->Scale(1./hists[0]->Integral());
+  //hists[1]->Scale(1./hists[1]->Integral());
   hists[1]->GetXaxis()->SetTitle(units.c_str());
 
   TLegend *leg = new TLegend(0.35, 0.55, 0.75, 0.75, "");
@@ -1631,6 +1631,7 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
       stackHist->Scale(isoSigBkgFile.second);
       stackHist->GetYaxis()->SetRangeUser(0.01, 10000.0);
       isoBkgSep.Add(stackHist, "HIST");
+      cout << "stat error on bkg sample " << i << " = " << stackHist->GetBinError(1) << endl;
       if (i == 0) {
 	isoBkgAllHist = (TH1F*)isoBkgHists->At(i)->Clone();
 	isoBkgAllHist->Scale(isoSigBkgFile.second);
@@ -1667,9 +1668,10 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
 	legendBkgSep.AddEntry(stackHist, "QCD (data)", "f");
       }
     }
+    cout << "stat error on total MC histogram = " << isoBkgAllHist->GetBinError(1) << endl;
 //     setHistogramOptions(isoBkgAllHist, kBlue, 0.7, 21, 1.0, unit.c_str(), "");
     isoBkgAllHist->GetYaxis()->SetRangeUser(0.01, 10000.0);
-    isoBkgAll.Add(isoBkgAllHist, "HIST");
+    isoBkgAll.Add(isoBkgAllHist, "HISTE C");
     isoBkgMain5.Add(isoBkgDibosonHist, "HIST");
     isoBkgMain5.Add(isoBkgWNJetsHist, "HIST");
     isoBkgMain5.Add(isoBkgTopHist, "HIST");
