@@ -794,10 +794,12 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
   setup(canvasNames, outputCanvases, setLogY, legends, stacks, legendHeaders, hists, 
 	inputFiles.size(), dataMC, false);
   bool data = true;
+  bool gg = false;
   for (vector<string>::const_iterator iInputFile = inputFiles.begin(); 
        iInputFile != inputFiles.end(); ++iInputFile) {
     const unsigned int fileIndex = iInputFile - inputFiles.begin();
     if ((fileIndex == 0) && (iInputFile->find("Wh1") != string::npos)) data = false;
+    if ((fileIndex == 1) && (iInputFile->find("gg") != string::npos)) gg = true;
     inputStreams.push_back(new TFile(iInputFile->c_str()));
     for (vector<string>::const_iterator iCanvasName = canvasNames.begin(); 
 	 iCanvasName != canvasNames.end(); ++iCanvasName) {
@@ -843,19 +845,20 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 // 	  pHist->SetFillStyle(0);
 // 	  pHist->SetFillColor(0);
 	  pHist->SetFillStyle(1001);
-	  if (((fileIndex == 0) || (fileIndex == 1)) && !data) pHist->SetFillColor(0);
+	  if (((fileIndex == 0) || (gg && (fileIndex == 1))) && !data) pHist->SetFillColor(0);
 	  else pHist->SetFillColor(colors[fileIndex]);
 	  if (fileIndex == 0) {
 	    if (data) legendStyle = "lp";
 	    else legendStyle = "l";
 	  }
-	  else if ((fileIndex == 1) && !data) legendStyle = "l";
+	  else if ((gg && (fileIndex == 1)) && !data) legendStyle = "l";
 	  else legendStyle = "f";
 	}
 	hists[canvasIndex][fileIndex] = pHist;
 	legends[canvasIndex]->
 	  AddEntry(pHist, legendEntries[fileIndex].c_str(), legendStyle.c_str());
-	if ((data && (fileIndex != 0)) || (!data && (fileIndex != 0) && (fileIndex != 1))) {
+	if ((data && (fileIndex != 0)) || 
+	    (!data && (fileIndex != 0) && ((gg && (fileIndex != 1)) || !gg))) {
 	  stacks[canvasIndex]->Add(pHist, "HIST");
 	}
       }
@@ -913,7 +916,7 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
       string drawOpt("SAME");
       if (!data) drawOpt = "HISTSAME";
       hists[canvasIndex][0]->Draw(drawOpt.c_str());
-      if (!data) hists[canvasIndex][1]->Draw(drawOpt.c_str());
+      if (!data && gg) hists[canvasIndex][1]->Draw(drawOpt.c_str());
       TH1F* stackSumHist = NULL;
       for (Int_t i = 0; i < stackedHists->GetEntries(); ++i) {
 	TH1F* stackHist = (TH1F*)stackedHists->At(i)->Clone();
@@ -1319,14 +1322,14 @@ void addClosurePlot(TFile& sigVsBkgIsoStream, const string& var, const string& u
 
   //get the signal histograms
   TH1F* histSig1 = NULL;
-  TH1F* histSig2 = NULL;
+//   TH1F* histSig2 = NULL;
   THStack* stackBkgIso = NULL;
   if (canvasIso != NULL) {
     TList* sigs = canvasIso->GetListOfPrimitives();
     histSig1 = (TH1F*)sigs->At(2)->Clone();
-    histSig2 = (TH1F*)sigs->At(3)->Clone();
+//     histSig2 = (TH1F*)sigs->At(3)->Clone();
     histSig1->GetYaxis()->SetRangeUser(0.1, 10000.0);
-    histSig2->GetYaxis()->SetRangeUser(0.1, 10000.0);
+//     histSig2->GetYaxis()->SetRangeUser(0.1, 10000.0);
 
     /*get the background stack histogram in the signal region (isolated taus) and convert it to a 
       TH1*/
@@ -1464,8 +1467,9 @@ void makeMCClosurePlots(const string& sigVsBkgIsoFileName, const vector<string>&
 
 void QCDVsMCClosurePlots(const vector<string>& QCDVsMCInputFileNames, const string& var, 
 			 const string& units, 
-			 const int normRegionLowerBin, 
-			 const int normRegionUpperBin, const string& outputFileName)
+// 			 const int normRegionLowerBin, 
+// 			 const int normRegionUpperBin,
+			 const string& outputFileName)
 {
 
   TFile outStream(outputFileName.c_str(), "RECREATE");
@@ -1521,30 +1525,30 @@ void QCDVsMCClosurePlots(const vector<string>& QCDVsMCInputFileNames, const stri
 }
 
   
-//structs defining the draw options for each sample
-struct drawOptions {
-  string sampleName;
-  unsigned int sampleNumber;
-  Color_t markerColor;
-  Style_t markerStyle;
-  Color_t lineColor;
-  Color_t fillColor;
-  Style_t fillStyle;
-} Wh1, gg, WW, ZZ, WZ, WNJets, singleTop, tt, DrellYan;
+// //structs defining the draw options for each sample
+// struct drawOptions {
+//   string sampleName;
+//   unsigned int sampleNumber;
+//   Color_t markerColor;
+//   Style_t markerStyle;
+//   Color_t lineColor;
+//   Color_t fillColor;
+//   Style_t fillStyle;
+// } Wh1, gg, WW, ZZ, WZ, WNJets, singleTop, tt, DrellYan;
 
-//set the draw options for each sample and store it all in global scope
-void setDrawOptions(drawOptions& sampleDrawOptions, const string& sampleName, 
-		    unsigned int sampleNumber, Color_t markerColor, Style_t markerStyle, 
-		    Color_t lineColor, Color_t fillColor, Style_t fillStyle)
-{
-  sampleDrawOptions.sampleName = sampleName;
-  sampleDrawOptions.sampleNumber = sampleNumber;
-  sampleDrawOptions.markerColor = markerColor;
-  sampleDrawOptions.markerStyle = markerStyle;
-  sampleDrawOptions.lineColor = lineColor;
-  sampleDrawOptions.fillColor = fillColor;
-  sampleDrawOptions.fillStyle = fillStyle;
-}
+// //set the draw options for each sample and store it all in global scope
+// void setDrawOptions(drawOptions& sampleDrawOptions, const string& sampleName, 
+// 		    unsigned int sampleNumber, Color_t markerColor, Style_t markerStyle, 
+// 		    Color_t lineColor, Color_t fillColor, Style_t fillStyle)
+// {
+//   sampleDrawOptions.sampleName = sampleName;
+//   sampleDrawOptions.sampleNumber = sampleNumber;
+//   sampleDrawOptions.markerColor = markerColor;
+//   sampleDrawOptions.markerStyle = markerStyle;
+//   sampleDrawOptions.lineColor = lineColor;
+//   sampleDrawOptions.fillColor = fillColor;
+//   sampleDrawOptions.fillStyle = fillStyle;
+// }
 
 /*make final plot showing:
   - Wh1 expected signal
@@ -1560,7 +1564,7 @@ void setDrawOptions(drawOptions& sampleDrawOptions, const string& sampleName,
 void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile, 
 		  pair<TFile*, float>& nonIsoDataFile, const string& var, const string& unit, 
 		  const int normRegionLowerBin, const int normRegionUpperBin, 
-		  const string& option, TFile& outStream)
+		  const string& option, TFile& outStream, const bool gg)
 {
   //top level declarations
   string canvasName(var + "Canvas");
@@ -1574,6 +1578,7 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
 
   //get the signal histograms
   vector<TH1F*> isoSig(2, NULL);
+  if (!gg) isoSig.erase(isoSig.begin() + 1);
   THStack* isoBkg = NULL;
   TLegend legendBkgSep(0.35, 0.55, 0.75, 0.95);
   TLegend legendBkgMain5(0.35, 0.55, 0.75, 0.95);
@@ -1590,15 +1595,17 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
       (*iIsoSig)->GetYaxis()->SetRangeUser(0.01, 10000.0);
     }
     legendBkgSep.AddEntry(isoSig[0], "Wh_{1}", "l");
-    legendBkgSep.AddEntry(isoSig[1], "gg fusion", "l");
+    if (gg) legendBkgSep.AddEntry(isoSig[1], "gg fusion", "l");
     legendBkgMain5.AddEntry(isoSig[0], "Wh_{1}", "l");
-    legendBkgMain5.AddEntry(isoSig[1], "gg fusion", "l");
+    if (gg) legendBkgMain5.AddEntry(isoSig[1], "gg fusion", "l");
     legendBkgAll.AddEntry(isoSig[0], "Wh_{1}", "l");
-    legendBkgAll.AddEntry(isoSig[1], "gg fusion", "l");
+    if (gg) legendBkgAll.AddEntry(isoSig[1], "gg fusion", "l");
     isoSig[0]->SetName((var + "Wh1Search").c_str());
-    isoSig[1]->SetName((var + "ggSearch").c_str());
+    if (gg) isoSig[1]->SetName((var + "ggSearch").c_str());
     setHistogramOptions(isoSig[0], kSpring - 1, 0.7, 20, isoSigBkgFile.second, unit.c_str(), "");
-    setHistogramOptions(isoSig[1], kAzure + 1, 0.7, 20, isoSigBkgFile.second, unit.c_str(), "");
+    if (gg) {
+      setHistogramOptions(isoSig[1], kAzure + 1, 0.7, 20, isoSigBkgFile.second, unit.c_str(), "");
+    }
 
     /*get the MC + data-driven QCD background stack histogram and make some new stacks with 
       different combinations of the backgrounds*/
@@ -1842,7 +1849,7 @@ void makeFinalPlot(const pair<string, float>& isoMC, const string& isoDataFileNa
 		   const pair<string, float>& nonIsoData, const vector<string>& vars, 
 		   const vector<string>& units, const vector<int>& normRegionLowerBins, 
 		   const vector<int>& normRegionUpperBins, const string& outputFileName, 
-		   const string& option// , const vector<Color_t>& colors, 
+		   const string& option, const bool gg// , const vector<Color_t>& colors, 
 // 		   const vector<Style_t>& styles
 		   )
 {
@@ -1870,7 +1877,7 @@ void makeFinalPlot(const pair<string, float>& isoMC, const string& isoDataFileNa
       const unsigned int varIndex = iVar - vars.begin();
       addFinalPlot(isoSigBkgFile, isoDataFile, nonIsoDataFile, *iVar, units[varIndex], 
 		   normRegionLowerBins[varIndex], normRegionUpperBins[varIndex], option, 
-		   outStream);
+		   outStream, gg);
     }
   }
   else {
