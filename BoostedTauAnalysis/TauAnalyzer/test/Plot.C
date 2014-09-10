@@ -1,6 +1,7 @@
 #include <string>
 #include <map>
 #include <iostream>
+#include <iomanip>
 #include <sstream>
 #include <algorithm>
 #include "TFile.h"
@@ -1480,9 +1481,7 @@ void QCDVsMCClosurePlots(const vector<string>& QCDVsMCInputFileNames, const stri
     inputStreams.push_back(new TFile(iInputFile->c_str()));
     TCanvas* pCanvas;
     inputStreams[inputStreams.size() - 1]->GetObject(canvasName.c_str(), pCanvas);
-    cout << "QCDVSMC pCanvas: " << pCanvas << endl;
     TH1F* pHist = (TH1F*)pCanvas->GetPrimitive(var.c_str());
-    cout << "QCDVsMC pHist: " << pHist << endl;
     if (fileIndex == 0)
       { // if this is the QCD file
 	hists[0] = (TH1F*)pHist->Clone();
@@ -1505,6 +1504,13 @@ void QCDVsMCClosurePlots(const vector<string>& QCDVsMCInputFileNames, const stri
   //hists[1]->Scale(1./hists[1]->Integral());
   hists[1]->GetXaxis()->SetTitle(units.c_str());
 
+  TH1F* ratioHist = (TH1F*)hists[0]->Clone();
+  ratioHist->Add(hists[1],-1.);
+  ratioHist->Divide(hists[1]);
+  ratioHist->GetYaxis()->SetTitle("#frac{QCD-MC}{MC}");
+  ratioHist->GetYaxis()->SetRangeUser(-2.0,2.0);
+  ratioHist->SetLineColor(1);
+
   TLegend *leg = new TLegend(0.35, 0.55, 0.75, 0.75, "");
   leg->AddEntry(hists[0], "QCD (data-driven)", "lp");
   leg->AddEntry(hists[1], "EWK+TOP+DY (MC)", "lp");
@@ -1512,14 +1518,109 @@ void QCDVsMCClosurePlots(const vector<string>& QCDVsMCInputFileNames, const stri
   //write to file
   outStream.cd();
   TCanvas outCanvas(canvasName.c_str(), "", 600, 600);
+  outCanvas.Divide(1,2);
+  outCanvas.cd(1)->SetPad(0.0, 0.33, 1.0, 1.0);
+  outCanvas.cd(2)->SetPad(0.0, 0.0, 1.0, 0.33);
+  outCanvas.cd(1);
   hists[0]->Draw("HISTE");
   hists[1]->Draw("HISTESAME");
   leg->Draw();
+  outCanvas.cd(2);
+  ratioHist->Draw();
+
   outCanvas.Write();
   outStream.Write();
   outStream.Close();
 }
 
+void compareTotalMCBToA(const vector<string>& QCDVsMCInputFileNames1,
+			    const vector<string>& QCDVsMCInputFileNames2,
+			    const string& var, 
+			    const string& units, 
+			    const int normRegionLowerBin, 
+			    const int normRegionUpperBin, const string& outputFileName)
+{
+
+  TFile outStream(outputFileName.c_str(), "RECREATE");
+  vector<TFile*> inputStreams;
+  vector<TCanvas*> outputCanvases;
+  vector<TH1F*> hists(2);
+  string canvasName(var + "Canvas");
+
+  // loop over Region B files
+  for (vector<string>::const_iterator iInputFile = QCDVsMCInputFileNames1.begin(); 
+       iInputFile != QCDVsMCInputFileNames1.end(); ++iInputFile) { // loop over input files
+    const unsigned int fileIndex = iInputFile - QCDVsMCInputFileNames1.begin();
+    inputStreams.push_back(new TFile(iInputFile->c_str()));
+    TCanvas* pCanvas;
+    inputStreams[inputStreams.size() - 1]->GetObject(canvasName.c_str(), pCanvas);
+    TH1F* pHist = (TH1F*)pCanvas->GetPrimitive(var.c_str());
+    if (fileIndex == 0)
+      { // if this is the first file
+	hists[0] = (TH1F*)pHist->Clone();
+      } // if this is the first file
+    else
+      { // if this is not the first file
+	hists[0]->Add(pHist,1.);
+      } // if this is not the first file
+    
+  } // loop over input files
+
+  // loop over Region A files
+  for (vector<string>::const_iterator iInputFile = QCDVsMCInputFileNames2.begin(); 
+       iInputFile != QCDVsMCInputFileNames2.end(); ++iInputFile) { // loop over input files
+    const unsigned int fileIndex = iInputFile - QCDVsMCInputFileNames2.begin();
+    inputStreams.push_back(new TFile(iInputFile->c_str()));
+    TCanvas* pCanvas;
+    inputStreams[inputStreams.size() - 1]->GetObject(canvasName.c_str(), pCanvas);
+    TH1F* pHist = (TH1F*)pCanvas->GetPrimitive(var.c_str());
+    if (fileIndex == 0)
+      { // if this is the first file
+	hists[1] = (TH1F*)pHist->Clone();
+      } // if this is the first file
+    else
+      { // if this is not the first file
+	hists[1]->Add(pHist,1.);
+      } // if this is not the first file
+    
+  } // loop over input files
+
+
+  hists[0]->SetLineColor(4); // blue for Region B
+  hists[1]->SetLineColor(2); // red for Region A
+  hists[0]->Scale(hists[1]->Integral(normRegionLowerBin,normRegionUpperBin)/hists[0]->Integral(normRegionLowerBin,normRegionUpperBin)); // scale B to A
+  //hists[0]->Scale(1./hists[0]->Integral());
+  //hists[1]->Scale(1./hists[1]->Integral());
+  hists[1]->GetXaxis()->SetTitle(units.c_str());
+
+  TH1F* ratioHist = (TH1F*)hists[0]->Clone();
+  ratioHist->Add(hists[1],-1.);
+  ratioHist->Divide(hists[1]);
+  ratioHist->GetYaxis()->SetTitle("#frac{B-A}{A}");
+  ratioHist->GetYaxis()->SetRangeUser(-2.0,2.0);
+  ratioHist->SetLineColor(1);
+
+  TLegend *leg = new TLegend(0.35, 0.55, 0.75, 0.75, "");
+  leg->AddEntry(hists[0], "Total MC + data-driven QCD, Region B", "lp");
+  leg->AddEntry(hists[1], "Total MC + data-driven QCD, Region A", "lp");
+
+  //write to file
+  outStream.cd();
+  TCanvas outCanvas(canvasName.c_str(), "", 600, 600);
+  outCanvas.Divide(1,2);
+  outCanvas.cd(1)->SetPad(0.0, 0.33, 1.0, 1.0);
+  outCanvas.cd(2)->SetPad(0.0, 0.0, 1.0, 0.33);
+  outCanvas.cd(1);
+  hists[0]->Draw("HISTE");
+  hists[1]->Draw("HISTESAME");
+  leg->Draw();
+  outCanvas.cd(2);
+  ratioHist->Draw();
+
+  outCanvas.Write();
+  outStream.Write();
+  outStream.Close();
+}
   
 //structs defining the draw options for each sample
 struct drawOptions {
@@ -1747,7 +1848,7 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
   //calculate the normalization factor
   Double_t norm = isoData->Integral(normRegionLowerBin, normRegionUpperBin)/
     nonIsoData->Integral(normRegionLowerBin, normRegionUpperBin);
-
+  cerr << "The normalization constant is: " << norm << endl;
   /*calculate the statistical error on the background prediction from the non-isolated data, 
     including the term from the error on the normalization factor*/
   const TH1* nonIsoDataPtrCast = dynamic_cast<const TH1*>(nonIsoData);
@@ -1762,7 +1863,9 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
   }
 
   //normalize non-isolated data histogram to isolated data in signal-depleted region
+  cout << "Region B m > 4 integral before normalization = " << nonIsoData->Integral(5,-1) << endl;
   nonIsoData->Scale(norm);
+  cout << "Normalization constant for region B = " << norm << endl;
 
   //set statistical error in each bin of the non-isolated data histogram
   for (Int_t iBin = 1; iBin <= nonIsoData->GetNbinsX(); ++iBin) {
@@ -1778,6 +1881,7 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
   outCanvas.cd(2)->SetPad(0.0, 0.0, 1.0, 0.33);
   setCanvasOptions(*outCanvas.cd(2), 1, 0, 0);
   outCanvas.cd(1);
+  Double_t B = 0.;
   if (option == "separate") {
     isoBkgSep.Draw();
     isoBkgSep.SetMinimum(0.01);
@@ -1795,7 +1899,8 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
 	err+=(hist->GetBinError(iBin)*hist->GetBinError(iBin));
       }
     }
-    cout << "Region A MC + data-driven QCD, m > 4: " << sum << " +/- " << sqrt(err) <<  endl;
+    B = sum;
+    cout << "Region A MC + data-driven QCD, m > 4: " << setprecision(3) << sum << " +/- " << setprecision(3) << sqrt(err) <<  endl;
     isoBkgMain5.SetMinimum(0.01);
     isoBkgMain5.SetMaximum(10000.0);
     isoBkgMain5.GetHistogram()->GetXaxis()->SetTitle(unit.c_str());
@@ -1809,12 +1914,13 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
   nonIsoData->Draw("HISTESAME");
   Double_t statErr;
   nonIsoData->IntegralAndError(5, -1, statErr);
-  cout << "Region B data, m > 4: " << nonIsoData->Integral(5, -1) << " +/- " << statErr << endl;
+  cout << "Region B data, m > 4: " << setprecision(3) << nonIsoData->Integral(5, -1) << " +/- " << setprecision(3) << statErr << endl;
   for (vector<TH1F*>::iterator iIsoSig = isoSig.begin(); iIsoSig != isoSig.end(); 
        ++iIsoSig) {
     (*iIsoSig)->Draw("HISTSAME");
     cout << "Region A signal " << iIsoSig - isoSig.begin() << ", m > 4: ";
-    cout << (*iIsoSig)->Integral(5, -1) << endl;
+    cout << setprecision(3) << (*iIsoSig)->Integral(5, -1);
+    cout << " (S/sqrt(S+B) = " << (*iIsoSig)->Integral(5, -1)/sqrt((*iIsoSig)->Integral(5, -1) + B) << ")" << endl;
   }
   isoData->Draw("ESAME");
   cout << "Region A data, m < 2: " << isoData->Integral(1, 2) << endl;

@@ -557,12 +557,12 @@ process.baseIsoTauAnalysisSequence = cms.Sequence(
     )
 process.highMTIsoTauAnalysisSequence = cms.Sequence(
     process.baseIsoTauAnalysisSequence*
-    process.highMTFilter*
+#    process.highMTFilter*
     BTAGGINGprocess.highMTMuHadIsoTauAnalyzer
     )
 process.lowMTIsoTauAnalysisSequence = cms.Sequence(
     process.baseIsoTauAnalysisSequence*
-    process.lowMTFilter*
+#    process.lowMTFilter*
     BTAGGINGprocess.lowMTMuHadIsoTauAnalyzer
     )
 process.baseSignalIsoTauAnalysisSequence = cms.Sequence(
@@ -580,12 +580,12 @@ process.baseSignalIsoTauAnalysisSequence = cms.Sequence(
     )
 process.highMTSignalIsoTauAnalysisSequence = cms.Sequence(
     process.baseSignalIsoTauAnalysisSequence*
-    process.highMTFilter*
+#    process.highMTFilter*
     BTAGGINGprocess.highMTMuHadIsoTauAnalyzer
     )
 process.lowMTSignalIsoTauAnalysisSequence = cms.Sequence(
     process.baseSignalIsoTauAnalysisSequence*
-    process.lowMTFilter*
+#    process.lowMTFilter*
     BTAGGINGprocess.lowMTMuHadIsoTauAnalyzer
     )
 process.baseNonIsoTauAnalysisSequence = cms.Sequence(
@@ -597,12 +597,12 @@ process.baseNonIsoTauAnalysisSequence = cms.Sequence(
     )
 process.highMTNonIsoTauAnalysisSequence = cms.Sequence(
     process.baseNonIsoTauAnalysisSequence*
-    process.highMTFilter*
+#    process.highMTFilter*
     BTAGGINGprocess.highMTMuHadNonIsoTauAnalyzer
     )
 process.lowMTNonIsoTauAnalysisSequence = cms.Sequence(
     process.baseNonIsoTauAnalysisSequence*
-    process.lowMTFilter*
+#    process.lowMTFilter*
     BTAGGINGprocess.lowMTMuHadNonIsoTauAnalyzer
     )
 process.baseTauAnalysisSequence = cms.Sequence(
@@ -614,12 +614,12 @@ process.baseTauAnalysisSequence = cms.Sequence(
     )
 process.highMTTauAnalysisSequence = cms.Sequence(
     process.baseTauAnalysisSequence*
-    process.highMTFilter*
+#    process.highMTFilter*
     BTAGGINGprocess.highMTMuHadTauAnalyzer
     )
 process.lowMTTauAnalysisSequence = cms.Sequence(
     process.baseTauAnalysisSequence*
-    process.lowMTFilter*
+#    process.lowMTFilter*
     BTAGGINGprocess.lowMTMuHadTauAnalyzer
     )
 

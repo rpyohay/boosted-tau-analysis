@@ -49,6 +49,7 @@ ANY_PT_RANK = -1
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(1000)
+#process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(1)
 
 process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
 
@@ -571,12 +572,12 @@ process.baseIsoTauAnalysisSequence = cms.Sequence(
     )
 process.highMTIsoTauAnalysisSequence = cms.Sequence(
     process.baseIsoTauAnalysisSequence*
-    process.highMTFilter*
+#    process.highMTFilter*
     process.highMTMuHadIsoTauAnalyzer
     )
 process.lowMTIsoTauAnalysisSequence = cms.Sequence(
     process.baseIsoTauAnalysisSequence*
-    process.lowMTFilter*
+#    process.lowMTFilter*
     process.lowMTMuHadIsoTauAnalyzer
     )
 process.baseSignalIsoTauAnalysisSequence = cms.Sequence(
@@ -595,12 +596,12 @@ process.baseSignalIsoTauAnalysisSequence = cms.Sequence(
     )
 process.highMTSignalIsoTauAnalysisSequence = cms.Sequence(
     process.baseSignalIsoTauAnalysisSequence*
-    process.highMTFilter*
+#    process.highMTFilter*
     process.highMTMuHadIsoTauAnalyzer
     )
 process.lowMTSignalIsoTauAnalysisSequence = cms.Sequence(
     process.baseSignalIsoTauAnalysisSequence*
-    process.lowMTFilter*
+#    process.lowMTFilter*
     process.lowMTMuHadIsoTauAnalyzer
     )
 process.baseNonIsoTauAnalysisSequence = cms.Sequence(
@@ -613,12 +614,12 @@ process.baseNonIsoTauAnalysisSequence = cms.Sequence(
     )
 process.highMTNonIsoTauAnalysisSequence = cms.Sequence(
     process.baseNonIsoTauAnalysisSequence*
-    process.highMTFilter*
+#    process.highMTFilter*
     process.highMTMuHadNonIsoTauAnalyzer
     )
 process.lowMTNonIsoTauAnalysisSequence = cms.Sequence(
     process.baseNonIsoTauAnalysisSequence*
-    process.lowMTFilter*
+#    process.lowMTFilter*
     process.lowMTMuHadNonIsoTauAnalyzer
     )
 process.baseTauAnalysisSequence = cms.Sequence(
@@ -631,12 +632,12 @@ process.baseTauAnalysisSequence = cms.Sequence(
     )
 process.highMTTauAnalysisSequence = cms.Sequence(
     process.baseTauAnalysisSequence*
-    process.highMTFilter*
+#    process.highMTFilter*
     process.highMTMuHadTauAnalyzer
     )
 process.lowMTTauAnalysisSequence = cms.Sequence(
     process.baseTauAnalysisSequence*
-    process.lowMTFilter*
+#    process.lowMTFilter*
     process.lowMTMuHadTauAnalyzer
     )
 
