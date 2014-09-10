@@ -100,11 +100,11 @@ process.load("PhysicsTools.PatAlgos.patSequences_cff")
 from PhysicsTools.PatAlgos.tools.pfTools import *
 from PhysicsTools.PatAlgos.tools.metTools import *
 
-postfix = "PFlow" 
+PF2PATPostfix = "PFlow"
 jetAlgo="AK5"
 #addPfMET(process, postfixLabel=postfix)
 
-usePF2PAT(process,runPF2PAT=True,jetAlgo=jetAlgo,runOnMC=True,postfix=postfix,jetCorrections=('AK5PF',['L1FastJet','L2Relative','L3Absolute']),typeIMetCorrections=True,outputModules=[])
+usePF2PAT(process,runPF2PAT=True,jetAlgo=jetAlgo,runOnMC=True,postfix=PF2PATPostfix,jetCorrections=('AK5PF',['L1FastJet','L2Relative','L3Absolute']),typeIMetCorrections=True,outputModules=[])
 
 # to use tau-cleaned jet collection uncomment the following: 
 #getattr(process,"pfNoTau"+postfix).enable = True
@@ -113,12 +113,16 @@ usePF2PAT(process,runPF2PAT=True,jetAlgo=jetAlgo,runOnMC=True,postfix=postfix,je
 #adaptPFTaus(process,"hpsPFTau",postfix=postfix)
 
 from PhysicsTools.PatUtils.tools.metUncertaintyTools import runMEtUncertainties
-runMEtUncertainties(process, electronCollection='selectedPatElectronsPFlow', muonCollection='selectedPatMuonsPFlow', tauCollection='selectedPatTausPFlow', jetCollection='selectedPatJetsPFlow',doApplyType0corr=False)
+from JetMETCorrections.Type1MET.pfMETCorrectionType0_cfi import *
+runMEtUncertainties(process, electronCollection='selectedPatElectronsPFlow', muonCollection='selectedPatMuonsPFlow', tauCollection='selectedPatTausPFlow', jetCollection='selectedPatJetsPFlow',doApplyType0corr=True, postfix='Smeared')
 
+process.patPFMETtype0CorrSmeared=process.patPFMETtype0Corr.clone()
 process.PF2PAT = cms.Sequence(
 #    process.patDefaultSequence +
-    getattr(process,"patPF2PATSequence"+postfix) +
-    process.metUncertaintySequence
+    getattr(process,"patPF2PATSequence"+PF2PATPostfix) +
+    process.type0PFMEtCorrection + 
+    process.patPFMETtype0CorrSmeared + 
+    process.metUncertaintySequenceSmeared
     )
 
 #output commands
@@ -219,7 +223,13 @@ skimEventContent = cms.PSet(
     "drop *_inclusiveMergedVertices_*_*",
     "drop *_inclusiveVertexFinder_*_*",
     "drop *_trackVertexArbitrator_*_*",
-    "drop *_vertexMerger_*_*"
+    "drop *_vertexMerger_*_*",
+    "drop *_pfCandidateToVertexAssociation_*_*",
+    "drop *_trackToVertexAssociation_*_*",
+    "drop *_pfCandsNotInJetSmeared_*_*",
+    "drop *_particleFlowDisplacedVertex_*_*",
+    "drop *_selectedPrimaryVertexHighestPtTrackSumForPFMEtCorrType0_*_*",
+    "drop *_selectedVerticesForPFMEtCorrType0_*_*"
     #added 2-Jul-13 after estimating data skim size
 ##     "drop *_clusterSummaryProducer_*_*",
 ##     "drop *_hcalnoise_*_*",
