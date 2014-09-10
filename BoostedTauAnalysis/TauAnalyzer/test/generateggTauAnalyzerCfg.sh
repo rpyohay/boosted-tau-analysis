@@ -36,7 +36,7 @@ EDMOutputFilePrefix="/data1/`whoami`/gg/EDM_files/"
 ####VECTORS OF QUANTITIES FOR EACH SAMPLE####
 
 #vector of input file blocks for each sample
-inputFileBlocks=( "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a5_v1.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a7_v1.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a9_v1.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a11_v1.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a13_v1.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a15_v1.root'\n    ])" )
+inputFileBlocks=( "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a5_v2.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a7_v2.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a9_v2.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a11_v2.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a13_v2.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a15_v2.root'\n    ])" )
 
 #CleanJets output file
 cleanJetsOutFiles=( "${cleanJetsOutputFilePrefix}NMSSMSignal_MuProperties_gg_a5.root" "${cleanJetsOutputFilePrefix}NMSSMSignal_MuProperties_gg_a7.root" "${cleanJetsOutputFilePrefix}NMSSMSignal_MuProperties_gg_a9.root" "${cleanJetsOutputFilePrefix}NMSSMSignal_MuProperties_gg_a11.root" "${cleanJetsOutputFilePrefix}NMSSMSignal_MuProperties_gg_a13.root" "${cleanJetsOutputFilePrefix}NMSSMSignal_MuProperties_gg_a15.root" )
@@ -48,10 +48,6 @@ highMTNonIsoTauAnalyzerOutputFiles=( "${tauAnalyzerOutputFilePrefix}muHadNonIsoA
 lowMTNonIsoTauAnalyzerOutputFiles=( "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_lowMT_gg_a5_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_lowMT_gg_a7_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_lowMT_gg_a9_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_lowMT_gg_a11_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_lowMT_gg_a13_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_lowMT_gg_a15_${version}.root" )
 highMTAllTauAnalyzerOutputFiles=( "${tauAnalyzerOutputFilePrefix}muHadAnalysis_highMT_gg_a5_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadAnalysis_highMT_gg_a7_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadAnalysis_highMT_gg_a9_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadAnalysis_highMT_gg_a11_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadAnalysis_highMT_gg_a13_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadAnalysis_highMT_gg_a15_${version}.root" )
 lowMTAllTauAnalyzerOutputFiles=( "${tauAnalyzerOutputFilePrefix}muHadAnalysis_lowMT_gg_a5_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadAnalysis_lowMT_gg_a7_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadAnalysis_lowMT_gg_a9_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadAnalysis_lowMT_gg_a11_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadAnalysis_lowMT_gg_a13_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadAnalysis_lowMT_gg_a15_${version}.root" )
-highMTIsoTauBVetoScaleMinus1SigmaAnalyzerOutputFiles=( "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_highMT_minus1SigmaBVetoScale_gg_a5_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_highMT_minus1SigmaBVetoScale_gg_a7_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_highMT_minus1SigmaBVetoScale_gg_a9_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_highMT_minus1SigmaBVetoScale_gg_a11_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_highMT_minus1SigmaBVetoScale_gg_a13_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_highMT_minus1SigmaBVetoScale_gg_a15_${version}.root" )
-lowMTIsoTauBVetoScaleMinus1SigmaAnalyzerOutputFiles=( "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_lowMT_minus1SigmaBVetoScale_gg_a5_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_lowMT_minus1SigmaBVetoScale_gg_a7_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_lowMT_minus1SigmaBVetoScale_gg_a9_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_lowMT_minus1SigmaBVetoScale_gg_a11_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_lowMT_minus1SigmaBVetoScale_gg_a13_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_lowMT_minus1SigmaBVetoScale_gg_a15_${version}.root" )
-highMTIsoTauBVetoScalePlus1SigmaAnalyzerOutputFiles=( "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_highMT_plus1SigmaBVetoScale_gg_a5_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_highMT_plus1SigmaBVetoScale_gg_a7_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_highMT_plus1SigmaBVetoScale_gg_a9_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_highMT_plus1SigmaBVetoScale_gg_a11_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_highMT_plus1SigmaBVetoScale_gg_a13_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_highMT_plus1SigmaBVetoScale_gg_a15_${version}.root" )
-lowMTIsoTauBVetoScalePlus1SigmaAnalyzerOutputFiles=( "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_lowMT_plus1SigmaBVetoScale_gg_a5_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_lowMT_plus1SigmaBVetoScale_gg_a7_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_lowMT_plus1SigmaBVetoScale_gg_a9_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_lowMT_plus1SigmaBVetoScale_gg_a11_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_lowMT_plus1SigmaBVetoScale_gg_a13_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_lowMT_plus1SigmaBVetoScale_gg_a15_${version}.root" )
 
 #EDM output files
 EDMOutputFiles=( "${EDMOutputFilePrefix}gg_a5${infoTag}_${version}.root" "${EDMOutputFilePrefix}gg_a7${infoTag}_${version}.root" "${EDMOutputFilePrefix}gg_a9${infoTag}_${version}.root" "${EDMOutputFilePrefix}gg_a11${infoTag}_${version}.root" "${EDMOutputFilePrefix}gg_a13${infoTag}_${version}.root" "${EDMOutputFilePrefix}gg_a15${infoTag}_${version}.root" )
@@ -69,24 +65,18 @@ cd $dir
 for i in `seq $iBeg $iEnd`
   do
 
-  #generate cfg file for the isolated sample, nominal b veto scale
-  sed -e "s%FILES%${inputFileBlocks[${i}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${i}]}%" -e "s%HIGHMTNONISOTAUANALYZEROUTFILE%${highMTNonIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%HIGHMTALLTAUANALYZEROUTFILE%${highMTAllTauAnalyzerOutputFiles[${i}]}%" -e "s%HIGHMTISOTAUANALYZEROUTFILE%${highMTIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%LOWMTNONISOTAUANALYZEROUTFILE%${lowMTNonIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%LOWMTALLTAUANALYZEROUTFILE%${lowMTAllTauAnalyzerOutputFiles[${i}]}%" -e "s%LOWMTISOTAUANALYZEROUTFILE%${lowMTIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${i}]}%" -e "s%HIGHMTSEQUENCE%process.highMTIsoTauAnalysisSequence%" -e "s%LOWMTSEQUENCE%process.lowMTIsoTauAnalysisSequence%" -e "s%PUSCENARIO%S7%" -e "s%REWEIGHT%True%" -e "s%BTAGSCALESHIFT%mean%" -e "s%SAMPLE%${samples[${i}]}%" ../${templateCfg} > tauanalyzer_${samples[${i}]}_iso_nominal_b_veto_scale_cfg.py
+  #generate cfg file for the isolated sample
+  sed -e "s%FILES%${inputFileBlocks[${i}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${i}]}%" -e "s%HIGHMTNONISOTAUANALYZEROUTFILE%${highMTNonIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%HIGHMTALLTAUANALYZEROUTFILE%${highMTAllTauAnalyzerOutputFiles[${i}]}%" -e "s%HIGHMTISOTAUANALYZEROUTFILE%${highMTIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%LOWMTNONISOTAUANALYZEROUTFILE%${lowMTNonIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%LOWMTALLTAUANALYZEROUTFILE%${lowMTAllTauAnalyzerOutputFiles[${i}]}%" -e "s%LOWMTISOTAUANALYZEROUTFILE%${lowMTIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${i}]}%" -e "s%HIGHMTSEQUENCE%process.highMTIsoTauAnalysisSequence%" -e "s%LOWMTSEQUENCE%process.lowMTIsoTauAnalysisSequence%" -e "s%PUSCENARIO%S7%" -e "s%SAMPLE%${samples[${i}]}%" ../${templateCfg} > tauanalyzer_${samples[${i}]}_iso_cfg.py
 
-  #generate cfg file for the isolated sample, nominal b veto scale - 1sigma
-  sed -e "s%FILES%${inputFileBlocks[${i}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${i}]}%" -e "s%HIGHMTNONISOTAUANALYZEROUTFILE%${highMTNonIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%LOWMTNONISOTAUANALYZEROUTFILE%${lowMTNonIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%HIGHMTALLTAUANALYZEROUTFILE%${highMTAllTauAnalyzerOutputFiles[${i}]}%" -e "s%LOWMTALLTAUANALYZEROUTFILE%${lowMTAllTauAnalyzerOutputFiles[${i}]}%" -e "s%HIGHMTISOTAUANALYZEROUTFILE%${highMTIsoTauBVetoScaleMinus1SigmaAnalyzerOutputFiles[${i}]}%" -e "s%LOWMTISOTAUANALYZEROUTFILE%${lowMTIsoTauBVetoScaleMinus1SigmaAnalyzerOutputFiles[${i}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${i}]}%" -e "s%HIGHMTSEQUENCE%process.highMTIsoTauAnalysisSequence%" -e "s%LOWMTSEQUENCE%process.lowMTIsoTauAnalysisSequence%" -e "s%PUSCENARIO%S7%" -e "s%REWEIGHT%True%" -e "s%BTAGSCALESHIFT%min%" -e "s%SAMPLE%${samples[${i}]}%" ../${templateCfg} > tauanalyzer_${samples[${i}]}_iso_minus1sigma_b_veto_scale_cfg.py
-
-  #generate cfg file for the isolated sample, nominal b veto scale + 1sigma
-  sed -e "s%FILES%${inputFileBlocks[${i}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${i}]}%" -e "s%HIGHMTNONISOTAUANALYZEROUTFILE%${highMTNonIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%LOWMTNONISOTAUANALYZEROUTFILE%${lowMTNonIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%HIGHMTALLTAUANALYZEROUTFILE%${highMTAllTauAnalyzerOutputFiles[${i}]}%" -e "s%LOWMTALLTAUANALYZEROUTFILE%${lowMTAllTauAnalyzerOutputFiles[${i}]}%" -e "s%HIGHMTISOTAUANALYZEROUTFILE%${highMTIsoTauBVetoScalePlus1SigmaAnalyzerOutputFiles[${i}]}%" -e "s%LOWMTISOTAUANALYZEROUTFILE%${lowMTIsoTauBVetoScalePlus1SigmaAnalyzerOutputFiles[${i}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${i}]}%" -e "s%HIGHMTSEQUENCE%process.highMTIsoTauAnalysisSequence%" -e "s%LOWMTSEQUENCE%process.lowMTIsoTauAnalysisSequence%" -e "s%PUSCENARIO%S7%" -e "s%REWEIGHT%True%" -e "s%BTAGSCALESHIFT%max%" -e "s%SAMPLE%${samples[${i}]}%" ../${templateCfg} > tauanalyzer_${samples[${i}]}_iso_plus1sigma_b_veto_scale_cfg.py
-
-  #generate cfg file for the sample with no isolation cut, nominal b veto scale
-  sed -e "s%FILES%${inputFileBlocks[${i}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${i}]}%" -e "s%HIGHMTNONISOTAUANALYZEROUTFILE%${highMTNonIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%HIGHMTALLTAUANALYZEROUTFILE%${highMTAllTauAnalyzerOutputFiles[${i}]}%" -e "s%HIGHMTISOTAUANALYZEROUTFILE%${highMTIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%LOWMTNONISOTAUANALYZEROUTFILE%${lowMTNonIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%LOWMTALLTAUANALYZEROUTFILE%${lowMTAllTauAnalyzerOutputFiles[${i}]}%" -e "s%LOWMTISOTAUANALYZEROUTFILE%${lowMTIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${i}]}%" -e "s%HIGHMTSEQUENCE%process.highMTIsoTauAnalysisSequence%" -e "s%LOWMTSEQUENCE%process.lowMTIsoTauAnalysisSequence%" -e "s%PUSCENARIO%S7%" -e "s%REWEIGHT%True%" -e "s%BTAGSCALESHIFT%mean%" -e "s%SAMPLE%${samples[${i}]}%" ../${templateCfg} > tauanalyzer_${samples[${i}]}_all_cfg.py
+  #generate cfg file for the sample with no isolation cut
+  sed -e "s%FILES%${inputFileBlocks[${i}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${i}]}%" -e "s%HIGHMTNONISOTAUANALYZEROUTFILE%${highMTNonIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%HIGHMTALLTAUANALYZEROUTFILE%${highMTAllTauAnalyzerOutputFiles[${i}]}%" -e "s%HIGHMTISOTAUANALYZEROUTFILE%${highMTIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%LOWMTNONISOTAUANALYZEROUTFILE%${lowMTNonIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%LOWMTALLTAUANALYZEROUTFILE%${lowMTAllTauAnalyzerOutputFiles[${i}]}%" -e "s%LOWMTISOTAUANALYZEROUTFILE%${lowMTIsoTauAnalyzerOutputFiles[${i}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${i}]}%" -e "s%HIGHMTSEQUENCE%process.highMTIsoTauAnalysisSequence%" -e "s%LOWMTSEQUENCE%process.lowMTIsoTauAnalysisSequence%" -e "s%PUSCENARIO%S7%" -e "s%SAMPLE%${samples[${i}]}%" ../${templateCfg} > tauanalyzer_${samples[${i}]}_all_cfg.py
 done
 
 #generate run cfg that runs all nominal b veto scale files in the directory
-cat <<EOF > runggIsoNominalBVetoScaleTauAnalyzerCfgs.sh
+cat <<EOF > runggIsoTauAnalyzerCfgs.sh
 #!/bin/bash
 
-for file in \`ls -alh *gg_a*_iso_nominal*.py | awk '{ print \$9 }'\`
+for file in \`ls -alh *gg_a*_iso*.py | grep -v MET | awk '{ print \$9 }'\`
   do
   outFile=\`echo \$file | sed -e "s%\.py%.txt%"\`
   cmsRun \$file >& \$outFile &
@@ -94,34 +84,6 @@ done
 
 exit 0
 EOF
-chmod a+x runggIsoNominalBVetoScaleTauAnalyzerCfgs.sh
-
-#generate run cfg that runs all - 1sigma b veto scale files in the directory
-cat <<EOF > runggIsoMinus1SigmaBVetoScaleTauAnalyzerCfgs.sh
-#!/bin/bash
-
-for file in \`ls -alh *gg_a*_iso_minus1sigma*.py | awk '{ print \$9 }'\`
-  do
-  outFile=\`echo \$file | sed -e "s%\.py%.txt%"\`
-  cmsRun \$file >& \$outFile &
-done
-
-exit 0
-EOF
-chmod a+x runggIsoMinus1SigmaBVetoScaleTauAnalyzerCfgs.sh
-
-#generate run cfg that runs all + 1sigma b veto scale files in the directory
-cat <<EOF > runggIsoPlus1SigmaBVetoScaleTauAnalyzerCfgs.sh
-#!/bin/bash
-
-for file in \`ls -alh *gg_a*_iso_plus1sigma*.py | awk '{ print \$9 }'\`
-  do
-  outFile=\`echo \$file | sed -e "s%\.py%.txt%"\`
-  cmsRun \$file >& \$outFile &
-done
-
-exit 0
-EOF
-chmod a+x runggIsoPlus1SigmaBVetoScaleTauAnalyzerCfgs.sh
+chmod a+x runggIsoTauAnalyzerCfgs.sh
 
 exit 0
