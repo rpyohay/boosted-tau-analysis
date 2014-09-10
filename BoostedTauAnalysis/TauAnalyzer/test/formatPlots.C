@@ -36,13 +36,22 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   vector<string> canvasNames1D;
   canvasNames1D.push_back("hadTauAssociatedMuMultiplicityCanvas");
   canvasNames1D.push_back("muHadMassCanvas");
-  canvasNames1D.push_back("muHadMassFinalSelCanvas");
+  canvasNames1D.push_back("muHadMassZMuCanvas");
+  canvasNames1D.push_back("muHadMassZTauMuCanvas");
+  canvasNames1D.push_back("muHadMassOtherTauMuCanvas");
+  canvasNames1D.push_back("muHadMassMuElseCanvas");
+  canvasNames1D.push_back("muHadMassNotMuElseCanvas");
   canvasNames1D.push_back("muHadMass1ProngCanvas");
   canvasNames1D.push_back("muHadMass1Prong1Pi0Canvas");
   canvasNames1D.push_back("muHadMass1Prong2Pi0Canvas");
   canvasNames1D.push_back("muHadMass3ProngCanvas");
   canvasNames1D.push_back("muHadMassReweightErrSqCanvas");
   canvasNames1D.push_back("muHadChargeCanvas");
+  canvasNames1D.push_back("muHadDdxyCanvas");
+  canvasNames1D.push_back("muHadDdzCanvas");
+  canvasNames1D.push_back("WMuPVdzCanvas");
+  canvasNames1D.push_back("muPVdzCanvas");
+  canvasNames1D.push_back("hadPVdzCanvas");
   canvasNames1D.push_back("METCanvas");
   canvasNames1D.push_back("bTagDiscrimCanvas");
   canvasNames1D.push_back("WMuIsoCanvas");
@@ -94,6 +103,9 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   canvasNames1D.push_back("jet_ptmj_etacutCanvas");
   canvasNames1D.push_back("muHad_t3t1Canvas");
   canvasNames1D.push_back("muHad_t2t1Canvas");
+  canvasNames1D.push_back("muHad_t1t2Canvas");
+  canvasNames1D.push_back("muHad_t2t3Canvas");
+  canvasNames1D.push_back("muHad_t3t4Canvas");
   canvasNames1D.push_back("muHad_t3t1_pT1020Canvas");
   canvasNames1D.push_back("muHad_t3t1_pT2030Canvas");
   canvasNames1D.push_back("muHad_t3t1_pT3040Canvas");
@@ -115,10 +127,13 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   canvasNames1D.push_back("secondNchtrk_10_Canvas");
   canvasNames1D.push_back("secondNchtrk_30_Canvas");
   canvasNames1D.push_back("dRWMuSoftMuCanvas");
+  //canvasNames1D.push_back("dRWMuTauHadCanvas");
+  //canvasNames1D.push_back("dRTauMuTauHadCanvas");
+  //canvasNames1D.push_back("dRWMuTauMuTauHadCanvas");
   canvasNames1D.push_back("dPhiWMuSoftMuCanvas");
   canvasNames1D.push_back("dPhiWMuSoftMuWithCutCanvas");
   canvasNames1D.push_back("dPhiWMuSecJetCanvas");
-//  canvasNames1D.push_back("dRWMuTriggerObjectCanvas");
+  //  canvasNames1D.push_back("dRWMuTriggerObjectCanvas");
   canvasNames1D.push_back("WMu3rdTightMuChargeProductCanvas");
   canvasNames1D.push_back("tauHadPhotonEnergyFractionCanvas");
   canvasNames1D.push_back("dThetaPhotonOtherTauConstituentsCanvas");
@@ -154,22 +169,35 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   canvasNames2D.push_back("mWMuTauMuVsMWMuTauMuTauHadGenFSRCanvas");
   canvasNames2D.push_back("muHadMassVsMWMuTauMuTauHadCanvas");
   canvasNames2D.push_back("WMuMTVsMETCanvas");
+  //canvasNames2D.push_back("dzWMuVsdzTauMuCanvas");
+  //canvasNames2D.push_back("dzWMuVsdzTauHadCanvas");
+  //canvasNames2D.push_back("dzTauMuVsdzTauHadCanvas");
   canvasNames2D.push_back("muHad_t3t1VsptmjCanvas");
   canvasNames2D.push_back("muHad_t3t1VsDecayModeCanvas");
   canvasNames2D.push_back("muHadMassVsNAddlJetsCanvas");
   canvasNames2D.push_back("muHadMassVsCSVScoreCanvas");
+  canvasNames2D.push_back("muHadMassVsWMuMTCanvas");
   canvasNames2D.push_back("tauHadJetEnergyFractionVsTauHadIsoCanvas");
   canvasNames2D.push_back("tauHadCleanedJetEnergyFractionVsTauHadIsoCanvas");
   vector<string> graphNames1D;
   graphNames1D.push_back("hadTauAssociatedMuMultiplicity");
   graphNames1D.push_back("muHadMass");
-  graphNames1D.push_back("muHadMassFinalSel");
+  graphNames1D.push_back("muHadMassZMu");
+  graphNames1D.push_back("muHadMassZTauMu");
+  graphNames1D.push_back("muHadMassOtherTauMu");
+  graphNames1D.push_back("muHadMassMuElse");
+  graphNames1D.push_back("muHadMassNotMuElse");
   graphNames1D.push_back("muHadMass1Prong");
   graphNames1D.push_back("muHadMass1Prong1Pi0");
   graphNames1D.push_back("muHadMass1Prong2Pi0");
   graphNames1D.push_back("muHadMass3Prong");
   graphNames1D.push_back("muHadMassReweightErrSq");
   graphNames1D.push_back("muHadCharge");
+  graphNames1D.push_back("muHadDdxy");
+  graphNames1D.push_back("muHadDdz");
+  graphNames1D.push_back("WMuPVdz");
+  graphNames1D.push_back("muPVdz");
+  graphNames1D.push_back("hadPVdz");
   graphNames1D.push_back("MET");
   graphNames1D.push_back("bTagDiscrim");
   graphNames1D.push_back("WMuIso");
@@ -221,6 +249,9 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   graphNames1D.push_back("jet_ptmj_etacut");
   graphNames1D.push_back("muHad_t3t1");
   graphNames1D.push_back("muHad_t2t1");
+  graphNames1D.push_back("muHad_t1t2");
+  graphNames1D.push_back("muHad_t2t3");
+  graphNames1D.push_back("muHad_t3t4");
   graphNames1D.push_back("muHad_t3t1_pT1020");
   graphNames1D.push_back("muHad_t3t1_pT2030");
   graphNames1D.push_back("muHad_t3t1_pT3040");
@@ -242,6 +273,9 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   graphNames1D.push_back("second_Nchtrk_10");
   graphNames1D.push_back("second_Nchtrk_30");
   graphNames1D.push_back("dRWMuSoftMu");
+  //graphNames1D.push_back("dRWMuTauHad");
+  //graphNames1D.push_back("dRTauMuTauHad");
+  //graphNames1D.push_back("dRWMuTauMuTauHad");
   graphNames1D.push_back("dPhiWMuSoftMu");
   graphNames1D.push_back("dPhiWMuSoftMu_withCut");
   graphNames1D.push_back("dPhiWMuSecJet");
@@ -281,10 +315,14 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   graphNames2D.push_back("mWMuTauMuVsMWMuTauMuTauHadGenFSR");
   graphNames2D.push_back("muHadMassVsMWMuTauMuTauHad");
   graphNames2D.push_back("WMuMTVsMET");
+  //  graphNames2D.push_back("dzWMuVsdzTauMu");
+  //  graphNames2D.push_back("dzWMuVsdzTauHad");
+  //  graphNames2D.push_back("dzTauMuVsdzTauHad");
   graphNames2D.push_back("muHad_t3t1Vsptmj");
   graphNames2D.push_back("muHad_t3t1VsDecayMode");
   graphNames2D.push_back("muHadMassVsNAddlJets");
   graphNames2D.push_back("muHadMassVsCSVScore");
+  graphNames2D.push_back("muHadMassVsWMuMT");
   graphNames2D.push_back("tauHadJetEnergyFractionVsTauHadIso");
   graphNames2D.push_back("tauHadCleanedJetEnergyFractionVsTauHadIso");
   vector<Int_t> nullBlindLow(canvasNames1D.size(), 0);
@@ -1409,8 +1447,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   }
 
   //compute data-driven QCD estimate in signal (i.e. isolated W muon + isolated tau) region
-  string outputFileNameA(analysisFilePath + "results/dataVsMC_RegionAQCDEstimate" + dataVTag + 
-			 fileExt);
+  string outputFileNameA(analysisFilePath + "results/dataVsMC_RegionAQCDEstimate" + MTBin + dataVTag + fileExt);
   string inputFileNameB(nonIsoWDataIsoHaddOutputFile); // Region C
   string inputFileNameC(dataVsMCOutputDiff); // Region B
   string inputFileNameD(nonIsoWDataNonIsoHaddOutputFile); // Region D
@@ -1423,8 +1460,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   }
 
   //compute data-driven QCD estimate in control (i.e. isolated W muon + non-isolated tau) region
-  string outputFileNameB(analysisFilePath + "results/dataVsMC_RegionBQCDEstimate" + dataVTag + 
-			 fileExt);
+  string outputFileNameB(analysisFilePath + "results/dataVsMC_RegionBQCDEstimate" + MTBin + dataVTag + fileExt);
   if (uncTag == "") {
     cout << "\nPlot data-driven QCD estimate for region B\n---\n";
     drawQCDRegionAHistograms(outputFileNameB,inputFileNameD,inputFileNameC,
@@ -1497,7 +1533,6 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   //compare data-driven QCD to total MC in signal region
   vector<string>RegionAQCDVsMCInputFiles;
   RegionAQCDVsMCInputFiles.push_back(outputFileNameA);
-  //RegionAQCDVsMCInputFiles.push_back("/data1/friccita/results/dataVsMC_RegionAQCDEstimate_v43.root");
   RegionAQCDVsMCInputFiles.push_back(DYJetsToLLIsoHaddOutputFile);
   RegionAQCDVsMCInputFiles.push_back(TTJetsIsoHaddOutputFile);
   RegionAQCDVsMCInputFiles.push_back(TIsoHaddOutputFile);
@@ -1511,7 +1546,11 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 				       tag19p7InvFb + outputVTag + fileExt);
   QCDVsMCClosurePlots(RegionAQCDVsMCInputFiles, variable, theunit, 1, 2, RegionAQCDVsMCOutputFile);
 
-
+  cout << "\nCompare region B MC+ddQCD to regionA MC+ddQCD \n\n";
+  string RegionBVsAMCComparisonOutputFile(analysisFilePath + 
+				       "results/QCDMC_RegionBVsA" + MTBin +
+				       tag19p7InvFb + outputVTag + fileExt);
+  compareTotalMCBToA(RegionBQCDVsMCInputFiles, RegionAQCDVsMCInputFiles, variable, theunit, 1, 2, RegionBVsAMCComparisonOutputFile);
 
   cout << "\nBegin region A vs. region B plots, sample by sample...\n\n";
   
@@ -1966,34 +2005,34 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   // 				    tag19p7InvFb + "_v149" + fileExt);
   // fileNamesForComparison1.push_back(nonIsoWDataIsoPrefix + "_v149" + fileExt);
   // fileNamesForComparison1.push_back(nonIsoWDataNonIsoPrefix + "_v149" + fileExt);
-// vector<string> fileNamesForComparison2;
-// fileNamesForComparison2.push_back(analysisFilePath + "results/dataVsMCQCDFromData_muHadNonIsoAnalysis" + MTBin +
-  //				    tag19p7InvFb + "_v41" + fileExt);
+  //vector<string> fileNamesForComparison2;
+  //fileNamesForComparison2.push_back(analysisFilePath + "results/dataVsMCQCDFromData_muHadNonIsoAnalysis" + MTBin +
+  //			    tag19p7InvFb + "_v41" + fileExt);
   // fileNamesForComparison2.push_back(analysisFilePath + "results/dataVsMC_muHadNonIsoAnalysis" + 
   // 				    tag19p7InvFb + "_v152" + fileExt);
   // fileNamesForComparison2.push_back(analysisFilePath + "results/sigVsBkg_muHadIsoAnalysis" + 
   // 				    tag19p7InvFb + "_v152" + fileExt);
   // fileNamesForComparison2.push_back(nonIsoWDataIsoPrefix + "_v152" + fileExt);
   // fileNamesForComparison2.push_back(nonIsoWDataNonIsoPrefix + "_v152" + fileExt);
-//vector<string> outputCanvasTagsForComparison;
+ //vector<string> outputCanvasTagsForComparison;
   // outputCanvasTagsForComparison.push_back("_regionBData");
-//outputCanvasTagsForComparison.push_back("_regionBMC");
-  // outputCanvasTagsForComparison.push_back("_regionAMC");
+ //outputCanvasTagsForComparison.push_back("_regionBMC");
+ //outputCanvasTagsForComparison.push_back("_regionAMC");
   // outputCanvasTagsForComparison.push_back("_regionCData");
   // outputCanvasTagsForComparison.push_back("_regionDData");
-  // vector<bool> stack;
+ //vector<bool> stack;
   // stack.push_back(false);
 //stack.push_back(true);
-  // stack.push_back(true);
+   //stack.push_back(true);
   // stack.push_back(false);
   // stack.push_back(false);
-//vector<unsigned int> pad;
-  // pad.push_back(1);
+   //vector<unsigned int> pad;
+   //pad.push_back(1);
   // pad.push_back(1);
 //pad.push_back(1);
   // pad.push_back(0);
   // pad.push_back(0);
-//compare2Versions(fileNamesForComparison1, fileNamesForComparison2, analysisFilePath + 
-//		   "results/comparison_v35_v41" + fileExt, outputCanvasTagsForComparison, stack, 
-//  		   pad);
+   //compare2Versions(fileNamesForComparison1, fileNamesForComparison2, analysisFilePath + 
+   //	   "results/comparison_v35_v41" + fileExt, outputCanvasTagsForComparison, stack, 
+   //  		   pad);
 }
