@@ -146,7 +146,7 @@ process.SSSFFilterIso = cms.EDFilter('SSSFFilter',
 #MT filter
 process.load('BoostedTauAnalysis/TauAnalyzer/tauanalyzer_cfi')
 process.MTFilter.minMT = cms.double(50.)
-process.MTFilter.METTag = cms.InputTag("patType1CorrectedPFMet")
+process.MTFilter.METTag = cms.InputTag("patType1CorrectedPFMetPFlow")
 
 #produce gen tau mu collection
 process.genTauMuSelector = cms.EDFilter(

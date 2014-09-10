@@ -42,3 +42,5 @@ Toolset/
 dummy.root
 gen*root
 iso*root
+GluGlu_*/
+*speed_test*

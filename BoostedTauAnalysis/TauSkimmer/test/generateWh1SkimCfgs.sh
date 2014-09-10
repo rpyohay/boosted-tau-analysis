@@ -42,13 +42,13 @@ for i in `seq $iBeg $iEnd`
       sed -e "s%    'root.*_150\.root',%%" -e "s%    'root.*_368\.root',%%" -e "s%    'root.*_41\.root',%%" -e "s%    'root.*_487\.root',%%" -e "s%    'root.*_[5-9][0-9][1-9]\.root'.*%%" -e "s%    'root.*_[5-9][1-9][0-9]\.root'.*%%" -e "s%    'root.*_[6-9][0-9][0-9]\.root'.*%%" -e "s%    'root.*_1000\.root'.*%%" -e "s%a9%${masses[${i}]}%g" -e "s%SAMPLE%${samples[${i}]}%" -e "s%VERSION%${version}%g" ../${templateCfg} > tauSelectionSkim_${samples[${i}]}.py
   elif [ ${samples[${i}]} = "Wh1_a7" ]
       then
-      sed -e "s%    'root.*_324\.root',%%" -e "s%a9%${masses[${i}]}%g" -e "s%SAMPLE%${samples[${i}]}%" -e "s%VERSION%${version}%g" -e "s%user\/yohay%group/phys_higgs%" ../${templateCfg} > tauSelectionSkim_${samples[${i}]}.py
+      sed -e "s%    'root.*_324\.root',%%" -e "s%a9%${masses[${i}]}%g" -e "s%SAMPLE%${samples[${i}]}%" -e "s%VERSION%${version}%g" -e "s%user\/yohay%group/phys_higgs/HiggsExo%" ../${templateCfg} > tauSelectionSkim_${samples[${i}]}.py
   elif [ ${samples[${i}]} = "Wh1_a9" ]
       then
       sed -e "s%SAMPLE%${samples[${i}]}%" -e "s%VERSION%${version}%g" ../${templateCfg} > tauSelectionSkim_${samples[${i}]}.py
   elif [ ${samples[${i}]} = "Wh1_a11" ]
       then
-      sed -e "s%    'root.*_18\.root',%%" -e "s%    'root.*_125\.root',%%" -e "s%    'root.*_235\.root',%%" -e "s%    'root.*_359\.root',%%" -e "s%    'root.*_373\.root'.*%%" -e "s%    'root.*_436\.root'.*%%" -e "s%    'root.*_529\.root'.*%%" -e "s%a9%${masses[${i}]}%g" -e "s%SAMPLE%${samples[${i}]}%" -e "s%VERSION%${version}%g" -e "s%user\/yohay%group/phys_higgs%" ../${templateCfg} > tauSelectionSkim_${samples[${i}]}.py
+      sed -e "s%    'root.*_18\.root',%%" -e "s%    'root.*_125\.root',%%" -e "s%    'root.*_235\.root',%%" -e "s%    'root.*_359\.root',%%" -e "s%    'root.*_373\.root'.*%%" -e "s%    'root.*_436\.root'.*%%" -e "s%    'root.*_529\.root'.*%%" -e "s%    'root.*_787\.root'.*%%" -e "s%a9%${masses[${i}]}%g" -e "s%SAMPLE%${samples[${i}]}%" -e "s%VERSION%${version}%g" -e "s%user\/yohay%group/phys_higgs/HiggsExo%" ../${templateCfg} > tauSelectionSkim_${samples[${i}]}.py
   elif [ ${samples[${i}]} = "Wh1_a13" ]
       then
       sed -e "s%    'root.*_914\.root',%%" -e "s%a9%${masses[${i}]}%g" -e "s%SAMPLE%${samples[${i}]}%" -e "s%VERSION%${version}%g" ../${templateCfg} > tauSelectionSkim_${samples[${i}]}.py

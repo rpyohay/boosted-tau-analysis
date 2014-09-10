@@ -29,6 +29,9 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
     gSystem->Load((macroPath + "Plot_C.so").c_str());
   }
 
+  //ignore warnings
+  gErrorIgnoreLevel = kError;
+
   //needed so vector<Color_t> and vector<Style_t> work
   vector<short> dummy;
 
@@ -333,7 +336,6 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   dataBlindLow[3] = 3;
   dataBlindLow[4] = 3;
   dataBlindLow[5] = 3;
-
   vector<Int_t> dataBlindHigh(canvasNames1D.size(), -1);
 
   //set up plot style options
@@ -391,7 +393,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   styles.push_back(34);
   vector<string> legendEntriesSigBkg;
   legendEntriesSigBkg.push_back("Wh_{1}");
-  legendEntriesSigBkg.push_back("gg fusion");
+  if (a1Mass == "_a9") legendEntriesSigBkg.push_back("gg fusion");
 //   legendEntriesSigBkg.push_back("QCD");
 //   legendEntriesSigBkg.push_back("QCDB");
 //   legendEntriesSigBkg.push_back("QCDBMu");
@@ -404,12 +406,13 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   legendEntriesSigBkg.push_back("WZ");
   legendEntriesSigBkg.push_back("ZZ");
   legendEntriesSigBkg.push_back("WW");
-  std::reverse(legendEntriesSigBkg.begin() + 2, legendEntriesSigBkg.end());
+  if (a1Mass == "_a9") std::reverse(legendEntriesSigBkg.begin() + 2, legendEntriesSigBkg.end());
+  else std::reverse(legendEntriesSigBkg.begin() + 1, legendEntriesSigBkg.end());
   vector<string> legendEntriesSigBkgQCDFromData(legendEntriesSigBkg);
   legendEntriesSigBkgQCDFromData.push_back("QCD (from data)");
   vector<string> legendEntriesMCData(legendEntriesSigBkg);
   legendEntriesMCData[0] = "Data 19.7 fb^{-1}";
-  legendEntriesMCData.erase(legendEntriesMCData.begin() + 1);
+  if (a1Mass == "_a9") legendEntriesMCData.erase(legendEntriesMCData.begin() + 1);
   vector<string> legendEntriesMCDataQCDFromData(legendEntriesMCData);
   legendEntriesMCDataQCDFromData.push_back("QCD (from data)");
   vector<string> legendEntriesSearchVsControl;
@@ -429,11 +432,43 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   const float Wh1a11Weight19p7InvFb = 0.0000912588116817724;
   const float Wh1a13Weight19p7InvFb = 0.0000570729270729271;
   const float Wh1a15Weight19p7InvFb = 0.0000493486973947896;
+  const float gga5Weight19p7InvFb = 1.0;
+  const float gga7Weight19p7InvFb = 1.0;
   const float gga9Weight19p7InvFb = 1.95295217378794;
+  const float gga11Weight19p7InvFb = 1.0;
+  const float gga13Weight19p7InvFb = 1.0;
+  const float gga15Weight19p7InvFb = 1.0;
+  float Wh1Weight19p7InvFb = 1.0;
+  float ggWeight19p7InvFb = 1.0;
+  if (a1Mass == "_a5") {
+    Wh1Weight19p7InvFb = Wh1a5Weight19p7InvFb;
+    ggWeight19p7InvFb = gga5Weight19p7InvFb;
+  }
+  else if (a1Mass == "_a7") {
+    Wh1Weight19p7InvFb = Wh1a7Weight19p7InvFb;
+    ggWeight19p7InvFb = gga7Weight19p7InvFb;
+  }
+  else if (a1Mass == "_a9") {
+    Wh1Weight19p7InvFb = Wh1a9Weight19p7InvFb;
+    ggWeight19p7InvFb = gga9Weight19p7InvFb;
+  }
+  else if (a1Mass == "_a11") {
+    Wh1Weight19p7InvFb = Wh1a11Weight19p7InvFb;
+    ggWeight19p7InvFb = gga11Weight19p7InvFb;
+  }
+  else if (a1Mass == "_a13") {
+    Wh1Weight19p7InvFb = Wh1a13Weight19p7InvFb;
+    ggWeight19p7InvFb = gga13Weight19p7InvFb;
+  }
+  else if (a1Mass == "_a15") {
+    Wh1Weight19p7InvFb = Wh1a15Weight19p7InvFb;
+    ggWeight19p7InvFb = gga15Weight19p7InvFb;
+  }
+  else cout << "Unrecognized a1 mass, weight defaulting to 1\n";
   vector<float> weights1(15, 0.0);
   vector<float> weightsSigBkg;
   weightsSigBkg.push_back(1.0); //Wh1 already weighted to 19.7 fb^-1
-  weightsSigBkg.push_back(1.0); //gg already weighted to 19.7 fb^-1
+  if (a1Mass == "_a9") weightsSigBkg.push_back(1.0); //gg already weighted to 19.7 fb^-1
 //   weightsSigBkg.push_back(1.0); //QCDRelXSecWeights already weighted to 19.7 fb^-1
 //   weightsSigBkg.push_back(1.0); //QCDBRelXSecWeights already weighted to 19.7 fb^-1
 //   weightsSigBkg.push_back(1.0); //QCDBMuRelXSecWeights already weighted to 19.7 fb^-1
@@ -446,7 +481,8 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   weightsSigBkg.push_back(1.0); //WZ already weighted to 19.7 fb^-1
   weightsSigBkg.push_back(1.0); //ZZ already weighted to 19.7 fb^-1
   weightsSigBkg.push_back(1.0); //WW already weighted to 19.7 fb^-1
-  std::reverse(weightsSigBkg.begin() + 2, weightsSigBkg.end());
+  if (a1Mass == "_a9") std::reverse(weightsSigBkg.begin() + 2, weightsSigBkg.end());
+  else std::reverse(weightsSigBkg.begin() + 1, weightsSigBkg.end());
   vector<float> weightsSigBkgQCDFromData(weightsSigBkg);
   weightsSigBkgQCDFromData.push_back(1.0); //QCD estimate from data already weighted to 19.7 fb^-1
   vector<float> weightsMCData;
@@ -537,7 +573,8 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   string dataSuffix(dataVTag + fileExt);
   string dataIsoPrefix(analysisFilePath + "data/analysis/muHadIsoAnalysis" + MTBin + "_SingleMu");
   string dataIsoHaddOutputFile(dataIsoPrefix + dataSuffix); //BLINDED!!!
-  string dataNonIsoPrefix(analysisFilePath + "data/analysis/muHadNonIsoAnalysis" + MTBin + "_SingleMu");
+  string dataNonIsoPrefix(analysisFilePath + "data/analysis/muHadNonIsoAnalysis" + MTBin + 
+			  "_SingleMu");
   string dataNonIsoHaddOutputFile(dataNonIsoPrefix + dataSuffix);
   string dataNonIsoReweightPrefix(analysisFilePath + 
 				  "data/analysis/muHadNonIsoReweightAnalysis_SingleMu");
@@ -592,8 +629,8 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 // 		 nullBlindLow, nullBlindHigh);
     if (doNoHPSIsoCut) {
       haddCanvases(dataAllHaddOutputFile, dataAllHaddInputFiles, 
-		   vector<float>(32, 1.0), canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, 
-		   dataBlindLow, dataBlindHigh); //BLINDED!!!
+		   vector<float>(32, 1.0), canvasNames1D, graphNames1D, canvasNames2D, 
+		   graphNames2D, dataBlindLow, dataBlindHigh); //BLINDED!!!
     }
   }
 
@@ -601,10 +638,12 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   cout << "...non-isolated W data\n";
   string nonIsoWDataSuffix(nonIsoWDataVTag + fileExt);
   string nonIsoWDataIsoPrefix(analysisFilePath + 
-			      "nonIsoWData/analysis/nonIsoW_muHadIsoAnalysis" + MTBin + "_SingleMu");
+			      "nonIsoWData/analysis/nonIsoW_muHadIsoAnalysis" + MTBin + 
+			      "_SingleMu");
   string nonIsoWDataIsoHaddOutputFile(nonIsoWDataIsoPrefix + nonIsoWDataSuffix);
   string nonIsoWDataNonIsoPrefix(analysisFilePath + 
-				 "nonIsoWData/analysis/nonIsoW_muHadNonIsoAnalysis" + MTBin + "_SingleMu");
+				 "nonIsoWData/analysis/nonIsoW_muHadNonIsoAnalysis" + MTBin + 
+				 "_SingleMu");
   string nonIsoWDataNonIsoHaddOutputFile(nonIsoWDataNonIsoPrefix + nonIsoWDataSuffix);
   string nonIsoWDataNonIsoReweightPrefix(analysisFilePath + "nonIsoWData/analysis/nonIsoW_muHadNonIsoReweightAnalysis_SingleMu");
   string nonIsoWDataNonIsoReweightHaddOutputFile(nonIsoWDataNonIsoReweightPrefix + 
@@ -633,9 +672,9 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
     nonIsoWDataAllHaddInputFiles.push_back(nonIsoWDataAllName.str());
   }
   if (uncTag == "") {
-    haddCanvases(nonIsoWDataIsoHaddOutputFile, nonIsoWDataIsoHaddInputFiles, vector<float>(4, 1.0), 
-		 canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
-		 nullBlindHigh);
+    haddCanvases(nonIsoWDataIsoHaddOutputFile, nonIsoWDataIsoHaddInputFiles, 
+		 vector<float>(4, 1.0), canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, 
+		 nullBlindLow, nullBlindHigh);
     haddCanvases(nonIsoWDataNonIsoHaddOutputFile, nonIsoWDataNonIsoHaddInputFiles, 
 		 vector<float>(4, 1.0), canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, 
 		 nullBlindLow, nullBlindHigh);
@@ -644,8 +683,8 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 // 		 nullBlindLow, nullBlindHigh);
     if (doNoHPSIsoCut) {
       haddCanvases(nonIsoWDataAllHaddOutputFile, nonIsoWDataAllHaddInputFiles, 
-		   vector<float>(4, 1.0), canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, 
-		   nullBlindLow, nullBlindHigh);
+		   vector<float>(4, 1.0), canvasNames1D, graphNames1D, canvasNames2D, 
+		   graphNames2D, nullBlindLow, nullBlindHigh);
     }
   }
   
@@ -702,9 +741,11 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   //"hadd" Wh1 sample just to get the formatting of the 2D plots the same
   cout << "...Wh1\n";
   string Wh1Suffix(Wh1SigVTag + fileExt);
-  string Wh1IsoPrefix(analysisFilePath + "Wh1_Medium/muHadIsoAnalysis" + MTBin + uncTag + "_Wh1_a9");
+  string Wh1IsoPrefix(analysisFilePath + "Wh1_Medium/muHadIsoAnalysis" + MTBin + uncTag + "_Wh1" + 
+		      a1Mass);
   string Wh1IsoHaddOutputFile(Wh1IsoPrefix + "_hadd" + Wh1Suffix);
-  string Wh1AllPrefix(analysisFilePath + "Wh1_Medium/muHadAnalysis" + MTBin + uncTag + "_Wh1_a9");
+  string Wh1AllPrefix(analysisFilePath + "Wh1_Medium/muHadAnalysis" + MTBin + uncTag + "_Wh1" + 
+		      a1Mass);
   string Wh1AllHaddOutputFile(Wh1AllPrefix + "_hadd" + Wh1Suffix);
   vector<string> Wh1IsoHaddInputFiles;
   vector<string> Wh1AllHaddInputFiles;
@@ -715,20 +756,20 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   Wh1AllName << Wh1AllPrefix << Wh1Suffix;
   Wh1AllHaddInputFiles.push_back(Wh1AllName.str());
   haddCanvases(Wh1IsoHaddOutputFile, Wh1IsoHaddInputFiles, 
-	       vector<float>(1, Wh1a9Weight19p7InvFb), canvasNames1D, graphNames1D, 
+	       vector<float>(1, Wh1Weight19p7InvFb), canvasNames1D, graphNames1D, 
 	       canvasNames2D, graphNames2D, nullBlindLow, nullBlindHigh);
   if (doNoHPSIsoCut) {
     haddCanvases(Wh1AllHaddOutputFile, Wh1AllHaddInputFiles, 
-		 vector<float>(1, Wh1a9Weight19p7InvFb), canvasNames1D, graphNames1D, 
+		 vector<float>(1, Wh1Weight19p7InvFb), canvasNames1D, graphNames1D, 
 		 canvasNames2D, graphNames2D, nullBlindLow, nullBlindHigh);
   }
 
   //"hadd" gg sample just to get the formatting of the 2D plots the same
   cout << "...gg fusion\n";
   string ggSuffix(ggSigVTag + fileExt);
-  string ggIsoPrefix(analysisFilePath + "gg/muHadIsoAnalysis" + MTBin + uncTag + "_gg_a9");
+  string ggIsoPrefix(analysisFilePath + "gg/muHadIsoAnalysis" + MTBin + uncTag + "_gg" + a1Mass);
   string ggIsoHaddOutputFile(ggIsoPrefix + "_hadd" + ggSuffix);
-  string ggAllPrefix(analysisFilePath + "gg/muHadAnalysis" + MTBin + uncTag + "_gg_a9");
+  string ggAllPrefix(analysisFilePath + "gg/muHadAnalysis" + MTBin + uncTag + "_gg" + a1Mass);
   string ggAllHaddOutputFile(ggAllPrefix + "_hadd" + ggSuffix);
   vector<string> ggIsoHaddInputFiles;
   vector<string> ggAllHaddInputFiles;
@@ -738,13 +779,15 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   stringstream ggAllName;
   ggAllName << ggAllPrefix << ggSuffix;
   ggAllHaddInputFiles.push_back(ggAllName.str());
-  haddCanvases(ggIsoHaddOutputFile, ggIsoHaddInputFiles, vector<float>(1, gga9Weight19p7InvFb), 
-	       canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
-	       nullBlindHigh);
-  if (doNoHPSIsoCut) {
-    haddCanvases(ggAllHaddOutputFile, ggAllHaddInputFiles, vector<float>(1, gga9Weight19p7InvFb), 
+  if (a1Mass == "_a9") { //temporary until all gg samples are done
+    haddCanvases(ggIsoHaddOutputFile, ggIsoHaddInputFiles, vector<float>(1, ggWeight19p7InvFb), 
 		 canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
 		 nullBlindHigh);
+    if (doNoHPSIsoCut) {
+      haddCanvases(ggAllHaddOutputFile, ggAllHaddInputFiles, vector<float>(1, ggWeight19p7InvFb), 
+		   canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
+		   nullBlindHigh);
+    }
   }
   /*
   //hadd QCD Mu-enriched Pt-binned samples
@@ -905,7 +948,8 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   //hadd Drell-Yan+jets ml+l- binned samples
   cout << "...Drell-Yan\n";
   string DYJetsToLLSuffix(DYJetsToLLVTag + fileExt);
-  string DYJetsToLLIsoPrefix(analysisFilePath + "DYJetsToLL/analysis/muHadIsoAnalysis" + MTBin + "_DYJetsToLL");
+  string DYJetsToLLIsoPrefix(analysisFilePath + "DYJetsToLL/analysis/muHadIsoAnalysis" + MTBin + 
+			     "_DYJetsToLL");
   string DYJetsToLLIsoHaddOutputFile(DYJetsToLLIsoPrefix + DYJetsToLLSuffix);
   string DYJetsToLLNonIsoPrefix(analysisFilePath + 
 				"DYJetsToLL/analysis/muHadNonIsoAnalysis" + MTBin + "_DYJetsToLL");
@@ -914,7 +958,8 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
     DYJetsToLLNonIsoReweightPrefix(analysisFilePath + 
 				   "DYJetsToLL/analysis/muHadNonIsoReweightAnalysis_DYJetsToLL");
   string DYJetsToLLNonIsoReweightHaddOutputFile(DYJetsToLLNonIsoReweightPrefix + DYJetsToLLSuffix);
-  string DYJetsToLLAllPrefix(analysisFilePath + "DYJetsToLL/analysis/muHadAnalysis" + MTBin + "_DYJetsToLL");
+  string DYJetsToLLAllPrefix(analysisFilePath + "DYJetsToLL/analysis/muHadAnalysis" + MTBin + 
+			     "_DYJetsToLL");
   string DYJetsToLLAllHaddOutputFile(DYJetsToLLAllPrefix + DYJetsToLLSuffix);
   vector<string> DYJetsToLLIsoHaddInputFiles;
   vector<string> DYJetsToLLNonIsoHaddInputFiles;
@@ -940,12 +985,12 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
     DYJetsToLLAllHaddInputFiles.push_back(DYJetsToLLAllName.str());
   }
   if (uncTag == "") {
-    haddCanvases(DYJetsToLLIsoHaddOutputFile, DYJetsToLLIsoHaddInputFiles, DYJetsToLLRelXSecWeights, 
-		 canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
-		 nullBlindHigh);
+    haddCanvases(DYJetsToLLIsoHaddOutputFile, DYJetsToLLIsoHaddInputFiles, 
+		 DYJetsToLLRelXSecWeights, canvasNames1D, graphNames1D, canvasNames2D, 
+		 graphNames2D, nullBlindLow, nullBlindHigh);
     haddCanvases(DYJetsToLLNonIsoHaddOutputFile, DYJetsToLLNonIsoHaddInputFiles, 
-		 DYJetsToLLRelXSecWeights, canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, 
-		 nullBlindLow, nullBlindHigh);
+		 DYJetsToLLRelXSecWeights, canvasNames1D, graphNames1D, canvasNames2D, 
+		 graphNames2D, nullBlindLow, nullBlindHigh);
 //     haddCanvases(DYJetsToLLNonIsoReweightHaddOutputFile, DYJetsToLLNonIsoReweightHaddInputFiles, 
 // 		 DYJetsToLLRelXSecWeights, canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, 
 // 		 nullBlindLow, nullBlindHigh);
@@ -959,9 +1004,11 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   //"hadd" ttbar sample just to get the formatting of the 2D plots the same
   cout << "...ttbar\n";
   string TTJetsSuffix(TTJetsVTag + fileExt);
-  string TTJetsIsoPrefix(analysisFilePath + "TTJets/analysis/muHadIsoAnalysis" + MTBin + "_TTJets");
+  string TTJetsIsoPrefix(analysisFilePath + "TTJets/analysis/muHadIsoAnalysis" + MTBin + 
+			 "_TTJets");
   string TTJetsIsoHaddOutputFile(TTJetsIsoPrefix + "_hadd" + TTJetsSuffix);
-  string TTJetsNonIsoPrefix(analysisFilePath + "TTJets/analysis/muHadNonIsoAnalysis" + MTBin + "_TTJets");
+  string TTJetsNonIsoPrefix(analysisFilePath + "TTJets/analysis/muHadNonIsoAnalysis" + MTBin + 
+			    "_TTJets");
   string TTJetsNonIsoHaddOutputFile(TTJetsNonIsoPrefix + "_hadd" + TTJetsSuffix);
   string TTJetsNonIsoReweightPrefix(analysisFilePath + 
 				    "TTJets/analysis/muHadNonIsoReweightAnalysis_TTJets");
@@ -1054,15 +1101,18 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   //hadd W+>=1 jet samples
   cout << "...W+>=1 jet\n";
   string WNJetsToLNuSuffix("JetsToLNu" + WNJetsToLNuVTag + fileExt);
-  string WNJetsToLNuIsoPrefix(analysisFilePath + "WNJetsToLNu/analysis/muHadIsoAnalysis" + MTBin + "_W");
+  string WNJetsToLNuIsoPrefix(analysisFilePath + "WNJetsToLNu/analysis/muHadIsoAnalysis" + MTBin + 
+			      "_W");
   string WNJetsToLNuIsoHaddOutputFile(WNJetsToLNuIsoPrefix + "N" + WNJetsToLNuSuffix);
-  string WNJetsToLNuNonIsoPrefix(analysisFilePath + "WNJetsToLNu/analysis/muHadNonIsoAnalysis" + MTBin + "_W");
+  string WNJetsToLNuNonIsoPrefix(analysisFilePath + "WNJetsToLNu/analysis/muHadNonIsoAnalysis" + 
+				 MTBin + "_W");
   string WNJetsToLNuNonIsoHaddOutputFile(WNJetsToLNuNonIsoPrefix + "N" + WNJetsToLNuSuffix);
   string WNJetsToLNuNonIsoReweightPrefix(analysisFilePath + 
 					 "WNJetsToLNu/analysis/muHadNonIsoReweightAnalysis_W");
   string WNJetsToLNuNonIsoReweightHaddOutputFile(WNJetsToLNuNonIsoReweightPrefix + "N" + 
 						 WNJetsToLNuSuffix);
-  string WNJetsToLNuAllTauPrefix(analysisFilePath + "WNJetsToLNu/analysis/muHadAnalysis" + MTBin + "_W");
+  string WNJetsToLNuAllTauPrefix(analysisFilePath + "WNJetsToLNu/analysis/muHadAnalysis" + MTBin + 
+				 "_W");
   string WNJetsToLNuAllTauHaddOutputFile(WNJetsToLNuAllTauPrefix + "N" + WNJetsToLNuSuffix);
   vector<string> WNJetsToLNuIsoHaddInputFiles;
   vector<string> WNJetsToLNuNonIsoHaddInputFiles;
@@ -1326,15 +1376,15 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   //compare MC signal to background
   string sigVsBkgOutputFile(analysisFilePath + "results/sigVsBkg_muHadIsoAnalysis" + MTBin + 
 			    uncTag + tag19p7InvFb + outputVTag + fileExt);
-  string sigVsBkgOutputFile1(analysisFilePath + "results/sigVsBkg_muHadIsoAnalysis" + MTBin + tag1 + 
-			     uncTag + outputVTag + fileExt);
-  string sigVsBkgOutputFileNoHPSIsoCut(analysisFilePath + "results/sigVsBkg_muHadAnalysis" + MTBin + 
-				       uncTag + tag19p7InvFb + outputVTag + fileExt);
-  string sigVsBkgOutputFileNoHPSIsoCutNorm1(analysisFilePath + "results/sigVsBkg_muHadAnalysis" + MTBin + 
-					    uncTag + tag1 + outputVTag + fileExt);
+  string sigVsBkgOutputFile1(analysisFilePath + "results/sigVsBkg_muHadIsoAnalysis" + MTBin + 
+			     tag1 + uncTag + outputVTag + fileExt);
+  string sigVsBkgOutputFileNoHPSIsoCut(analysisFilePath + "results/sigVsBkg_muHadAnalysis" + 
+				       MTBin + uncTag + tag19p7InvFb + outputVTag + fileExt);
+  string sigVsBkgOutputFileNoHPSIsoCutNorm1(analysisFilePath + "results/sigVsBkg_muHadAnalysis" + 
+					    MTBin + uncTag + tag1 + outputVTag + fileExt);
   vector<string> sigVsBkgInputFiles;
   sigVsBkgInputFiles.push_back(Wh1IsoHaddOutputFile);
-  sigVsBkgInputFiles.push_back(ggIsoHaddOutputFile);
+  if (a1Mass == "_a9") sigVsBkgInputFiles.push_back(ggIsoHaddOutputFile);
 //   sigVsBkgInputFiles.push_back(QCDIsoHaddOutputFile);
 //   sigVsBkgInputFiles.push_back(QCDBIsoHaddOutputFile);
 //   sigVsBkgInputFiles.push_back(QCDBMuIsoHaddOutputFile);
@@ -1347,10 +1397,11 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   sigVsBkgInputFiles.push_back(WZIsoHaddOutputFile);
   sigVsBkgInputFiles.push_back(ZZIsoHaddOutputFile);
   sigVsBkgInputFiles.push_back(WWIsoHaddOutputFile);
-  std::reverse(sigVsBkgInputFiles.begin() + 2, sigVsBkgInputFiles.end());
+  if (a1Mass == "_a9") std::reverse(sigVsBkgInputFiles.begin() + 2, sigVsBkgInputFiles.end());
+  else std::reverse(sigVsBkgInputFiles.begin() + 1, sigVsBkgInputFiles.end());
   vector<string> sigVsBkgNoHPSIsoCutInputFiles;
   sigVsBkgNoHPSIsoCutInputFiles.push_back(Wh1AllHaddOutputFile);
-  sigVsBkgNoHPSIsoCutInputFiles.push_back(ggAllHaddOutputFile);
+  if (a1Mass == "_a9") sigVsBkgNoHPSIsoCutInputFiles.push_back(ggAllHaddOutputFile);
 //   sigVsBkgNoHPSIsoCutInputFiles.push_back(QCDAllHaddOutputFile);
 //   sigVsBkgNoHPSIsoCutInputFiles.push_back(QCDBAllHaddOutputFile);
 //   sigVsBkgNoHPSIsoCutInputFiles.push_back(QCDBMuAllHaddOutputFile);
@@ -1363,17 +1414,37 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   sigVsBkgNoHPSIsoCutInputFiles.push_back(WZAllHaddOutputFile);
   sigVsBkgNoHPSIsoCutInputFiles.push_back(ZZAllHaddOutputFile);
   sigVsBkgNoHPSIsoCutInputFiles.push_back(WWAllHaddOutputFile);
-  std::reverse(sigVsBkgNoHPSIsoCutInputFiles.begin() + 2, sigVsBkgNoHPSIsoCutInputFiles.end());
+  if (a1Mass == "_a9") {
+    std::reverse(sigVsBkgNoHPSIsoCutInputFiles.begin() + 2, sigVsBkgNoHPSIsoCutInputFiles.end());
+  }
+  else {
+    std::reverse(sigVsBkgNoHPSIsoCutInputFiles.begin() + 1, sigVsBkgNoHPSIsoCutInputFiles.end());
+  }
   cout << "Plot signal vs. background normalized to data luminosity\n---\n";
-  drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgOutputFile, sigVsBkgInputFiles, 
-					canvasNames1D, graphNames1D, legendHeaders19p7InvFb, 
-					colors, styles, legendEntriesSigBkg, weightsSigBkg, 
-					setLogY, drawStack, sigBkg);
-  cout << "\nPlot signal vs. background normalized to 1\n---\n";
-  drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgOutputFile1, sigVsBkgInputFiles, 
-					canvasNames1D, graphNames1D, legendHeaders1, colors, 
-					styles, legendEntriesSigBkg, weights1, setLinY, drawSame, 
-					sigBkg);
+  if (uncTag == "") {
+    drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgOutputFile, sigVsBkgInputFiles, 
+					  canvasNames1D, graphNames1D, legendHeaders19p7InvFb, 
+					  colors, styles, legendEntriesSigBkg, weightsSigBkg, 
+					  setLogY, drawStack, sigBkg);
+    cout << "\nPlot signal vs. background normalized to 1\n---\n";
+    drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgOutputFile1, sigVsBkgInputFiles, 
+					  canvasNames1D, graphNames1D, legendHeaders1, colors, 
+					  styles, legendEntriesSigBkg, weights1, setLinY, 
+					  drawSame, sigBkg);
+  }
+  else {
+    drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgOutputFile, sigVsBkgInputFiles, 
+					  vector<string>(1, "muHadMassCanvas"), 
+					  vector<string>(1, "muHadMass"), legendHeaders19p7InvFb, 
+					  colors, styles, legendEntriesSigBkg, weightsSigBkg, 
+					  setLogY, drawStack, sigBkg);
+    cout << "\nPlot signal vs. background normalized to 1\n---\n";
+    drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgOutputFile1, sigVsBkgInputFiles, 
+					  vector<string>(1, "muHadMassCanvas"), 
+					  vector<string>(1, "muHadMass"), legendHeaders1, colors, 
+					  styles, legendEntriesSigBkg, weights1, setLinY, 
+					  drawSame, sigBkg);
+  }
   if (doNoHPSIsoCut) {
     cout << "\nPlot signal vs. background normalized to data luminosity, ";
     cout << "no cut on tau isolation\n---\n";
@@ -1474,24 +1545,41 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 				       "results/sigVsBkgQCDFromData_muHadIsoAnalysis" + MTBin + 
 				       uncTag + tag19p7InvFb + outputVTag + fileExt);
   string sigVsBkgQCDFromDataOutputFile1(analysisFilePath + 
-					"results/sigVsBkgQCDFromData_muHadIsoAnalysis" + MTBin + uncTag + 
-					tag1 + outputVTag + fileExt);
+					"results/sigVsBkgQCDFromData_muHadIsoAnalysis" + MTBin + 
+					uncTag + tag1 + outputVTag + fileExt);
   vector<string> sigVsBkgQCDFromDataInputFiles(sigVsBkgInputFiles);
   sigVsBkgQCDFromDataInputFiles.push_back(outputFileNameA);
   //sigVsBkgQCDFromDataInputFiles.push_back("/data1/friccita/results/dataVsMC_RegionAQCDEstimate_v43.root");
   cout << "\nPlot signal vs. background with data-driven QCD estimate ";
   cout << "normalized to data luminosity\n---\n";
-  drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgQCDFromDataOutputFile, 
-  					sigVsBkgQCDFromDataInputFiles, canvasNames1D, 
-  					graphNames1D, legendHeaders19p7InvFb, colors, styles, 
-  					legendEntriesSigBkgQCDFromData, weightsSigBkgQCDFromData, 
-  					setLogY, drawStack, sigBkg);
-  cout << "\nPlot signal vs. background with data-driven QCD estimate normalized to 1\n---\n";
-  drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgQCDFromDataOutputFile1, 
-  					sigVsBkgQCDFromDataInputFiles, canvasNames1D, 
-  					graphNames1D, legendHeaders1, colors, styles, 
-  					legendEntriesSigBkgQCDFromData, weights1, setLinY, 
-  					drawSame, sigBkg);
+  if (uncTag == "") {
+    drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgQCDFromDataOutputFile, 
+					  sigVsBkgQCDFromDataInputFiles, canvasNames1D, 
+					  graphNames1D, legendHeaders19p7InvFb, colors, styles, 
+					  legendEntriesSigBkgQCDFromData, 
+					  weightsSigBkgQCDFromData, setLogY, drawStack, sigBkg);
+    cout << "\nPlot signal vs. background with data-driven QCD estimate normalized to 1\n---\n";
+    drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgQCDFromDataOutputFile1, 
+					  sigVsBkgQCDFromDataInputFiles, canvasNames1D, 
+					  graphNames1D, legendHeaders1, colors, styles, 
+					  legendEntriesSigBkgQCDFromData, weights1, setLinY, 
+					  drawSame, sigBkg);
+  }
+  else {
+    drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgQCDFromDataOutputFile, 
+					  sigVsBkgQCDFromDataInputFiles, 
+					  vector<string>(1, "muHadMassCanvas"), 
+					  vector<string>(1, "muHadMass"), legendHeaders19p7InvFb, 
+					  colors, styles, legendEntriesSigBkgQCDFromData, 
+					  weightsSigBkgQCDFromData, setLogY, drawStack, sigBkg);
+    cout << "\nPlot signal vs. background with data-driven QCD estimate normalized to 1\n---\n";
+    drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgQCDFromDataOutputFile1, 
+					  sigVsBkgQCDFromDataInputFiles, 
+					  vector<string>(1, "muHadMassCanvas"), 
+					  vector<string>(1, "muHadMass"), legendHeaders1, colors, 
+					  styles, legendEntriesSigBkgQCDFromData, weights1, 
+					  setLinY, drawSame, sigBkg);
+  }
 
   //compare data to MC + data-driven QCD in control region
   string dataVsMCQCDFromDataOutputFile(analysisFilePath + 
@@ -1508,8 +1596,8 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
     drawMultipleEfficiencyGraphsOn1Canvas(dataVsMCQCDFromDataOutputFile, 
 					  dataVsMCQCDFromDataInputFiles, canvasNames1D, 
 					  graphNames1D, legendHeaders19p7InvFb, colors, styles, 
-					  legendEntriesMCDataQCDFromData, weightsMCDataQCDFromData, 
-					  setLogY, drawStack, dataMC);
+					  legendEntriesMCDataQCDFromData, 
+					  weightsMCDataQCDFromData, setLogY, drawStack, dataMC);
   }
 
   //compare data-driven QCD to total MC in control region
@@ -1528,7 +1616,10 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   string RegionBQCDVsMCOutputFile(analysisFilePath + 
 				       "results/QCDVsMC_RegionB" + MTBin +
 				       tag19p7InvFb + outputVTag + fileExt);
-  QCDVsMCClosurePlots(RegionBQCDVsMCInputFiles, variable, theunit, 1, 2, RegionBQCDVsMCOutputFile);
+  if (uncTag == "") {
+    QCDVsMCClosurePlots(RegionBQCDVsMCInputFiles, variable, theunit, // 1, 2, 
+			RegionBQCDVsMCOutputFile);
+  }
 
   //compare data-driven QCD to total MC in signal region
   vector<string>RegionAQCDVsMCInputFiles;
@@ -1544,12 +1635,16 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   string RegionAQCDVsMCOutputFile(analysisFilePath + 
 				       "results/QCDVsMC_RegionA" + MTBin +
 				       tag19p7InvFb + outputVTag + fileExt);
-  QCDVsMCClosurePlots(RegionAQCDVsMCInputFiles, variable, theunit, 1, 2, RegionAQCDVsMCOutputFile);
 
+  if (uncTag == "") {
+    QCDVsMCClosurePlots(RegionAQCDVsMCInputFiles, variable, theunit, // 1, 2, 
+			RegionAQCDVsMCOutputFile);
+  }
+  
   cout << "\nCompare region B MC+ddQCD to regionA MC+ddQCD \n\n";
   string RegionBVsAMCComparisonOutputFile(analysisFilePath + 
-				       "results/QCDMC_RegionBVsA" + MTBin +
-				       tag19p7InvFb + outputVTag + fileExt);
+					  "results/QCDMC_RegionBVsA" + MTBin +
+					  tag19p7InvFb + outputVTag + fileExt);
   compareTotalMCBToA(RegionBQCDVsMCInputFiles, RegionAQCDVsMCInputFiles, variable, theunit, 1, 2, RegionBVsAMCComparisonOutputFile);
 
   cout << "\nBegin region A vs. region B plots, sample by sample...\n\n";
@@ -1629,8 +1724,8 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   //compare Drell-Yan+jets search sample to control sample
   cout << "...Drell-Yan\n";
   string DYJetsToLLSearchVsControlOutputFile(analysisFilePath + 
-  					     "DYJetsToLL/analysis/isoVsNonIsoTaus" + MTBin + tag1 + 
-  					     outputVTag + fileExt);
+  					     "DYJetsToLL/analysis/isoVsNonIsoTaus" + MTBin + 
+					     tag1 + outputVTag + fileExt);
   string DYJetsToLLSearchVsControlReweightOutputFile = 
     smartReplace(DYJetsToLLSearchVsControlOutputFile, "NonIso", "NonIsoReweight");
   vector<string> DYJetsToLLSearchVsControlInputFiles;
@@ -1643,8 +1738,8 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
     drawMultipleEfficiencyGraphsOn1Canvas(DYJetsToLLSearchVsControlOutputFile, 
 					  DYJetsToLLSearchVsControlInputFiles, canvasNames1D, 
 					  graphNames1D, legendHeaders1DYJetsToLL, colors, styles, 
-					  legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
-					  dataMC);
+					  legendEntriesSearchVsControl, weights1, setLinY, 
+					  drawSame, dataMC);
   }
   // cout << "...with reweighting\n";
   // drawMultipleEfficiencyGraphsOn1Canvas(DYJetsToLLSearchVsControlReweightOutputFile, 
@@ -1655,8 +1750,8 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 
   //compare tt+jets search sample to control sample
   cout << "...ttbar\n";
-  string TTJetsSearchVsControlOutputFile(analysisFilePath + "TTJets/analysis/isoVsNonIsoTaus" + MTBin + 
-  					 tag1 + outputVTag + fileExt);
+  string TTJetsSearchVsControlOutputFile(analysisFilePath + "TTJets/analysis/isoVsNonIsoTaus" + 
+					 MTBin + tag1 + outputVTag + fileExt);
   string TTJetsSearchVsControlReweightOutputFile = 
     smartReplace(TTJetsSearchVsControlOutputFile, "NonIso", "NonIsoReweight");
   vector<string> TTJetsSearchVsControlInputFiles;
@@ -1669,8 +1764,8 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
     drawMultipleEfficiencyGraphsOn1Canvas(TTJetsSearchVsControlOutputFile, 
 					  TTJetsSearchVsControlInputFiles, canvasNames1D, 
 					  graphNames1D, legendHeaders1TTJets, colors, styles, 
-					  legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
-					  dataMC);
+					  legendEntriesSearchVsControl, weights1, setLinY, 
+					  drawSame, dataMC);
   }
   // cout << "...with reweighting\n";
   // drawMultipleEfficiencyGraphsOn1Canvas(TTJetsSearchVsControlReweightOutputFile, 
@@ -1681,8 +1776,8 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 
   //compare single top search sample to control sample
   cout << "...single top\n";
-  string TSearchVsControlOutputFile(analysisFilePath + "SingleTop/analysis/isoVsNonIsoTaus" + MTBin + 
-  				    tag1 + outputVTag + fileExt);
+  string TSearchVsControlOutputFile(analysisFilePath + "SingleTop/analysis/isoVsNonIsoTaus" + 
+				    MTBin + tag1 + outputVTag + fileExt);
   string TSearchVsControlReweightOutputFile = 
     smartReplace(TSearchVsControlOutputFile, "NonIso", "NonIsoReweight");
   vector<string> TSearchVsControlInputFiles;
@@ -1707,8 +1802,8 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   //compare W+>=1 jet search sample to control sample
   cout << "...W+>=1 jet\n";
   string WNJetsToLNuSearchVsControlOutputFile(analysisFilePath + 
-  					      "WNJetsToLNu/analysis/isoVsNonIsoTaus" + MTBin + tag1 + 
-  					      outputVTag + fileExt);
+  					      "WNJetsToLNu/analysis/isoVsNonIsoTaus" + MTBin + 
+					      tag1 + outputVTag + fileExt);
   string WNJetsToLNuSearchVsControlReweightOutputFile = 
     smartReplace(WNJetsToLNuSearchVsControlOutputFile, "NonIso", "NonIsoReweight");
   vector<string> WNJetsToLNuSearchVsControlInputFiles;
@@ -1722,8 +1817,8 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
     drawMultipleEfficiencyGraphsOn1Canvas(WNJetsToLNuSearchVsControlOutputFile, 
 					  WNJetsToLNuSearchVsControlInputFiles, canvasNames1D, 
 					  graphNames1D, legendHeaders1WNJetsToLNu, colors, styles, 
-					  legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
-					  dataMC);
+					  legendEntriesSearchVsControl, weights1, setLinY, 
+					  drawSame, dataMC);
   }
   // cout << "...with reweighting\n";
   // drawMultipleEfficiencyGraphsOn1Canvas(WNJetsToLNuSearchVsControlReweightOutputFile, 
@@ -1732,59 +1827,59 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   // 					colors, styles, legendEntriesSearchVsControl, weights1, 
   // 					setLinY, drawSame, dataMC);
 
-  //compare W+bbbar search sample to control sample
-  cout << "...Wbb\n";
-  string WbbSearchVsControlOutputFile(analysisFilePath + "Wbb/analysis/isoVsNonIsoTaus" + MTBin + tag1 + 
-  				      outputVTag + fileExt);
-  //string WbbSearchVsControlReweightOutputFile = 
-  // smartReplace(WbbSearchVsControlOutputFile, "NonIso", "NonIsoReweight");
-  vector<string> WbbSearchVsControlInputFiles;
-  //WbbSearchVsControlInputFiles.push_back(WbbIsoHaddOutputFile);
-  //WbbSearchVsControlInputFiles.push_back(WbbNonIsoHaddOutputFile);
-  // vector<string> WbbSearchVsControlReweightInputFiles(WbbSearchVsControlInputFiles);
-  //WbbSearchVsControlReweightInputFiles[1] = WbbNonIsoReweightHaddOutputFile;
-  // cout << "...without reweighting\n";
-  // drawMultipleEfficiencyGraphsOn1Canvas(WbbSearchVsControlOutputFile, 
-  // 					WbbSearchVsControlInputFiles, canvasNames1D, graphNames1D, 
-  // 					legendHeaders1Wbb, colors, styles, 
-  // 					legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
-  // 					dataMC);
-  // cout << "...with reweighting\n";
-  // drawMultipleEfficiencyGraphsOn1Canvas(WbbSearchVsControlReweightOutputFile, 
-  // 					WbbSearchVsControlReweightInputFiles, 
-  // 					canvasNames1D, graphNames1D, legendHeaders1Wbb, colors, 
-  // 					styles, legendEntriesSearchVsControl, weights1, setLinY, 
-  // 					drawSame, dataMC);
+//   //compare W+bbbar search sample to control sample
+//   cout << "...Wbb\n";
+//   string WbbSearchVsControlOutputFile(analysisFilePath + "Wbb/analysis/isoVsNonIsoTaus" + MTBin + 
+// 				      tag1 + outputVTag + fileExt);
+//   string WbbSearchVsControlReweightOutputFile = 
+//     smartReplace(WbbSearchVsControlOutputFile, "NonIso", "NonIsoReweight");
+//   vector<string> WbbSearchVsControlInputFiles;
+//   WbbSearchVsControlInputFiles.push_back(WbbIsoHaddOutputFile);
+//   WbbSearchVsControlInputFiles.push_back(WbbNonIsoHaddOutputFile);
+//   vector<string> WbbSearchVsControlReweightInputFiles(WbbSearchVsControlInputFiles);
+//   WbbSearchVsControlReweightInputFiles[1] = WbbNonIsoReweightHaddOutputFile;
+//   cout << "...without reweighting\n";
+//   drawMultipleEfficiencyGraphsOn1Canvas(WbbSearchVsControlOutputFile, 
+//   					WbbSearchVsControlInputFiles, canvasNames1D, graphNames1D, 
+//   					legendHeaders1Wbb, colors, styles, 
+//   					legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
+//   					dataMC);
+//   cout << "...with reweighting\n";
+//   drawMultipleEfficiencyGraphsOn1Canvas(WbbSearchVsControlReweightOutputFile, 
+//   					WbbSearchVsControlReweightInputFiles, 
+//   					canvasNames1D, graphNames1D, legendHeaders1Wbb, colors, 
+//   					styles, legendEntriesSearchVsControl, weights1, setLinY, 
+//   					drawSame, dataMC);
 
-  //compare W+jets jet search sample to control sample
-  cout << "...W+jets\n";
-  string WJetsToLNuSearchVsControlOutputFile(analysisFilePath + 
-  					     "WJetsToLNu/analysis/isoVsNonIsoTaus" + MTBin + tag1 + 
-  					     outputVTag + fileExt);
-  //string WJetsToLNuSearchVsControlReweightOutputFile = 
-  // smartReplace(WJetsToLNuSearchVsControlOutputFile, "NonIso", "NonIsoReweight");
-  vector<string> WJetsToLNuSearchVsControlInputFiles;
-  // WJetsToLNuSearchVsControlInputFiles.push_back(WJetsToLNuIsoHaddOutputFile);
-  // WJetsToLNuSearchVsControlInputFiles.push_back(WJetsToLNuNonIsoHaddOutputFile);
-  //vector<string> WJetsToLNuSearchVsControlReweightInputFiles(WJetsToLNuSearchVsControlInputFiles);
-  //WJetsToLNuSearchVsControlReweightInputFiles[1] = WJetsToLNuNonIsoReweightHaddOutputFile;
-  // cout << "...without reweighting\n";
-  // drawMultipleEfficiencyGraphsOn1Canvas(WJetsToLNuSearchVsControlOutputFile, 
-  // 					WJetsToLNuSearchVsControlInputFiles, canvasNames1D, 
-  // 					graphNames1D, legendHeaders1WJetsToLNu, colors, styles, 
-  // 					legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
-  // 					dataMC);
-  // cout << "...with reweighting\n";
-  // drawMultipleEfficiencyGraphsOn1Canvas(WJetsToLNuSearchVsControlReweightOutputFile, 
-  // 					WJetsToLNuSearchVsControlReweightInputFiles, 
-  // 					canvasNames1D, graphNames1D, legendHeaders1WJetsToLNu, 
-  // 					colors, styles, legendEntriesSearchVsControl, weights1, 
-  // 					setLinY, drawSame, dataMC);
+//   //compare W+jets jet search sample to control sample
+//   cout << "...W+jets\n";
+//   string WJetsToLNuSearchVsControlOutputFile(analysisFilePath + 
+//   					     "WJetsToLNu/analysis/isoVsNonIsoTaus" + MTBin + 
+// 					     tag1 + outputVTag + fileExt);
+//   string WJetsToLNuSearchVsControlReweightOutputFile = 
+//     smartReplace(WJetsToLNuSearchVsControlOutputFile, "NonIso", "NonIsoReweight");
+//   vector<string> WJetsToLNuSearchVsControlInputFiles;
+//   WJetsToLNuSearchVsControlInputFiles.push_back(WJetsToLNuIsoHaddOutputFile);
+//   WJetsToLNuSearchVsControlInputFiles.push_back(WJetsToLNuNonIsoHaddOutputFile);
+//   vector<string> WJetsToLNuSearchVsControlReweightInputFiles(WJetsToLNuSearchVsControlInputFiles);
+//   WJetsToLNuSearchVsControlReweightInputFiles[1] = WJetsToLNuNonIsoReweightHaddOutputFile;
+//   cout << "...without reweighting\n";
+//   drawMultipleEfficiencyGraphsOn1Canvas(WJetsToLNuSearchVsControlOutputFile, 
+//   					WJetsToLNuSearchVsControlInputFiles, canvasNames1D, 
+//   					graphNames1D, legendHeaders1WJetsToLNu, colors, styles, 
+//   					legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
+//   					dataMC);
+//   cout << "...with reweighting\n";
+//   drawMultipleEfficiencyGraphsOn1Canvas(WJetsToLNuSearchVsControlReweightOutputFile, 
+//   					WJetsToLNuSearchVsControlReweightInputFiles, 
+//   					canvasNames1D, graphNames1D, legendHeaders1WJetsToLNu, 
+//   					colors, styles, legendEntriesSearchVsControl, weights1, 
+//   					setLinY, drawSame, dataMC);
 
   //compare WZ search sample to control sample
   cout << "...WZ\n";
-  string WZSearchVsControlOutputFile(analysisFilePath + "WZ/analysis/isoVsNonIsoTaus" + MTBin + tag1 + 
-  				     outputVTag + fileExt);
+  string WZSearchVsControlOutputFile(analysisFilePath + "WZ/analysis/isoVsNonIsoTaus" + MTBin + 
+				     tag1 + outputVTag + fileExt);
   string WZSearchVsControlReweightOutputFile = 
     smartReplace(WZSearchVsControlOutputFile, "NonIso", "NonIsoReweight");
   vector<string> WZSearchVsControlInputFiles;
@@ -1794,9 +1889,10 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   WZSearchVsControlReweightInputFiles[1] = WZNonIsoReweightHaddOutputFile;
   if (uncTag == "") {
     cout << "...without reweighting\n";
-    drawMultipleEfficiencyGraphsOn1Canvas(WZSearchVsControlOutputFile, WZSearchVsControlInputFiles, 
-					  canvasNames1D, graphNames1D, legendHeaders1WZ, colors, 
-					  styles, legendEntriesSearchVsControl, weights1, setLinY, 
+    drawMultipleEfficiencyGraphsOn1Canvas(WZSearchVsControlOutputFile, 
+					  WZSearchVsControlInputFiles, canvasNames1D, 
+					  graphNames1D, legendHeaders1WZ, colors, styles, 
+					  legendEntriesSearchVsControl, weights1, setLinY, 
 					  drawSame, dataMC);
   }
   // cout << "...with reweighting\n";
@@ -1808,8 +1904,8 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 
   //compare ZZ search sample to control sample
   cout << "...ZZ\n";
-  string ZZSearchVsControlOutputFile(analysisFilePath + "ZZ/analysis/isoVsNonIsoTaus" + MTBin + tag1 + 
-  				     outputVTag + fileExt);
+  string ZZSearchVsControlOutputFile(analysisFilePath + "ZZ/analysis/isoVsNonIsoTaus" + MTBin + 
+				     tag1 + outputVTag + fileExt);
   string ZZSearchVsControlReweightOutputFile = 
     smartReplace(ZZSearchVsControlOutputFile, "NonIso", "NonIsoReweight");
   vector<string> ZZSearchVsControlInputFiles;
@@ -1819,9 +1915,10 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   ZZSearchVsControlReweightInputFiles[1] = ZZNonIsoReweightHaddOutputFile;
   if (uncTag == "") {
     cout << "...without reweighting\n";
-    drawMultipleEfficiencyGraphsOn1Canvas(ZZSearchVsControlOutputFile, ZZSearchVsControlInputFiles, 
-					  canvasNames1D, graphNames1D, legendHeaders1ZZ, colors, 
-					  styles, legendEntriesSearchVsControl, weights1, setLinY, 
+    drawMultipleEfficiencyGraphsOn1Canvas(ZZSearchVsControlOutputFile, 
+					  ZZSearchVsControlInputFiles, canvasNames1D, 
+					  graphNames1D, legendHeaders1ZZ, colors, styles, 
+					  legendEntriesSearchVsControl, weights1, setLinY, 
 					  drawSame, dataMC);
   }
   // cout << "...with reweighting\n";
@@ -1833,8 +1930,8 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 
   //compare WW search sample to control sample
   cout << "...WW\n";
-  string WWSearchVsControlOutputFile(analysisFilePath + "WW/analysis/isoVsNonIsoTaus" + MTBin + tag1 + 
-  				     outputVTag + fileExt);
+  string WWSearchVsControlOutputFile(analysisFilePath + "WW/analysis/isoVsNonIsoTaus" + MTBin + 
+				     tag1 + outputVTag + fileExt);
   string WWSearchVsControlReweightOutputFile = 
     smartReplace(WWSearchVsControlOutputFile, "NonIso", "NonIsoReweight");
   vector<string> WWSearchVsControlInputFiles;
@@ -1844,9 +1941,10 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   WWSearchVsControlReweightInputFiles[1] = WWNonIsoReweightHaddOutputFile;
   if (uncTag == "") {
     cout << "...without reweighting\n";
-    drawMultipleEfficiencyGraphsOn1Canvas(WWSearchVsControlOutputFile, WWSearchVsControlInputFiles, 
-					  canvasNames1D, graphNames1D, legendHeaders1WW, colors, 
-					  styles, legendEntriesSearchVsControl, weights1, setLinY, 
+    drawMultipleEfficiencyGraphsOn1Canvas(WWSearchVsControlOutputFile, 
+					  WWSearchVsControlInputFiles, canvasNames1D, 
+					  graphNames1D, legendHeaders1WW, colors, styles, 
+					  legendEntriesSearchVsControl, weights1, setLinY, 
 					  drawSame, dataMC);
   }
   // cout << "...with reweighting\n";
@@ -1859,8 +1957,8 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   //compare region C to region D
   cout << "...non-isolated W data\n";
   string nonIsoWDataSearchVsControlOutputFile(analysisFilePath + 
-  					      "nonIsoWData/analysis/isoVsNonIsoTaus" + MTBin + tag1 + 
-  					      outputVTag + fileExt);
+  					      "nonIsoWData/analysis/isoVsNonIsoTaus" + MTBin + 
+					      tag1 + outputVTag + fileExt);
   string nonIsoWDataSearchVsControlReweightOutputFile = 
     smartReplace(nonIsoWDataSearchVsControlOutputFile, "NonIso", "NonIsoReweight");
   vector<string> nonIsoWDataSearchVsControlInputFiles;
@@ -1874,8 +1972,8 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
     drawMultipleEfficiencyGraphsOn1Canvas(nonIsoWDataSearchVsControlOutputFile, 
 					  nonIsoWDataSearchVsControlInputFiles, canvasNames1D, 
 					  graphNames1D, legendHeaders1NonIsoWData, colors, styles, 
-					  legendEntriesSearchVsControl, weights1, setLinY, drawSame, 
-					  dataMC);
+					  legendEntriesSearchVsControl, weights1, setLinY, 
+					  drawSame, dataMC);
   }
 //   cout << "...with reweighting\n";
 //   drawMultipleEfficiencyGraphsOn1Canvas(nonIsoWDataSearchVsControlReweightOutputFile, 
@@ -1892,7 +1990,8 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   		pair<string, float>(dataVsMCOutputFile, 1.0), 
   		vector<string>(1, "muHadMass"), vector<string>(1, "m_{#mu+had} (GeV)"), 
   		vector<int>(1, 1), vector<int>(1, 2), 
-  		analysisFilePath + "results/final" + MTBin + uncTag + outputVTag + fileExt, "main 5");
+  		analysisFilePath + "results/final" + MTBin + uncTag + outputVTag + fileExt, 
+		"main 5", a1Mass == "_a9" ? true : false);
 
 //   //print the hadronic tau pT weights and their statistical errors
 //   printWeightsAndErrors(nonIsoWDataIsoHaddOutputFile, dataNonIsoHaddOutputFile);
@@ -1922,9 +2021,12 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   normRegionUpperBins.push_back(46);
   normRegionUpperBins.push_back(50);
   normRegionUpperBins.push_back(9);
-  makeMCClosurePlots(sigVsBkgOutputFile, vars, units, dataVsMCOutputFile, 1.0, 
-  		     normRegionLowerBins, normRegionUpperBins, 
-  		     analysisFilePath + "results/MC_closure_" + MTBin + uncTag + outputVersion + fileExt);
+  if (uncTag == "") {
+    makeMCClosurePlots(sigVsBkgOutputFile, vars, units, dataVsMCOutputFile, 1.0, 
+		       normRegionLowerBins, normRegionUpperBins, 
+		       analysisFilePath + "results/MC_closure" + MTBin + uncTag + outputVTag + 
+		       fileExt);
+  }
 
   //make plots of hadronic tau pT to support reweighting
   vector<string> fileNames;
@@ -1939,14 +2041,18 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   stylePairs.push_back(pair<Style_t, Style_t>(20, 20));
   stylePairs.push_back(pair<Style_t, Style_t>(21, 22));
   stylePairs.push_back(pair<Style_t, Style_t>(23, 20));
+  if (uncTag == "") {
   plotTauHadPT(fileNames, colorPairs, stylePairs, 
   	       analysisFilePath + "results/tauHadPT" + MTBin + outputVTag + fileExt);
+  }
 
   //plot ratio of region C and B data tau pT spectra and fit
-  cout << "---\nFitting for weights\n";
-  calculateTauPTWeightsFromFit(nonIsoWDataIsoHaddOutputFile, dataNonIsoHaddOutputFile, 
-  			       analysisFilePath + "results/tauHadPTWeights" + outputVTag + 
-  			       fileExt);
+  if (uncTag == "") {
+    cout << "---\nFitting for weights\n";
+    calculateTauPTWeightsFromFit(nonIsoWDataIsoHaddOutputFile, dataNonIsoHaddOutputFile, 
+				 analysisFilePath + "results/tauHadPTWeights" + outputVTag + 
+				 fileExt);
+  }
 
   // cout << "---\nCalculating fake rates\n";
 

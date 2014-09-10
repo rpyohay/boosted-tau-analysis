@@ -1925,22 +1925,22 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
       //plot the mu + 1-prong tau invariant mass for the highest pT muon
       if ((*iTau)->decayMode() == reco::PFTau::kOneProng0PiZero) {
-	muHadMass1Prong_->Fill(muHadMass, PUWeight);
+	muHadMass1Prong_->Fill(muHadMass, PUWeight*tauHadPTWeight);
       }
 
       //plot the mu + 1-prong + 1 pi0 tau invariant mass for the highest pT muon
       if ((*iTau)->decayMode() == reco::PFTau::kOneProng1PiZero) {
-	muHadMass1Prong1Pi0_->Fill(muHadMass, PUWeight);
+	muHadMass1Prong1Pi0_->Fill(muHadMass, PUWeight*tauHadPTWeight);
       }
 
       //plot the mu + 1-prong + 2 pi0 tau invariant mass for the highest pT muon
       if ((*iTau)->decayMode() == reco::PFTau::kOneProng2PiZero) {
-	muHadMass1Prong2Pi0_->Fill(muHadMass, PUWeight);
+	muHadMass1Prong2Pi0_->Fill(muHadMass, PUWeight*tauHadPTWeight);
       }
 
       //plot the mu + 3-prong tau invariant mass for the highest pT muon
       if ((*iTau)->decayMode() == reco::PFTau::kThreeProng0PiZero) {
-	muHadMass3Prong_->Fill(muHadMass, PUWeight);
+	muHadMass3Prong_->Fill(muHadMass, PUWeight*tauHadPTWeight);
       }
 
       //track maximum mu+had mass
