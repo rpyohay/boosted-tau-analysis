@@ -141,10 +141,24 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   edm::Handle<std::vector<PileupSummaryInfo> > pPU;
   iEvent.getByLabel(PUTag_, pPU);
 
+  //look at muon parentage
+  for (reco::GenParticleCollection::const_iterator iGenParticle = pGenParticles->begin(); 
+       iGenParticle != pGenParticles->end(); ++iGenParticle) {
+    if (fabs(iGenParticle->pdgId()) == 13)
+      { // if it's a muon
+	std::cout << "Gen muon found with pT = " << iGenParticle->pt() << ", status " << iGenParticle->status() << std::endl;
+	std::cout << "Its mother's pdgId was: " << iGenParticle->mother()->pdgId() << std::endl;
+	std::cout << "Its grandmother's pdgId was: " << iGenParticle->mother()->mother()->pdgId() << std::endl;
+	std::cout << "Its great-grandmothers' pdgId was: " << iGenParticle->mother()->mother()->mother()->pdgId() << std::endl;
+      } // if it's a muon
+  }
+
   //find a1 tau decay products
   std::vector<GenTauDecayID> aDecayProducts;
   for (reco::GenParticleCollection::const_iterator iGenParticle = pGenParticles->begin(); 
        iGenParticle != pGenParticles->end(); ++iGenParticle) {
+    //    if (iGenParticle->pdgId() == 35)
+    //     std::cout << "Mass of a = " << iGenParticle->mass() << std::endl;
     try {
       GenTauDecayID tauDecay(genTauDecayIDPSet_, pGenParticles, 
 			     iGenParticle - pGenParticles->begin());
