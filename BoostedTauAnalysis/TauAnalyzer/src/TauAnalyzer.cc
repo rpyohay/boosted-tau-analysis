@@ -1754,14 +1754,14 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 			 (*iTau)->p4()).M();
     }
 
-    //calculate relative isolation of tau muon
-    double tauMuIso = -1.0;
-    double tauMuRelIso = -1.0;
-    if (removedMuonRefs.size() > 0)
-      {
-	tauMuIso = Common::getMuonCombPFIso(*(removedMuonRefs[removedMuonRefs.size()-1]), muonPFIsoPUSubtractionCoeff_);
-	tauMuRelIso = tauMuIso/removedMuonRefs[removedMuonRefs.size()-1]->pt();
-      }
+//     //calculate relative isolation of tau muon
+//     double tauMuIso = -1.0;
+//     double tauMuRelIso = -1.0;
+//     if (removedMuonRefs.size() > 0)
+//       {
+// 	tauMuIso = Common::getMuonCombPFIso(*(removedMuonRefs[removedMuonRefs.size()-1]), muonPFIsoPUSubtractionCoeff_);
+// 	tauMuRelIso = tauMuIso/removedMuonRefs[removedMuonRefs.size()-1]->pt();
+//       }
 
     //calculate relative isolation of W muon
     double WMuIso = -1.0;
@@ -1803,8 +1803,8 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     }
 
     // get coordinates of W_mu vertex
-    double WMu_vx = WMuonRefs[WMuonRefs.size() - 1]->vertex().x();
-    double WMu_vy = WMuonRefs[WMuonRefs.size() - 1]->vertex().y();
+//     double WMu_vx = WMuonRefs[WMuonRefs.size() - 1]->vertex().x();
+//     double WMu_vy = WMuonRefs[WMuonRefs.size() - 1]->vertex().y();
     double WMu_vz = WMuonRefs[WMuonRefs.size() - 1]->vertex().z();
 
     // get coordinates of tau_mu and tau_had vertices
@@ -1823,8 +1823,8 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     double tau_pz = (*iTau)->p4().pz();
     
     //get coordinates of primary vertex
-    double pv_vx = primaryVertex->x();
-    double pv_vy = primaryVertex->y();
+//     double pv_vx = primaryVertex->x();
+//     double pv_vy = primaryVertex->y();
     double pv_vz = primaryVertex->z();
 
     //  cout << "tau_mu vertex (x,y,z) = " << mu_vx << ", " << mu_vy << ", " << mu_vz << endl;
@@ -1847,13 +1847,13 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     double delR_Wmutaumutauhad = reco::deltaR((*iTau)->p4() + removedMuonRefs[removedMuonRefs.size() - 1]->p4(), *WMuonRefs[WMuonRefs.size() - 1]);
     double delR_Wmutaumu = reco::deltaR(*removedMuonRefs[removedMuonRefs.size() - 1], *WMuonRefs[WMuonRefs.size() - 1]);
 
-    const double halfpi_ = 3.14159265/2.0;
+//     const double halfpi_ = 3.14159265/2.0;
 
     //impose pT and decay mode cut on tau
     if (((*iTau)->pt() > tauPTMin_) && 
 	((tauDecayMode_ == reco::PFTau::kNull) || ((*iTau)->decayMode() == tauDecayMode_)) && 
-	(fabs(tauOldJetRef->eta()) < 2.4) && (fabs(tau_vz - pv_vz) < 0.2) && (fabs(mu_vz - pv_vz) < 0.5) && (delR_taumutauhad > 0.05)/*&& (delR_Wmutaumutauhad > halfpi_) && (tauMuRelIso > 0.2)*/) {
-
+	(fabs(tauOldJetRef->eta()) < 2.4) && (fabs(tau_vz - pv_vz) < 0.2) && 
+	(fabs(mu_vz - pv_vz) < 0.5)) {
 
       //plot delR(WMu, taumu)
       dRWMuSoftMu_->Fill(delR_Wmutaumu, PUWeight);
