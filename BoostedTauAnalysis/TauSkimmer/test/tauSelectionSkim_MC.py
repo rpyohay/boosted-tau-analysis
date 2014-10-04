@@ -453,7 +453,7 @@ process.muHadNonIsoTauSelector = cms.EDFilter(
     ),
     jetTag = cms.InputTag('CleanJets', 'ak5PFJetsNoMu', 'SKIM'),
     muonRemovalDecisionTag = cms.InputTag('CleanJets'),
-    overlapCandTag = cms.InputTag('WIsoMuonSelector'),
+    muonTag = cms.InputTag('WIsoMuonSelector'),
     passDiscriminator = cms.bool(False),
     etaMax = cms.double(2.4),
     isoMax = cms.double(-1.0),
@@ -519,7 +519,7 @@ process.noSelectionSequence = cms.Sequence(process.IsoMu24eta2p1Selector*
                                            process.tauMuonSelector*
                                            process.PFTau*
                                            process.muHadTauSelector*
-#                                           process.tauShiftProducer*
+                                           process.tauShiftProducer*
                                            process.btagging*
                                            process.pfParticleSelectionSequence*
                                            process.phoIsoSequence)
