@@ -114,7 +114,7 @@ usePF2PAT(process,runPF2PAT=True,jetAlgo=jetAlgo,runOnMC=True,postfix=PF2PATPost
 
 from PhysicsTools.PatUtils.tools.metUncertaintyTools import runMEtUncertainties
 from JetMETCorrections.Type1MET.pfMETCorrectionType0_cfi import *
-runMEtUncertainties(process, electronCollection='selectedPatElectronsPFlow', muonCollection='selectedPatMuonsPFlow', tauCollection='selectedPatTausPFlow', jetCollection='selectedPatJetsPFlow',doApplyType0corr=True, doSmearJets=False, postfix='NotSmeared')
+runMEtUncertainties(process, electronCollection='selectedPatElectronsPFlow', muonCollection='selectedPatMuonsPFlow', tauCollection='selectedPatTausPFlow', jetCollection='selectedPatJetsPFlow',doApplyType0corr=False, doSmearJets=False, postfix='NotSmeared')
 
 process.patPFMETtype0CorrNotSmeared=process.patPFMETtype0Corr.clone()
 process.PF2PAT = cms.Sequence(
