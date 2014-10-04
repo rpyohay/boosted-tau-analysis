@@ -214,7 +214,7 @@ process.highMTEGScaleDownMuHadIsoTauAnalyzer = cms.EDAnalyzer(
     'PREFIX_highMT_minus1SigmaEGScale_SAMPLE_VERSION.root'
     ),
     tauTag = cms.InputTag('IsoBVetoFilter'),
-    METTag = cms.InputTag('patType1CorrectedPFMetElectronEnDownSmeared'),
+    METTag = cms.InputTag('patType1CorrectedPFMetElectronEnDownNotSmeared'),
     muonTag = cms.InputTag('WIsoMuonSelector'),
     muonPFIsoPUSubtractionCoeff = cms.double(0.5),
     genMatchedMuonTag = cms.InputTag('WIsoMuonSelector'),
@@ -282,7 +282,7 @@ process.highMTEGScaleUpMuHadIsoTauAnalyzer.outFileName = cms.string(
     'PREFIX_highMT_plus1SigmaEGScale_SAMPLE_VERSION.root'
     )
 process.highMTEGScaleUpMuHadIsoTauAnalyzer.METTag = cms.InputTag(
-    'patType1CorrectedPFMetElectronEnUpSmeared'
+    'patType1CorrectedPFMetElectronEnUpNotSmeared'
     )
 process.lowMTEGScaleUpMuHadIsoTauAnalyzer = process.highMTEGScaleUpMuHadIsoTauAnalyzer.clone()
 process.lowMTEGScaleUpMuHadIsoTauAnalyzer.outFileName = cms.string(
@@ -295,7 +295,7 @@ process.highMTJERDownMuHadIsoTauAnalyzer.outFileName = cms.string(
     'PREFIX_highMT_minus1SigmaJER_SAMPLE_VERSION.root'
     )
 process.highMTJERDownMuHadIsoTauAnalyzer.METTag = cms.InputTag(
-    'patType1CorrectedPFMetJetResDownSmeared'
+    'patType1CorrectedPFMetJetResDownNotSmeared'
     )
 process.lowMTJERDownMuHadIsoTauAnalyzer = process.highMTJERDownMuHadIsoTauAnalyzer.clone()
 process.lowMTJERDownMuHadIsoTauAnalyzer.outFileName = cms.string(
@@ -306,7 +306,7 @@ process.highMTJERUpMuHadIsoTauAnalyzer.outFileName = cms.string(
     'PREFIX_highMT_plus1SigmaJER_SAMPLE_VERSION.root'
     )
 process.highMTJERUpMuHadIsoTauAnalyzer.METTag = cms.InputTag(
-    'patType1CorrectedPFMetJetResUpSmeared'
+    'patType1CorrectedPFMetJetResUpNotSmeared'
     )
 process.lowMTJERUpMuHadIsoTauAnalyzer = process.highMTJERUpMuHadIsoTauAnalyzer.clone()
 process.lowMTJERUpMuHadIsoTauAnalyzer.outFileName = cms.string(
@@ -319,7 +319,7 @@ process.highMTJESDownMuHadIsoTauAnalyzer.outFileName = cms.string(
     'PREFIX_highMT_minus1SigmaJES_SAMPLE_VERSION.root'
     )
 process.highMTJESDownMuHadIsoTauAnalyzer.METTag = cms.InputTag(
-    'patType1CorrectedPFMetJetEnDownSmeared'
+    'patType1CorrectedPFMetJetEnDownNotSmeared'
     )
 process.lowMTJESDownMuHadIsoTauAnalyzer = process.highMTJESDownMuHadIsoTauAnalyzer.clone()
 process.lowMTJESDownMuHadIsoTauAnalyzer.outFileName = cms.string(
@@ -330,7 +330,7 @@ process.highMTJESUpMuHadIsoTauAnalyzer.outFileName = cms.string(
     'PREFIX_highMT_plus1SigmaJES_SAMPLE_VERSION.root'
     )
 process.highMTJESUpMuHadIsoTauAnalyzer.METTag = cms.InputTag(
-    'patType1CorrectedPFMetJetEnUpSmeared'
+    'patType1CorrectedPFMetJetEnUpNotSmeared'
     )
 process.lowMTJESUpMuHadIsoTauAnalyzer = process.highMTJESUpMuHadIsoTauAnalyzer.clone()
 process.lowMTJESUpMuHadIsoTauAnalyzer.outFileName = cms.string(
@@ -343,7 +343,7 @@ process.highMTMuEnergyScaleDownMuHadIsoTauAnalyzer.outFileName = cms.string(
     'PREFIX_highMT_minus1SigmaMuEnergyScale_SAMPLE_VERSION.root'
     )
 process.highMTMuEnergyScaleDownMuHadIsoTauAnalyzer.METTag = cms.InputTag(
-    'patType1CorrectedPFMetMuonEnDownSmeared'
+    'patType1CorrectedPFMetMuonEnDownNotSmeared'
     )
 process.lowMTMuEnergyScaleDownMuHadIsoTauAnalyzer = process.highMTMuEnergyScaleDownMuHadIsoTauAnalyzer.clone()
 process.lowMTMuEnergyScaleDownMuHadIsoTauAnalyzer.outFileName = cms.string(
@@ -354,7 +354,7 @@ process.highMTMuEnergyScaleUpMuHadIsoTauAnalyzer.outFileName = cms.string(
     'PREFIX_highMT_plus1SigmaMuEnergyScale_SAMPLE_VERSION.root'
     )
 process.highMTMuEnergyScaleUpMuHadIsoTauAnalyzer.METTag = cms.InputTag(
-    'patType1CorrectedPFMetMuonEnUpSmeared'
+    'patType1CorrectedPFMetMuonEnUpNotSmeared'
     )
 process.lowMTMuEnergyScaleUpMuHadIsoTauAnalyzer = process.highMTMuEnergyScaleUpMuHadIsoTauAnalyzer.clone()
 process.lowMTMuEnergyScaleUpMuHadIsoTauAnalyzer.outFileName = cms.string(
@@ -367,7 +367,7 @@ process.highMTTauEnergyScaleDownMuHadIsoTauAnalyzer.outFileName = cms.string(
     'PREFIX_highMT_minus1SigmaTauEnergyScale_SAMPLE_VERSION.root'
     )
 process.highMTTauEnergyScaleDownMuHadIsoTauAnalyzer.METTag = cms.InputTag(
-    'patType1CorrectedPFMetTauEnDownSmeared'
+    'patType1CorrectedPFMetTauEnDownNotSmeared'
     )
 process.lowMTTauEnergyScaleDownMuHadIsoTauAnalyzer = process.highMTTauEnergyScaleDownMuHadIsoTauAnalyzer.clone()
 process.lowMTTauEnergyScaleDownMuHadIsoTauAnalyzer.outFileName = cms.string(
@@ -378,7 +378,7 @@ process.highMTTauEnergyScaleUpMuHadIsoTauAnalyzer.outFileName = cms.string(
     'PREFIX_highMT_plus1SigmaTauEnergyScale_SAMPLE_VERSION.root'
     )
 process.highMTTauEnergyScaleUpMuHadIsoTauAnalyzer.METTag = cms.InputTag(
-    'patType1CorrectedPFMetTauEnUpSmeared'
+    'patType1CorrectedPFMetTauEnUpNotSmeared'
     )
 process.lowMTTauEnergyScaleUpMuHadIsoTauAnalyzer = process.highMTTauEnergyScaleUpMuHadIsoTauAnalyzer.clone()
 process.lowMTTauEnergyScaleUpMuHadIsoTauAnalyzer.outFileName = cms.string(
@@ -391,7 +391,7 @@ process.highMTUnclusteredEnergyScaleDownMuHadIsoTauAnalyzer.outFileName = cms.st
     'PREFIX_highMT_minus1SigmaUnclusteredEnergyScale_SAMPLE_VERSION.root'
     )
 process.highMTUnclusteredEnergyScaleDownMuHadIsoTauAnalyzer.METTag = cms.InputTag(
-    'patType1CorrectedPFMetUnclusteredEnDownSmeared'
+    'patType1CorrectedPFMetUnclusteredEnDownNotSmeared'
     )
 process.lowMTUnclusteredEnergyScaleDownMuHadIsoTauAnalyzer = process.highMTUnclusteredEnergyScaleDownMuHadIsoTauAnalyzer.clone()
 process.lowMTUnclusteredEnergyScaleDownMuHadIsoTauAnalyzer.outFileName = cms.string(
@@ -403,7 +403,7 @@ process.highMTUnclusteredEnergyScaleUpMuHadIsoTauAnalyzer.outFileName = cms.stri
     'PREFIX_highMT_plus1SigmaUnclusteredEnergyScale_SAMPLE_VERSION.root'
     )
 process.highMTUnclusteredEnergyScaleUpMuHadIsoTauAnalyzer.METTag = cms.InputTag(
-    'patType1CorrectedPFMetUnclusteredEnUpSmeared'
+    'patType1CorrectedPFMetUnclusteredEnUpNotSmeared'
     )
 process.lowMTUnclusteredEnergyScaleUpMuHadIsoTauAnalyzer = process.highMTUnclusteredEnergyScaleUpMuHadIsoTauAnalyzer.clone()
 process.lowMTUnclusteredEnergyScaleUpMuHadIsoTauAnalyzer.outFileName = cms.string(
@@ -416,7 +416,7 @@ process.highMTBVetoScaleDownMuHadIsoTauAnalyzer.outFileName = cms.string(
     'PREFIX_highMT_minus1SigmaBVetoScale_SAMPLE_VERSION.root'
     )
 process.highMTBVetoScaleDownMuHadIsoTauAnalyzer.METTag = cms.InputTag(
-    'patType1CorrectedPFMetSmeared'
+    'patType1CorrectedPFMetNotSmeared'
     )
 process.highMTBVetoScaleDownMuHadIsoTauAnalyzer.reweight = cms.bool(True)
 process.highMTBVetoScaleDownMuHadIsoTauAnalyzer.bTagScaleShift = cms.string("min")
@@ -447,72 +447,72 @@ process.output = cms.OutputModule(
 #MT filter
 process.MTFilter.minMT = cms.double(50.)
 process.highMTFilter = process.MTFilter.clone()
-process.highMTFilter.METTag = cms.InputTag('patType1CorrectedPFMetSmeared')
+process.highMTFilter.METTag = cms.InputTag('patType1CorrectedPFMetNotSmeared')
 process.lowMTFilter = process.highMTFilter.clone()
 process.lowMTFilter.passFilter = cms.bool(False)
 
 #MT filter for isolated taus, e/g scale shifted
 process.highMTEGScaleDownFilter = process.MTFilter.clone()
-process.highMTEGScaleDownFilter.METTag = cms.InputTag('patType1CorrectedPFMetElectronEnDownSmeared')
+process.highMTEGScaleDownFilter.METTag = cms.InputTag('patType1CorrectedPFMetElectronEnDownNotSmeared')
 process.lowMTEGScaleDownFilter = process.highMTEGScaleDownFilter.clone()
 process.lowMTEGScaleDownFilter.passFilter = cms.bool(False)
 process.highMTEGScaleUpFilter = process.MTFilter.clone()
-process.highMTEGScaleUpFilter.METTag = cms.InputTag('patType1CorrectedPFMetElectronEnUpSmeared')
+process.highMTEGScaleUpFilter.METTag = cms.InputTag('patType1CorrectedPFMetElectronEnUpNotSmeared')
 process.lowMTEGScaleUpFilter = process.highMTEGScaleUpFilter.clone()
 process.lowMTEGScaleUpFilter.passFilter = cms.bool(False)
 
 #MT filter for isolated taus, JER shifted
 process.highMTJERDownFilter = process.MTFilter.clone()
-process.highMTJERDownFilter.METTag = cms.InputTag('patType1CorrectedPFMetJetResDownSmeared')
+process.highMTJERDownFilter.METTag = cms.InputTag('patType1CorrectedPFMetJetResDownNotSmeared')
 process.lowMTJERDownFilter = process.highMTJERDownFilter.clone()
 process.lowMTJERDownFilter.passFilter = cms.bool(False)
 process.highMTJERUpFilter = process.MTFilter.clone()
-process.highMTJERUpFilter.METTag = cms.InputTag('patType1CorrectedPFMetJetResUpSmeared')
+process.highMTJERUpFilter.METTag = cms.InputTag('patType1CorrectedPFMetJetResUpNotSmeared')
 process.lowMTJERUpFilter = process.highMTJERUpFilter.clone()
 process.lowMTJERUpFilter.passFilter = cms.bool(False)
 
 #MT filter for isolated taus, JES shifted
 process.highMTJESDownFilter = process.MTFilter.clone()
-process.highMTJESDownFilter.METTag = cms.InputTag('patType1CorrectedPFMetJetEnDownSmeared')
+process.highMTJESDownFilter.METTag = cms.InputTag('patType1CorrectedPFMetJetEnDownNotSmeared')
 process.lowMTJESDownFilter = process.highMTJESDownFilter.clone()
 process.lowMTJESDownFilter.passFilter = cms.bool(False)
 process.highMTJESUpFilter = process.MTFilter.clone()
-process.highMTJESUpFilter.METTag = cms.InputTag('patType1CorrectedPFMetJetEnUpSmeared')
+process.highMTJESUpFilter.METTag = cms.InputTag('patType1CorrectedPFMetJetEnUpNotSmeared')
 process.lowMTJESUpFilter = process.highMTJESUpFilter.clone()
 process.lowMTJESUpFilter.passFilter = cms.bool(False)
 
 #MT filter for isolated taus, muon energy scale shifted
 process.highMTMuEnergyScaleDownFilter = process.MTFilter.clone()
-process.highMTMuEnergyScaleDownFilter.METTag = cms.InputTag('patType1CorrectedPFMetMuonEnDownSmeared')
+process.highMTMuEnergyScaleDownFilter.METTag = cms.InputTag('patType1CorrectedPFMetMuonEnDownNotSmeared')
 process.lowMTMuEnergyScaleDownFilter = process.highMTMuEnergyScaleDownFilter.clone()
 process.lowMTMuEnergyScaleDownFilter.passFilter = cms.bool(False)
 process.highMTMuEnergyScaleUpFilter = process.MTFilter.clone()
-process.highMTMuEnergyScaleUpFilter.METTag = cms.InputTag('patType1CorrectedPFMetMuonEnUpSmeared')
+process.highMTMuEnergyScaleUpFilter.METTag = cms.InputTag('patType1CorrectedPFMetMuonEnUpNotSmeared')
 process.lowMTMuEnergyScaleUpFilter = process.highMTMuEnergyScaleUpFilter.clone()
 process.lowMTMuEnergyScaleUpFilter.passFilter = cms.bool(False)
 
 #MT filter for isolated taus, tau energy scale shifted
 process.highMTTauEnergyScaleDownFilter = process.MTFilter.clone()
 process.highMTTauEnergyScaleDownFilter.METTag = cms.InputTag(
-    'patType1CorrectedPFMetTauEnDownSmeared'
+    'patType1CorrectedPFMetTauEnDownNotSmeared'
     )
 process.lowMTTauEnergyScaleDownFilter = process.highMTTauEnergyScaleDownFilter.clone()
 process.lowMTTauEnergyScaleDownFilter.passFilter = cms.bool(False)
 process.highMTTauEnergyScaleUpFilter = process.MTFilter.clone()
-process.highMTTauEnergyScaleUpFilter.METTag = cms.InputTag('patType1CorrectedPFMetTauEnUpSmeared')
+process.highMTTauEnergyScaleUpFilter.METTag = cms.InputTag('patType1CorrectedPFMetTauEnUpNotSmeared')
 process.lowMTTauEnergyScaleUpFilter = process.highMTTauEnergyScaleUpFilter.clone()
 process.lowMTTauEnergyScaleUpFilter.passFilter = cms.bool(False)
 
 #MT filter for isolated taus, unclustered energy scale shifted
 process.highMTUnclusteredEnergyScaleDownFilter = process.MTFilter.clone()
 process.highMTUnclusteredEnergyScaleDownFilter.METTag = cms.InputTag(
-    'patType1CorrectedPFMetUnclusteredEnDownSmeared'
+    'patType1CorrectedPFMetUnclusteredEnDownNotSmeared'
     )
 process.lowMTUnclusteredEnergyScaleDownFilter = process.highMTUnclusteredEnergyScaleDownFilter.clone()
 process.lowMTUnclusteredEnergyScaleDownFilter.passFilter = cms.bool(False)
 process.highMTUnclusteredEnergyScaleUpFilter = process.MTFilter.clone()
 process.highMTUnclusteredEnergyScaleUpFilter.METTag = cms.InputTag(
-    'patType1CorrectedPFMetUnclusteredEnUpSmeared'
+    'patType1CorrectedPFMetUnclusteredEnUpNotSmeared'
     )
 process.lowMTUnclusteredEnergyScaleUpFilter = process.highMTUnclusteredEnergyScaleUpFilter.clone()
 process.lowMTUnclusteredEnergyScaleUpFilter.passFilter = cms.bool(False)
