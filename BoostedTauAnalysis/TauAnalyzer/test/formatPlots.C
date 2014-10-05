@@ -93,8 +93,8 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   canvasNames1D.push_back("dPhiMuHadSecondJetCanvas");
   canvasNames1D.push_back("muHadUncleanedJetPTRankCanvas");
   canvasNames1D.push_back("nAddlHardMuonsCanvas");
-  canvasNames1D.push_back("nAddlJetsPTGeq0Canvas");
   canvasNames1D.push_back("nAddlJetsPTGeq20Canvas");
+  canvasNames1D.push_back("nAddlJetsPTGeq30Canvas");
   canvasNames1D.push_back("nAddlJetsPTGeq40Canvas");
   canvasNames1D.push_back("tauHadDecayModeCanvas");
   canvasNames1D.push_back("dRSoftMuNearestGenZOrTTMuCanvas");
@@ -130,9 +130,9 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   canvasNames1D.push_back("secondNchtrk_10_Canvas");
   canvasNames1D.push_back("secondNchtrk_30_Canvas");
   canvasNames1D.push_back("dRWMuSoftMuCanvas");
-  //canvasNames1D.push_back("dRWMuTauHadCanvas");
-  //canvasNames1D.push_back("dRTauMuTauHadCanvas");
-  //canvasNames1D.push_back("dRWMuTauMuTauHadCanvas");
+  canvasNames1D.push_back("dRWMuTauHadCanvas");
+  canvasNames1D.push_back("dRTauMuTauHadCanvas");
+  canvasNames1D.push_back("dRWMuTauMuTauHadCanvas");
   canvasNames1D.push_back("dPhiWMuSoftMuCanvas");
   canvasNames1D.push_back("dPhiWMuSoftMuWithCutCanvas");
   canvasNames1D.push_back("dPhiWMuSecJetCanvas");
@@ -239,8 +239,8 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   graphNames1D.push_back("dPhiMuHadSecondJet");
   graphNames1D.push_back("muHadUncleanedJetPTRank");
   graphNames1D.push_back("nAddlHardMuons");
-  graphNames1D.push_back("nAddlJetsPTGeq0");
   graphNames1D.push_back("nAddlJetsPTGeq20");
+  graphNames1D.push_back("nAddlJetsPTGeq30");
   graphNames1D.push_back("nAddlJetsPTGeq40");
   graphNames1D.push_back("tauHadDecayMode");
   graphNames1D.push_back("dRSoftMuNearestGenZOrTTMu");
@@ -276,9 +276,9 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   graphNames1D.push_back("second_Nchtrk_10");
   graphNames1D.push_back("second_Nchtrk_30");
   graphNames1D.push_back("dRWMuSoftMu");
-  //graphNames1D.push_back("dRWMuTauHad");
-  //graphNames1D.push_back("dRTauMuTauHad");
-  //graphNames1D.push_back("dRWMuTauMuTauHad");
+  graphNames1D.push_back("dRWMuTauHad");
+  graphNames1D.push_back("dRTauMuTauHad");
+  graphNames1D.push_back("dRWMuTauMuTauHad");
   graphNames1D.push_back("dPhiWMuSoftMu");
   graphNames1D.push_back("dPhiWMuSoftMu_withCut");
   graphNames1D.push_back("dPhiWMuSecJet");

@@ -3539,8 +3539,8 @@ void TauAnalyzer::endJob()
   TCanvas dPhiMuHadSecondJetCanvas("dPhiMuHadSecondJetCanvas", "", 600, 600);
   TCanvas muHadUncleanedJetPTRankCanvas("muHadUncleanedJetPTRankCanvas", "", 600, 600);
   TCanvas nAddlHardMuonsCanvas("nAddlHardMuonsCanvas", "", 600, 600);
-  TCanvas nAddlJetsPTGeq20Canvas("nAddlJetsPTGeq0Canvas", "", 600, 600);
-  TCanvas nAddlJetsPTGeq30Canvas("nAddlJetsPTGeq20Canvas", "", 600, 600);
+  TCanvas nAddlJetsPTGeq20Canvas("nAddlJetsPTGeq20Canvas", "", 600, 600);
+  TCanvas nAddlJetsPTGeq30Canvas("nAddlJetsPTGeq30Canvas", "", 600, 600);
   TCanvas nAddlJetsPTGeq40Canvas("nAddlJetsPTGeq40Canvas", "", 600, 600);
   TCanvas tauHadDecayModeCanvas("tauHadDecayModeCanvas", "", 600, 600);
   TCanvas dRSoftMuNearestGenZOrTTMuCanvas("dRSoftMuNearestGenZOrTTMuCanvas", "", 600, 600);

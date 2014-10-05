@@ -913,7 +913,8 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 	stacks[canvasIndex]->SetMinimum(1.0);
 	stacks[canvasIndex]->SetMaximum(10000000.0);
       }
-      stacks[canvasIndex]->Draw("e");
+      //stacks[canvasIndex]->Draw("e");
+      stacks[canvasIndex]->Draw();
       TList* stackedHists = stacks[canvasIndex]->GetHists();
       TH1F* hist = (TH1F*)stackedHists->First();
       stacks[canvasIndex]->GetXaxis()->SetTitle(hist->GetXaxis()->GetTitle());
