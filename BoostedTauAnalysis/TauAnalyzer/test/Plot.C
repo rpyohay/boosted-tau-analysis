@@ -1473,8 +1473,8 @@ void makeMCClosurePlots(const string& sigVsBkgIsoFileName, const vector<string>&
 
 void QCDVsMCClosurePlots(const vector<string>& QCDVsMCInputFileNames, const string& var, 
 			 const string& units, 
- 			 const int normRegionLowerBin, 
- 			 const int normRegionUpperBin,
+			 const int normRegionLowerBin, 
+			 const int normRegionUpperBin,
 			 const string& outputFileName)
 {
 
@@ -1864,7 +1864,7 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
   //calculate the normalization factor
   Double_t norm = isoData->Integral(normRegionLowerBin, normRegionUpperBin)/
     nonIsoData->Integral(normRegionLowerBin, normRegionUpperBin);
-  cerr << "The normalization constant is: " << norm << endl;
+  cout << "The normalization constant is: " << norm << endl;
   /*calculate the statistical error on the background prediction from the non-isolated data, 
     including the term from the error on the normalization factor*/
   const TH1* nonIsoDataPtrCast = dynamic_cast<const TH1*>(nonIsoData);
