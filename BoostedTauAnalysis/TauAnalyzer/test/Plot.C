@@ -1468,8 +1468,8 @@ void makeMCClosurePlots(const string& sigVsBkgIsoFileName, const vector<string>&
 
 void QCDVsMCClosurePlots(const vector<string>& QCDVsMCInputFileNames, const string& var, 
 			 const string& units, 
-// 			 const int normRegionLowerBin, 
-// 			 const int normRegionUpperBin,
+			 const int normRegionLowerBin, 
+			 const int normRegionUpperBin,
 			 const string& outputFileName)
 {
 
