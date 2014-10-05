@@ -83,6 +83,9 @@ private:
   //set of parameters for GenTauDecayID class
   edm::ParameterSet genTauDecayIDPSet_;
 
+  //mass of pseudoscalar a
+  TH1F* aMass_;
+
   //histogram of dR between gen objects from a1 decay
   TH1F* dRA1TauDaughters_;
 
@@ -144,13 +147,20 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   //look at muon parentage
   for (reco::GenParticleCollection::const_iterator iGenParticle = pGenParticles->begin(); 
        iGenParticle != pGenParticles->end(); ++iGenParticle) {
-    if (fabs(iGenParticle->pdgId()) == 13)
+    /*if (fabs(iGenParticle->pdgId()) == 13)
       { // if it's a muon
 	std::cout << "Gen muon found with pT = " << iGenParticle->pt() << ", status " << iGenParticle->status() << std::endl;
 	std::cout << "Its mother's pdgId was: " << iGenParticle->mother()->pdgId() << std::endl;
 	std::cout << "Its grandmother's pdgId was: " << iGenParticle->mother()->mother()->pdgId() << std::endl;
 	std::cout << "Its great-grandmothers' pdgId was: " << iGenParticle->mother()->mother()->mother()->pdgId() << std::endl;
       } // if it's a muon
+    */
+    if (fabs(iGenParticle->pdgId()) == 36)
+      { // if it's an A
+	std::cout << "Gen A found with mass = " << iGenParticle->mass() << std::endl;
+	if(iGenParticle->status() == 2)
+	  aMass_->Fill(iGenParticle->mass());
+      } // if it's an A
   }
 
   //find a1 tau decay products
@@ -230,6 +240,7 @@ void GenAnalyzer::beginJob()
 
   //book histograms
   dRA1TauDaughters_ = new TH1F("dRA1TauDaughters", "", 60, 0.0, 3.0);
+  aMass_ = new TH1F("aMass", "", 100, 0.0, 25.0);
   tauMuPT_ = new TH1F("tauMuPT", "", 50, 0.0, 100.0);
   tauHadPT_ = new TH1F("tauHadPT", "", 50, 0.0, 100.0);
   trueNInt_ = new TH1D("trueNInt", "", 60, 0.0, 60.0);
@@ -241,6 +252,8 @@ void GenAnalyzer::endJob()
   //make the canvases
   TCanvas dRA1TauDaughtersCanvas("dRA1TauDaughtersCanvas", "", 600, 600);
   Common::setCanvasOptions(dRA1TauDaughtersCanvas, 1, 0, 0);
+  TCanvas aMassCanvas("aMassCanvas", "", 600, 600);
+  Common::setCanvasOptions(aMassCanvas, 1, 0, 0);
   TCanvas tauMuPTCanvas("tauMuPTCanvas", "", 600, 600);
   Common::setCanvasOptions(tauMuPTCanvas, 1, 0, 0);
   TCanvas tauHadPTCanvas("tauHadPTCanvas", "", 600, 600);
@@ -251,6 +264,8 @@ void GenAnalyzer::endJob()
   //format the plots
   Common::setHistogramOptions(dRA1TauDaughters_, kBlack, 0.7, 20, 1.0, "#DeltaR", "", 0.05);
   dRA1TauDaughters_->SetLineWidth(2);
+  Common::setHistogramOptions(aMass_, kBlack, 0.7, 20, 1.0, "m_{a} (GeV)", "", 0.05);
+  aMass_->SetLineWidth(2);
   Common::setHistogramOptions(tauMuPT_, kBlack, 0.7, 20, 1.0, "No. interactions", "", 0.05);
   tauMuPT_->SetLineWidth(2);
   Common::setHistogramOptions(tauHadPT_, kBlack, 0.7, 20, 1.0, "No. interactions", "", 0.05);
@@ -261,6 +276,8 @@ void GenAnalyzer::endJob()
   //draw plots
   dRA1TauDaughtersCanvas.cd();
   dRA1TauDaughters_->Draw();
+  aMassCanvas.cd();
+  aMass_->Draw();
   tauMuPTCanvas.cd();
   tauMuPT_->Draw();
   tauHadPTCanvas.cd();
@@ -271,6 +288,7 @@ void GenAnalyzer::endJob()
   //write output file
   out_->cd();
   dRA1TauDaughtersCanvas.Write();
+  aMassCanvas.Write();
   tauMuPTCanvas.Write();
   tauHadPTCanvas.Write();
   trueNIntCanvas.Write();

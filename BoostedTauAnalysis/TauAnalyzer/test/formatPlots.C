@@ -426,10 +426,16 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   const bool sigBkg = false;
 
   //best available weights according to Dropbox spreadsheet
-  const float Wh1a5Weight19p7InvFb = 0.00562668010752688;
+  //  const float Wh1a5Weight19p7InvFb = 0.00562668010752688;
+  //  const float Wh1a7Weight19p7InvFb = 0.00545988813757409;
+  //  const float Wh1a9Weight19p7InvFb = 0.0058903;
+  //  const float Wh1a11Weight19p7InvFb = 0.0000912588116817724;
+  //  const float Wh1a13Weight19p7InvFb = 0.0000570729270729271;
+  //  const float Wh1a15Weight19p7InvFb = 0.0000493486973947896;
+  const float Wh1a5Weight19p7InvFb = 0.0071013571;
   const float Wh1a7Weight19p7InvFb = 0.00545988813757409;
   const float Wh1a9Weight19p7InvFb = 0.0058903;
-  const float Wh1a11Weight19p7InvFb = 0.0000912588116817724;
+  const float Wh1a11Weight19p7InvFb = 0.0001197093791;
   const float Wh1a13Weight19p7InvFb = 0.0000570729270729271;
   const float Wh1a15Weight19p7InvFb = 0.0000493486973947896;
   const float gga5Weight19p7InvFb = 1.0;
@@ -1617,7 +1623,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 				       "results/QCDVsMC_RegionB" + MTBin +
 				       tag19p7InvFb + outputVTag + fileExt);
   if (uncTag == "") {
-    QCDVsMCClosurePlots(RegionBQCDVsMCInputFiles, variable, theunit, // 1, 2, 
+    QCDVsMCClosurePlots(RegionBQCDVsMCInputFiles, variable, theunit, 1, 2, 
 			RegionBQCDVsMCOutputFile);
   }
 
@@ -1637,7 +1643,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 				       tag19p7InvFb + outputVTag + fileExt);
 
   if (uncTag == "") {
-    QCDVsMCClosurePlots(RegionAQCDVsMCInputFiles, variable, theunit, // 1, 2, 
+    QCDVsMCClosurePlots(RegionAQCDVsMCInputFiles, variable, theunit, 1, 2, 
 			RegionAQCDVsMCOutputFile);
   }
   

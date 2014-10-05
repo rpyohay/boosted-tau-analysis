@@ -1128,17 +1128,18 @@ TauAnalyzer::TauAnalyzer(const edm::ParameterSet& iConfig):
   muHadMassBins_.push_back(2.0);
   muHadMassBins_.push_back(3.0);
   muHadMassBins_.push_back(4.0);
-  muHadMassBins_.push_back(5.0);
-  muHadMassBins_.push_back(6.0);
-  muHadMassBins_.push_back(7.0);
-  muHadMassBins_.push_back(8.0);
-  muHadMassBins_.push_back(9.0);
-  muHadMassBins_.push_back(10.0);
-  muHadMassBins_.push_back(11.0);
-  muHadMassBins_.push_back(12.0);
-  muHadMassBins_.push_back(15.0);
-  muHadMassBins_.push_back(18.0);
-  muHadMassBins_.push_back(21.0); /*maximum over all MC and full 2012 dataset for MET > 30 and 
+  // muHadMassBins_.push_back(5.0);
+  //muHadMassBins_.push_back(6.0);
+  //muHadMassBins_.push_back(7.0);
+  //muHadMassBins_.push_back(8.0);
+  //muHadMassBins_.push_back(9.0);
+  //muHadMassBins_.push_back(10.0);
+  //muHadMassBins_.push_back(11.0);
+  //muHadMassBins_.push_back(12.0);
+  //muHadMassBins_.push_back(15.0);
+  //muHadMassBins_.push_back(18.0);
+  //muHadMassBins_.push_back(21.0);
+  /*maximum over all MC and full 2012 dataset for MET > 30 and 
 				    CSVM b veto*/
 
   //fill hadronic tau pT bins for isolated MC fake rate correction
@@ -1852,7 +1853,7 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     //impose pT and decay mode cut on tau
     if (((*iTau)->pt() > tauPTMin_) && 
 	((tauDecayMode_ == reco::PFTau::kNull) || ((*iTau)->decayMode() == tauDecayMode_)) && 
-	(fabs(tauOldJetRef->eta()) < 2.4) && (fabs(tau_vz - pv_vz) < 0.2) && (fabs(mu_vz - pv_vz) < 0.5) && (delR_taumutauhad > 0.05)/*&& (delR_Wmutaumutauhad > halfpi_) && (tauMuRelIso > 0.2)*/) {
+	(fabs(tauOldJetRef->eta()) < 2.4) && (fabs(tau_vz - pv_vz) < 0.2) && (fabs(mu_vz - pv_vz) < 0.5)/* && (delR_taumutauhad > 0.05)&& (delR_Wmutaumutauhad > halfpi_) && (tauMuRelIso > 0.2)*/) {
 
 
       //plot delR(WMu, taumu)
@@ -2967,67 +2968,67 @@ void TauAnalyzer::beginJob()
   out_ = new TFile(outFileName_.c_str(), "RECREATE");
 
   //book histograms
-  MET_ = new TH1F("MET", ";#slash{E}_{T} (GeV);", 40, 0.0, 200.0);
+  MET_ = new TH1F("MET", ";#slash{E}_{T} (GeV);", 20, 0.0, 200.0);
   hadTauAssociatedMuMultiplicity_ = 
     new TH1F("hadTauAssociatedMuMultiplicity", ";N_{#mu}/#tau;", 2, 0.5, 2.5);
   muHadMass_ = 
-    new TH1F("muHadMass", ";m_{#mu+had} (GeV);", muHadMassBins_.size() - 1, &muHadMassBins_[0]);
+    new TH1F("muHadMass", ";m_{#mu+X} (GeV);", muHadMassBins_.size() - 1, &muHadMassBins_[0]);
   muHadMassZMu_ = 
-    new TH1F("muHadMassZMu", ";m_{#mu+had} (GeV);", muHadMassBins_.size() - 1, &muHadMassBins_[0]);
+    new TH1F("muHadMassZMu", ";m_{#mu+X} (GeV);", muHadMassBins_.size() - 1, &muHadMassBins_[0]);
   muHadMassZTauMu_ = 
-    new TH1F("muHadMassZTauMu", ";m_{#mu+had} (GeV);", muHadMassBins_.size() - 1, &muHadMassBins_[0]);
+    new TH1F("muHadMassZTauMu", ";m_{#mu+X} (GeV);", muHadMassBins_.size() - 1, &muHadMassBins_[0]);
   muHadMassOtherTauMu_ = 
-    new TH1F("muHadMassOtherTauMu", ";m_{#mu+had} (GeV);", muHadMassBins_.size() - 1, &muHadMassBins_[0]);
+    new TH1F("muHadMassOtherTauMu", ";m_{#mu+X} (GeV);", muHadMassBins_.size() - 1, &muHadMassBins_[0]);
   muHadMassMuElse_ = 
-    new TH1F("muHadMassMuElse", ";m_{#mu+had} (GeV);", muHadMassBins_.size() - 1, &muHadMassBins_[0]);
+    new TH1F("muHadMassMuElse", ";m_{#mu+X} (GeV);", muHadMassBins_.size() - 1, &muHadMassBins_[0]);
   muHadMassNotMuElse_ = 
-    new TH1F("muHadMassNotMuElse", ";m_{#mu+had} (GeV);", muHadMassBins_.size() - 1, &muHadMassBins_[0]);
+    new TH1F("muHadMassNotMuElse", ";m_{#mu+X} (GeV);", muHadMassBins_.size() - 1, &muHadMassBins_[0]);
   // muHadMassFinalSel_ = 
-  //new TH1F("muHadMassFinalSel", ";m_{#mu+had} (GeV);", 1, 4., 21.);
-  muHadMass1Prong_ = new TH1F("muHadMass1Prong", ";m_{#mu+had} (GeV);", 
+  //new TH1F("muHadMassFinalSel", ";m_{#mu+X} (GeV);", 1, 4., 21.);
+  muHadMass1Prong_ = new TH1F("muHadMass1Prong", ";m_{#mu+X} (GeV);", 
 			      muHadMassBins_.size() - 1, &muHadMassBins_[0]);
-  muHadMass1Prong1Pi0_ = new TH1F("muHadMass1Prong1Pi0", ";m_{#mu+had} (GeV);", 
+  muHadMass1Prong1Pi0_ = new TH1F("muHadMass1Prong1Pi0", ";m_{#mu+X} (GeV);", 
 				  muHadMassBins_.size() - 1, &muHadMassBins_[0]);
-  muHadMass1Prong2Pi0_ = new TH1F("muHadMass1Prong2Pi0", ";m_{#mu+had} (GeV);", 
+  muHadMass1Prong2Pi0_ = new TH1F("muHadMass1Prong2Pi0", ";m_{#mu+X} (GeV);", 
 				  muHadMassBins_.size() - 1, &muHadMassBins_[0]);
-  muHadMass3Prong_ = new TH1F("muHadMass3Prong", ";m_{#mu+had} (GeV);", 
+  muHadMass3Prong_ = new TH1F("muHadMass3Prong", ";m_{#mu+X} (GeV);", 
 			      muHadMassBins_.size() - 1, &muHadMassBins_[0]);
-  muHadMassReweightErrSq_ = new TH1F("muHadMassReweightErrSq", ";m_{#mu+had} (GeV);", 
+  muHadMassReweightErrSq_ = new TH1F("muHadMassReweightErrSq", ";m_{#mu+X} (GeV);", 
 				     muHadMassBins_.size() - 1, &muHadMassBins_[0]);
   muHadCharge_ = new TH1F("muHadCharge", ";q_{#mu} + q_{had};", 5, -2.5, 2.5);
   muHadDdxy_ = new TH1F("muHadDdxy", ";#Delta_{dxy}(#mu,had);", 40, 0, 2);
   muHadDdz_ = new TH1F("muHadDdz", ";#Delta_{dz}(#mu,had);", 400, 0, 20);
-  WMuPVdz_ = new TH1F("WMuPVdz", ";dz(W_{#mu},PV) (cm);", 200, 0, 1);
-  muPVdz_ = new TH1F("muPVdz", ";dz(#tau_{#mu},PV) (cm);", 200, 0, 1);
-  hadPVdz_ = new TH1F("hadPVdz", ";dz(#tau_{had},PV) (cm);", 200, 0, 1);
-  bTagDiscrim_ = new TH1F("bTagDiscrim", ";b-tag discriminator;", 25, 0.0, 1.0);
-  WMuIso_ = new TH1F("WMuIso", ";W muon PFRelIso;", 4000, 0.0, 40.0);
+  WMuPVdz_ = new TH1F("WMuPVdz", ";dz(W_{#mu},PV) (cm);", 100, 0, 1);
+  muPVdz_ = new TH1F("muPVdz", ";dz(#tau_{#mu},PV) (cm);", 100, 0, 1);
+  hadPVdz_ = new TH1F("hadPVdz", ";dz(#tau_{had},PV) (cm);", 100, 0, 1);
+  bTagDiscrim_ = new TH1F("bTagDiscrim", ";CSV discriminator;", 25, 0.0, 1.0);
+  WMuIso_ = new TH1F("WMuIso", ";W muon PFRelIso;", 2000, 0.0, 40.0);
   WMuMT_ = new TH1F("WMuMT", ";W muon M_{T} (GeV);", 100, 0.0, 400.0);
-  tauMuMT_ = new TH1F("tauMuMT", ";#tau muon M_{T} (GeV);", 50, 0.0, 200.0);
-  tauHadMT_ = new TH1F("tauHadMT", ";#tau_{had} M_{T} (GeV);", 50, 0.0, 200.0);
-  dPhiWMuMET_ = new TH1F("dPhiWMuMET", ";#Delta#phi(W muon, #slash{E}_{T});", 63, 0.0, 3.15);
+  tauMuMT_ = new TH1F("tauMuMT", ";#tau muon M_{T} (GeV);", 25, 0.0, 200.0);
+  tauHadMT_ = new TH1F("tauHadMT", ";#tau_{had} M_{T} (GeV);", 25, 0.0, 200.0);
+  dPhiWMuMET_ = new TH1F("dPhiWMuMET", ";#Delta#phi(W muon, #slash{E}_{T});", 32, 0.0, 3.2);
   dPhiTauMuMET_ = 
-    new TH1F("dPhiTauMuMET", ";#Delta#phi(#tau muon, #slash{E}_{T});", 63, 0.0, 3.15);
-  tauMuTauHadJetHT_ = new TH1F("tauMuTauHadJetHT", ";H_{T} (GeV);", 40, 0.0, 1000.0);
-  diJetHT_ = new TH1F("diJetHT", ";H_{T} (GeV);", 40, 0.0, 1000.0);
-  jetTauJetHT_ = new TH1F("jetTauJetHT", ";H_{T} (GeV);", 40, 0.0, 1000.0);
-  tauMuTauHadJetWMuHT_ = new TH1F("tauMuTauHadJetWMuHT", ";H_{T} (GeV);", 40, 0.0, 1000.0);
-  tauMuTauHadJetWMuMETHT_ = new TH1F("tauMuTauHadJetWMuMETHT", ";H_{T} (GeV);", 40, 0.0, 1000.0);
-  diJetWMuHT_ = new TH1F("diJetWMuHT", ";H_{T} (GeV);", 40, 0.0, 1000.0);
-  jetTauJetWMuHT_ = new TH1F("jetTauJetWMuHT", ";H_{T} (GeV);", 40, 0.0, 1000.0);
+    new TH1F("dPhiTauMuMET", ";#Delta#phi(#tau muon, #slash{E}_{T});", 32, 0.0, 3.2);
+  tauMuTauHadJetHT_ = new TH1F("tauMuTauHadJetHT", ";H_{T} (GeV);", 20, 0.0, 1000.0);
+  diJetHT_ = new TH1F("diJetHT", ";H_{T} (GeV);", 20, 0.0, 1000.0);
+  jetTauJetHT_ = new TH1F("jetTauJetHT", ";H_{T} (GeV);", 20, 0.0, 1000.0);
+  tauMuTauHadJetWMuHT_ = new TH1F("tauMuTauHadJetWMuHT", ";H_{T} (GeV);", 20, 0.0, 1000.0);
+  tauMuTauHadJetWMuMETHT_ = new TH1F("tauMuTauHadJetWMuMETHT", ";H_{T} (GeV);", 20, 0.0, 1000.0);
+  diJetWMuHT_ = new TH1F("diJetWMuHT", ";H_{T} (GeV);", 20, 0.0, 1000.0);
+  jetTauJetWMuHT_ = new TH1F("jetTauJetWMuHT", ";H_{T} (GeV);", 20, 0.0, 1000.0);
   dRWMuSoftMu_ = new TH1F("dRWMuSoftMu", ";#DeltaR(W_{#mu}, #tau_{#mu});", 60, 0.0, 3.0);
   dRWMuTauHad_ = new TH1F("dRWMuTauHad", ";#DeltaR(W_{#mu}, #tau_{had});", 60, 0.0, 3.0);
   dRTauMuTauHad_ = new TH1F("dRTauMuTauHad", ";#DeltaR(#tau_{#mu}, #tau_{had});", 60, 0.0, 3.0);
   dRWMuTauMuTauHad_ = new TH1F("dRWMuTauMuTauHad", ";#DeltaR(W_{#mu}, #tau_{#mu} + #tau_{had});", 60, 0.0, 3.0);
-  dPhiWMuSoftMu_ = new TH1F("dPhiWMuSoftMu", ";#Delta#phi(W muon, soft muon);", 400, -4.0, 4.0);
+  dPhiWMuSoftMu_ = new TH1F("dPhiWMuSoftMu", ";#Delta#phi(W muon, soft muon);", 40, -4.0, 4.0);
   dPhiWMuSoftMu_withCut_ = 
-    new TH1F("dPhiWMuSoftMu_withCut", ";#Delta#phi(W muon, soft muon);", 400, -4.0, 4.0);
+    new TH1F("dPhiWMuSoftMu_withCut", ";#Delta#phi(W muon, soft muon);", 40, -4.0, 4.0);
   dRWMuSoftGenMatchedMu_ = 
     new TH1F("dRWMuSoftGenMatchedMu", ";#DeltaR(W muon, soft muon);", 30, 0.0, 3.0);
   dRWMuSoftMuMuHadMassGe2_ = 
     new TH1F("dRWMuSoftMuMuHadMassGe2", ";#DeltaR(W muon, soft muon);", 30, 0.0, 3.0);
   dRSoftMuTauHad_ = 
-    new TH1F("dRSoftMuTauHad", ";#DeltaR(#tau_{#mu},#tau_{had});", 60, 0.0, 3.0);
+    new TH1F("dRSoftMuTauHad", ";#DeltaR(#tau_{#mu},#tau_{had});", 30, 0.0, 3.0);
   tauMuPT_ = new TH1F("tauMuPT", ";p_{T} (GeV);", 20, 0.0, 100.0);
   tauHadPT_ = new TH1F("tauHadPT", ";p_{T} (GeV);", tauHadPTBins_.size() - 1, &tauHadPTBins_[0]);
   tauHadPT1Prong_ = new TH1F("tauHadPT1Prong", ";p_{T} (GeV);", 
@@ -3040,26 +3041,26 @@ void TauAnalyzer::beginJob()
 			     tauHadPTBins_.size() - 1, &tauHadPTBins_[0]);
   tauHadIso_ = new TH1F("tauHadIso", ";Isolation energy (GeV);", 20, 0.0, 20.0);
   WMuLeptonRelIso_ = new TH1F("WMuLeptonRelIso", ";Relative isolation;", 100, 0.0, 2.0);
-  tauHadEta_ = new TH1F("tauHadEta", ";#eta;", 46, -2.3, 2.3);
+  tauHadEta_ = new TH1F("tauHadEta", ";#eta;", 23, -2.3, 2.3);
   softMuPTOverMuHadMass_ = 
-    new TH1F("softMuPTOverMuHadMass", ";#frac{p_{T}^{#mu}}{m_{#mu+had}};", 80, 0.0, 80.0);
+    new TH1F("softMuPTOverMuHadMass", ";#frac{p_{T}^{#mu}}{m_{#mu+X}};", 80, 0.0, 80.0);
   muHadPTOverMuHadMass_ = 
     new TH1F("muHadPTOverMuHadMass", ";#frac{p_{T}}{m};", 80, 0.0, 80.0);
   dRSoftMuNearestGenMuHist_ = 
     new TH1F("dRSoftMuNearestGenMuHist", ";#DeltaR(soft #mu, gen #mu);", 40, 0.0, 2.0);
-  muHadPT_ = new TH1F("muHadPT", ";p_{T}^{#mu+had} (GeV);", 50, 0.0, 100.0);
-  muHadMultiplicity_ = new TH1F("muHadMultiplicity", ";N_{#mu+had}/event;", 4, 0.5, 4.5);
+  muHadPT_ = new TH1F("muHadPT", ";p_{T}^{#mu+X} (GeV);", 50, 0.0, 100.0);
+  muHadMultiplicity_ = new TH1F("muHadMultiplicity", ";N_{#mu+X}/event;", 4, 0.5, 4.5);
   nGoodVtx_ = new TH1F("nGoodVtx", ";No. good vertices;", 60, -0.5, 59.5);
   mWMuTauMu_ = new TH1F("mWMuTauMu", ";m_{#mu#mu} (GeV);", 36, 0.0, 180.0);
   PDGIDNearestStatus1GenParticleToSoftMu_ = 
     new TH1F("PDGIDNearestStatus1GenParticleToSoftMu", ";PDG ID;", 6, -0.5, 5.5);
   PDGIDMuSrc_ = new TH1F("PDGIDMuSrc", ";PDG ID;", 2, -0.5, 1.5);
   mSecondJetMuHad_ = new TH1F("mSecondJetMuHad", ";m_{#mu#tauj} (GeV);", 30, 0.0, 150.0);
-  dPhiMuHadSecondJet_ = new TH1F("dPhiMuHadSecondJet", ";#Delta#phi(#mu+had,j);", 63, 0.0, 3.15);
+  dPhiMuHadSecondJet_ = new TH1F("dPhiMuHadSecondJet", ";#Delta#phi(#mu+X,j);", 63, 0.0, 3.15);
   muHadUncleanedJetPTRank_ = new TH1F("muHadUncleanedJetPTRank", "", 2, -0.5, 1.5);
   nAddlHardMuons_ = new TH1F("nAddlHardMuons", ";N_{#mu};", 6, -0.5, 5.5);
-  nAddlJetsPTGeq20_ = new TH1F("nAddlJetsPTGeq0", ";N_{j}(p_{T} > 20 GeV);", 76, -0.5, 75.5);
-  nAddlJetsPTGeq30_ = new TH1F("nAddlJetsPTGeq20", ";N_{j}(p_{T} > 30 GeV);", 16, -0.5, 15.5);
+  nAddlJetsPTGeq20_ = new TH1F("nAddlJetsPTGeq20", ";N_{j}(p_{T} > 20 GeV);", 76, -0.5, 75.5);
+  nAddlJetsPTGeq30_ = new TH1F("nAddlJetsPTGeq30", ";N_{j}(p_{T} > 30 GeV);", 16, -0.5, 15.5);
   nAddlJetsPTGeq40_ = new TH1F("nAddlJetsPTGeq40", ";N_{j}(p_{T} > 40 GeV);", 16, -0.5, 15.5);
   tauHadDecayMode_ = new TH1F("tauHadDecayMode", ";Decay mode;", 5, -0.5, 4.5);
   dRSoftMuNearestGenZOrTTMu_ = 
@@ -3081,10 +3082,10 @@ void TauAnalyzer::beginJob()
     new TH2F("uncleanedJetPTVsCleanedTauPT", ";#tau p_{T} (GeV);Jet p_{T} (GeV)", 
 	     50, 0.0, 100.0, 50, 0.0, 100.0);
   muHadMassVsDRSoftMuTau_ = 
-    new TH2F("muHadMassVsDRSoftMuTau", ";#DeltaR(soft muon, #tau_{had});m_{#mu+had} (GeV)", 
+    new TH2F("muHadMassVsDRSoftMuTau", ";#DeltaR(soft muon, #tau_{had});m_{#mu+X} (GeV)", 
 	     30, 0.0, 3.0, 20, 0.0, 20.0);
   muHadMassVsSoftMuPT_ = 
-    new TH2F("muHadMassVsSoftMuPT", ";p_{T} (GeV);m_{#mu+had} (GeV)", 
+    new TH2F("muHadMassVsSoftMuPT", ";p_{T} (GeV);m_{#mu+X} (GeV)", 
 	     20, 0.0, 100.0, 20, 0.0, 20.0);
   tauHadIsoVsSoftMuPT_ = 
     new TH2F("tauHadIsoVsSoftMuPT", ";p_{T} (GeV);Isolation energy (GeV)", 
@@ -3093,14 +3094,14 @@ void TauAnalyzer::beginJob()
     new TH2F("genMuExistsVsSoftMuNearestMuProperties", ";Nearest muon property;Gen muon property", 
 	     3, -0.5, 2.5, 2, -0.5, 1.5);
   muHadMassVsTauHadEta_ = 
-    new TH2F("muHadMassVsTauHadEta", ";#eta;m_{#mu+had} (GeV)", 46, -2.3, 2.3, 20, 0.0, 20.0);
+    new TH2F("muHadMassVsTauHadEta", ";#eta;m_{#mu+X} (GeV)", 46, -2.3, 2.3, 20, 0.0, 20.0);
   muHadMassVsSoftMuEta_ = 
-    new TH2F("muHadMassVsSoftMuEta", ";#eta;m_{#mu+had} (GeV)", 46, -2.3, 2.3, 20, 0.0, 20.0);
+    new TH2F("muHadMassVsSoftMuEta", ";#eta;m_{#mu+X} (GeV)", 46, -2.3, 2.3, 20, 0.0, 20.0);
   muHadMassVsTauHadIso_ = 
-    new TH2F("muHadMassVsTauHadIso", ";Isolation energy (GeV);m_{#mu+had} (GeV)", 
+    new TH2F("muHadMassVsTauHadIso", ";Isolation energy (GeV);m_{#mu+X} (GeV)", 
 	     20, 0.0, 20.0, 20, 0.0, 20.0);
   muHadMassVsTauHadPT_ = 
-    new TH2F("muHadMassVsTauHadPT", ";p_{T} (GeV);m_{#mu+had} (GeV)", 
+    new TH2F("muHadMassVsTauHadPT", ";p_{T} (GeV);m_{#mu+X} (GeV)", 
 	     20, 0.0, 100.0, 20, 0.0, 20.0);
   tauHadIsoVsEta_ = 
     new TH2F("tauHadIsoVsEta", ";#eta;Isolation energy (GeV)", 46, -2.3, 2.3, 20, 0.0, 20.0);
@@ -3111,19 +3112,19 @@ void TauAnalyzer::beginJob()
 	     20, 0.0, 1.0, 20, 0.0, 1.0);
   tauHadPTOverMuHadMassVsTauHadIso_ = 
     new TH2F("tauHadPTOverMuHadMassVsTauHadIso", 
-	     ";Isolation energy (GeV);#frac{p_{T}^{#tau}}{m_{#mu+had}}", 
+	     ";Isolation energy (GeV);#frac{p_{T}^{#tau}}{m_{#mu+X}}", 
 	     20, 0.0, 20.0, 80, 0.0, 80.0);
   softMuPTOverMuHadMassVsTauHadIso_ = 
     new TH2F("softMuPTOverMuHadMassVsTauHadIso", 
-	     ";Isolation energy (GeV);#frac{p_{T}^{#mu}}{m_{#mu+had}}", 
+	     ";Isolation energy (GeV);#frac{p_{T}^{#mu}}{m_{#mu+X}}", 
 	     20, 0.0, 20.0, 80, 0.0, 80.0);
   avgTauHadSoftMuPTOverMuHadMassVsTauHadIso_ = 
     new TH2F("avgTauHadSoftMuPTOverMuHadMassVsTauHadIso", 
-	     ";Isolation energy (GeV);#frac{p_{T}^{#tau} + p_{T}^{#mu}}{2m_{#mu+had}}", 
+	     ";Isolation energy (GeV);#frac{p_{T}^{#tau} + p_{T}^{#mu}}{2m_{#mu+X}}", 
 	     20, 0.0, 20.0, 80, 0.0, 80.0);
   muHadPTOverMuHadMassVsTauHadIso_ = 
     new TH2F("muHadPTOverMuHadMassVsTauHadIso", 
-	     ";Isolation energy (GeV);#frac{p_{T}^{#mu+had}}{m_{#mu+had}}", 
+	     ";Isolation energy (GeV);#frac{p_{T}^{#mu+X}}{m_{#mu+X}}", 
 	     20, 0.0, 20.0, 80, 0.0, 80.0);
   WMuIsoVsTauHadIso_ = 
     new TH2F("WMuIsoVsTauHadIso", 
@@ -3148,16 +3149,16 @@ void TauAnalyzer::beginJob()
   softMuPFEtaVsRECOEta_ = new TH2F("softMuPFEtaVsRECOEta", ";RECO #eta;PF #eta", 
 				   46, -2.3, 2.3, 46, -2.3, 2.3);
   mSecondJetMuHadVsMuHadMass_ = 
-    new TH2F("mSecondJetMuHadVsMuHadMass", ";m_{#mu+had} (GeV);m_{#mu#tauj} (GeV)", 
+    new TH2F("mSecondJetMuHadVsMuHadMass", ";m_{#mu+X} (GeV);m_{#mu#tauj} (GeV)", 
 	     20, 0.0, 20.0, 60, 0.0, 300.0);
   muHadMassVsSecondJetMass_ = 
-    new TH2F("muHadMassVsSecondJetMass", ";m_{j} (GeV);m_{#mu+had} (GeV)", 
+    new TH2F("muHadMassVsSecondJetMass", ";m_{j} (GeV);m_{#mu+X} (GeV)", 
 	     20, 0.0, 200.0, 20, 0.0, 20.0);
   muHadPTOverMVsSecondJetPTOverM_ = 
-    new TH2F("muHadPTOverMVsSecondJetPTOverM", ";p_{T}^{j}/m^{j};p_{T}^{#mu+had}/m^{#mu+had}", 
+    new TH2F("muHadPTOverMVsSecondJetPTOverM", ";p_{T}^{j}/m^{j};p_{T}^{#mu+X}/m^{#mu+X}", 
 	     20, 0.0, 20.0, 20, 0.0, 20.0);
   muHadMassVsSecondJetPTOverM_ = 
-    new TH2F("muHadMassVsSecondJetPTOverM", ";p_{T}^{j}/m^{j};m_{#mu+had} (GeV)", 
+    new TH2F("muHadMassVsSecondJetPTOverM", ";p_{T}^{j}/m^{j};m_{#mu+X} (GeV)", 
 	     40, 0.0, 40.0, 20, 0.0, 20.0);
   tauMuTauHadJetWMuHTVsMET_ = 
     new TH2F("tauMuTauHadJetWMuHTVsMET", ";#slash{E}_{T} (GeV);H_{T} (GeV)", 
@@ -3169,7 +3170,7 @@ void TauAnalyzer::beginJob()
     new TH2F("mWMuTauMuVsMWMuTauMuTauHadGenFSR", ";m_{#mu#mu#tau} (GeV);m_{#mu#mu} (GeV)", 
 	     36, 0.0, 180.0, 36, 0.0, 180.0);
   muHadMassVsMWMuTauMuTauHad_ = 
-    new TH2F("muHadMassVsMWMuTauMuTauHad", ";m_{#mu#mu#tau} (GeV);m_{#mu+had} (GeV)", 
+    new TH2F("muHadMassVsMWMuTauMuTauHad", ";m_{#mu#mu#tau} (GeV);m_{#mu+X} (GeV)", 
 	     36, 0.0, 180.0, 20, 0.0, 20.0);
   jet_pt_etacut = new TH1F("jet_pt_etacut", ";p_{T} (GeV);", 20, 0., 200.);
   muHad_t3t1Vsptmj_ = new TH2F("muHad_t3t1Vsptmj", ";#frac{p_{T}}{m};#frac{#tau_{3}}{#tau_{1}}", 
@@ -3178,10 +3179,10 @@ void TauAnalyzer::beginJob()
 				    ";HPS #tau decay mode;#frac{#tau_{3}}{#tau_{1}}", 
 				    16, -1.5, 14.5, 500, 0.0, 2.0);
   muHadMassVsNAddlJets_ = 
-    new TH2F("muHadMassVsNAddlJets", ";N_{j};m_{#mu+had} (GeV)", 10, -0.5, 9.5, 20, 0.0, 20.0);
-  muHadMassVsCSVScore_ = new TH2F("muHadMassVsCSVScore", ";CSV score;m_{#mu+had} (GeV)", 25, 0.0, 
+    new TH2F("muHadMassVsNAddlJets", ";N_{j};m_{#mu+X} (GeV)", 10, -0.5, 9.5, 20, 0.0, 20.0);
+  muHadMassVsCSVScore_ = new TH2F("muHadMassVsCSVScore", ";CSV score;m_{#mu+X} (GeV)", 25, 0.0, 
 				  1.0, muHadMassBins_.size() - 1, &muHadMassBins_[0]);
-  muHadMassVsWMuMT_ = new TH2F("muHadMassVsWMuMT", ";W muon M_{T} (GeV);m_{#mu+had} (GeV)", 100, 0.0, 400.0,
+  muHadMassVsWMuMT_ = new TH2F("muHadMassVsWMuMT", ";W muon M_{T} (GeV);m_{#mu+X} (GeV)", 100, 0.0, 400.0,
 			       muHadMassBins_.size() - 1, &muHadMassBins_[0]);
   WMuMTVsMET_ = new TH2F("WMuMTVsMET", ";#slash{E}_{T} (GeV);W muon M_{T} (GeV)", 40, 0.0, 200.0, 
 			 100, 0.0, 400.0);
@@ -3194,7 +3195,7 @@ void TauAnalyzer::beginJob()
   tauHadCleanedJetEnergyFractionVsTauHadIso_ = 
     new TH2F("tauHadCleanedJetEnergyFractionVsTauHadIso", 
 	     ";Isolation energy (GeV);#frac{E_{#tau}}{E_{j}}", 20, 0.0, 20.0, 20, 0.0, 1.0);
-  jet_eta = new TH1F("jet_eta", "#eta", 70, -3.5, 3.5);
+  jet_eta = new TH1F("jet_eta", "#eta", 35, -3.5, 3.5);
   jet_phi = new TH1F("jet_phi", "#phi", 14, -3.5, 3.5);
   jet_mass_etacut = new TH1F("jet_mass_etacut", "m (GeV)", 20, 0., 200.);
   jet_ptmj_etacut = new TH1F("jet_ptmj_etacut", "#frac{p_{T}}{m}", 80, 0., 80.);
@@ -3267,7 +3268,7 @@ void TauAnalyzer::beginJob()
 			       "charged track multiplicity of second jet (pT > 30)", 
 			       40, -0.5, 39.5);
   dPhiWMuSecJet_ = 
-    new TH1F("dPhiWMuSecJet", "#Delta#phi between W muon and second jet", 400, -4., 4.);
+    new TH1F("dPhiWMuSecJet", "#Delta#phi between W muon and second jet", 40, -4., 4.);
   //dRWMuTriggerObject_ = new TH1F("dRWMuTriggerObject", ";#DeltaR(W muon, trigger object);", 30, 0.0, 3.0);
 
   //set bin labels

@@ -840,6 +840,10 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 	if (histName == "jet_ptmj_etacut") {
 	  pHist->GetXaxis()->SetTitle("#frac{p_{T}}{m}");
 	}
+	//	if ((histName == "muHadMass") && (outputFileName.find("dataVsMC_muHadNonIsoAnalysis") != string::npos))
+	//{
+	//  cout << "For " << iInputFile->c_str() << ", " << histName << " total integral = " << pHist->Integral() << endl;
+	//}
 	if (setLogY) pHist->GetYaxis()->SetRangeUser(0.1, 10000.0);
 	string legendStyle("l");
 	if (drawStack) {
@@ -1468,8 +1472,8 @@ void makeMCClosurePlots(const string& sigVsBkgIsoFileName, const vector<string>&
 
 void QCDVsMCClosurePlots(const vector<string>& QCDVsMCInputFileNames, const string& var, 
 			 const string& units, 
-// 			 const int normRegionLowerBin, 
-// 			 const int normRegionUpperBin,
+ 			 const int normRegionLowerBin, 
+ 			 const int normRegionUpperBin,
 			 const string& outputFileName)
 {
 
@@ -1694,6 +1698,10 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
       const unsigned int i = iIsoSig - isoSig.begin();
       *iIsoSig = (TH1F*)sigs->At(i + 2)->Clone();
       (*iIsoSig)->GetYaxis()->SetRangeUser(0.01, 10000.0);
+      for (int b = 5; b < (*iIsoSig)->GetNbinsX(); ++b)
+	{
+	  cout << "stat error on signal sample " << i << " = " << (*iIsoSig)->GetBinError(b) << endl;
+	}
     }
     legendBkgSep.AddEntry(isoSig[0], "Wh_{1}", "l");
     if (gg) legendBkgSep.AddEntry(isoSig[1], "gg fusion", "l");
