@@ -1138,7 +1138,7 @@ TauAnalyzer::TauAnalyzer(const edm::ParameterSet& iConfig):
   //muHadMassBins_.push_back(12.0);
   //muHadMassBins_.push_back(15.0);
   //muHadMassBins_.push_back(18.0);
-  //muHadMassBins_.push_back(21.0);
+  muHadMassBins_.push_back(21.0);
   /*maximum over all MC and full 2012 dataset for MET > 30 and 
 				    CSVM b veto*/
 
