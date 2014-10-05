@@ -114,15 +114,15 @@ usePF2PAT(process,runPF2PAT=True,jetAlgo=jetAlgo,runOnMC=True,postfix=PF2PATPost
 
 from PhysicsTools.PatUtils.tools.metUncertaintyTools import runMEtUncertainties
 from JetMETCorrections.Type1MET.pfMETCorrectionType0_cfi import *
-runMEtUncertainties(process, electronCollection='selectedPatElectronsPFlow', muonCollection='selectedPatMuonsPFlow', tauCollection='selectedPatTausPFlow', jetCollection='selectedPatJetsPFlow',doApplyType0corr=True, postfix='Smeared')
+runMEtUncertainties(process, electronCollection='selectedPatElectronsPFlow', muonCollection='selectedPatMuonsPFlow', tauCollection='selectedPatTausPFlow', jetCollection='selectedPatJetsPFlow',doApplyType0corr=False, doSmearJets=False, postfix='NotSmeared')
 
-process.patPFMETtype0CorrSmeared=process.patPFMETtype0Corr.clone()
+process.patPFMETtype0CorrNotSmeared=process.patPFMETtype0Corr.clone()
 process.PF2PAT = cms.Sequence(
 #    process.patDefaultSequence +
     getattr(process,"patPF2PATSequence"+PF2PATPostfix) +
     process.type0PFMEtCorrection + 
-    process.patPFMETtype0CorrSmeared + 
-    process.metUncertaintySequenceSmeared
+    process.patPFMETtype0CorrNotSmeared + 
+    process.metUncertaintySequenceNotSmeared
     )
 
 #output commands
@@ -226,7 +226,7 @@ skimEventContent = cms.PSet(
     "drop *_vertexMerger_*_*",
     "drop *_pfCandidateToVertexAssociation_*_*",
     "drop *_trackToVertexAssociation_*_*",
-    "drop *_pfCandsNotInJetSmeared_*_*",
+    "drop *_pfCandsNotInJetNotSmeared_*_*",
     "drop *_particleFlowDisplacedVertex_*_*",
     "drop *_selectedPrimaryVertexHighestPtTrackSumForPFMEtCorrType0_*_*",
     "drop *_selectedVerticesForPFMEtCorrType0_*_*"
@@ -453,7 +453,7 @@ process.muHadNonIsoTauSelector = cms.EDFilter(
     ),
     jetTag = cms.InputTag('CleanJets', 'ak5PFJetsNoMu', 'SKIM'),
     muonRemovalDecisionTag = cms.InputTag('CleanJets'),
-    overlapCandTag = cms.InputTag('WIsoMuonSelector'),
+    muonTag = cms.InputTag('WIsoMuonSelector'),
     passDiscriminator = cms.bool(False),
     etaMax = cms.double(2.4),
     isoMax = cms.double(-1.0),
@@ -519,7 +519,7 @@ process.noSelectionSequence = cms.Sequence(process.IsoMu24eta2p1Selector*
                                            process.tauMuonSelector*
                                            process.PFTau*
                                            process.muHadTauSelector*
-#                                           process.tauShiftProducer*
+                                           process.tauShiftProducer*
                                            process.btagging*
                                            process.pfParticleSelectionSequence*
                                            process.phoIsoSequence)

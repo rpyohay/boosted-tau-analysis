@@ -1,4 +1,5 @@
 import FWCore.ParameterSet.Config as cms
+from subprocess import *
 
 process = cms.Process("SKIM")
 
@@ -91,6 +92,39 @@ WMuNuPSet.momPDGID = cms.vint32(W_PDGID)
 WRecoilJetPSet = commonGenTauDecayIDPSet.clone()
 WRecoilJetPSet.momPDGID = cms.vint32(ANY_PDGID)
 
+# load the PAT config
+process.load("PhysicsTools.PatAlgos.patSequences_cff")
+
+# Configure PAT to use PF2PAT instead of AOD sources
+# this function will modify the PAT sequences. 
+from PhysicsTools.PatAlgos.tools.pfTools import *
+from PhysicsTools.PatAlgos.tools.metTools import *
+
+PF2PATPostfix = "PFlow"
+jetAlgo="AK5"
+#addPfMET(process, postfixLabel=postfix)
+
+usePF2PAT(process,runPF2PAT=True,jetAlgo=jetAlgo,runOnMC=True,postfix=PF2PATPostfix,jetCorrections=('AK5PF',['L1FastJet','L2Relative','L3Absolute']),typeIMetCorrections=True,outputModules=[])
+
+# to use tau-cleaned jet collection uncomment the following: 
+#getattr(process,"pfNoTau"+postfix).enable = True
+
+# to switch default tau to HPS tau uncomment the following: 
+#adaptPFTaus(process,"hpsPFTau",postfix=postfix)
+
+from PhysicsTools.PatUtils.tools.metUncertaintyTools import runMEtUncertainties
+from JetMETCorrections.Type1MET.pfMETCorrectionType0_cfi import *
+runMEtUncertainties(process, electronCollection='selectedPatElectronsPFlow', muonCollection='selectedPatMuonsPFlow', tauCollection='selectedPatTausPFlow', jetCollection='selectedPatJetsPFlow',doApplyType0corr=False, doSmearJets=False, postfix='NotSmeared')
+
+process.patPFMETtype0CorrNotSmeared=process.patPFMETtype0Corr.clone()
+process.PF2PAT = cms.Sequence(
+#    process.patDefaultSequence +
+    getattr(process,"patPF2PATSequence"+PF2PATPostfix) +
+    process.type0PFMEtCorrection + 
+    process.patPFMETtype0CorrNotSmeared + 
+    process.metUncertaintySequenceNotSmeared
+    )
+
 #output commands
 skimEventContent = cms.PSet(
     outputCommands = cms.untracked.vstring(
@@ -119,7 +153,8 @@ skimEventContent = cms.PSet(
     "drop *_hfRecoEcalCandidate_*_*",
     "drop *_generalV0Candidates_*_*",
     "drop *_selectDigi_*_*",
-    "drop *_*BJetTags*_*_*",
+    "drop *_*BJetTags*_*_RECO",
+    "drop *_*BJetTags*_*_HLT",
     "drop *_castorreco_*_*",
     "drop *_reduced*RecHits*_*_*",
     "drop *_PhotonIDProd_*_*",
@@ -141,8 +176,8 @@ skimEventContent = cms.PSet(
     "drop *_uncleanedOnlyGsfElectron*_*_*",
     "drop recoJPTJets_*_*_*",
     "drop recoMETs_*_*_*",
-    "drop *_photons_*_*",
-    "drop *_photonCore_*_*",
+##     "drop *_photons_*_*",
+##     "drop *_photonCore_*_*",
     "drop *_ak5PFJetsRecoTauPiZeros_*_RECO",
     "drop *_ak5PFJetsRecoTauPiZeros_*_HLT",
     "drop *_hpsPFTauDiscrimination*_*_RECO",
@@ -166,6 +201,35 @@ skimEventContent = cms.PSet(
     "drop *_correctedHybridSuperClusters_*_*",
     "drop *_correctedMulti5x5SuperClustersWithPreshower_*_*",
     "drop *_*Voronoi*_*_*",
+    "drop *_*phPFIsoValue*04PFIdPFIso_*_*",
+    "drop *_phPFIsoDeposit*_*_*",
+    "drop *_pfAll*_*_*",
+    "drop *_pf*PileUp*_*_*",
+    "drop *_*TagInfos*_*_*",
+    "drop *_ghostTrackBJetTags_*_SKIM",
+    "drop *_jet*ProbabilityBJetTags_*_SKIM",
+    "drop *_simpleSecondaryVertexHigh*BJetTags_*_SKIM",
+    "drop *_trackCountingHigh*BJetTags_*_SKIM",
+    "drop CorrMETData_*_*_SKIM",
+    "drop *_*NoNu_*_*",
+    "drop *_*PFlow_*_*",
+    "keep *_patType1CorrectedPFMetPFlow_*_*",
+    "drop *_softElectronCands_*_*",
+    "drop *_*_caloTowers_*",
+    "drop *_shiftedPat*_*_*",
+    "drop *_selectedPat*_*_*",
+    "drop *_smearedPat*_*_*",
+    "drop *_pfCandsNotInJet_*_*",
+    "drop *_inclusiveMergedVertices_*_*",
+    "drop *_inclusiveVertexFinder_*_*",
+    "drop *_trackVertexArbitrator_*_*",
+    "drop *_vertexMerger_*_*",
+    "drop *_pfCandidateToVertexAssociation_*_*",
+    "drop *_trackToVertexAssociation_*_*",
+    "drop *_pfCandsNotInJetNotSmeared_*_*",
+    "drop *_particleFlowDisplacedVertex_*_*",
+    "drop *_selectedPrimaryVertexHighestPtTrackSumForPFMEtCorrType0_*_*",
+    "drop *_selectedVerticesForPFMEtCorrType0_*_*"
     #added 2-Jul-13 after estimating data skim size
 ##     "drop *_clusterSummaryProducer_*_*",
 ##     "drop *_hcalnoise_*_*",
@@ -182,6 +246,38 @@ skimEventContent = cms.PSet(
 ##     "drop *_particleFlowRecHit*_*_*",
 ##     "drop recoPFCandidates_CleanJets_*_SKIM"
     )
+    )
+
+# b-tagging general configuration
+process.load("RecoBTag.Configuration.RecoBTag_cff")
+process.load("RecoJets.JetAssociationProducers.ak5JTA_cff")
+from RecoBTag.SoftLepton.softLepton_cff import *
+from RecoBTag.ImpactParameter.impactParameter_cff import *
+from RecoBTag.SecondaryVertex.secondaryVertex_cff import *
+from RecoBTau.JetTagComputer.combinedMVA_cff import *
+process.impactParameterTagInfos.jetTracks = cms.InputTag("ak5JetTracksAssociatorAtVertex")
+process.ak5JetTracksAssociatorAtVertex.jets = cms.InputTag("ak5PFJets")
+process.ak5JetTracksAssociatorAtVertex.tracks = cms.InputTag("generalTracks")
+process.btagging = cms.Sequence(
+    process.ak5JetTracksAssociatorAtVertex*
+    # impact parameters and IP-only algorithms
+    process.impactParameterTagInfos*
+    (process.trackCountingHighEffBJetTags +
+     process.trackCountingHighPurBJetTags +
+     process.jetProbabilityBJetTags +
+     process.jetBProbabilityBJetTags +
+     # SV tag infos depending on IP tag infos, and SV (+IP) based algos
+     process.secondaryVertexTagInfos*
+     (process.simpleSecondaryVertexHighEffBJetTags +
+      process.simpleSecondaryVertexHighPurBJetTags +
+      process.combinedSecondaryVertexBJetTags +
+      process.combinedSecondaryVertexMVABJetTags) +
+     process.ghostTrackVertexTagInfos*
+     process.ghostTrackBJetTags)##  +
+##     process.softPFMuonsTagInfos*
+##     process.softPFMuonBJetTags *
+##     process.softPFElectronsTagInfos*
+##     process.softPFElectronBJetTags
     )
 
 #only proceed if event is a true W-->munu event
@@ -232,7 +328,11 @@ process.WMuonPTSelector = cms.EDFilter('MuonRefSelector',
                                        filter = cms.bool(True)
                                        )
 
-#search for a loose PF isolated tight muon in |eta| < 2.1 with pT > 25 GeV
+#produce photon isolations
+from CommonTools.ParticleFlow.Tools.pfIsolation import setupPFPhotonIso
+process.phoIsoSequence = setupPFPhotonIso(process, 'photons')
+
+#search for a tight PF isolated tight muon in |eta| < 2.1 with pT > 25 GeV
 #(see https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Muon_Isolation_AN1 for
 #isolation definition; CMS AN-2012/349 uses loose isolation working point for WHbb muon selection)
 #this will produce a ref to the original muon collection
@@ -241,7 +341,7 @@ process.WIsoMuonSelector = cms.EDFilter('CustomMuonSelector',
                                         muonTag = cms.InputTag('WMuonPTSelector'),
                                         vtxTag = cms.InputTag('offlinePrimaryVertices'),
                                         muonID = cms.string('tight'),
-                                        PFIsoMax = cms.double(0.2),
+                                        PFIsoMax = cms.double(0.12),
                                         detectorIsoMax = cms.double(-1.0),
                                         PUSubtractionCoeff = cms.double(0.5),
                                         usePFIso = cms.bool(True),
@@ -300,17 +400,20 @@ process.PFTau = cms.Sequence(process.recoTauCommonSequence*process.recoTauClassi
 #discriminator
 #this will produce a ref to the cleaned tau collection
 process.muHadIsoTauSelector = cms.EDFilter(
-    'CustomTauSelector',
+    'CustomTauSepFromMuonSelector',
     baseTauTag = cms.InputTag('hpsPFTauProducer', '', 'SKIM'),
+    tauHadIsoTag = cms.InputTag('hpsPFTauDiscriminationByRawCombinedIsolationDBSumPtCorr', '',
+                                'SKIM'),
     tauDiscriminatorTags = cms.VInputTag(
     cms.InputTag('hpsPFTauDiscriminationByDecayModeFinding', '', 'SKIM'), 
     cms.InputTag('hpsPFTauDiscriminationByMediumCombinedIsolationDBSumPtCorr', '', 'SKIM')
     ),
     jetTag = cms.InputTag('CleanJets', 'ak5PFJetsNoMu', 'SKIM'),
     muonRemovalDecisionTag = cms.InputTag('CleanJets'),
-    muonTag = cms.InputTag('WIsoMuonSelector'),
+    overlapCandTag = cms.InputTag('WIsoMuonSelector'),
     passDiscriminator = cms.bool(True),
     etaMax = cms.double(2.4),
+    isoMax = cms.double(-1.0),
     dR = cms.double(0.5),
     minNumObjsToPassFilter = cms.uint32(1)
     )
@@ -318,17 +421,20 @@ process.muHadIsoTauSelector = cms.EDFilter(
 #find taus in |eta| < 2.4 matched to muon-tagged cleaned jets
 #this will produce a ref to the cleaned tau collection
 process.muHadTauSelector = cms.EDFilter(
-    'CustomTauSelector',
+    'CustomTauSepFromMuonSelector',
     baseTauTag = cms.InputTag('hpsPFTauProducer', '', 'SKIM'),
+    tauHadIsoTag = cms.InputTag('hpsPFTauDiscriminationByRawCombinedIsolationDBSumPtCorr', '',
+                                'SKIM'),
     tauDiscriminatorTags = cms.VInputTag(
     cms.InputTag('hpsPFTauDiscriminationByDecayModeFinding', '', 'SKIM')
     ),
     jetTag = cms.InputTag('CleanJets', 'ak5PFJetsNoMu', 'SKIM'),
     muonRemovalDecisionTag = cms.InputTag('CleanJets'),
-    muonTag = cms.InputTag('WIsoMuonSelector'),
+    overlapCandTag = cms.InputTag('WIsoMuonSelector'),
     passDiscriminator = cms.bool(True),
     pTMin = cms.double(10.0),
     etaMax = cms.double(2.4),
+    isoMax = cms.double(-1.0),
     dR = cms.double(0.5),
     minNumObjsToPassFilter = cms.uint32(1)
     )
@@ -337,9 +443,11 @@ process.muHadTauSelector = cms.EDFilter(
 #discriminator
 #this will produce a ref to the cleaned tau collection
 process.muHadNonIsoTauSelector = cms.EDFilter(
-    'CustomTauSelector',
+    'CustomTauSepFromMuonSelector',
     tauTag = cms.InputTag('muHadTauSelector'),
     baseTauTag = cms.InputTag('hpsPFTauProducer', '', 'SKIM'),
+    tauHadIsoTag = cms.InputTag('hpsPFTauDiscriminationByRawCombinedIsolationDBSumPtCorr', '',
+                                'SKIM'),
     tauDiscriminatorTags = cms.VInputTag(
     cms.InputTag('hpsPFTauDiscriminationByMediumCombinedIsolationDBSumPtCorr', '', 'SKIM')
     ),
@@ -348,8 +456,17 @@ process.muHadNonIsoTauSelector = cms.EDFilter(
     muonTag = cms.InputTag('WIsoMuonSelector'),
     passDiscriminator = cms.bool(False),
     etaMax = cms.double(2.4),
+    isoMax = cms.double(-1.0),
     dR = cms.double(0.5),
     minNumObjsToPassFilter = cms.uint32(1)
+    )
+
+process.tauShiftProducer = cms.EDProducer(
+    'TauEnergyShifter',
+#    baseTauTag = cms.InputTag('hpsPFTauProducer', '', 'SKIM'),
+    tauTag = cms.InputTag('muHadTauSelector'),
+    pTMin = cms.double(10.),
+    pTShift = cms.double(0.03)
     )
 
 #output
@@ -373,19 +490,39 @@ process.noSelectedOutput = cms.OutputModule(
     )
 
 #sequences
-process.antiSelectionSequence = cms.Sequence(process.IsoMu24eta2p1Selector*process.WMuonPTSelector*
-                                             process.WIsoMuonSelector*process.tauMuonPTSelector*
-                                             process.tauMuonSelector*process.PFTau*
+process.antiSelectionSequence = cms.Sequence(process.IsoMu24eta2p1Selector*
+                                             process.WMuonPTSelector*
+                                             process.WIsoMuonSelector*
+                                             process.tauMuonPTSelector*
+                                             process.tauMuonSelector*
+                                             process.PFTau*
                                              process.muHadTauSelector*
-                                             process.muHadNonIsoTauSelector)
-process.selectionSequence = cms.Sequence(process.IsoMu24eta2p1Selector*process.WMuonPTSelector*
-                                         process.WIsoMuonSelector*process.tauMuonPTSelector*
-                                         process.tauMuonSelector*process.PFTau*
-                                         process.muHadIsoTauSelector)
-process.noSelectionSequence = cms.Sequence(process.IsoMu24eta2p1Selector*process.WMuonPTSelector*
-                                           process.WIsoMuonSelector*process.tauMuonPTSelector*
-                                           process.tauMuonSelector*process.PFTau*
-                                           process.muHadTauSelector)
+                                             process.muHadNonIsoTauSelector*
+                                             process.btagging*
+                                             process.pfParticleSelectionSequence*
+                                             process.phoIsoSequence)
+process.selectionSequence = cms.Sequence(process.IsoMu24eta2p1Selector*
+                                         process.WMuonPTSelector*
+                                         process.WIsoMuonSelector*
+                                         process.tauMuonPTSelector*
+                                         process.tauMuonSelector*
+                                         process.PFTau*
+                                         process.muHadIsoTauSelector*
+                                         process.btagging*
+                                         process.pfParticleSelectionSequence*
+                                         process.phoIsoSequence)
+process.noSelectionSequence = cms.Sequence(process.IsoMu24eta2p1Selector*
+                                           process.WMuonPTSelector*
+                                           process.WIsoMuonSelector*
+                                           process.PF2PAT*
+                                           process.tauMuonPTSelector*
+                                           process.tauMuonSelector*
+                                           process.PFTau*
+                                           process.muHadTauSelector*
+                                           process.tauShiftProducer*
+                                           process.btagging*
+                                           process.pfParticleSelectionSequence*
+                                           process.phoIsoSequence)
 
 ## #selection path
 ## process.p = cms.Path(process.selectionSequence)
