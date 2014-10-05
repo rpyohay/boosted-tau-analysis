@@ -1,30 +1,38 @@
 #!/bin/bash
 
 #parse arguments
-if [ $# -ne 3 ] && [ $# -ne 4 ]
+if [ $# -ne 7 ]
     then
-    echo "Usage: ./generate.sh script_name dir_name start_job num_jobs"
+    echo "Usage: ./generate.sh cfg_name script_name dir_name data_tier start_job num_jobs queue"
     exit 0
 fi
-script_name=$1
-dir_name=$2
-start=$3
-num_jobs=$4
+cfg_name=$1
+script_name=$2
+dir_name=$3
+data_tier=$4
+start=$5
+num_jobs=$6
+queue=$7
 
 #make directory on EOS
-cmsMkdir /store/user/yohay/${dir_name}
+EOS_dir_query=`cmsLs /store/user/yohay/${dir_name}`
+EOS_dir_query=`echo $EOS_dir_query | grep "No such file or directory"`
+if [ "EOS_dir_query" != "" ]
+    then
+    cmsMkdir /store/user/yohay/${dir_name}
+fi
 
 #make local directory for holding all generated scripts and LSF output directories
-mkdir $dir_name
+mkdir -p $dir_name
 cd $dir_name
 
 #generate cfg and sh files for each job
 for i in `seq $start $num_jobs`
   do
-  sed -e "s%JOBNUM%$i%g" ../${script_name}.py > ${script_name}_${i}.py
-  sed -e "s%JOBNUM%$i%g" -e "s%DIRNAME%$dir_name%g" -e "s%SCRIPTNAME%$script_name%g" ../${script_name}.sh > ${script_name}_${i}.sh
-  chmod a+x ${script_name}_${i}.sh
-  bsub -q 1nd -J ${script_name}_${i} < ${script_name}_${i}.sh
+  sed -e "s%JOBNUM%$i%g" -e "s%DIRNAME%$dir_name%g" ../${cfg_name}.py > ${cfg_name}_${i}.py
+  sed -e "s%JOBNUM%$i%g" -e "s%DIRNAME%$dir_name%g" -e "s%SCRIPTNAME%$cfg_name%g" -e "s%DATATIER%$data_tier%g" ../${script_name}.sh > ${cfg_name}_${i}.sh
+  chmod a+x ${cfg_name}_${i}.sh
+  bsub -q $queue -J ${cfg_name}_${i} < ${cfg_name}_${i}.sh
 done
 
 exit 0
