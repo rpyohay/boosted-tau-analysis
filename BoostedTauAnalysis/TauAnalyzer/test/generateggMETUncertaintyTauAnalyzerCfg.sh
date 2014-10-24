@@ -36,7 +36,7 @@ EDMOutputFilePrefix="/data1/`whoami`/gg/EDM_files/"
 ####VECTORS OF QUANTITIES FOR EACH SAMPLE####
 
 #vector of input file blocks for each sample
-inputFileBlocks=( "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a5_v2.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a7_v2.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a9_v2.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a11_v2.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a13_v2.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a15_v2.root'\n    ])" )
+inputFileBlocks=( "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a5_v7.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a7_v7.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a9_v7.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a11_v7.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a13_v7.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a15_v7.root'\n    ])" )
 
 #EDM output files
 EDMOutputFiles=( "${EDMOutputFilePrefix}gg_a5${infoTag}_${version}.root" "${EDMOutputFilePrefix}gg_a7${infoTag}_${version}.root" "${EDMOutputFilePrefix}gg_a9${infoTag}_${version}.root" "${EDMOutputFilePrefix}gg_a11${infoTag}_${version}.root" "${EDMOutputFilePrefix}gg_a13${infoTag}_${version}.root" "${EDMOutputFilePrefix}gg_a15${infoTag}_${version}.root" )
@@ -56,7 +56,7 @@ for i in `seq $iBeg $iEnd`
 
   #generate cfg file for the isolated sample, energy scale uncertainties shifted up(down) by +(-)1 
   #sigma
-  sed -e "s%FILES%${inputFileBlocks[${i}]}%" -e "s%PREFIX%${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis%g" -e "s%VERSION%${version}%g" -e "s%EDMOUTFILE%${EDMOutputFiles[${i}]}%" -e "s%PUSCENARIO%S7%" -e "s%SAMPLE%${samples[${i}]}%" ../${templateCfg} > tauanalyzer_${samples[${i}]}_iso_signal_MET_uncertainties_cfg.py
+  sed -e "s%FILES%${inputFileBlocks[${i}]}%" -e "s%PREFIX%${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis%g" -e "s%VERSION%${version}%g" -e "s%EDMOUTFILE%${EDMOutputFiles[${i}]}%" -e "s%PUSCENARIO%S10%" -e "s%SAMPLE%${samples[${i}]}%" ../${templateCfg} > tauanalyzer_${samples[${i}]}_iso_signal_MET_uncertainties_cfg.py
 
 done
 

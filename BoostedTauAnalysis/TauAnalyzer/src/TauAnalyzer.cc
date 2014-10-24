@@ -1914,25 +1914,25 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       //plot delR(WMu, tauhad)
       dRWMuTauHad_->Fill(delR_Wmutauhad, PUWeight);
       
-      if (MC_)
-	{
-	  //print event number
-	  std::cerr << "Run " << iEvent.run() << ", event " << iEvent.id().event() << ", lumi ";
-	  std::cerr << iEvent.luminosityBlock() << std::endl;
-	  std::cerr << "And muHadMass = " << muHadMass << std::endl;
-	  std::cerr << "GenParticlePtrs size = " << genParticlePtrs.size() << std::endl;
-	  for (std::vector<reco::GenParticle*>::const_iterator iGenParticle = allGenParticlePtrs.begin(); iGenParticle != allGenParticlePtrs.end(); ++iGenParticle) { // loop over gen particles
-	    if ((*iGenParticle)->pdgId() == 23)
-	      { // if a Z was found
-		std::cerr << "A status-" << (*iGenParticle)->status() << " Z was found, with " << (*iGenParticle)->numberOfDaughters() << " daughters" << std::endl;
-		for (size_type i = 0; i != (*iGenParticle)->numberOfDaughters(); ++i)
-		  { // loop over daughters of Z
-		    std::cerr << "Test " << i << ": " << (*iGenParticle)->daughterRef(i)->pdgId() << endl;
-		    std::cerr << "Daughter " << i << " has pdgId " << (*iGenParticle)->daughterRef(i)->pdgId() << " and status " << (*iGenParticle)->daughterRef(i)->status() << endl;
-		  } // loop over daughters of Z
-	      } // if a Z was found
-	  } // loop over gen particles
-	}
+//       if (MC_)
+// 	{
+// 	  //print event number
+// 	  std::cerr << "Run " << iEvent.run() << ", event " << iEvent.id().event() << ", lumi ";
+// 	  std::cerr << iEvent.luminosityBlock() << std::endl;
+// 	  std::cerr << "And muHadMass = " << muHadMass << std::endl;
+// 	  std::cerr << "GenParticlePtrs size = " << genParticlePtrs.size() << std::endl;
+// 	  for (std::vector<reco::GenParticle*>::const_iterator iGenParticle = allGenParticlePtrs.begin(); iGenParticle != allGenParticlePtrs.end(); ++iGenParticle) { // loop over gen particles
+// 	    if ((*iGenParticle)->pdgId() == 23)
+// 	      { // if a Z was found
+// 		std::cerr << "A status-" << (*iGenParticle)->status() << " Z was found, with " << (*iGenParticle)->numberOfDaughters() << " daughters" << std::endl;
+// 		for (size_type i = 0; i != (*iGenParticle)->numberOfDaughters(); ++i)
+// 		  { // loop over daughters of Z
+// 		    std::cerr << "Test " << i << ": " << (*iGenParticle)->daughterRef(i)->pdgId() << endl;
+// 		    std::cerr << "Daughter " << i << " has pdgId " << (*iGenParticle)->daughterRef(i)->pdgId() << " and status " << (*iGenParticle)->daughterRef(i)->status() << endl;
+// 		  } // loop over daughters of Z
+// 	      } // if a Z was found
+// 	  } // loop over gen particles
+// 	}
       
       //plot the number of good vertices
       nGoodVtx_->Fill(Common::numGoodVertices(pVtx)/*trueNInt*/, PUWeight);
@@ -2299,7 +2299,7 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       double d_dxy = fabs(tau_dxy - mu_dxy);
       double d_dz = fabs(tau_dz - mu_dz);
 
-      cout << "d_dxy = " << d_dxy << ", d_dz = " << d_dz << endl;
+//       cout << "d_dxy = " << d_dxy << ", d_dz = " << d_dz << endl;
       muHadDdxy_->Fill(d_dxy, PUWeight);
       muHadDdz_->Fill(d_dz, PUWeight);
 
@@ -2315,41 +2315,41 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
       if ((nearestGenMu != NULL) && (nearestGenMu->status() == 1))
 	{ // if a nearestGenMu was found with status 1
-	  cout << "A gen mu close to the reco tau_mu was found." << endl;
-	  cout << "Its mother's pdgId was: " << nearestGenMu->mother()->pdgId() << endl;
-	  cout << "Its grandmother's pdgId was: " << nearestGenMu->mother()->mother()->pdgId() << endl;
-	  cout << "Its great-grandmother's pdgId was: " << nearestGenMu->mother()->mother()->mother()->pdgId() << endl;
+// 	  cout << "A gen mu close to the reco tau_mu was found." << endl;
+// 	  cout << "Its mother's pdgId was: " << nearestGenMu->mother()->pdgId() << endl;
+// 	  cout << "Its grandmother's pdgId was: " << nearestGenMu->mother()->mother()->pdgId() << endl;
+// 	  cout << "Its great-grandmother's pdgId was: " << nearestGenMu->mother()->mother()->mother()->pdgId() << endl;
 
 	  if (deltaR(*nearestGenMu, *removedMuonRefs[removedMuonRefs.size() - 1]) < 0.3)
 	    { // if dR(gen mu, tau mu) < 0.3
-	      cout << "dR(gen mu, tau mu) = " << deltaR(*nearestGenMu, *removedMuonRefs[removedMuonRefs.size() - 1]) << endl;
+// 	      cout << "dR(gen mu, tau mu) = " << deltaR(*nearestGenMu, *removedMuonRefs[removedMuonRefs.size() - 1]) << endl;
 	      if ((fabs(nearestGenMu->mother()->pdgId()) == 13) && (fabs(nearestGenMu->mother()->mother()->pdgId()) == 13) && (nearestGenMu->mother()->mother()->mother()->pdgId() == 23))
 		{ // if the status-1 gen mu was from Z->mu
-		  cout << "Z->mu" << endl;
+// 		  cout << "Z->mu" << endl;
 		  muHadMassZMu_->Fill(muHadMass, PUWeight);
 		} // if the status-1 gen mu was from Z->mu
 	      else if ((fabs(nearestGenMu->mother()->pdgId()) == 15) && (nearestGenMu->mother()->mother()->mother()->pdgId() == 23))
 		{ // if the gen mu was from Z->tau->mu
-		  cout << "Z->tau->mu" << endl;
+// 		  cout << "Z->tau->mu" << endl;
 		  muHadMassZTauMu_->Fill(muHadMass, PUWeight);
 		} // if the gen mu was from Z->tau->mu
 	      else
 		{ // if the gen mu came from something else
-		  cout << "The muon came from something else." << endl;
+// 		  cout << "The muon came from something else." << endl;
 		  muHadMassMuElse_->Fill(muHadMass, PUWeight);
 		} // if the gen mu came from something else
 	    } // if dR(gen mu, tau mu) < 0.3
 	  else
 	    { // if dR(gen mu, tau mu) >= 0.3
-	      cout << "dR(gen mu, tau mu) was not less than 0.3. It was " << deltaR(*nearestGenMu, *removedMuonRefs[removedMuonRefs.size() - 1]) << endl;
+// 	      cout << "dR(gen mu, tau mu) was not less than 0.3. It was " << deltaR(*nearestGenMu, *removedMuonRefs[removedMuonRefs.size() - 1]) << endl;
 	    } // if dR(gen mu, tau mu) >= 0.3
 	} // if a nearest GenMu was found with status 1
       else
 	{ // if there was no nearest GeMu
 	  if (nearestStatus1GenParticle != NULL)
 	    {
-	      cout << "But a nearby status-1 gen particle was found." << endl;
-	      cout << "pdgId of gen particle = " << nearestStatus1GenParticle->pdgId() << endl;
+// 	      cout << "But a nearby status-1 gen particle was found." << endl;
+// 	      cout << "pdgId of gen particle = " << nearestStatus1GenParticle->pdgId() << endl;
 	      muHadMassNotMuElse_->Fill(muHadMass, PUWeight);
 	    }
 	} // if there was no nearest GenMu
@@ -2362,44 +2362,44 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	  unsigned int nearestGenParticleVal = 5;
 	  unsigned int muSrcVal = 1;
 	  const reco::Candidate* ancestor = nearestStatus1GenParticle->mother();
-	  cout << "tau_mu pt = " << removedMuonRefs[removedMuonRefs.size() - 1]->pt() << ", eta = " << removedMuonRefs[removedMuonRefs.size() - 1]->eta() << ", phi = " << removedMuonRefs[removedMuonRefs.size() - 1]->phi() << endl;
-	  if (absNearestStatus1GenParticlePDGID == GenTauDecayID::MUPDGID)
-	    { // if nearest status-1 particle is a gen muon
-	      if ((nearestStatus1GenParticle->mother()->pdgId() == GenTauDecayID::ZPDGID) || (nearestStatus1GenParticle->mother()->pdgId() == GenTauDecayID::GAMMAPDGID))
-		{ // if its mother is a Z/gamma (DY->mumu)
-		  std::cerr << "Tau_mu matched to gen mu from Z->mumu" << std::endl;
-		  //muHadMassZMu_->Fill(muHadMass, PUWeight);
-		} // if its mother is a Z/gamma (DY->mumu)
-	      else if (nearestStatus1GenParticle->mother()->pdgId() == GenTauDecayID::TAUPDGID)
-		{ // if its mother is a tau
-		  std::cerr << "Tau_mu matched to gen mu from tau->mu" << std::endl;
-		  if ((nearestStatus1GenParticle->mother()->mother()->mother()->pdgId() == GenTauDecayID::ZPDGID) || (nearestStatus1GenParticle->mother()->mother()->mother()->pdgId() == GenTauDecayID::GAMMAPDGID))
-		    { // if grandmother is Z/gamma (DY->tau->mu)
-		      std::cerr << "...and its grandmother is Z/gamma" << std::endl;
-		      //muHadMassZTauMu_->Fill(muHadMass, PUWeight);
-		    } // if grandmother is Z/gamma (DY->tau->mu)
-		  else
-		    { // if grandmother not DY
-		      std::cerr << "but its grandmother is not Z/gamma" << std::endl;
-		      std::cerr << "grandmother pdgid: " << nearestStatus1GenParticle->mother()->mother()->mother()->pdgId() << std::endl;
-		      //muHadMassOtherTauMu_->Fill(muHadMass, PUWeight);
-		    } // if grandmother not DY
-		} // if its mother is a tau
-	      else
-		{ // if it is a gen muon from something else
-		  std::cerr << "Tau_mu matched to gen mu from something else" << std::endl;
-		  std::cerr << "Its mother was: " << nearestStatus1GenParticle->mother()->pdgId() << endl;
+// 	  cout << "tau_mu pt = " << removedMuonRefs[removedMuonRefs.size() - 1]->pt() << ", eta = " << removedMuonRefs[removedMuonRefs.size() - 1]->eta() << ", phi = " << removedMuonRefs[removedMuonRefs.size() - 1]->phi() << endl;
+// 	  if (absNearestStatus1GenParticlePDGID == GenTauDecayID::MUPDGID)
+// 	    { // if nearest status-1 particle is a gen muon
+// 	      if ((nearestStatus1GenParticle->mother()->pdgId() == GenTauDecayID::ZPDGID) || (nearestStatus1GenParticle->mother()->pdgId() == GenTauDecayID::GAMMAPDGID))
+// 		{ // if its mother is a Z/gamma (DY->mumu)
+// 		  std::cerr << "Tau_mu matched to gen mu from Z->mumu" << std::endl;
+// 		  //muHadMassZMu_->Fill(muHadMass, PUWeight);
+// 		} // if its mother is a Z/gamma (DY->mumu)
+// 	      else if (nearestStatus1GenParticle->mother()->pdgId() == GenTauDecayID::TAUPDGID)
+// 		{ // if its mother is a tau
+// 		  std::cerr << "Tau_mu matched to gen mu from tau->mu" << std::endl;
+// 		  if ((nearestStatus1GenParticle->mother()->mother()->mother()->pdgId() == GenTauDecayID::ZPDGID) || (nearestStatus1GenParticle->mother()->mother()->mother()->pdgId() == GenTauDecayID::GAMMAPDGID))
+// 		    { // if grandmother is Z/gamma (DY->tau->mu)
+// 		      std::cerr << "...and its grandmother is Z/gamma" << std::endl;
+// 		      //muHadMassZTauMu_->Fill(muHadMass, PUWeight);
+// 		    } // if grandmother is Z/gamma (DY->tau->mu)
+// 		  else
+// 		    { // if grandmother not DY
+// 		      std::cerr << "but its grandmother is not Z/gamma" << std::endl;
+// 		      std::cerr << "grandmother pdgid: " << nearestStatus1GenParticle->mother()->mother()->mother()->pdgId() << std::endl;
+// 		      //muHadMassOtherTauMu_->Fill(muHadMass, PUWeight);
+// 		    } // if grandmother not DY
+// 		} // if its mother is a tau
+// 	      else
+// 		{ // if it is a gen muon from something else
+// 		  std::cerr << "Tau_mu matched to gen mu from something else" << std::endl;
+// 		  std::cerr << "Its mother was: " << nearestStatus1GenParticle->mother()->pdgId() << endl;
 
-		  //muHadMassMuElse_->Fill(muHadMass, PUWeight);
-		} // if it is a gen muon from something else
-	    } // if nearest status-1 particle is a gen muon
-	  else
-	    { // if nearest status-1 particle is not a gen muon
-		  std::cerr << "Tau_mu matched to non-mu gen particle" << std::endl;
-		  std::cerr << "That particle was: " << nearestStatus1GenParticle->pdgId() << std::endl;
-		  std::cerr << "Its mother was: " << nearestStatus1GenParticle->mother()->pdgId() << endl;
-		  //muHadMassNotMuElse_->Fill(muHadMass, PUWeight);
-	    } // if nearest status-1 particle is not a gen muon
+// 		  //muHadMassMuElse_->Fill(muHadMass, PUWeight);
+// 		} // if it is a gen muon from something else
+// 	    } // if nearest status-1 particle is a gen muon
+// 	  else
+// 	    { // if nearest status-1 particle is not a gen muon
+// 		  std::cerr << "Tau_mu matched to non-mu gen particle" << std::endl;
+// 		  std::cerr << "That particle was: " << nearestStatus1GenParticle->pdgId() << std::endl;
+// 		  std::cerr << "Its mother was: " << nearestStatus1GenParticle->mother()->pdgId() << endl;
+// 		  //muHadMassNotMuElse_->Fill(muHadMass, PUWeight);
+// 	    } // if nearest status-1 particle is not a gen muon
 
 	  switch (absNearestStatus1GenParticlePDGID) {
 	  case GenTauDecayID::EPDGID:
@@ -4058,26 +4058,26 @@ void TauAnalyzer::fillMistagEffPlot()
     mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
     mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
     mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 1, 0.22);
-    mistagEffVsPTAndEta_->SetBinContent(2, 2, 0.1);
-    mistagEffVsPTAndEta_->SetBinContent(2, 3, 0.129032);
-    mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.107143);
-    mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.0625);
-    mistagEffVsPTAndEta_->SetBinContent(3, 3, 0.235294);
-    mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.148148);
-    mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.108108);
-    mistagEffVsPTAndEta_->SetBinContent(4, 3, 0.117647);
-    mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.103448);
-    mistagEffVsPTAndEta_->SetBinContent(5, 2, 0.130435);
-    mistagEffVsPTAndEta_->SetBinContent(5, 3, 0.0909091);
-    mistagEffVsPTAndEta_->SetBinContent(6, 1, 0.148148);
-    mistagEffVsPTAndEta_->SetBinContent(6, 2, 0.105263);
-    mistagEffVsPTAndEta_->SetBinContent(6, 3, 0.285714);
-    mistagEffVsPTAndEta_->SetBinContent(7, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(7, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(7, 3, 0.2);
-    mistagEffVsPTAndEta_->SetBinContent(8, 1, 0.2);
-    mistagEffVsPTAndEta_->SetBinContent(8, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(2, 1, 0.121875);
+    mistagEffVsPTAndEta_->SetBinContent(2, 2, 0.104418);
+    mistagEffVsPTAndEta_->SetBinContent(2, 3, 0.047619);
+    mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.131579);
+    mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.114458);
+    mistagEffVsPTAndEta_->SetBinContent(3, 3, 0.181818);
+    mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.149123);
+    mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.144144);
+    mistagEffVsPTAndEta_->SetBinContent(4, 3, 0.127273);
+    mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.118644);
+    mistagEffVsPTAndEta_->SetBinContent(5, 2, 0.123077);
+    mistagEffVsPTAndEta_->SetBinContent(5, 3, 0.125);
+    mistagEffVsPTAndEta_->SetBinContent(6, 1, 0.234043);
+    mistagEffVsPTAndEta_->SetBinContent(6, 2, 0.192308);
+    mistagEffVsPTAndEta_->SetBinContent(6, 3, 0.25);
+    mistagEffVsPTAndEta_->SetBinContent(7, 1, 0.157895);
+    mistagEffVsPTAndEta_->SetBinContent(7, 2, 0.222222);
+    mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(8, 1, 0.230769);
+    mistagEffVsPTAndEta_->SetBinContent(8, 2, 0.111111);
     mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
     mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
     mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
@@ -4090,22 +4090,22 @@ void TauAnalyzer::fillMistagEffPlot()
     mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
     mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
     mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 1, 0.112245);
-    mistagEffVsPTAndEta_->SetBinContent(2, 2, 0.1);
-    mistagEffVsPTAndEta_->SetBinContent(2, 3, 0.141176);
-    mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.12973);
-    mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.100719);
-    mistagEffVsPTAndEta_->SetBinContent(3, 3, 0.125);
-    mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.136364);
-    mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.076087);
-    mistagEffVsPTAndEta_->SetBinContent(4, 3, 0.08);
-    mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.0714286);
-    mistagEffVsPTAndEta_->SetBinContent(5, 2, 0.107527);
-    mistagEffVsPTAndEta_->SetBinContent(5, 3, 0.0816327);
-    mistagEffVsPTAndEta_->SetBinContent(6, 1, 0.205128);
+    mistagEffVsPTAndEta_->SetBinContent(2, 1, 0.105263);
+    mistagEffVsPTAndEta_->SetBinContent(2, 2, 0.100559);
+    mistagEffVsPTAndEta_->SetBinContent(2, 3, 0.142857);
+    mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.116667);
+    mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.0977444);
+    mistagEffVsPTAndEta_->SetBinContent(3, 3, 0.117647);
+    mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.138462);
+    mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.0769231);
+    mistagEffVsPTAndEta_->SetBinContent(4, 3, 0.0833333);
+    mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.0727273);
+    mistagEffVsPTAndEta_->SetBinContent(5, 2, 0.10989);
+    mistagEffVsPTAndEta_->SetBinContent(5, 3, 0.0869565);
+    mistagEffVsPTAndEta_->SetBinContent(6, 1, 0.210526);
     mistagEffVsPTAndEta_->SetBinContent(6, 2, 0.0769231);
     mistagEffVsPTAndEta_->SetBinContent(6, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(7, 1, 0.185185);
+    mistagEffVsPTAndEta_->SetBinContent(7, 1, 0.178571);
     mistagEffVsPTAndEta_->SetBinContent(7, 2, 0);
     mistagEffVsPTAndEta_->SetBinContent(7, 3, 0.2);
     mistagEffVsPTAndEta_->SetBinContent(8, 1, 0.166667);
@@ -4122,26 +4122,26 @@ void TauAnalyzer::fillMistagEffPlot()
     mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
     mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
     mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 1, 0.143885);
-    mistagEffVsPTAndEta_->SetBinContent(2, 2, 0.192661);
+    mistagEffVsPTAndEta_->SetBinContent(2, 1, 0.148148);
+    mistagEffVsPTAndEta_->SetBinContent(2, 2, 0.194444);
     mistagEffVsPTAndEta_->SetBinContent(2, 3, 0.208333);
-    mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.0769231);
-    mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.0847458);
-    mistagEffVsPTAndEta_->SetBinContent(3, 3, 0.159091);
-    mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.10101);
-    mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.105263);
-    mistagEffVsPTAndEta_->SetBinContent(4, 3, 0.2);
-    mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.0900901);
-    mistagEffVsPTAndEta_->SetBinContent(5, 2, 0.0615385);
-    mistagEffVsPTAndEta_->SetBinContent(5, 3, 0.0526316);
-    mistagEffVsPTAndEta_->SetBinContent(6, 1, 0.0285714);
+    mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.0687023);
+    mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.0869565);
+    mistagEffVsPTAndEta_->SetBinContent(3, 3, 0.155556);
+    mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.102041);
+    mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.111111);
+    mistagEffVsPTAndEta_->SetBinContent(4, 3, 0.181818);
+    mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.0818182);
+    mistagEffVsPTAndEta_->SetBinContent(5, 2, 0.0746269);
+    mistagEffVsPTAndEta_->SetBinContent(5, 3, 0.0571429);
+    mistagEffVsPTAndEta_->SetBinContent(6, 1, 0.0588235);
     mistagEffVsPTAndEta_->SetBinContent(6, 2, 0.115385);
     mistagEffVsPTAndEta_->SetBinContent(6, 3, 0);
     mistagEffVsPTAndEta_->SetBinContent(7, 1, 0);
     mistagEffVsPTAndEta_->SetBinContent(7, 2, 0);
     mistagEffVsPTAndEta_->SetBinContent(7, 3, 0.25);
     mistagEffVsPTAndEta_->SetBinContent(8, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(8, 2, 0.1);
+    mistagEffVsPTAndEta_->SetBinContent(8, 2, 0.111111);
     mistagEffVsPTAndEta_->SetBinContent(8, 3, 0.25);
     mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
     mistagEffVsPTAndEta_->SetBinContent(9, 2, 0.5);
@@ -4154,25 +4154,25 @@ void TauAnalyzer::fillMistagEffPlot()
     mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
     mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
     mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 1, 0.134615);
+    mistagEffVsPTAndEta_->SetBinContent(2, 1, 0.137255);
     mistagEffVsPTAndEta_->SetBinContent(2, 2, 0.0555556);
-    mistagEffVsPTAndEta_->SetBinContent(2, 3, 0.146341);
+    mistagEffVsPTAndEta_->SetBinContent(2, 3, 0.128205);
     mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.109375);
-    mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.104167);
-    mistagEffVsPTAndEta_->SetBinContent(3, 3, 0.193548);
+    mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.105263);
+    mistagEffVsPTAndEta_->SetBinContent(3, 3, 0.206897);
     mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.175439);
-    mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.137931);
+    mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.142857);
     mistagEffVsPTAndEta_->SetBinContent(4, 3, 0.131579);
-    mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.105769);
-    mistagEffVsPTAndEta_->SetBinContent(5, 2, 0.137255);
+    mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.0990099);
+    mistagEffVsPTAndEta_->SetBinContent(5, 2, 0.134615);
     mistagEffVsPTAndEta_->SetBinContent(5, 3, 0.166667);
-    mistagEffVsPTAndEta_->SetBinContent(6, 1, 0.115385);
+    mistagEffVsPTAndEta_->SetBinContent(6, 1, 0.12);
     mistagEffVsPTAndEta_->SetBinContent(6, 2, 0.047619);
     mistagEffVsPTAndEta_->SetBinContent(6, 3, 0.333333);
     mistagEffVsPTAndEta_->SetBinContent(7, 1, 0.0625);
     mistagEffVsPTAndEta_->SetBinContent(7, 2, 0);
     mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(8, 1, 0.25);
+    mistagEffVsPTAndEta_->SetBinContent(8, 1, 0.230769);
     mistagEffVsPTAndEta_->SetBinContent(8, 2, 0.166667);
     mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
     mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
@@ -4187,24 +4187,24 @@ void TauAnalyzer::fillMistagEffPlot()
     mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
     mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
     mistagEffVsPTAndEta_->SetBinContent(2, 1, 0.125);
-    mistagEffVsPTAndEta_->SetBinContent(2, 2, 0.204082);
-    mistagEffVsPTAndEta_->SetBinContent(2, 3, 0.0689655);
-    mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.112676);
-    mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.109375);
+    mistagEffVsPTAndEta_->SetBinContent(2, 2, 0.2);
+    mistagEffVsPTAndEta_->SetBinContent(2, 3, 0.0714286);
+    mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.111111);
+    mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.112903);
     mistagEffVsPTAndEta_->SetBinContent(3, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.16129);
-    mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.137931);
+    mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.166667);
+    mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.109091);
     mistagEffVsPTAndEta_->SetBinContent(4, 3, 0.0454545);
     mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.132353);
     mistagEffVsPTAndEta_->SetBinContent(5, 2, 0.078125);
     mistagEffVsPTAndEta_->SetBinContent(5, 3, 0.0555556);
-    mistagEffVsPTAndEta_->SetBinContent(6, 1, 0.0606061);
+    mistagEffVsPTAndEta_->SetBinContent(6, 1, 0.0588235);
     mistagEffVsPTAndEta_->SetBinContent(6, 2, 0);
     mistagEffVsPTAndEta_->SetBinContent(6, 3, 0);
     mistagEffVsPTAndEta_->SetBinContent(7, 1, 0.133333);
     mistagEffVsPTAndEta_->SetBinContent(7, 2, 0.0833333);
     mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(8, 1, 0.2);
+    mistagEffVsPTAndEta_->SetBinContent(8, 1, 0.142857);
     mistagEffVsPTAndEta_->SetBinContent(8, 2, 0);
     mistagEffVsPTAndEta_->SetBinContent(8, 3, 0.333333);
     mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
@@ -4222,21 +4222,21 @@ void TauAnalyzer::fillMistagEffPlot()
     mistagEffVsPTAndEta_->SetBinContent(2, 2, 0.08);
     mistagEffVsPTAndEta_->SetBinContent(2, 3, 0.133333);
     mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.0526316);
-    mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.09375);
+    mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.0625);
     mistagEffVsPTAndEta_->SetBinContent(3, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.106383);
-    mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.16129);
+    mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.108696);
+    mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.166667);
     mistagEffVsPTAndEta_->SetBinContent(4, 3, 0);
     mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.0816327);
-    mistagEffVsPTAndEta_->SetBinContent(5, 2, 0.113636);
+    mistagEffVsPTAndEta_->SetBinContent(5, 2, 0.116279);
     mistagEffVsPTAndEta_->SetBinContent(5, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(6, 1, 0.136364);
+    mistagEffVsPTAndEta_->SetBinContent(6, 1, 0.130435);
     mistagEffVsPTAndEta_->SetBinContent(6, 2, 0.125);
     mistagEffVsPTAndEta_->SetBinContent(6, 3, 0.125);
     mistagEffVsPTAndEta_->SetBinContent(7, 1, 0.153846);
-    mistagEffVsPTAndEta_->SetBinContent(7, 2, 0.375);
+    mistagEffVsPTAndEta_->SetBinContent(7, 2, 0.333333);
     mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(8, 1, 0.105263);
+    mistagEffVsPTAndEta_->SetBinContent(8, 1, 0.1);
     mistagEffVsPTAndEta_->SetBinContent(8, 2, 0.2);
     mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
     mistagEffVsPTAndEta_->SetBinContent(9, 1, 1);
@@ -4247,23 +4247,83 @@ void TauAnalyzer::fillMistagEffPlot()
     mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
   }
   else if (sample_ == "gg_a5") {
+    mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(2, 1, 0.170213);
+    mistagEffVsPTAndEta_->SetBinContent(2, 2, 0.157895);
+    mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.214286);
+    mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.176471);
+    mistagEffVsPTAndEta_->SetBinContent(3, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.111111);
+    mistagEffVsPTAndEta_->SetBinContent(4, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(4, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.333333);
+    mistagEffVsPTAndEta_->SetBinContent(5, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(5, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(6, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(6, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(6, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(7, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(7, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(8, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(8, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
   }
   else if (sample_ == "gg_a7") {
+    mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(2, 1, 0.163636);
+    mistagEffVsPTAndEta_->SetBinContent(2, 2, 0.142857);
+    mistagEffVsPTAndEta_->SetBinContent(2, 3, 0.2);
+    mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.125);
+    mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.142857);
+    mistagEffVsPTAndEta_->SetBinContent(3, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(4, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(4, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(4, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.285714);
+    mistagEffVsPTAndEta_->SetBinContent(5, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(5, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(6, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(6, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(6, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(7, 1, 1);
+    mistagEffVsPTAndEta_->SetBinContent(7, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(8, 1, 1);
+    mistagEffVsPTAndEta_->SetBinContent(8, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
   }
   else if (sample_ == "gg_a9") {
     mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
     mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
     mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(3, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(3, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(3, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(4, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(2, 1, 0.12);
+    mistagEffVsPTAndEta_->SetBinContent(2, 2, 0.135135);
+    mistagEffVsPTAndEta_->SetBinContent(2, 3, 0.25);
+    mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.125);
+    mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.0952381);
+    mistagEffVsPTAndEta_->SetBinContent(3, 3, 0.125);
+    mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.133333);
     mistagEffVsPTAndEta_->SetBinContent(4, 2, 0);
     mistagEffVsPTAndEta_->SetBinContent(4, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(5, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.166667);
     mistagEffVsPTAndEta_->SetBinContent(5, 2, 0);
     mistagEffVsPTAndEta_->SetBinContent(5, 3, 0);
     mistagEffVsPTAndEta_->SetBinContent(6, 1, 0);
@@ -4283,6 +4343,36 @@ void TauAnalyzer::fillMistagEffPlot()
     mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
   }
   else if (sample_ == "gg_a11") {
+    mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(2, 1, 0.185185);
+    mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(2, 3, 0.5);
+    mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.0714286);
+    mistagEffVsPTAndEta_->SetBinContent(3, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(3, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.111111);
+    mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.25);
+    mistagEffVsPTAndEta_->SetBinContent(4, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.2);
+    mistagEffVsPTAndEta_->SetBinContent(5, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(5, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(6, 1, 1);
+    mistagEffVsPTAndEta_->SetBinContent(6, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(6, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(7, 1, 1);
+    mistagEffVsPTAndEta_->SetBinContent(7, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(8, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(8, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
   }
   else if (sample_ == "gg_a13") {
   }

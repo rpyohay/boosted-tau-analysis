@@ -36,7 +36,7 @@ EDMOutputFilePrefix="/data1/`whoami`/Wh1_Medium/EDM_files/"
 ####VECTORS OF QUANTITIES FOR EACH SAMPLE####
 
 #vector of input file blocks for each sample
-inputFileBlocks=( "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a5_v2.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a7_v2.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a9_v2.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a11_v2.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a13_v2.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a15_v2.root'\n    ])" )
+inputFileBlocks=( "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a5_v6.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a7_v6.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a9_v6.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a11_v6.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a13_v6.root'\n    ])" "readFiles.extend([\n    '${inputFilePrefix}data_no_selection_a15_v6.root'\n    ])" )
 
 #EDM output files
 EDMOutputFiles=( "${EDMOutputFilePrefix}Wh1_a5${infoTag}_${version}.root" "${EDMOutputFilePrefix}Wh1_a7${infoTag}_${version}.root" "${EDMOutputFilePrefix}Wh1_a9${infoTag}_${version}.root" "${EDMOutputFilePrefix}Wh1_a11${infoTag}_${version}.root" "${EDMOutputFilePrefix}Wh1_a13${infoTag}_${version}.root" "${EDMOutputFilePrefix}Wh1_a15${infoTag}_${version}.root" )

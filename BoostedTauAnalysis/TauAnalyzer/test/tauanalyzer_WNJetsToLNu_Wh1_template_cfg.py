@@ -429,7 +429,7 @@ process.highMTMuHadIsoTauAnalyzer = cms.EDAnalyzer(
     RcutFactor = cms.double(0.5),
     CSVMax = cms.double(0.679),
     MC = cms.bool(True),
-    reweight = cms.bool(False),
+    reweight = cms.bool(REWEIGHT),
     bTagScaleShift = cms.string("mean"),
     sample = cms.string("SAMPLE"),
     pTRankColors = cms.vuint32(1, 2, 4, 6),
@@ -468,7 +468,6 @@ process.highMTMuHadNonIsoTauAnalyzer.outFileName = cms.string(
     )
 process.highMTMuHadNonIsoTauAnalyzer.tauTag = cms.InputTag('NonIsoBVetoFilter')
 process.highMTMuHadNonIsoTauAnalyzer.corrJetTag = cms.InputTag('corrJetDistinctNonIsoTauSelector')
-process.highMTMuHadNonIsoTauAnalyzer.reweight = cms.bool(False)
 process.lowMTMuHadNonIsoTauAnalyzer = process.highMTMuHadNonIsoTauAnalyzer.clone()
 process.lowMTMuHadNonIsoTauAnalyzer.outFileName = cms.string('LOWMTNONISOTAUANALYZEROUTFILE')
 
