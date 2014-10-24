@@ -35,5 +35,10 @@ fi
 ./generateggTauAnalyzerCfg.sh $version $MCTemplateCfg
 ./generateNonIsoWDataTauAnalyzerCfgs.sh $version $dataTemplateCfg
 #./generateSinglePhotonDataTauAnalyzerCfgs.sh $version $dataTemplateCfg
-
+#./generateNonIsoWQCDTauAnalyzerCfgs.sh $version $MCTemplateCfg
+#./generateNonIsoWQCDBTauAnalyzerCfgs.sh $version $MCTemplateCfg
+#./generateNonIsoWQCDBMuTauAnalyzerCfgs.sh $version $MCTemplateCfg
+./generateNonIsoWDYJetsToLLTauAnalyzerCfgs.sh $version $MCTemplateCfg
+./generateNonIsoWTTJetsTauAnalyzerCfgs.sh $version $MCTemplateCfg
+./generateNonIsoWWNJetsToLNuTauAnalyzerCfgs.sh $version $MCTemplateCfg
 exit 0

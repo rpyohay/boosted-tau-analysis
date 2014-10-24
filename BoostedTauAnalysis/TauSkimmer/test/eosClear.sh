@@ -3,11 +3,12 @@
 export SCRAM_ARCH=slc5_amd64_gcc462
 eval `scramv1 runtime -sh`
 
-outputFileName="kinematics_bkg_sel"
+#outputFileName="kinematics_bkg_sel"
 #WNJetsToLNu
-inputFiles=`cmsLs /store/user/friccita/Testing/ | grep WNJetsToLNu  | wc -l`
+inputFiles=`cmsLs /store/user/friccita/effTest | grep root | wc -l`
 echo $inputFiles
-cmsLs /store/user/friccita/Testing/ | grep WNJetsToLNu | awk '{ print $5 }' > kinFileList.txt
+
+cmsLs /store/user/friccita/effTest | grep root | awk '{ print $5 }' > fileList.txt
 
 p=1
 startp=1
@@ -18,7 +19,7 @@ echo $endp
 for linenumber in `seq ${startp} ${endp}`
     do
     file=""
-    file=`sed -n "${linenumber} p" kinFileList.txt `
+    file=`sed -n "${linenumber} p" fileList.txt `
     if [ $linenumber -le $endp ]; then
 	echo $file
 	cmsRm $file

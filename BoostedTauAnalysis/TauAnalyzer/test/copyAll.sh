@@ -30,6 +30,14 @@ cd $version
 #./copyQCDBMuFromEOS.sh
 ./copyNonIsoWDataFromEOS.sh
 #./copySinglePhotonDataFromEOS.sh
+#./copyNonIsoWQCDFromEOS.sh
+#./copyNonIsoWQCDBFromEOS.sh
+#./copyNonIsoWQCDBMuFromEOS.sh
+./copyNonIsoWDYJetsToLLFromEOS.sh
+./copyNonIsoWTTJetsFromEOS.sh
+./copyNonIsoWWNJetsToLNuFromEOS.sh
+
+
 cd ..
 
 exit 0
