@@ -140,13 +140,16 @@
 
   //make signal b veto efficiency plots
   vector<string> effInputFiles;
-  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v0/b_veto_eff_gg_a9.root");
-  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v0/b_veto_eff_Wh1_a5.root");
-  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v0/b_veto_eff_Wh1_a7.root");
-  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v0/b_veto_eff_Wh1_a9.root");
-  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v0/b_veto_eff_Wh1_a11.root");
-  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v0/b_veto_eff_Wh1_a13.root");
-  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v0/b_veto_eff_Wh1_a15.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v1/b_veto_eff_gg_a5.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v1/b_veto_eff_gg_a7.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v1/b_veto_eff_gg_a9.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v1/b_veto_eff_gg_a11.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v1/b_veto_eff_Wh1_a5.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v1/b_veto_eff_Wh1_a7.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v1/b_veto_eff_Wh1_a9.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v1/b_veto_eff_Wh1_a11.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v1/b_veto_eff_Wh1_a13.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v1/b_veto_eff_Wh1_a15.root");
   for (vector<string>::const_iterator iFile = effInputFiles.begin(); iFile != effInputFiles.end(); 
        ++iFile) {
     const unsigned int strLen = iFile->find(".root");
