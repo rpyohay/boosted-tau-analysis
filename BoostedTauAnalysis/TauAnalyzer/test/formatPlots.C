@@ -97,8 +97,8 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   canvasNames1D.push_back("dPhiMuHadSecondJetCanvas");
   canvasNames1D.push_back("muHadUncleanedJetPTRankCanvas");
   canvasNames1D.push_back("nAddlHardMuonsCanvas");
-  canvasNames1D.push_back("nAddlJetsPTGeq0Canvas");
   canvasNames1D.push_back("nAddlJetsPTGeq20Canvas");
+  canvasNames1D.push_back("nAddlJetsPTGeq30Canvas");
   canvasNames1D.push_back("nAddlJetsPTGeq40Canvas");
   canvasNames1D.push_back("tauHadDecayModeCanvas");
   canvasNames1D.push_back("dRSoftMuNearestGenZOrTTMuCanvas");
@@ -134,9 +134,9 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   canvasNames1D.push_back("secondNchtrk_10_Canvas");
   canvasNames1D.push_back("secondNchtrk_30_Canvas");
   canvasNames1D.push_back("dRWMuSoftMuCanvas");
-  //canvasNames1D.push_back("dRWMuTauHadCanvas");
-  //canvasNames1D.push_back("dRTauMuTauHadCanvas");
-  //canvasNames1D.push_back("dRWMuTauMuTauHadCanvas");
+  canvasNames1D.push_back("dRWMuTauHadCanvas");
+  canvasNames1D.push_back("dRTauMuTauHadCanvas");
+  canvasNames1D.push_back("dRWMuTauMuTauHadCanvas");
   canvasNames1D.push_back("dPhiWMuSoftMuCanvas");
   canvasNames1D.push_back("dPhiWMuSoftMuWithCutCanvas");
   canvasNames1D.push_back("dPhiWMuSecJetCanvas");
@@ -243,8 +243,8 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   graphNames1D.push_back("dPhiMuHadSecondJet");
   graphNames1D.push_back("muHadUncleanedJetPTRank");
   graphNames1D.push_back("nAddlHardMuons");
-  graphNames1D.push_back("nAddlJetsPTGeq0");
   graphNames1D.push_back("nAddlJetsPTGeq20");
+  graphNames1D.push_back("nAddlJetsPTGeq30");
   graphNames1D.push_back("nAddlJetsPTGeq40");
   graphNames1D.push_back("tauHadDecayMode");
   graphNames1D.push_back("dRSoftMuNearestGenZOrTTMu");
@@ -280,9 +280,9 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   graphNames1D.push_back("second_Nchtrk_10");
   graphNames1D.push_back("second_Nchtrk_30");
   graphNames1D.push_back("dRWMuSoftMu");
-  //graphNames1D.push_back("dRWMuTauHad");
-  //graphNames1D.push_back("dRTauMuTauHad");
-  //graphNames1D.push_back("dRWMuTauMuTauHad");
+  graphNames1D.push_back("dRWMuTauHad");
+  graphNames1D.push_back("dRTauMuTauHad");
+  graphNames1D.push_back("dRWMuTauMuTauHad");
   graphNames1D.push_back("dPhiWMuSoftMu");
   graphNames1D.push_back("dPhiWMuSoftMu_withCut");
   graphNames1D.push_back("dPhiWMuSecJet");
@@ -431,11 +431,11 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   const float Wh1a11Weight19p7InvFb = 0.0000913508064516129;
   const float Wh1a13Weight19p7InvFb = 0.0000570729270729271;
   const float Wh1a15Weight19p7InvFb = 0.0000493486973947896;
-  const float gga5Weight19p7InvFb = 0.0555860897751702;
-  const float gga7Weight19p7InvFb = 0.0545993544537175;
-  const float gga9Weight19p7InvFb = 0.0588126151919509;
-  const float gga11Weight19p7InvFb = 0.000912521087164133;
-  const float gga13Weight19p7InvFb = 0.000570618266718562;
+  const float gga5Weight19p7InvFb = 0.0552668358395599;
+  const float gga7Weight19p7InvFb = 0.0542857677477334;
+  const float gga9Weight19p7InvFb = 0.0584748299845453;
+  const float gga11Weight19p7InvFb = 0.000907280100622663;
+  const float gga13Weight19p7InvFb = 0.000567340969680438;
   const float gga15Weight19p7InvFb = 1.0; //ggH
   float Wh1Weight19p7InvFb = 1.0;
   float ggWeight19p7InvFb = 1.0;
