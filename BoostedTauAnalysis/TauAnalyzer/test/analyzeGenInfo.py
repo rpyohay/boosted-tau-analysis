@@ -28,14 +28,8 @@ process.source = cms.Source("PoolSource",
 #    'file:/data1/yohay/NMSSMHiggs_WH_files501-750_24Sep12.root',
 #    'file:/data1/yohay/NMSSMHiggs_WH_files751-1000_24Sep12.root'
 #    'file:/data1/yohay/gg/EDM_files/data_no_selection_a9_v1.root'
-    'root://eoscms//eos/cms/store/user/friccita/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball-Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v3/data_no_selection_128_1_Smw.root',
-    'root://eoscms//eos/cms/store/user/friccita/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball-Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v3/data_no_selection_15_1_bL7.root',
-    'root://eoscms//eos/cms/store/user/friccita/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball-Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v3/data_no_selection_169_1_JlD.root',
-    'root://eoscms//eos/cms/store/user/friccita/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball-Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v3/data_no_selection_202_2_Ll7.root',
-    'root://eoscms//eos/cms/store/user/friccita/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball-Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v3/data_no_selection_295_1_OW1.root',
-    'root://eoscms//eos/cms/store/user/friccita/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball-Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v3/data_no_selection_49_1_p0t.root',
-    'root://eoscms//eos/cms/store/user/friccita/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball-Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v3/data_no_selection_88_1_Yd7.root',
-    'root://eoscms//eos/cms/store/user/friccita/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball-Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v3/data_no_selection_180_1_HFx.root'
+    'file:/data1/yohay/Wh1_Medium/EDM_files/data_no_selection_a5_v2.root'
+#    'root://eoscms//eos/cms/store/user/friccita/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball-Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v3/data_no_selection_128_1_Smw.root',
     )
 )
 
@@ -43,7 +37,7 @@ process.source = cms.Source("PoolSource",
 process.analyzeGenInfo = cms.EDAnalyzer(
     'GenAnalyzer',
 #    outFileName = cms.string('/data1/yohay/Wh_gen_analysis_v2.root'),
-    outFileName = cms.string('gg_gen_analysis_v2.root'),
+    outFileName = cms.string('Wh1_a5_gen_analysis.root'),
     genParticleTag = cms.InputTag('genParticles'),
     PUTag = cms.InputTag('addPileupInfo'),
     genTauDecayIDPSet = commonGenTauDecayIDPSet

@@ -93,8 +93,8 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   canvasNames1D.push_back("dPhiMuHadSecondJetCanvas");
   canvasNames1D.push_back("muHadUncleanedJetPTRankCanvas");
   canvasNames1D.push_back("nAddlHardMuonsCanvas");
-  canvasNames1D.push_back("nAddlJetsPTGeq0Canvas");
   canvasNames1D.push_back("nAddlJetsPTGeq20Canvas");
+  canvasNames1D.push_back("nAddlJetsPTGeq30Canvas");
   canvasNames1D.push_back("nAddlJetsPTGeq40Canvas");
   canvasNames1D.push_back("tauHadDecayModeCanvas");
   canvasNames1D.push_back("dRSoftMuNearestGenZOrTTMuCanvas");
@@ -130,9 +130,9 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   canvasNames1D.push_back("secondNchtrk_10_Canvas");
   canvasNames1D.push_back("secondNchtrk_30_Canvas");
   canvasNames1D.push_back("dRWMuSoftMuCanvas");
-  //canvasNames1D.push_back("dRWMuTauHadCanvas");
-  //canvasNames1D.push_back("dRTauMuTauHadCanvas");
-  //canvasNames1D.push_back("dRWMuTauMuTauHadCanvas");
+  canvasNames1D.push_back("dRWMuTauHadCanvas");
+  canvasNames1D.push_back("dRTauMuTauHadCanvas");
+  canvasNames1D.push_back("dRWMuTauMuTauHadCanvas");
   canvasNames1D.push_back("dPhiWMuSoftMuCanvas");
   canvasNames1D.push_back("dPhiWMuSoftMuWithCutCanvas");
   canvasNames1D.push_back("dPhiWMuSecJetCanvas");
@@ -239,8 +239,8 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   graphNames1D.push_back("dPhiMuHadSecondJet");
   graphNames1D.push_back("muHadUncleanedJetPTRank");
   graphNames1D.push_back("nAddlHardMuons");
-  graphNames1D.push_back("nAddlJetsPTGeq0");
   graphNames1D.push_back("nAddlJetsPTGeq20");
+  graphNames1D.push_back("nAddlJetsPTGeq30");
   graphNames1D.push_back("nAddlJetsPTGeq40");
   graphNames1D.push_back("tauHadDecayMode");
   graphNames1D.push_back("dRSoftMuNearestGenZOrTTMu");
@@ -276,9 +276,9 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   graphNames1D.push_back("second_Nchtrk_10");
   graphNames1D.push_back("second_Nchtrk_30");
   graphNames1D.push_back("dRWMuSoftMu");
-  //graphNames1D.push_back("dRWMuTauHad");
-  //graphNames1D.push_back("dRTauMuTauHad");
-  //graphNames1D.push_back("dRWMuTauMuTauHad");
+  graphNames1D.push_back("dRWMuTauHad");
+  graphNames1D.push_back("dRTauMuTauHad");
+  graphNames1D.push_back("dRWMuTauMuTauHad");
   graphNames1D.push_back("dPhiWMuSoftMu");
   graphNames1D.push_back("dPhiWMuSoftMu_withCut");
   graphNames1D.push_back("dPhiWMuSecJet");
@@ -426,10 +426,16 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   const bool sigBkg = false;
 
   //best available weights according to Dropbox spreadsheet
-  const float Wh1a5Weight19p7InvFb = 0.00562668010752688;
+  //  const float Wh1a5Weight19p7InvFb = 0.00562668010752688;
+  //  const float Wh1a7Weight19p7InvFb = 0.00545988813757409;
+  //  const float Wh1a9Weight19p7InvFb = 0.0058903;
+  //  const float Wh1a11Weight19p7InvFb = 0.0000912588116817724;
+  //  const float Wh1a13Weight19p7InvFb = 0.0000570729270729271;
+  //  const float Wh1a15Weight19p7InvFb = 0.0000493486973947896;
+  const float Wh1a5Weight19p7InvFb = 0.0071013571;
   const float Wh1a7Weight19p7InvFb = 0.00545988813757409;
   const float Wh1a9Weight19p7InvFb = 0.0058903;
-  const float Wh1a11Weight19p7InvFb = 0.0000912588116817724;
+  const float Wh1a11Weight19p7InvFb = 0.0001197093791;
   const float Wh1a13Weight19p7InvFb = 0.0000570729270729271;
   const float Wh1a15Weight19p7InvFb = 0.0000493486973947896;
   const float gga5Weight19p7InvFb = 1.0;
@@ -1617,7 +1623,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 				       "results/QCDVsMC_RegionB" + MTBin +
 				       tag19p7InvFb + outputVTag + fileExt);
   if (uncTag == "") {
-    QCDVsMCClosurePlots(RegionBQCDVsMCInputFiles, variable, theunit, // 1, 2, 
+    QCDVsMCClosurePlots(RegionBQCDVsMCInputFiles, variable, theunit, 1, 2, 
 			RegionBQCDVsMCOutputFile);
   }
 
@@ -1637,7 +1643,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 				       tag19p7InvFb + outputVTag + fileExt);
 
   if (uncTag == "") {
-    QCDVsMCClosurePlots(RegionAQCDVsMCInputFiles, variable, theunit, // 1, 2, 
+    QCDVsMCClosurePlots(RegionAQCDVsMCInputFiles, variable, theunit, 1, 2, 
 			RegionAQCDVsMCOutputFile);
   }
   
