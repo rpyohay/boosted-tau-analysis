@@ -1,5 +1,7 @@
 #ifdef __CINT__
 
+#include <vector>
+
 #pragma link off all class;
 #pragma link off all function;
 #pragma link off all global;
@@ -17,5 +19,7 @@
 #pragma link C++ class vector<pair<short, short> >+;
 #pragma link C++ function vector<pair<short, short> >::push_back(const pair<short, short>&);
 #pragma link C++ class vector<vector<string> >+;
+#pragma link C++ class vector<vector<float> >+;
+#pragma link C++ function vector<vector<float> >::push_back(const vector<float>&);
 
 #endif
