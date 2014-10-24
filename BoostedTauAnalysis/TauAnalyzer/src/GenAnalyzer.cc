@@ -38,6 +38,7 @@
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 #include "TFile.h"
 #include "TH1F.h"
+#include "TH2F.h"
 #include "TCanvas.h"
 #include "TLegend.h"
 
@@ -94,6 +95,9 @@ private:
 
   //histogram of true no. in-time interactions
   TH1D* trueNInt_;
+
+  //a2 tau pair decay type vs. a1 tau pair decay type
+  TH2F* a2TauPairDecayVsA1TauPairDecay_;
 };
 
 //
@@ -141,17 +145,17 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   edm::Handle<std::vector<PileupSummaryInfo> > pPU;
   iEvent.getByLabel(PUTag_, pPU);
 
-  //look at muon parentage
-  for (reco::GenParticleCollection::const_iterator iGenParticle = pGenParticles->begin(); 
-       iGenParticle != pGenParticles->end(); ++iGenParticle) {
-    if (fabs(iGenParticle->pdgId()) == 13)
-      { // if it's a muon
-	std::cout << "Gen muon found with pT = " << iGenParticle->pt() << ", status " << iGenParticle->status() << std::endl;
-	std::cout << "Its mother's pdgId was: " << iGenParticle->mother()->pdgId() << std::endl;
-	std::cout << "Its grandmother's pdgId was: " << iGenParticle->mother()->mother()->pdgId() << std::endl;
-	std::cout << "Its great-grandmothers' pdgId was: " << iGenParticle->mother()->mother()->mother()->pdgId() << std::endl;
-      } // if it's a muon
-  }
+//   //look at muon parentage
+//   for (reco::GenParticleCollection::const_iterator iGenParticle = pGenParticles->begin(); 
+//        iGenParticle != pGenParticles->end(); ++iGenParticle) {
+//     if (fabs(iGenParticle->pdgId()) == 13)
+//       { // if it's a muon
+// 	std::cout << "Gen muon found with pT = " << iGenParticle->pt() << ", status " << iGenParticle->status() << std::endl;
+// 	std::cout << "Its mother's pdgId was: " << iGenParticle->mother()->pdgId() << std::endl;
+// 	std::cout << "Its grandmother's pdgId was: " << iGenParticle->mother()->mother()->pdgId() << std::endl;
+// 	std::cout << "Its great-grandmothers' pdgId was: " << iGenParticle->mother()->mother()->mother()->pdgId() << std::endl;
+//       } // if it's a muon
+//   }
 
   //find a1 tau decay products
   std::vector<GenTauDecayID> aDecayProducts;
@@ -167,6 +171,9 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     catch (std::string& ex) { throw cms::Exception("GenAnalyzer") << ex; }
   }
 
+  //containers for a tau decay types
+  std::vector<std::pair<GenTauDecayID::DecayType, GenTauDecayID::DecayType> > aDecay;
+
   //loop over a1 tau daughters
   std::vector<unsigned int> keysToIgnore;
   for (std::vector<GenTauDecayID>::iterator iTau = aDecayProducts.begin(); 
@@ -178,10 +185,17 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       iTau->findSister();
       const unsigned int iSister = iTau->getSisterIndex();
 
-      //if sister wasn't already looped over, plot dR(sisters)
+      //if sister wasn't already looped over...
       if (std::find(keysToIgnore.begin(), keysToIgnore.end(), iSister) == keysToIgnore.end()) {
+
+	//...plot dR(sisters)
 	dRA1TauDaughters_->Fill(reco::deltaR(*reco::GenParticleRef(pGenParticles, tauKey), 
 					     *reco::GenParticleRef(pGenParticles, iSister)));
+
+	//...save pair decay mode
+	aDecay.push_back(std::pair<GenTauDecayID::DecayType, 
+			 GenTauDecayID::DecayType>(iTau->tauDecayType(false, true).second, 
+						   iTau->sisterDecayType(false, true).second));
 
 	//ignore this tau in the future
 	keysToIgnore.push_back(tauKey);
@@ -205,6 +219,35 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     }
     catch (std::string& ex) { throw cms::Exception("GenAnalyzer") << ex; }
   }
+
+  //plot a2 decay type vs. a1 decay type
+  int val1 = -1;
+  int val2 = -1;
+  if (aDecay.size() == 2) {
+    for (std::vector<std::pair<GenTauDecayID::DecayType, 
+	   GenTauDecayID::DecayType> >::const_iterator iADecay = aDecay.begin(); 
+	 iADecay != aDecay.end(); ++iADecay) {
+      int val = -1;
+      if ((iADecay->first == GenTauDecayID::MU) && (iADecay->second == GenTauDecayID::MU)) val = 0;
+      if (((iADecay->first == GenTauDecayID::MU) && (iADecay->second == GenTauDecayID::E)) || 
+	  ((iADecay->first == GenTauDecayID::E) && (iADecay->second == GenTauDecayID::MU))) val = 1;
+      if (((iADecay->first == GenTauDecayID::MU) && (iADecay->second == GenTauDecayID::HAD)) || 
+	  ((iADecay->first == GenTauDecayID::HAD) && (iADecay->second == GenTauDecayID::MU))) {
+	val = 2;
+      }
+      if ((iADecay->first == GenTauDecayID::E) && (iADecay->second == GenTauDecayID::E)) val = 3;
+      if (((iADecay->first == GenTauDecayID::E) && (iADecay->second == GenTauDecayID::HAD)) || 
+	  ((iADecay->first == GenTauDecayID::HAD) && (iADecay->second == GenTauDecayID::E))) {
+	val = 4;
+      }
+      if ((iADecay->first == GenTauDecayID::HAD) && (iADecay->second == GenTauDecayID::HAD)) {
+	val = 5;
+      }
+      if ((iADecay - aDecay.begin()) == 0) val1 = val;
+      if ((iADecay - aDecay.begin()) == 1) val2 = val;
+    }
+  }
+  a2TauPairDecayVsA1TauPairDecay_->Fill(val1, val2);
 
   //plot distribution of true no. in-time interactions
   float trueNInt = -1;
@@ -233,6 +276,23 @@ void GenAnalyzer::beginJob()
   tauMuPT_ = new TH1F("tauMuPT", "", 50, 0.0, 100.0);
   tauHadPT_ = new TH1F("tauHadPT", "", 50, 0.0, 100.0);
   trueNInt_ = new TH1D("trueNInt", "", 60, 0.0, 60.0);
+  a2TauPairDecayVsA1TauPairDecay_ = new TH2F("a2TauPairDecayVsA1TauPairDecay", 
+					     ";a_{1} di-tau decay;a_{2} di-tau decay", 
+					     6, -0.5, 5.5, 6, -0.5, 5.5);
+
+  //set bin labels where appropriate
+  a2TauPairDecayVsA1TauPairDecay_->GetXaxis()->SetBinLabel(1, "#tau_{#mu}#tau_{#mu}");
+  a2TauPairDecayVsA1TauPairDecay_->GetXaxis()->SetBinLabel(2, "#tau_{#mu}#tau_{e}");
+  a2TauPairDecayVsA1TauPairDecay_->GetXaxis()->SetBinLabel(3, "#tau_{#mu}#tau_{had}");
+  a2TauPairDecayVsA1TauPairDecay_->GetXaxis()->SetBinLabel(4, "#tau_{e}#tau_{e}");
+  a2TauPairDecayVsA1TauPairDecay_->GetXaxis()->SetBinLabel(5, "#tau_{e}#tau_{had}");
+  a2TauPairDecayVsA1TauPairDecay_->GetXaxis()->SetBinLabel(6, "#tau_{had}#tau_{had}");
+  a2TauPairDecayVsA1TauPairDecay_->GetYaxis()->SetBinLabel(1, "#tau_{#mu}#tau_{#mu}");
+  a2TauPairDecayVsA1TauPairDecay_->GetYaxis()->SetBinLabel(2, "#tau_{#mu}#tau_{e}");
+  a2TauPairDecayVsA1TauPairDecay_->GetYaxis()->SetBinLabel(3, "#tau_{#mu}#tau_{had}");
+  a2TauPairDecayVsA1TauPairDecay_->GetYaxis()->SetBinLabel(4, "#tau_{e}#tau_{e}");
+  a2TauPairDecayVsA1TauPairDecay_->GetYaxis()->SetBinLabel(5, "#tau_{e}#tau_{had}");
+  a2TauPairDecayVsA1TauPairDecay_->GetYaxis()->SetBinLabel(6, "#tau_{had}#tau_{had}");
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
@@ -247,6 +307,8 @@ void GenAnalyzer::endJob()
   Common::setCanvasOptions(tauHadPTCanvas, 1, 0, 0);
   TCanvas trueNIntCanvas("trueNIntCanvas", "", 600, 600);
   Common::setCanvasOptions(trueNIntCanvas, 1, 0, 0);
+  TCanvas a2TauPairDecayVsA1TauPairDecayCanvas("a2TauPairDecayVsA1TauPairDecayCanvas", "", 
+					       600, 600);
 
   //format the plots
   Common::setHistogramOptions(dRA1TauDaughters_, kBlack, 0.7, 20, 1.0, "#DeltaR", "", 0.05);
@@ -267,6 +329,7 @@ void GenAnalyzer::endJob()
   tauHadPT_->Draw();
   trueNIntCanvas.cd();
   trueNInt_->Draw();
+  Common::draw2DHistograms(a2TauPairDecayVsA1TauPairDecayCanvas, a2TauPairDecayVsA1TauPairDecay_);
 
   //write output file
   out_->cd();
@@ -274,6 +337,7 @@ void GenAnalyzer::endJob()
   tauMuPTCanvas.Write();
   tauHadPTCanvas.Write();
   trueNIntCanvas.Write();
+  a2TauPairDecayVsA1TauPairDecayCanvas.Write();
   out_->Write();
   out_->Close();
 }
@@ -321,6 +385,10 @@ void GenAnalyzer::reset(const bool doDelete)
   tauHadPT_ = NULL;
   if ((doDelete) && (trueNInt_ != NULL)) delete trueNInt_;
   trueNInt_ = NULL;
+  if (doDelete && (a2TauPairDecayVsA1TauPairDecay_ != NULL)) {
+    delete a2TauPairDecayVsA1TauPairDecay_;
+  }
+  a2TauPairDecayVsA1TauPairDecay_ = NULL;
 }
 
 //define this as a plug-in
