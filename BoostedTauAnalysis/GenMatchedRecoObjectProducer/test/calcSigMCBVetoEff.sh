@@ -1,17 +1,18 @@
 #!/bin/bash
 
-if [ $# -ne 3 ]
+if [ $# -ne 4 ]
     then
-    echo "Usage: ./calcSigMCBVetoEff.sh <in_version> <out_version> <template cfg>"
+    echo "Usage: ./calcSigMCBVetoEff.sh <in_version_WH> <in_version_ggH> <out_version> <template cfg>"
     exit 0
 fi
 
 ####STUFF TO CONFIGURE####
 
 #version
-inVersion=$1
-outVersion=$2
-templateCfg=$3
+inVersionWH=$1
+inVersionggH=$2
+outVersion=$3
+templateCfg=$4
 dir=$outVersion
 
 #a1 mass
@@ -43,9 +44,11 @@ for iSample in `seq $iBeg $iEndSample`
 
     #generate cfg file
     sample=${dirs[${iSample}]}
+    inVersion=$inVersionggH
     if [ ${sample} = "Wh1_Medium" ]
 	then
 	sample="Wh1"
+	inVersion=$inVersionWH
     fi
     sample="${sample}_a${a1Mass[${iJob}]}"
     sed -e "s%DIR%${dirs[${iSample}]}%" -e "s%MASS%${a1Mass[${iJob}]}%" -e "s%VERSION%${inVersion}%" -e "s%SAMPLE%${sample}%" ../${templateCfg} > calcSigMCBVetoEff_${sample}.py
