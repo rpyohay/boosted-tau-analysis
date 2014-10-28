@@ -442,7 +442,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   const float gga9Weight19p7InvFb = 0.0584748299845453;
   const float gga11Weight19p7InvFb = 0.000907280100622663;
   const float gga13Weight19p7InvFb = 0.000567340969680438;
-  const float gga15Weight19p7InvFb = 1.0; //ggH
+  const float gga15Weight19p7InvFb = 0.00048980947568; //ggH
   float Wh1Weight19p7InvFb = 1.0;
   float ggWeight19p7InvFb = 1.0;
   if (a1Mass == "_a5") {
@@ -711,7 +711,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 		   graphNames2D, nullBlindLow, nullBlindHigh);
     }
   }
-
+    
   //hadd non-isolated W Drell-Yan samples
 
   cout << "...non-isolated W Drell-Yan" << endl;
@@ -724,9 +724,9 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   string NonIsoWDYJetsToLLNonIsoHaddOutputFile(NonIsoWDYJetsToLLNonIsoPrefix + NonIsoWDYJetsToLLSuffix);
   string 
     NonIsoWDYJetsToLLNonIsoReweightPrefix(analysisFilePath + 
-					  "DYJetsToLL/analysis/muHadNonIsoReweightAnalysis_NonIsoWDYJetsToLL");
+					  "nonIsoWDYJetsToLL/analysis/muHadNonIsoReweightAnalysis_NonIsoWDYJetsToLL");
   string NonIsoWDYJetsToLLNonIsoReweightHaddOutputFile(NonIsoWDYJetsToLLNonIsoReweightPrefix + NonIsoWDYJetsToLLSuffix);
-  string NonIsoWDYJetsToLLAllPrefix(analysisFilePath + "DYJetsToLL/analysis/muHadAnalysis" + MTBin + 
+  string NonIsoWDYJetsToLLAllPrefix(analysisFilePath + "nonIsoWDYJetsToLL/analysis/muHadAnalysis" + MTBin + 
 				    "_NonIsoWDYJetsToLL");
   string NonIsoWDYJetsToLLAllHaddOutputFile(NonIsoWDYJetsToLLAllPrefix + NonIsoWDYJetsToLLSuffix);
   vector<string> NonIsoWDYJetsToLLIsoHaddInputFiles;
@@ -867,7 +867,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 		   graphNames2D, nullBlindLow, nullBlindHigh);
     }
   }
-
+  
 
   //hadd single photon data samples
   /*  cout << "...single photon data\n";
@@ -1712,8 +1712,9 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 				      canvasNames1D, graphNames1D, legendHeaders19p7InvFb, colors, 
 				      styles, legendEntriesNonIsoWMCData, weightsNonIsoWMCData, setLogY, sigBkg);
       } // high-MT bkg subtraction in Regions C and D
+    
   }
-
+    
   //draw data Vs MC in Region C
   cout <<"\nPlot data vs MC in Region C, normalized to data luminosity\n---\n";
   string nonIsoWDataVsMC_RegionCOutputFile(analysisFilePath + "results/nonIsoW_dataVsMC_muHadIsoAnalysis" + MTBin + 
@@ -1745,21 +1746,23 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 					  colors, styles, legendEntriesNonIsoWMCData, 
 					  weightsNonIsoWMCData, setLogY, drawStack, dataMC);
   }
-
+   
 
   //compute data-driven QCD estimate in signal (i.e. isolated W muon + isolated tau) region
   string outputFileNameA(analysisFilePath + "results/dataVsMC_RegionAQCDEstimate" + MTBin + dataVTag + fileExt);
   string inputFileNameB;
   string inputFileNameD;
-  if (MTBin == "_highMT")
-    { inputFileNameB.assign(dataVsMCRegionCOutputDiff); } // Region C
-  else
-    { inputFileNameB.assign(nonIsoWDataIsoHaddOutputFile); } // Region C
+  //if (MTBin == "_highMT")
+  // { inputFileNameB.assign(dataVsMCRegionCOutputDiff); } // Region C
+  //else
+  //  { inputFileNameB.assign(nonIsoWDataIsoHaddOutputFile); } // Region C
+  inputFileNameB.assign(nonIsoWDataIsoHaddOutputFile); // Region C
   string inputFileNameC(dataVsMCOutputDiff); // Region B
-  if (MTBin == "_highMT")
-    { inputFileNameD.assign(dataVsMCRegionDOutputDiff); } // Region D
-  else
-    { inputFileNameD.assign(nonIsoWDataNonIsoHaddOutputFile); } // Region D
+  //if (MTBin == "_highMT")
+  //  { inputFileNameD.assign(dataVsMCRegionDOutputDiff); } // Region D
+  //else
+  //  { inputFileNameD.assign(nonIsoWDataNonIsoHaddOutputFile); } // Region D
+  inputFileNameD.assign(nonIsoWDataNonIsoHaddOutputFile); // Region D
   
   if (uncTag == "") {
     cout << "\nPlot data-driven QCD estimate for region A\n---\n";
