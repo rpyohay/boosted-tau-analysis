@@ -27,8 +27,8 @@ process.source = cms.Source("PoolSource",
 #    'file:/data1/yohay/NMSSMHiggs_WH_files251-500_24Sep12.root',
 #    'file:/data1/yohay/NMSSMHiggs_WH_files501-750_24Sep12.root',
 #    'file:/data1/yohay/NMSSMHiggs_WH_files751-1000_24Sep12.root'
-#    'file:/data1/yohay/gg/EDM_files/data_no_selection_a9_v1.root'
-    'file:/data1/yohay/Wh1_Medium/EDM_files/data_no_selection_a5_v2.root'
+#    'file:/data1/yohay/gg/EDM_files/data_no_selection_a9_v7.root'
+    'file:/data1/yohay/Wh1_Medium/EDM_files/data_no_selection_a9_v6.root'
 #    'root://eoscms//eos/cms/store/user/friccita/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball-Summer12_DR53X-PU_S10_START53_V7A-v1-AODSIM_skim_v3/data_no_selection_128_1_Smw.root',
     )
 )
@@ -37,7 +37,7 @@ process.source = cms.Source("PoolSource",
 process.analyzeGenInfo = cms.EDAnalyzer(
     'GenAnalyzer',
 #    outFileName = cms.string('/data1/yohay/Wh_gen_analysis_v2.root'),
-    outFileName = cms.string('Wh1_a5_gen_analysis.root'),
+    outFileName = cms.string('Wh1_a9_gen_analysis.root'),
     genParticleTag = cms.InputTag('genParticles'),
     PUTag = cms.InputTag('addPileupInfo'),
     genTauDecayIDPSet = commonGenTauDecayIDPSet

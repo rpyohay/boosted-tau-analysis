@@ -19,17 +19,20 @@ cd $version
 ./submitDataAllTauAnalyzerJobs.sh
 ./submitTTJetsAllTauAnalyzerJobs.sh
 ./submitWNJetsToLNuAllTauAnalyzerJobs.sh
-./submitWbbAllTauAnalyzerJobs.sh
-./submitWJetsToLNuAllTauAnalyzerJobs.sh
+#./submitWbbAllTauAnalyzerJobs.sh
+#./submitWJetsToLNuAllTauAnalyzerJobs.sh
 ./submitSingleTopAllTauAnalyzerJobs.sh
 ./submitWZAllTauAnalyzerJobs.sh
 ./submitWWAllTauAnalyzerJobs.sh
 ./submitZZAllTauAnalyzerJobs.sh
-./submitQCDAllTauAnalyzerJobs.sh
-./submitQCDBAllTauAnalyzerJobs.sh
-./submitQCDBMuAllTauAnalyzerJobs.sh
+#./submitQCDAllTauAnalyzerJobs.sh
+#./submitQCDBAllTauAnalyzerJobs.sh
+#./submitQCDBMuAllTauAnalyzerJobs.sh
 ./submitNonIsoWDataAllTauAnalyzerJobs.sh
-./submitSinglePhotonDataAllTauAnalyzerJobs.sh
+#./submitSinglePhotonDataAllTauAnalyzerJobs.sh
+./submitNonIsoWDYJetsToLLAllTauAnalyzerJobs.sh
+./submitNonIsoWTTJetsAllTauAnalyzerJobs.sh
+./submitNonIsoWWNJetsToLNuAllTauAnalyzerJobs.sh
 cd ..
 
 exit 0
