@@ -960,10 +960,20 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 	  if (((fileIndex == 0) || (gg && (fileIndex == 1))) && !data) pHist->SetFillColor(0);
 	  else pHist->SetFillColor(colors[fileIndex]);
 	  if (fileIndex == 0) {
+	    if(!data)
+	      {
+		pHist->SetLineWidth(4);
+		pHist->SetLineStyle(2);
+	      }
 	    if (data) legendStyle = "lp";
 	    else legendStyle = "l";
 	  }
-	  else if ((gg && (fileIndex == 1)) && !data) legendStyle = "l";
+	  else if ((gg && (fileIndex == 1)) && !data)
+	    {
+	      legendStyle = "l";
+	      pHist->SetLineWidth(4);
+	      pHist->SetLineStyle(2);
+	    }
 	  else legendStyle = "f";
 	}
 	hists[canvasIndex][fileIndex] = pHist;
@@ -1821,7 +1831,13 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
     if (gg) isoSig[1]->SetName((var + "ggSearch").c_str());
     setHistogramOptions(isoSig[0], kSpring - 1, 0.7, 20, isoSigBkgFile.second, unit.c_str(), "");
     if (gg) {
-      setHistogramOptions(isoSig[1], kAzure + 1, 0.7, 20, isoSigBkgFile.second, unit.c_str(), "");
+      setHistogramOptions(isoSig[1], kBlue, 0.7, 20, isoSigBkgFile.second, unit.c_str(), "");
+    }
+    isoSig[0]->SetLineWidth(4);
+    isoSig[0]->SetLineStyle(2);
+    if (gg) {
+      isoSig[1]->SetLineWidth(4);
+      isoSig[1]->SetLineStyle(2);
     }
 
     /*get the MC + data-driven QCD background stack histogram and make some new stacks with 
