@@ -54,7 +54,7 @@ for i in `seq $iBeg $iEnd`
       sed -e "s%    'root.*_973\.root',%%" -e "s%    'root.*_624\.root',%%" -e "s%    'root.*_336\.root',%%" -e "s%    'root.*_3\.root',%%" -e "s%    'root.*_127\.root',%%" -e "s%    'root.*_135\.root',%%" -e "s%    'root.*_332\.root',%%" -e "s%    'root.*_970\.root',%%" -e "s%    'root.*_1127\.root',%%" -e "s%a9%${masses[${i}]}%g" -e "s%SAMPLE%${samples[${i}]}%" -e "s%VERSION%${version}%g" -e "s%user\/yohay%group/phys_higgs/HiggsExo%" ../${templateCfg} > tauSelectionSkim_${samples[${i}]}.py
   elif [ ${samples[${i}]} = "gg_a15" ]
       then
-      sed -e "s%    'root.*_661\.root',%%" -e "s%    'root.*_761\.root',%%" -e "s%a9%${masses[${i}]}%g" -e "s%SAMPLE%${samples[${i}]}%" -e "s%VERSION%${version}%g" -e "s%user\/yohay%group/phys_higgs/HiggsExo%" ../${templateCfg} > tauSelectionSkim_${samples[${i}]}.py
+      sed -e "s%    'root.*_46\.root',%%" -e "s%    'root.*_51\.root',%%" -e "s%    'root.*_136\.root',%%" -e "s%    'root.*_140\.root',%%" -e "s%    'root.*_259\.root',%%" -e "s%    'root.*_381\.root',%%" -e "s%    'root.*_489\.root',%%" -e "s%    'root.*_637\.root',%%" -e "s%    'root.*_668\.root',%%" -e "s%    'root.*_894\.root',%%" -e "s%    'root.*_1053\.root',%%" -e "s%a9%${masses[${i}]}%g" -e "s%SAMPLE%${samples[${i}]}%" -e "s%VERSION%${version}%g" -e "s%user\/yohay%group/phys_higgs/HiggsExo%" ../${templateCfg} > tauSelectionSkim_${samples[${i}]}.py
   else
       sed -e "s%a9%${masses[${i}]}%g" -e "s%SAMPLE%${samples[${i}]}%" -e "s%VERSION%${version}%g" ../${templateCfg} > tauSelectionSkim_${samples[${i}]}.py
   fi
