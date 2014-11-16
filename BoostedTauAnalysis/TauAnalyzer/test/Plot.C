@@ -399,6 +399,111 @@ ErrorCode plot1DHistograms(TFile& in, TFile& out, const map<string, string>& his
   return SUCCESS;
 }
 
+//make plots with efficiency and histogram overlaid
+ErrorCode 
+plot1DHistogramAndEfficiencyOverlaid(TFile& in, TFile& out, 
+				     const map<string, pair<string, string> >& effHistMap, 
+				     const map<string, vector<string> >& binLabelMap, 
+				     string savePath, const float weight)
+{
+  string fnName("ErrorCode plot1DHistogramAndEfficiencyOverlaid(/*TFile& in, */TFile& out, ");
+  fnName+="const map<string, pair<string, string> >& effHistMap, ";
+  fnName+="const map<string, vector<string> >& binLabelMap, string savePath)";
+
+  //loop over efficiency histogram map
+  for (map<string, pair<string, string> >::const_iterator iEffHist = effHistMap.begin(); 
+       iEffHist != effHistMap.end(); ++iEffHist) {
+
+    //create canvas
+    out.cd();
+    string effAndHistCanvasName("eff_" + iEffHist->first + "_over_" + iEffHist->second.first + "_and_hist_" + iEffHist->second.first);
+    Int_t canvasWidth = defaultCanvasWidth;
+    Int_t canvasHeight = defaultCanvasHeight;
+    map<string, vector<string> >::const_iterator iHistLabels = 
+      binLabelMap.find(iEffHist->second.first);
+    if (iHistLabels != binLabelMap.end()) {
+      canvasWidth = 1200;
+      canvasHeight = 600;
+    }
+    TCanvas effAndHistCanvas(effAndHistCanvasName.c_str(), "", canvasWidth, canvasHeight);
+    setCanvasOptions(effAndHistCanvas, 1, 0, 0);
+    if (iHistLabels != binLabelMap.end()) effAndHistCanvas.cd()->SetRightMargin(0.1);
+
+    //create pads, one transparent, for the two objects and axes
+    string effCanvasName("eff_" + iEffHist->first + "_over_" + iEffHist->second.first);
+    string effGraphName("divide_" + iEffHist->first + "_by_" + iEffHist->second.first);
+    TPad graphPad(effCanvasName.c_str(), "", 0, 0, 1, 1);
+    graphPad.SetRightMargin(0.2);
+    graphPad.SetLeftMargin(0.2);
+    graphPad.SetTopMargin(0.2);
+    graphPad.SetBottomMargin(0.2);
+    TPad histPad(effGraphName.c_str(), "", 0, 0, 1, 1);
+    histPad.SetFillStyle(4000);
+    histPad.SetRightMargin(0.2);
+    histPad.SetLeftMargin(0.2);
+    histPad.SetTopMargin(0.2);
+    histPad.SetBottomMargin(0.2);
+    graphPad.Draw();
+    graphPad.cd();
+
+    //get efficiency graph from file
+    TCanvas* effCanvas = NULL;
+    TGraphAsymmErrors* effGraph = NULL;
+    out.GetObject(effCanvasName.c_str(), effCanvas);
+    if (effCanvas != NULL) {
+      effGraph = (TGraphAsymmErrors*)effCanvas->GetPrimitive(effGraphName.c_str());
+      if (effGraph == NULL) {
+	cerr << errorCannotRetrieveObject(fnName, out.GetName(), effGraphName);
+	return CANNOT_RETRIEVE_OBJECT;
+      }
+    }
+    else {
+      cerr << errorCannotRetrieveObject(fnName, out.GetName(), effCanvasName);
+      return CANNOT_RETRIEVE_OBJECT;
+    }
+
+    //get histogram
+    TH1F* denominatorHist = NULL;
+    in.cd();
+    in.GetObject(iEffHist->second.first.c_str(), denominatorHist);
+
+    //draw efficiency graph on canvas with left side axis
+    out.cd();
+    effAndHistCanvas.cd();
+    graphPad.cd();
+    graphPad.SetTicks(0, 0);
+    effGraph->GetXaxis()->SetRangeUser(denominatorHist->GetXaxis()->GetXmin(), denominatorHist->GetXaxis()->GetXmax());
+    effGraph->Draw("AP");
+    graphPad.SetTicks(0, 0);
+    graphPad.Update();
+    effAndHistCanvas.cd();
+
+    //draw histogram on canvas with right side axis
+    out.cd();
+    effAndHistCanvas.cd();
+    histPad.Draw();
+    histPad.cd();
+    histPad.SetTicks(0, 0);
+    denominatorHist->Scale(weight);
+    denominatorHist->GetXaxis()->SetLabelColor(kWhite);
+    denominatorHist->GetXaxis()->SetTitleColor(kWhite);
+    denominatorHist->GetYaxis()->SetTitle("Entries / 5 GeV");
+    denominatorHist->GetYaxis()->SetTitleOffset(1.6);
+    denominatorHist->Draw("X+Y+");
+    histPad.SetTicks(0, 0);
+    effAndHistCanvas.Write();
+
+    //save PDF of efficiency plot
+    if (savePath != "noPDF") {
+      formatSavePath(savePath);
+      effAndHistCanvas.SaveAs((savePath + effAndHistCanvasName + ".pdf").c_str());
+    }
+  }
+
+  //success
+  return SUCCESS;
+}
+
 /*make canvases with multiple 1D histogram plots from different input files and save them to the 
   output file*/
 ErrorCode plotMultiple1DHistogramsDifferentFiles(TFile& out, map<pair<string, string>, 
@@ -487,7 +592,7 @@ void plotNice(const string& inputFileName, const map<string, pair<string, string
 	      const map<pair<string, string>, pair<string, string> >& effHistMap2D, 
 	      const map<string, vector<string> >& binLabelMap, 
 	      const map<string, string>& hist1DMap, const string& outputFileName, 
-	      const string& savePath)
+	      const string& savePath, const float weight)
 {
   string fnName("const string& inputFileName, const map<string, pair<string, string> >& ");
   fnName+="effHistMap1D, const map<pair<string, string>, pair<string, string>& effHistMap2D, ";
@@ -502,7 +607,6 @@ void plotNice(const string& inputFileName, const map<string, pair<string, string
     cerr << inputFileName << ".\n";
     return;
   }
-  cout << inputFileName << endl;
 
   //open output file
   TFile out(outputFileName.c_str(), "RECREATE");
@@ -518,6 +622,9 @@ void plotNice(const string& inputFileName, const map<string, pair<string, string
 
   //make 1D histogram plots
   plot1DHistograms(in, out, hist1DMap, binLabelMap, savePath);
+
+  //make plots with efficiency and histogram overlaid
+  plot1DHistogramAndEfficiencyOverlaid(in, out, effHistMap1D, binLabelMap, savePath, weight);
 
   //write output file
   out.cd();
