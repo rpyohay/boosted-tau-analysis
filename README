@@ -65,6 +65,10 @@ mkdir -p /data1/`whoami`/WZ/analysis
 mkdir -p /data1/`whoami`/WZ/EDM_files
 mkdir -p /data1/`whoami`/Wh1_Medium/EDM_files
 mkdir -p /data1/`whoami`/gg/EDM_files
+mkdir -p /data1/`whoami`/ZH/analysis
+mkdir -p /data1/`whoami`/ZH/EDM_files
+mkdir -p /data1/`whoami`/VBF/analysis
+mkdir -p /data1/`whoami`/VBF/EDM_files
 mkdir -p /data1/`whoami`/ZZ/analysis
 mkdir -p /data1/`whoami`/ZZ/EDM_files
 mkdir -p /data1/`whoami`/data/analysis
@@ -115,6 +119,8 @@ cmsenv
 cd v<version_number>
 ./runggIsoTauAnalyzerCfgs.sh
 ./runWh1IsoTauAnalyzerCfgs.sh
+./runZHIsoTauAnalyzerCfgs.sh
+./runVBFIsoTauAnalyzerCfgs.sh
 ./runWh1IsoSignalMETUncertaintyTauAnalyzerCfgs.sh
 ./runggIsoSignalMETUncertaintyTauAnalyzerCfgs.sh
 
@@ -124,8 +130,12 @@ cd ~/CMSSW_5_3_11/src/BoostedTauAnalysis/TauAnalyzer/test
 cmsenv
 ./copyNoHPSIso.sh v<version_number>
 cd v<version_number>
-cmsRun tauanalyzer_Wh1_all_cfg.py
-cmsRun tauanalyzer_gg_all_cfg.py
+cmsRun tauanalyzer_Wh1_a<mass>_all_cfg.py
+cmsRun tauanalyzer_gg_a<mass>_all_cfg.py
+cmsRun tauanalyzer_ZH_a<mass>_all_cfg.py
+cmsRun tauanalyzer_VBF_a<mass>_all_cfg.py
+
+where <mass> is the pseudoscalar mass of the sample you're interested in.
 
 4. Make sure that in your rootlogon.C script, you DO NOT have the line
 
@@ -135,8 +145,8 @@ Then execute
 
 cd ~/CMSSW_5_3_11/src/BoostedTauAnalysis/TauAnalyzer/test
 cmsenv
-root -l -b -q 'formatPlots.C("v<input_version>", "v<output_version>", [true|false], "", "_a9", "_lowMT")'
-root -l -b -q 'formatPlots.C("v<input_version>", "v<output_version>", [true|false], "", "_a9", "_highMT")'
+root -l -b -q 'formatPlots.C("v<input_version>", "v<output_version>", [true|false], "", "_a<mass>", "_lowMT")'
+root -l -b -q 'formatPlots.C("v<input_version>", "v<output_version>", [true|false], "", "_a<mass>", "_highMT")'
 
 where
 
@@ -144,13 +154,13 @@ where
 <output_version> is the version number that will be assigned to the output files you create (typically it's the same as the input version but there might be special cases where you'd like them to be different)
 "true" means recompile the code, "false" means do not recompile the code
 "" is the tag for calculating signal uncertainties ("" means just run the nominal, not the +/1sigma shifted)
-"_a9" means ma1 = 9 GeV (for gg fusion this is the only supported option, for Wh1 the mass can be 5, 7, 9, 11, 13, or 15 GeV)
+"_a<mass>" is the pseudoscalar mass, i.e. "_a9" for 9 GeV pseudoscalar
 "_lowMT"/"_highMT" refer to the MT bins (<=50 GeV / >50 GeV)
 
 If you want to also make plots where no HPS tau isolation cut is applied, do
 
-root -l -b -q 'formatPlots.C("v<input_version>", "v<output_version>", [true|false], "", "_a9", "_lowMT", true)'
-root -l -b -q 'formatPlots.C("v<input_version>", "v<output_version>", [true|false], "", "_a9", "_highMT", true)'
+root -l -b -q 'formatPlots.C("v<input_version>", "v<output_version>", [true|false], "", "_a<mass>", "_lowMT", true)'
+root -l -b -q 'formatPlots.C("v<input_version>", "v<output_version>", [true|false], "", "_a<mass>", "_highMT", true)'
 
 instead of the root command given above.
 
@@ -210,7 +220,11 @@ They will be printed as text.
 
 /data1/<your_username>/Wh1_Medium/muHadIsoAnalysis_<MT_Bin>_Wh1_a<a1_mass>_v<version_number>.root
 
-/data1/<your_username>/gg/muHadIsoAnalysis_<MT_Bin>_Wh1_a<a1_mass>_v<version_number>.root
+/data1/<your_username>/gg/muHadIsoAnalysis_<MT_Bin>_gg_a<a1_mass>_v<version_number>.root
+
+/data1/<your_username>/ZH/muHadIsoAnalysis_<MT_Bin>_ZH_a<a1_mass>_v<version_number>.root
+
+/data1/<your_username>/VBF/muHadIsoAnalysis_<MT_Bin>_VBF_a<a1_mass>_v<version_number>.root
 
 /data1/<your_username>/ZZ/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
 /data1/<your_username>/ZZ/analysis/muHadIsoAnalysis_ZZ_v<version_number>.root
@@ -375,9 +389,13 @@ cd ~/CMSSW_5_3_11/src/BoostedTauAnalysis/TauSkimmer/test
 cmsenv
 ./generateWh1SkimCfgs.sh <version> tauSelectionSkim_Wh1.py
 ./generateggSkimCfgs.sh <version> tauSelectionSkim_gg.py
+./generateZHSkimCfgs.sh <version> tauSelectionSkim_ZH.py
+./generateVBFSkimCfgs.sh <version> tauSelectionSkim_VBF.py
 
 where <version> is the desired skim version.  Then execute
 
 cd <version>
 ./runWh1SkimCfgs.sh
 ./runggSkimCfgs.sh
+./runZHSkimCfgs.sh
+./runVBFSkimCfgs.sh

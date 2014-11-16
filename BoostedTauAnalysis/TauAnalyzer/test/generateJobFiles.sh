@@ -33,6 +33,7 @@ fi
 #./generateQCDBMuTauAnalyzerCfgs.sh $version $MCTemplateCfg
 ./generateWh1TauAnalyzerCfg.sh $version $MCTemplateCfg
 ./generateggTauAnalyzerCfg.sh $version $MCTemplateCfg
+./generateZHTauAnalyzerCfg.sh $version $MCTemplateCfg
 ./generateNonIsoWDataTauAnalyzerCfgs.sh $version $dataTemplateCfg
 #./generateSinglePhotonDataTauAnalyzerCfgs.sh $version $dataTemplateCfg
 
