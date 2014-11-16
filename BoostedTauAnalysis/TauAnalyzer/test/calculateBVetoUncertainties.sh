@@ -12,7 +12,7 @@ version=$1
 
 #a1 mass
 #a1Mass=( "_a5" "_a7" "_a9" "_a11" "_a13" "_a15" ) #ggH
-a1Mass=( "_a5" "_a7" "_a9" "_a11" ) #ggH
+a1Mass=( "_a5" "_a7" "_a9" "_a11" "_a13" ) #ggH
 nMasses=${#a1Mass[@]}
 iBeg=0
 iEndMass=`expr $nMasses - 1`
