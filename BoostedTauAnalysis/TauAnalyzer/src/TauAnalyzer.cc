@@ -4329,6 +4329,36 @@ void TauAnalyzer::fillMistagEffPlot()
     mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
   }
   else if (sample_ == "gg_a13") {
+    mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(2, 1, 0.3);
+    mistagEffVsPTAndEta_->SetBinContent(2, 2, 0.25);
+    mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.230769);
+    mistagEffVsPTAndEta_->SetBinContent(3, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(3, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(4, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(4, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(4, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(5, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(5, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(5, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(6, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(6, 2, 0.5);
+    mistagEffVsPTAndEta_->SetBinContent(6, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(7, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(7, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(8, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(8, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
   }
   else if (sample_ == "gg_a15") {
   }
