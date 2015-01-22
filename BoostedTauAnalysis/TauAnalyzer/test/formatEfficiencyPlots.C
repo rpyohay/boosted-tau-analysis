@@ -145,6 +145,7 @@
 //   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v1/b_veto_eff_gg_a9.root");
 //   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v1/b_veto_eff_gg_a11.root");
 //   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v1/b_veto_eff_gg_a13.root");
+//   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v1/b_veto_eff_gg_a15.root");
 //   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v1/b_veto_eff_Wh1_a5.root");
 //   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v1/b_veto_eff_Wh1_a7.root");
 //   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v1/b_veto_eff_Wh1_a9.root");
@@ -161,12 +162,12 @@
   //put trigger efficiency and pT distribution on same plot
 //   effInputFiles.push_back("/afs/cern.ch/user/y/yohay/CMSSW_5_3_3_Git/src/BoostedTauAnalysis/GenMatchedRecoObjectProducer/test/genA1TauRecoMuonEtaHLTEff.root");
 //   effInputFiles.push_back("/afs/cern.ch/user/y/yohay/CMSSW_5_3_3_Git/src/BoostedTauAnalysis/GenMatchedRecoObjectProducer/test/genWRecoMuonEtaHLTEff.root");
-  for (vector<string>::const_iterator iFile = effInputFiles.begin(); iFile != effInputFiles.end(); 
-       ++iFile) {
-    const unsigned int strLen = iFile->find(".root");
-    const string outputFileName(iFile->substr(0, strLen) + "_final.root");
-    float weight = 1.95295217378794;
-    if ((iFile - effInputFiles.begin()) == 1) weight = 0.0709988;
-    plotNice(*iFile, effHistMap1D, effHistMap2D, binLabelMap, hist1DMap, outputFileName, "noPDF", weight);
-  }
+//   for (vector<string>::const_iterator iFile = effInputFiles.begin(); iFile != effInputFiles.end(); 
+//        ++iFile) {
+//     const unsigned int strLen = iFile->find(".root");
+//     const string outputFileName(iFile->substr(0, strLen) + "_final.root");
+//     float weight = 1.95295217378794;
+//     if ((iFile - effInputFiles.begin()) == 1) weight = 0.0709988;
+//     plotNice(*iFile, effHistMap1D, effHistMap2D, binLabelMap, hist1DMap, outputFileName, "noPDF", weight);
+//   }
 }
