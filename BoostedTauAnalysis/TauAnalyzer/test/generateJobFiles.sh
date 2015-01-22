@@ -7,7 +7,7 @@ if [ $# -gt 3 ]
 fi
 
 version=$1
-MCTemplateCfg="tauanalyzer_WNJetsToLNu_Wh1_template_cfg.py"
+MCTemplateCfg="tauanalyzer_WNJetsToLNu_Wh1_template_speed_test_2_cfg.py"
 if [ -n "$2" ]
     then
     MCTemplateCfg=$2
@@ -34,6 +34,7 @@ fi
 ./generateWh1TauAnalyzerCfg.sh $version $MCTemplateCfg
 ./generateggTauAnalyzerCfg.sh $version $MCTemplateCfg
 ./generateZHTauAnalyzerCfg.sh $version $MCTemplateCfg
+./generateVBFTauAnalyzerCfg.sh $version $MCTemplateCfg
 ./generateNonIsoWDataTauAnalyzerCfgs.sh $version $dataTemplateCfg
 #./generateSinglePhotonDataTauAnalyzerCfgs.sh $version $dataTemplateCfg
 #./generateNonIsoWQCDTauAnalyzerCfgs.sh $version $MCTemplateCfg
@@ -42,4 +43,5 @@ fi
 ./generateNonIsoWDYJetsToLLTauAnalyzerCfgs.sh $version $MCTemplateCfg
 ./generateNonIsoWTTJetsTauAnalyzerCfgs.sh $version $MCTemplateCfg
 ./generateNonIsoWWNJetsToLNuTauAnalyzerCfgs.sh $version $MCTemplateCfg
+
 exit 0

@@ -353,7 +353,7 @@ process.NonIsoBVetoFilter.tauTag = cms.InputTag('muHadNonIsoTauSelector')
 process.AllBVetoFilter = process.IsoBVetoFilter.clone()
 process.AllBVetoFilter.tauTag = cms.InputTag('muHadTauSelector')
 
-#create a collection of corrected jets with pT > 20 GeV and |eta| < 2.4 distinct from the W muon
+#create a collection of corrected jets with pT > 20 GeV and |eta| < 4.7 distinct from the W muon
 #and isolated tau
 #this collection has no memory of the uncorrected jets
 process.corrJetDistinctIsoTauSelector = cms.EDFilter(
@@ -363,7 +363,7 @@ process.corrJetDistinctIsoTauSelector = cms.EDFilter(
     oldJetTag = cms.InputTag('ak5PFJets'),
     jetMuonMapTag = cms.InputTag('CleanJets'),
     pTMin = cms.double(30.0),
-    absEtaMax = cms.double(2.4),
+    absEtaMax = cms.double(4.7),
     dR = cms.double(0.3),
     minNumObjsToPassFilter = cms.uint32(0),
     maxNumObjsToPassFilter = cms.int32(-1)
@@ -555,7 +555,7 @@ process.muonTriggerObjectFilter = cms.EDFilter(
     )
 
 #sequences
-process.beginSequence = cms.Sequence(
+process.begin = cms.Path(
     process.genWMuNuSelector*
     process.genWTauNuSelector*
     process.genPartonSelector*
@@ -642,8 +642,17 @@ process.lowMTTauAnalysisSequence = cms.Sequence(
     )
 
 #path
-process.begin = cms.Path(process.beginSequence)
-process.highMT = cms.Path(HIGHMTSEQUENCE)
-process.lowMT = cms.Path(LOWMTSEQUENCE)
-process.schedule = cms.Schedule(process.begin,process.highMT,process.lowMT)
+process.highMTIsoTauAnalysis = cms.Path(process.highMTIsoTauAnalysisSequence)
+process.lowMTIsoTauAnalysis = cms.Path(process.lowMTIsoTauAnalysisSequence)
+process.highMTNonIsoTauAnalysis = cms.Path(process.highMTNonIsoTauAnalysisSequence)
+process.lowMTNonIsoTauAnalysis = cms.Path(process.lowMTNonIsoTauAnalysisSequence)
+process.highMTTauAnalysis = cms.Path(process.highMTTauAnalysisSequence)
+process.lowMTTauAnalysis = cms.Path(process.lowMTTauAnalysisSequence)
+process.schedule = cms.Schedule(process.begin,
+                                process.highMTIsoTauAnalysis,
+                                process.lowMTIsoTauAnalysis,
+                                process.highMTNonIsoTauAnalysis,
+                                process.lowMTNonIsoTauAnalysis,
+                                process.highMTTauAnalysis,
+                                process.lowMTTauAnalysis)
 ## process.e = cms.EndPath(process.output)

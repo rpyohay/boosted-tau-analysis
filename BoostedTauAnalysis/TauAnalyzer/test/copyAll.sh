@@ -36,8 +36,6 @@ cd $version
 ./copyNonIsoWDYJetsToLLFromEOS.sh
 ./copyNonIsoWTTJetsFromEOS.sh
 ./copyNonIsoWWNJetsToLNuFromEOS.sh
-
-
 cd ..
 
 exit 0

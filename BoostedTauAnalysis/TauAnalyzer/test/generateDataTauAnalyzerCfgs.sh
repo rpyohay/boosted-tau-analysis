@@ -1,8 +1,8 @@
 #!/bin/bash
 
-if [ $# -gt 3 ]
+if [ $# -gt 2 ]
     then
-    echo "Usage: ./generateDataTauAnalyzerCfgs.sh <version> <template cfg> [reweightOnly]"
+    echo "Usage: ./generateDataTauAnalyzerCfgs.sh <version> <template cfg>"
     exit 0
 fi
 
@@ -12,11 +12,6 @@ fi
 version=$1
 templateCfg=$2
 infoTag=""
-reweightOnly=0
-if [ "$3" == "reweightOnly" ]
-    then
-    reweightOnly=1
-fi
 dir=$version
 
 #number of jobs
@@ -81,7 +76,6 @@ for iSample in `seq $iBeg $iEndSample`
     lowMTIsoTauAnalyzerOutputFiles[$hashedIndex]="${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_lowMT_${samples[${iSample}]}_${iJob}_${version}.root"
     highMTNonIsoTauAnalyzerOutputFiles[$hashedIndex]="${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_highMT_${samples[${iSample}]}_${iJob}_${version}.root"
     lowMTNonIsoTauAnalyzerOutputFiles[$hashedIndex]="${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_lowMT_${samples[${iSample}]}_${iJob}_${version}.root"
-    nonIsoReweightTauAnalyzerOutputFiles[$hashedIndex]="${tauAnalyzerOutputFilePrefix}muHadNonIsoReweightAnalysis_${samples[${iSample}]}_${iJob}_${version}.root"
     highMTAllTauAnalyzerOutputFiles[$hashedIndex]="${tauAnalyzerOutputFilePrefix}muHadAnalysis_highMT_${samples[${iSample}]}_${iJob}_${version}.root"
     lowMTAllTauAnalyzerOutputFiles[$hashedIndex]="${tauAnalyzerOutputFilePrefix}muHadAnalysis_lowMT_${samples[${iSample}]}_${iJob}_${version}.root"
 
@@ -105,19 +99,10 @@ for iSample in `seq $iBeg $iEndSample`
     do
     hashedIndex=`expr ${iSample} \* ${nJobs} + ${iJob}`
 
-    #generate cfg file for the isolated sample
-    sed -e "s%FILES%${inputFileBlocks[${hashedIndex}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${hashedIndex}]}%" -e "s%HIGHMTNONISOTAUANALYZEROUTFILE%${highMTNonIsoTauAnalyzerOutputFiles[${hashedIndex}]}%" -e "s%HIGHMTALLTAUANALYZEROUTFILE%${highMTAllTauAnalyzerOutputFiles[${hashedIndex}]}%" -e "s%HIGHMTISOTAUANALYZEROUTFILE%${highMTIsoTauAnalyzerOutputFiles[${hashedIndex}]}%" -e "s%LOWMTNONISOTAUANALYZEROUTFILE%${lowMTNonIsoTauAnalyzerOutputFiles[${hashedIndex}]}%" -e "s%LOWMTALLTAUANALYZEROUTFILE%${lowMTAllTauAnalyzerOutputFiles[${hashedIndex}]}%" -e "s%LOWMTISOTAUANALYZEROUTFILE%${lowMTIsoTauAnalyzerOutputFiles[${hashedIndex}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${hashedIndex}]}%" -e "s%HIGHMTSEQUENCE%process.highMTIsoTauAnalysisSequence%" -e "s%LOWMTSEQUENCE%process.lowMTIsoTauAnalysisSequence%" -e "s%PUSCENARIO%S10%" -e "s%CUSTOMTAUSELECTOR%CustomTauSepFromMuonSelector%" -e "s%OVERLAPCANDTAG%WIsoMuonSelector%g" -e "s%MUONORPHOTONTAG%muonTag = cms.InputTag('WIsoMuonSelector')%" -e "s%TRIGGEROBJECTFILTER%muonTriggerObjectFilter%g" -e "s%OSSFFILTERISO%process.OSSFFilterIso*\n    %g" -e "s%OSSFFILTERNONISO%process.OSSFFilterNonIso*\n    %g" -e "s%OSSFFILTER%process.OSSFFilter*\n    %g" -e "s%SAMPLE%%" ../${templateCfg} > tauanalyzer_${samples[${iSample}]}_${iJob}_iso_cfg.py
+    #generate cfg file
+    sed -e "s%FILES%${inputFileBlocks[${hashedIndex}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${hashedIndex}]}%" -e "s%HIGHMTNONISOTAUANALYZEROUTFILE%${highMTNonIsoTauAnalyzerOutputFiles[${hashedIndex}]}%" -e "s%HIGHMTALLTAUANALYZEROUTFILE%${highMTAllTauAnalyzerOutputFiles[${hashedIndex}]}%" -e "s%HIGHMTISOTAUANALYZEROUTFILE%${highMTIsoTauAnalyzerOutputFiles[${hashedIndex}]}%" -e "s%LOWMTNONISOTAUANALYZEROUTFILE%${lowMTNonIsoTauAnalyzerOutputFiles[${hashedIndex}]}%" -e "s%LOWMTALLTAUANALYZEROUTFILE%${lowMTAllTauAnalyzerOutputFiles[${hashedIndex}]}%" -e "s%LOWMTISOTAUANALYZEROUTFILE%${lowMTIsoTauAnalyzerOutputFiles[${hashedIndex}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${hashedIndex}]}%" -e "s%CUSTOMTAUSELECTOR%CustomTauSepFromMuonSelector%" -e "s%OVERLAPCANDTAG%WIsoMuonSelector%g" -e "s%MUONORPHOTONTAG%muonTag = cms.InputTag('WIsoMuonSelector')%" -e "s%TRIGGEROBJECTFILTER%muonTriggerObjectFilter%g" -e "s%OSSFFILTERISO%process.OSSFFilterIso*\n    %g" -e "s%OSSFFILTERNONISO%process.OSSFFilterNonIso*\n    %g" -e "s%OSSFFILTER%process.OSSFFilter*\n    %g" -e "s%SAMPLE%%" ../${templateCfg} > tauanalyzer_${samples[${iSample}]}_${iJob}_cfg.py
 
-    #generate cfg file for the non-isolated sample
-    sed -e "s%FILES%${inputFileBlocks[${hashedIndex}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${hashedIndex}]}%" -e "s%HIGHMTNONISOTAUANALYZEROUTFILE%${highMTNonIsoTauAnalyzerOutputFiles[${hashedIndex}]}%" -e "s%HIGHMTALLTAUANALYZEROUTFILE%${highMTAllTauAnalyzerOutputFiles[${hashedIndex}]}%" -e "s%HIGHMTISOTAUANALYZEROUTFILE%${highMTIsoTauAnalyzerOutputFiles[${hashedIndex}]}%" -e "s%LOWMTNONISOTAUANALYZEROUTFILE%${lowMTNonIsoTauAnalyzerOutputFiles[${hashedIndex}]}%" -e "s%LOWMTALLTAUANALYZEROUTFILE%${lowMTAllTauAnalyzerOutputFiles[${hashedIndex}]}%" -e "s%LOWMTISOTAUANALYZEROUTFILE%${lowMTIsoTauAnalyzerOutputFiles[${hashedIndex}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${hashedIndex}]}%" -e "s%HIGHMTSEQUENCE%process.highMTNonIsoTauAnalysisSequence%" -e "s%LOWMTSEQUENCE%process.lowMTNonIsoTauAnalysisSequence%" -e "s%PUSCENARIO%S10%" -e "s%CUSTOMTAUSELECTOR%CustomTauSepFromMuonSelector%" -e "s%OVERLAPCANDTAG%WIsoMuonSelector%g" -e "s%MUONORPHOTONTAG%muonTag = cms.InputTag('WIsoMuonSelector')%" -e "s%TRIGGEROBJECTFILTER%muonTriggerObjectFilter%g" -e "s%OSSFFILTERISO%process.OSSFFilterIso*\n    %g" -e "s%OSSFFILTERNONISO%process.OSSFFilterNonIso*\n    %g" -e "s%OSSFFILTER%process.OSSFFilter*\n    %g" -e "s%SAMPLE%%" ../${templateCfg} > tauanalyzer_${samples[${iSample}]}_${iJob}_nonIso_cfg.py
-
-    #generate cfg file for the non-isolated, reweighted sample
-    sed -e "s%FILES%${inputFileBlocks[${hashedIndex}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${hashedIndex}]}%" -e "s%HIGHMTNONISOTAUANALYZEROUTFILE%${nonIsoReweightTauAnalyzerOutputFiles[${hashedIndex}]}%" -e "s%HIGHMTALLTAUANALYZEROUTFILE%${highMTAllTauAnalyzerOutputFiles[${hashedIndex}]}%" -e "s%HIGHMTISOTAUANALYZEROUTFILE%${highMTIsoTauAnalyzerOutputFiles[${hashedIndex}]}%" -e "s%LOWMTNONISOTAUANALYZEROUTFILE%${lowMTNonIsoTauAnalyzerOutputFiles[${hashedIndex}]}%" -e "s%LOWMTALLTAUANALYZEROUTFILE%${lowMTAllTauAnalyzerOutputFiles[${hashedIndex}]}%" -e "s%LOWMTISOTAUANALYZEROUTFILE%${lowMTIsoTauAnalyzerOutputFiles[${hashedIndex}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${hashedIndex}]}%" -e "s%HIGHMTSEQUENCE%process.highMTNonIsoTauAnalysisSequence%" -e "s%LOWMTSEQUENCE%process.lowMTNonIsoTauAnalysisSequence%" -e "s%PUSCENARIO%S10%" -e "s%REWEIGHT%True%" -e "s%CUSTOMTAUSELECTOR%CustomTauSepFromMuonSelector%" -e "s%OVERLAPCANDTAG%WIsoMuonSelector%g" -e "s%MUONORPHOTONTAG%muonTag = cms.InputTag('WIsoMuonSelector')%" -e "s%TRIGGEROBJECTFILTER%muonTriggerObjectFilter%g" -e "s%OSSFFILTERISO%process.OSSFFilterIso*\n    %g" -e "s%OSSFFILTERNONISO%process.OSSFFilterNonIso*\n    %g" -e "s%OSSFFILTER%process.OSSFFilter*\n    %g" -e "s%SAMPLE%%" ../${templateCfg} > tauanalyzer_${samples[${iSample}]}_${iJob}_nonIsoReweight_cfg.py
-
-    #generate cfg file for the sample with no isolation cut
-    sed -e "s%FILES%${inputFileBlocks[${hashedIndex}]}%" -e "s%CLEANJETSOUTFILE%${cleanJetsOutFiles[${hashedIndex}]}%" -e "s%HIGHMTNONISOTAUANALYZEROUTFILE%${highMTNonIsoTauAnalyzerOutputFiles[${hashedIndex}]}%" -e "s%HIGHMTALLTAUANALYZEROUTFILE%${highMTAllTauAnalyzerOutputFiles[${hashedIndex}]}%" -e "s%HIGHMTISOTAUANALYZEROUTFILE%${highMTIsoTauAnalyzerOutputFiles[${hashedIndex}]}%" -e "s%LOWMTNONISOTAUANALYZEROUTFILE%${lowMTNonIsoTauAnalyzerOutputFiles[${hashedIndex}]}%" -e "s%LOWMTALLTAUANALYZEROUTFILE%${lowMTAllTauAnalyzerOutputFiles[${hashedIndex}]}%" -e "s%LOWMTISOTAUANALYZEROUTFILE%${lowMTIsoTauAnalyzerOutputFiles[${hashedIndex}]}%" -e "s%EDMOUTFILE%${EDMOutputFiles[${hashedIndex}]}%" -e "s%HIGHMTSEQUENCE%process.highMTTauAnalysisSequence%" -e "s%LOWMTSEQUENCE%process.lowMTTauAnalysisSequence%" -e "s%PUSCENARIO%S10%" -e "s%CUSTOMTAUSELECTOR%CustomTauSepFromMuonSelector%" -e "s%OVERLAPCANDTAG%WIsoMuonSelector%g" -e "s%MUONORPHOTONTAG%muonTag = cms.InputTag('WIsoMuonSelector')%" -e "s%TRIGGEROBJECTFILTER%muonTriggerObjectFilter%g" -e "s%OSSFFILTERISO%process.OSSFFilterIso*\n    %g" -e "s%OSSFFILTERNONISO%process.OSSFFilterNonIso*\n    %g" -e "s%OSSFFILTER%process.OSSFFilter*\n    %g" -e "s%SAMPLE%%" ../${templateCfg} > tauanalyzer_${samples[${iSample}]}_${iJob}_all_cfg.py
-
-    #generate iso+nonIso+reweight job submission script for LSF
+    #generate job submission script for LSF
     cat <<EOF > tauanalyzer_${samples[${iSample}]}_${iJob}_cfg.sh
 #!/bin/bash
 
@@ -126,44 +111,19 @@ fileNamePrefix="tauanalyzer_${samples[${iSample}]}_${iJob}"
 cd \$jobDir
 eval \`scramv1 runtime -sh\`
 cd -
-cp \$jobDir/\${fileNamePrefix}_iso_cfg.py \$jobDir/\${fileNamePrefix}_nonIso_cfg.py \$jobDir/\${fileNamePrefix}_nonIsoReweight_cfg.py .
-cmsRun \${fileNamePrefix}_iso_cfg.py #BLINDED!!!
-if [ $reweightOnly -eq 0 ]
-    then
-    cmsRun \${fileNamePrefix}_nonIso_cfg.py
-    cmsStage -f ${highMTNonIsoTauAnalyzerOutputFiles[${hashedIndex}]} /store/user/`whoami`/
-    cmsStage -f ${lowMTNonIsoTauAnalyzerOutputFiles[${hashedIndex}]} /store/user/`whoami`/
-    rm ${highMTNonIsoTauAnalyzerOutputFiles[${hashedIndex}]} ${lowMTNonIsoTauAnalyzerOutputFiles[${hashedIndex}]}
-fi
-#cmsRun \${fileNamePrefix}_nonIsoReweight_cfg.py
+cp \$jobDir/\${fileNamePrefix}_cfg.py .
+cmsRun \${fileNamePrefix}_cfg.py
+cmsStage -f ${highMTNonIsoTauAnalyzerOutputFiles[${hashedIndex}]} /store/user/`whoami`/
+cmsStage -f ${lowMTNonIsoTauAnalyzerOutputFiles[${hashedIndex}]} /store/user/`whoami`/
 cmsStage -f ${highMTIsoTauAnalyzerOutputFiles[${hashedIndex}]} /store/user/`whoami`/ #BLINDED!!!
 cmsStage -f ${lowMTIsoTauAnalyzerOutputFiles[${hashedIndex}]} /store/user/`whoami`/ #BLINDED!!!
-#cmsStage -f ${nonIsoReweightTauAnalyzerOutputFiles[${hashedIndex}]} /store/user/`whoami`/
-rm ${highMTIsoTauAnalyzerOutputFiles[${hashedIndex}]} ${lowMTIsoTauAnalyzerOutputFiles[${hashedIndex}]} #BLINDED!!!
-#rm ${nonIsoReweightTauAnalyzerOutputFiles[${hashedIndex}]}
+cmsStage -f ${highMTAllTauAnalyzerOutputFiles[${hashedIndex}]} /store/user/`whoami`/ #BLINDED!!!
+cmsStage -f ${lowMTAllTauAnalyzerOutputFiles[${hashedIndex}]} /store/user/`whoami`/ #BLINDED!!!
+rm ${highMTNonIsoTauAnalyzerOutputFiles[${hashedIndex}]} ${lowMTNonIsoTauAnalyzerOutputFiles[${hashedIndex}]} ${highMTIsoTauAnalyzerOutputFiles[${hashedIndex}]} ${lowMTIsoTauAnalyzerOutputFiles[${hashedIndex}]} ${highMTAllTauAnalyzerOutputFiles[${hashedIndex}]} ${lowMTAllTauAnalyzerOutputFiles[${hashedIndex}]}
 
 exit 0
 EOF
     chmod a+x tauanalyzer_${samples[${iSample}]}_${iJob}_cfg.sh
-
-    #generate noIsoCut job submission script for LSF
-    cat <<EOF > tauanalyzer_${samples[${iSample}]}_${iJob}_all_cfg.sh
-#!/bin/bash
-
-jobDir="`pwd`"
-fileNamePrefix="tauanalyzer_${samples[${iSample}]}_${iJob}"
-cd \$jobDir
-eval \`scramv1 runtime -sh\`
-cd -
-cp \$jobDir/\${fileNamePrefix}_all_cfg.py .
-#cmsRun \${fileNamePrefix}_all_cfg.py #BLINDED!!!
-#cmsStage -f ${highMTAllTauAnalyzerOutputFiles[${hashedIndex}]} /store/user/`whoami`/ #BLINDED!!!
-#cmsStage -f ${lowMTAllTauAnalyzerOutputFiles[${hashedIndex}]} /store/user/`whoami`/ #BLINDED!!!
-#rm ${highMTAllTauAnalyzerOutputFiles[${hashedIndex}]} ${lowMTAllTauAnalyzerOutputFiles[${hashedIndex}]} #BLINDED!!!
-
-exit 0
-EOF
-    chmod a+x tauanalyzer_${samples[${iSample}]}_${iJob}_all_cfg.sh
   done
 done
 
@@ -174,24 +134,18 @@ cat <<EOF > runDataTauAnalyzerCfgs.sh
 for file in \`ls -alh *SingleMu*.py | grep -v nonIsoW | awk '{ print \$9 }'\`
   do
   outFile=\`echo \$file | sed -e "s%\.py%.txt%"\`
-  isIso=\`echo \$file | sed -e "s%.*\(iso\).*%\1%"\`
-#  if [ "\$isIso" != "iso" ] #BLINDED!!!
-#      then
-      cmsRun \$file > \$outFile
-#  else
-#      echo "Not running script \$file due to blinding requirement"
-#  fi
+  cmsRun \$file > \$outFile 
 done
 
 exit 0
 EOF
 chmod a+x runDataTauAnalyzerCfgs.sh
 
-#generate script that submits all iso+nonIso+reweight jobs to LSF
+#generate script that submits all jobs to LSF
 cat <<EOF > submitDataTauAnalyzerJobs.sh
 #!/bin/bash
 
-for file in \`ls -alh tauanalyzer*SingleMu*.sh | grep -v all | grep -v nonIsoW | awk '{ print \$9 }'\`
+for file in \`ls -alh tauanalyzer*SingleMu*.sh | grep -v nonIsoW | awk '{ print \$9 }'\`
   do
   jobName=\`echo \$file | sed -e "s%\(.*\)\.sh%\1%"\`
   bsub -q 1nd -J \$jobName < \$file
@@ -201,21 +155,7 @@ exit 0
 EOF
 chmod a+x submitDataTauAnalyzerJobs.sh
 
-#generate script that submits all noIsoCut jobs to LSF
-cat <<EOF > submitDataAllTauAnalyzerJobs.sh
-#!/bin/bash
-
-for file in \`ls -alh tauanalyzer*SingleMu*all*.sh | grep -v nonIsoW | awk '{ print \$9 }'\`
-  do
-  jobName=\`echo \$file | sed -e "s%\(.*\)\.sh%\1%"\`
-  bsub -q 1nd -J \$jobName < \$file
-done
-
-exit 0
-EOF
-chmod a+x submitDataAllTauAnalyzerJobs.sh
-
-#generate script that copies all iso+nonIso+reweight files locally from EOS
+#generate script that copies all files locally from EOS
 cat <<EOF > copyDataFromEOS.sh
 #!/bin/bash
 
@@ -225,16 +165,12 @@ for sample in "A" "B" "C" "D"
     #loop over number of subjobs
     for jInd in \`seq ${iBeg} ${iEndJob}\`
       do
-       #for cut in Iso NonIso NonIsoReweight #BLINDED!!!
-      for cut in Iso NonIso
+      for cut in "Iso" "NonIso" ""
         do
         for MTBin in high low
           do
-            if [ "\$cut" != "NonIso" ] || [ $reweightOnly -eq 0 ]
-            then
-            cmsStage -f /store/user/`whoami`/muHad\${cut}Analysis_\${MTBin}MT_SingleMu_Run2012\${sample}_\${jInd}_${version}.root /data1/`whoami`/data/analysis/
-            cmsRm /store/user/`whoami`/muHad\${cut}Analysis_\${MTBin}MT_SingleMu_Run2012\${sample}_\${jInd}_${version}.root
-            fi
+          cmsStage -f /store/user/`whoami`/muHad\${cut}Analysis_\${MTBin}MT_SingleMu_Run2012\${sample}_\${jInd}_${version}.root /data1/`whoami`/data/analysis/
+          cmsRm /store/user/`whoami`/muHad\${cut}Analysis_\${MTBin}MT_SingleMu_Run2012\${sample}_\${jInd}_${version}.root
         done
       done
    done
@@ -243,26 +179,5 @@ done
 exit 0
 EOF
 chmod a+x copyDataFromEOS.sh
-
-#generate script that copies all noIsoCut files locally from EOS
-cat <<EOF > copyAllDataFromEOS.sh
-#!/bin/bash
-
-eval \`scramv1 runtime -sh\`
-for sample in ${samples}
-  do
-  for iJob in \`seq ${iBeg} ${iEndJob}\`
-    do
-    for MTBin in high low
-      do
-      #cmsStage -f /store/user/`whoami`/muHadAnalysis_\${MTBin}MT_\${sample}_\${iJob}_${version}.root /data1/`whoami`/SinglePhotonParkedData/analysis/ #BLINDED!!!
-      #cmsRm /store/user/`whoami`/muHadAnalysis_\${MTBin}MT_\${sample}_\${iJob}_${version}.root #BLINDED!!!
-    done
-  done
-done
-
-exit 0
-EOF
-chmod a+x copyAllDataFromEOS.sh
 
 exit 0
