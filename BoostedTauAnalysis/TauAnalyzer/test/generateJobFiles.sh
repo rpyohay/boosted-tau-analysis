@@ -7,7 +7,7 @@ if [ $# -gt 3 ]
 fi
 
 version=$1
-MCTemplateCfg="tauanalyzer_WNJetsToLNu_Wh1_template_speed_test_2_cfg.py"
+MCTemplateCfg="tauanalyzer_WNJetsToLNu_Wh1_template_cfg.py"
 if [ -n "$2" ]
     then
     MCTemplateCfg=$2
