@@ -3129,7 +3129,7 @@ void TauAnalyzer::beginJob()
     new TH1F("tauHadPhotonEnergyFraction", ";#frac{E_{T#gamma}}{E_{T#tau}};", 20, 0.0, 1.0);
   dThetaPhotonOtherTauConstituents_ = 
     new TH1F("dThetaPhotonOtherTauConstituents", ";#Delta#theta;", 50, 0.0, 0.5);
-  hardestCorrJetEta_ = new TH1F("hardestCorrJetEta", ";#eta;", 40, -5.0, 5.0);
+  hardestCorrJetEta_ = new TH1F("hardestCorrJetEta", ";#eta;", 47, -4.7, 4.7);
   cleanedJetPTVsCleanedTauPT_ = 
     new TH2F("cleanedJetPTVsCleanedTauPT", ";#tau p_{T} (GeV);Jet p_{T} (GeV)", 
 	     50, 0.0, 100.0, 50, 0.0, 100.0);
@@ -3250,7 +3250,7 @@ void TauAnalyzer::beginJob()
   tauHadCleanedJetEnergyFractionVsTauHadIso_ = 
     new TH2F("tauHadCleanedJetEnergyFractionVsTauHadIso", 
 	     ";Isolation energy (GeV);#frac{E_{#tau}}{E_{j}}", 20, 0.0, 20.0, 20, 0.0, 1.0);
-  jet_eta = new TH1F("jet_eta", "#eta", 35, -3.5, 3.5);
+  jet_eta = new TH1F("jet_eta", "#eta", 47, -4.7, 4.7);
   jet_phi = new TH1F("jet_phi", "#phi", 14, -3.5, 3.5);
   jet_mass_etacut = new TH1F("jet_mass_etacut", "m (GeV)", 20, 0., 200.);
   jet_ptmj_etacut = new TH1F("jet_ptmj_etacut", "#frac{p_{T}}{m}", 80, 0., 80.);
