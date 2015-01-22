@@ -903,11 +903,15 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 	inputFiles.size(), dataMC, false);
   bool data = true;
   bool gg = false;
+  bool ZH = false;
+  bool VBF = false;
   for (vector<string>::const_iterator iInputFile = inputFiles.begin(); 
        iInputFile != inputFiles.end(); ++iInputFile) {
     const unsigned int fileIndex = iInputFile - inputFiles.begin();
     if ((fileIndex == 0) && (iInputFile->find("Wh1") != string::npos)) data = false;
     if ((fileIndex == 1) && (iInputFile->find("gg") != string::npos)) gg = true;
+    if ((fileIndex == 2) && (iInputFile->find("ZH") != string::npos)) ZH = true;
+    if ((fileIndex == 3) && (iInputFile->find("VBF") != string::npos)) VBF = true;
     inputStreams.push_back(new TFile(iInputFile->c_str()));
     for (vector<string>::const_iterator iCanvasName = canvasNames.begin(); 
 	 iCanvasName != canvasNames.end(); ++iCanvasName) {
@@ -957,7 +961,8 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 // 	  pHist->SetFillStyle(0);
 // 	  pHist->SetFillColor(0);
 	  pHist->SetFillStyle(1001);
-	  if (((fileIndex == 0) || (gg && (fileIndex == 1))) && !data) pHist->SetFillColor(0);
+	  if (((fileIndex == 0) || (gg && (fileIndex == 1)) || (ZH && (fileIndex == 2)) || 
+	       (VBF && (fileIndex == 3))) && !data) pHist->SetFillColor(0);
 	  else pHist->SetFillColor(colors[fileIndex]);
 	  if (fileIndex == 0) {
 	    if(!data)
@@ -968,7 +973,8 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 	    if (data) legendStyle = "lp";
 	    else legendStyle = "l";
 	  }
-	  else if ((gg && (fileIndex == 1)) && !data)
+	  else if (((gg && (fileIndex == 1)) || (ZH && (fileIndex == 2)) || 
+		    (VBF && (fileIndex == 3))) && !data)
 	    {
 	      legendStyle = "l";
 	      pHist->SetLineWidth(4);
@@ -980,7 +986,8 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 	legends[canvasIndex]->
 	  AddEntry(pHist, legendEntries[fileIndex].c_str(), legendStyle.c_str());
 	if ((data && (fileIndex != 0)) || 
-	    (!data && (fileIndex != 0) && ((gg && (fileIndex != 1)) || !gg))) {
+	    (!data && (fileIndex != 0) && ((gg && (fileIndex != 1)) || !gg) && 
+	     ((ZH && (fileIndex != 2)) || !ZH) && ((VBF && (fileIndex != 3)) || !VBF))) {
 	  stacks[canvasIndex]->Add(pHist, "HIST");
 	}
       }
@@ -1040,6 +1047,8 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
       if (!data) drawOpt = "HISTSAME";
       hists[canvasIndex][0]->Draw(drawOpt.c_str());
       if (!data && gg) hists[canvasIndex][1]->Draw(drawOpt.c_str());
+      if (!data && ZH) hists[canvasIndex][2]->Draw(drawOpt.c_str());
+      if (!data && VBF) hists[canvasIndex][3]->Draw(drawOpt.c_str());
       TH1F* stackSumHist = NULL;
       for (Int_t i = 0; i < stackedHists->GetEntries(); ++i) {
 	TH1F* stackHist = (TH1F*)stackedHists->At(i)->Clone();
@@ -1787,7 +1796,7 @@ void compareTotalMCBToA(const vector<string>& QCDVsMCInputFileNames1,
 void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile, 
 		  pair<TFile*, float>& nonIsoDataFile, const string& var, const string& unit, 
 		  const int normRegionLowerBin, const int normRegionUpperBin, 
-		  const string& option, TFile& outStream, const bool gg)
+		  const string& option, TFile& outStream, const bool ma9GeV)
 {
   //top level declarations
   string canvasName(var + "Canvas");
@@ -1800,8 +1809,10 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
   isoSigBkgFile.first->GetObject(canvasName.c_str(), canvasIsoSigBkg);
 
   //get the signal histograms
-  vector<TH1F*> isoSig(2, NULL);
-  if (!gg) isoSig.erase(isoSig.begin() + 1);
+  //for ma = 9 GeV, there are 4 signals
+  //for all other pseudoscalar masses, there are 2 signals
+  vector<TH1F*> isoSig(4, NULL);
+  if (!ma9GeV) isoSig.erase(isoSig.begin() + 2, isoSig.begin() + 4);
   THStack* isoBkg = NULL;
   TLegend legendBkgSep(0.35, 0.55, 0.75, 0.95);
   TLegend legendBkgMain5(0.35, 0.55, 0.75, 0.95);
@@ -1818,26 +1829,39 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
       (*iIsoSig)->GetYaxis()->SetRangeUser(0.01, 10000.0);
       for (int b = 5; b < (*iIsoSig)->GetNbinsX(); ++b)
 	{
-	  cout << "stat error on signal sample " << i << " = " << (*iIsoSig)->GetBinError(b) << endl;
+	  cout << "stat error on signal sample " << i << " = " << (*iIsoSig)->GetBinError(b);
+	  cout << endl;
 	}
     }
     legendBkgSep.AddEntry(isoSig[0], "Wh_{1}", "l");
-    if (gg) legendBkgSep.AddEntry(isoSig[1], "gg fusion", "l");
+    legendBkgSep.AddEntry(isoSig[1], "gg fusion", "l");
     legendBkgMain5.AddEntry(isoSig[0], "Wh_{1}", "l");
-    if (gg) legendBkgMain5.AddEntry(isoSig[1], "gg fusion", "l");
+    legendBkgMain5.AddEntry(isoSig[1], "gg fusion", "l");
     legendBkgAll.AddEntry(isoSig[0], "Wh_{1}", "l");
-    if (gg) legendBkgAll.AddEntry(isoSig[1], "gg fusion", "l");
+    legendBkgAll.AddEntry(isoSig[1], "gg fusion", "l");
     isoSig[0]->SetName((var + "Wh1Search").c_str());
-    if (gg) isoSig[1]->SetName((var + "ggSearch").c_str());
+    isoSig[1]->SetName((var + "ggSearch").c_str());
     setHistogramOptions(isoSig[0], kSpring - 1, 0.7, 20, isoSigBkgFile.second, unit.c_str(), "");
-    if (gg) {
-      setHistogramOptions(isoSig[1], kBlue, 0.7, 20, isoSigBkgFile.second, unit.c_str(), "");
-    }
+    setHistogramOptions(isoSig[1], kBlue, 0.7, 20, isoSigBkgFile.second, unit.c_str(), "");
     isoSig[0]->SetLineWidth(4);
     isoSig[0]->SetLineStyle(2);
-    if (gg) {
-      isoSig[1]->SetLineWidth(4);
-      isoSig[1]->SetLineStyle(2);
+    isoSig[1]->SetLineWidth(4);
+    isoSig[1]->SetLineStyle(2);
+    if (ma9GeV) {
+      legendBkgSep.AddEntry(isoSig[2], "ZH", "l");
+      legendBkgSep.AddEntry(isoSig[3], "VBF", "l");
+      legendBkgMain5.AddEntry(isoSig[2], "ZH", "l");
+      legendBkgMain5.AddEntry(isoSig[3], "VBF", "l");
+      legendBkgAll.AddEntry(isoSig[2], "ZH", "l");
+      legendBkgAll.AddEntry(isoSig[3], "VBF", "l");
+      isoSig[2]->SetName((var + "ZHSearch").c_str());
+      isoSig[3]->SetName((var + "VBFSearch").c_str());
+      setHistogramOptions(isoSig[2], kRed, 0.7, 20, isoSigBkgFile.second, unit.c_str(), "");
+      setHistogramOptions(isoSig[3], kMagenta, 0.7, 20, isoSigBkgFile.second, unit.c_str(), "");
+      isoSig[2]->SetLineWidth(4);
+      isoSig[2]->SetLineStyle(2);
+      isoSig[3]->SetLineWidth(4);
+      isoSig[3]->SetLineStyle(2);
     }
 
     /*get the MC + data-driven QCD background stack histogram and make some new stacks with 
@@ -2039,7 +2063,8 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
       }
     }
     B = sum;
-    cout << "Region A MC + data-driven QCD, m > 4: " << setprecision(3) << sum << " +/- " << setprecision(3) << sqrt(err) <<  endl;
+    cout << "Region A MC + data-driven QCD, m > 4: " << setprecision(3) << sum << " +/- ";
+    cout << setprecision(3) << sqrt(err) <<  endl;
     isoBkgMain5.SetMinimum(0.01);
     isoBkgMain5.SetMaximum(10000.0);
     isoBkgMain5.GetHistogram()->GetXaxis()->SetTitle(unit.c_str());
@@ -2051,15 +2076,18 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
     isoBkgAll.GetHistogram()->GetXaxis()->SetTitle(unit.c_str());
   }
   nonIsoData->Draw("HISTESAME");
-  Double_t statErr;
-  nonIsoData->IntegralAndError(5, -1, statErr);
-  cout << "Region B data, m > 4: " << setprecision(3) << nonIsoData->Integral(5, -1) << " +/- " << setprecision(3) << statErr << endl;
+  Double_t statErrNonIsoData;
+  nonIsoData->IntegralAndError(5, -1, statErrNonIsoData);
+  cout << "Region B data, m > 4: " << setprecision(3) << nonIsoData->Integral(5, -1) << " +/- ";
+  cout << setprecision(3) << statErrNonIsoData << endl;
   for (vector<TH1F*>::iterator iIsoSig = isoSig.begin(); iIsoSig != isoSig.end(); 
        ++iIsoSig) {
     (*iIsoSig)->Draw("HISTSAME");
+    Double_t statErrIsoSig;
+    Double_t S = (*iIsoSig)->IntegralAndError(5, -1, statErrIsoSig);
     cout << "Region A signal " << iIsoSig - isoSig.begin() << ", m > 4: ";
-    cout << setprecision(3) << (*iIsoSig)->Integral(5, -1);
-    cout << " (S/sqrt(S+B) = " << (*iIsoSig)->Integral(5, -1)/sqrt((*iIsoSig)->Integral(5, -1) + B) << ")" << endl;
+    cout << setprecision(3) << S << " +/- " << setprecision(3) << statErrIsoSig;
+    cout << " (S/sqrt(S+B) = " << S/sqrt(S + B) << ")" << endl;
   }
   isoData->Draw("ESAME");
   cout << "Region A data, m < 2: " << isoData->Integral(1, 2) << endl;
@@ -2089,7 +2117,7 @@ void makeFinalPlot(const pair<string, float>& isoMC, const string& isoDataFileNa
 		   const pair<string, float>& nonIsoData, const vector<string>& vars, 
 		   const vector<string>& units, const vector<int>& normRegionLowerBins, 
 		   const vector<int>& normRegionUpperBins, const string& outputFileName, 
-		   const string& option, const bool gg// , const vector<Color_t>& colors, 
+		   const string& option, const bool ma9GeV// , const vector<Color_t>& colors, 
 // 		   const vector<Style_t>& styles
 		   )
 {
@@ -2117,7 +2145,7 @@ void makeFinalPlot(const pair<string, float>& isoMC, const string& isoDataFileNa
       const unsigned int varIndex = iVar - vars.begin();
       addFinalPlot(isoSigBkgFile, isoDataFile, nonIsoDataFile, *iVar, units[varIndex], 
 		   normRegionLowerBins[varIndex], normRegionUpperBins[varIndex], option, 
-		   outStream, gg);
+		   outStream, ma9GeV);
     }
   }
   else {
