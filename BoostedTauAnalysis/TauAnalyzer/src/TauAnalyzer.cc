@@ -2744,8 +2744,11 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       muHad_Nchtrk_30_->Fill(Nchtrk_30, PUWeight);
 
       //plot hardest corrected jet eta
-      hardestCorrJetEta_->
-	Fill(oldJetRefsExcludingTau[oldJetRefsExcludingTau.size() - 1]->eta(), PUWeight);
+      double hardestCorrJetEta = -100.0;
+      if (oldJetRefsExcludingTau.size() > 0) {
+	hardestCorrJetEta = oldJetRefsExcludingTau[oldJetRefsExcludingTau.size() - 1]->eta();
+      }
+      hardestCorrJetEta_->Fill(hardestCorrJetEta, PUWeight);
 
       //plot mu+had mass vs. dR(tagged soft muon, tau axis)
       const double dRSoftMuTau = 
