@@ -830,7 +830,11 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 			    pHist->GetYaxis()->GetTitle());
 	if (string(pHist->GetName()) == "muHadMass"/*"tauHadIso"*/) {
 	  cout << "Processing file " << *iInputFile << endl;
-	  cout << "m > 4 GeV: " << pHist->Integral(5, -1) << endl;
+	  cout << "m > 4 GeV: " << pHist->Integral(5, -1) << " +/- " << pHist->GetBinError(5) << endl;
+	  double error2 = sqrt((pHist->GetBinError(1)*pHist->GetBinError(1)) + (pHist->GetBinError(2)*pHist->GetBinError(2)));
+	  cout << "m < 2 GeV: " << pHist->Integral(1,2) << " +/- " << error2 << endl;
+	  double errorRatio = sqrt((error2*error2/(pHist->Integral(1,2)*pHist->Integral(1,2))) + (pHist->GetBinError(5)*pHist->GetBinError(5)/(pHist->Integral(5, -1)*pHist->Integral(5, -1))));
+	  cout << "(m<2)/(m>4): " << pHist->Integral(1,2)/pHist->Integral(5, -1) << " +/- " << errorRatio*pHist->Integral(1,2)/pHist->Integral(5, -1) << endl;
 	}
 	string histName(pHist->GetName());
 	if (histName == "jet_pt_etacut") pHist->GetXaxis()->SetTitle("p_{T} (GeV)");
@@ -1363,13 +1367,33 @@ void addClosurePlot(TFile& sigVsBkgIsoStream, const string& var, const string& u
     cerr << sigVsBkgIsoStream.GetName() << ".\n";
     return;
   }
+  double sum2 = 0.;
+  double err2 = 0.;
+  double sum4 = 0.;
+  double err4 = 0.;
   TH1F* histBkgIso = NULL;
+  bool isItMass = false;
   if (stackedHistsIso != NULL) {
     for (Int_t i = 0; i < stackedHistsIso->GetEntries(); ++i) {
       TH1F* stackHist = (TH1F*)stackedHistsIso->At(i)->Clone();
+      if (canvasName.find("muHadMassCanvas") != string::npos)
+	{
+	  isItMass = true;
+	  cout << "MC closure routine: looking at muHadMass" << endl;
+	  sum2 += stackHist->Integral(1,2);
+	  sum4 += stackHist->Integral(5,-1);
+	  err2 += (stackHist->GetBinError(1)*stackHist->GetBinError(1)) + (stackHist->GetBinError(2)*stackHist->GetBinError(2));
+	  err4 += (stackHist->GetBinError(5)*stackHist->GetBinError(5));
+	}
       if (i == 0) histBkgIso = stackHist;
       else histBkgIso->Add(stackHist);
     }
+    if (isItMass)
+      {
+	cout << "Total MC in Region A (m < 2): " << sum2 << " +/- " << sqrt(err2) << endl;
+	cout << "Total MC in Region A (m > 4): " << sum4 << " +/- " << sqrt(err4) << endl;
+	cout << "Total MC in Region A (m<2)/(m>4): " << sum2/sum4 << " +/- " << sqrt((err2/(sum2*sum2)) + (err4/(sum4*sum4))) << endl;
+      }
     setHistogramOptions(histBkgIso, kBlue, 0.7, 21, 1.0, unit.c_str(), "");
     histBkgIso->GetYaxis()->SetRangeUser(0.1, 10000.0);
   }
@@ -1400,12 +1424,32 @@ void addClosurePlot(TFile& sigVsBkgIsoStream, const string& var, const string& u
     return;
   }
   TH1F* histBkgNonIso = NULL;
+  double sum2B = 0.;
+  double err2B = 0.;
+  double sum4B = 0.;
+  double err4B = 0.;
+  bool isItMassB = false;
   if (stackedHistsNonIso != NULL) {
     for (Int_t i = 0; i < stackedHistsNonIso->GetEntries(); ++i) {
       TH1F* stackHist = (TH1F*)stackedHistsNonIso->At(i)->Clone();
+      if (canvasName.find("muHadMassCanvas") != string::npos)
+	{
+	  isItMassB = true;
+	  cout << "MC closure routine: looking at muHadMass" << endl;
+	  sum2B += stackHist->Integral(1,2);
+	  sum4B += stackHist->Integral(5,-1);
+	  err2B += (stackHist->GetBinError(1)*stackHist->GetBinError(1)) + (stackHist->GetBinError(2)*stackHist->GetBinError(2));
+	  err4B += (stackHist->GetBinError(5)*stackHist->GetBinError(5));
+	}
       if (i == 0) histBkgNonIso = stackHist;
       else histBkgNonIso->Add(stackHist);
     }
+    if (isItMassB)
+      {
+	cout << "Total MC in Region B (m < 2): " << sum2B << " +/- " << sqrt(err2B) << endl;
+	cout << "Total MC in Region B (m > 4): " << sum4B << " +/- " << sqrt(err4B) << endl;
+	cout << "Total MC in Region B (m<2)/(m>4): " << sum2B/sum4B << " +/- " << sqrt((err2B/(sum2B*sum2B)) + (err4B/(sum4B*sum4B))) << endl;
+      }
     histBkgNonIso->Scale(nonIsoScale);
   }
   else {
@@ -1764,41 +1808,55 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
       stackHist->Scale(isoSigBkgFile.second);
       stackHist->GetYaxis()->SetRangeUser(0.01, 10000.0);
       isoBkgSep.Add(stackHist, "HIST");
-      cout << "stat error on bkg sample " << i << " = " << stackHist->GetBinError(1) << endl;
       if (i == 0) {
 	isoBkgAllHist = (TH1F*)isoBkgHists->At(i)->Clone();
 	isoBkgAllHist->Scale(isoSigBkgFile.second);
 	isoBkgDibosonHist = (TH1F*)isoBkgHists->At(i)->Clone();
 	isoBkgDibosonHist->Scale(isoSigBkgFile.second);
 	legendBkgSep.AddEntry(stackHist, "WW (MC)", "f");
+	cout << "prediction from WW: " << stackHist->GetBinContent(5) << " +/- " << stackHist->GetBinError(5) << endl;
+
       }
       else isoBkgAllHist->Add(stackHist);
-      if (i == 1) legendBkgSep.AddEntry(stackHist, "ZZ (MC)", "f");
-      if (i == 2) legendBkgSep.AddEntry(stackHist, "WZ (MC)", "f");
+      if (i == 1)
+	{
+	  legendBkgSep.AddEntry(stackHist, "ZZ (MC)", "f");
+	  cout << "prediction from ZZ: " << stackHist->GetBinContent(5) << " +/- " << stackHist->GetBinError(5) << endl;
+	}
+      if (i == 2)
+	{
+	  legendBkgSep.AddEntry(stackHist, "WZ (MC)", "f");
+	  cout << "prediction from WZ: " << stackHist->GetBinContent(5) << " +/- " << stackHist->GetBinError(5) << endl;
+	}
       if ((i == 1) || (i == 2)) isoBkgDibosonHist->Add(stackHist);
       if (i == 3) {
 	isoBkgWNJetsHist = (TH1F*)isoBkgHists->At(i)->Clone();
 	isoBkgWNJetsHist->Scale(isoSigBkgFile.second);
 	legendBkgSep.AddEntry(stackHist, "W + #geq1 jet (MC)", "f");
+	cout << "prediction from WNJets: " << stackHist->GetBinContent(5) << " +/- " << stackHist->GetBinError(5) << endl;
       }
       if (i == 4) {
 	isoBkgTopHist = (TH1F*)isoBkgHists->At(i)->Clone();
 	isoBkgTopHist->Scale(isoSigBkgFile.second);
 	legendBkgSep.AddEntry(stackHist, "t/#bar{t} (MC)", "f");
+	cout << "prediction from t/tbar: " << stackHist->GetBinContent(5) << " +/- " << stackHist->GetBinError(5) << endl;
       }
       if (i == 5) {
 	isoBkgTopHist->Add(stackHist);
 	legendBkgSep.AddEntry(stackHist, "t#bar{t} + jets (MC)", "f");
+	cout << "prediction from TTJets: " << stackHist->GetBinContent(5) << " +/- " << stackHist->GetBinError(5) << endl;
       }
       if (i == 6) {
 	isoBkgDrellYanHist = (TH1F*)isoBkgHists->At(i)->Clone();
 	isoBkgDrellYanHist->Scale(isoSigBkgFile.second);
 	legendBkgSep.AddEntry(stackHist, "Drell-Yan + jets (MC)", "f");
+	cout << "prediction from DY: " << stackHist->GetBinContent(5) << " +/- " << stackHist->GetBinError(5) << endl;
       }
       if (i == 7) {
 	isoBkgQCDHist = (TH1F*)isoBkgHists->At(i)->Clone();
 	isoBkgQCDHist->Scale(isoSigBkgFile.second);
 	legendBkgSep.AddEntry(stackHist, "QCD (data)", "f");
+	cout << "prediction from QCD (data): " << stackHist->GetBinContent(5) << " +/- " << stackHist->GetBinError(5) << endl;
       }
     }
     cout << "stat error on total MC histogram = " << isoBkgAllHist->GetBinError(1) << endl;
@@ -1924,15 +1982,25 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
     isoBkgMain5.Draw();
     Float_t sum = 0.0;
     Float_t err = 0.0;
+    //Float_t sum2 = 0.0;
+    //Float_t err2 = 0.0;
     for (Int_t iHist = 0; iHist < isoBkgMain5.GetHists()->GetEntries(); ++iHist) {
       TH1F* hist = (TH1F*)isoBkgMain5.GetHists()->At(iHist);
+      //for (Int_t iBin = 1; iBin <= 2; ++iBin) {
+	//sum2+=hist->GetBinContent(iBin);
+	//err2+=(hist->GetBinError(iBin)*hist->GetBinError(iBin));
+      //}
       for (Int_t iBin = 5; iBin <= (hist->GetNbinsX() + 1); ++iBin) {
 	sum+=hist->GetBinContent(iBin);
 	err+=(hist->GetBinError(iBin)*hist->GetBinError(iBin));
       }
     }
     B = sum;
+    
     cout << "Region A MC + data-driven QCD, m > 4: " << setprecision(3) << sum << " +/- " << setprecision(3) << sqrt(err) <<  endl;
+    //cout << "Region A MC + data-driven QCD, m <2: " << setprecision(3) << sum2 << " +/- " << setprecision(3) << sqrt(err2) <<  endl;
+    //cout << "Region A MC + data-driven QCD, (m<2)/(m>4): " << setprecision(3) << sum2/sum << " +/- " << setprecision(3) << sqrt((err/(sum*sum)) + (err2/(sum2*sum2))) <<  endl;
+
     isoBkgMain5.SetMinimum(0.01);
     isoBkgMain5.SetMaximum(10000.0);
     isoBkgMain5.GetHistogram()->GetXaxis()->SetTitle(unit.c_str());
@@ -1966,6 +2034,7 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
   nonIsoDataMinusIsoBkgAll->GetYaxis()->SetTitle("#frac{Data (B) - MC (A)}{Data (B)}");
   nonIsoDataMinusIsoBkgAll->GetYaxis()->SetRangeUser(-1.0, 1.0);
   nonIsoDataMinusIsoBkgAll->Draw();
+  cout << "percent deviation in final bin: " << nonIsoDataMinusIsoBkgAll->GetBinContent(5) << " +/- " << nonIsoDataMinusIsoBkgAll->GetBinError(5) << endl;
   TH1F* nonIsoDataMinusIsoData = (TH1F*)nonIsoData->Clone();
   nonIsoDataMinusIsoData->Add(isoData, -1.0);
   nonIsoDataMinusIsoData->Divide(nonIsoData);

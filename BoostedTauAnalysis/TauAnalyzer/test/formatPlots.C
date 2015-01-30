@@ -431,18 +431,30 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   const bool sigBkg = false;
 
   //best available weights according to Dropbox spreadsheet
-  const float Wh1a5Weight19p7InvFb = 0.00558166666666667;
-  const float Wh1a7Weight19p7InvFb = 0.00545988813757409;
-  const float Wh1a9Weight19p7InvFb = 0.00591;
-  const float Wh1a11Weight19p7InvFb = 0.0000913508064516129;
-  const float Wh1a13Weight19p7InvFb = 0.0000570729270729271;
-  const float Wh1a15Weight19p7InvFb = 0.0000493486973947896;
-  const float gga5Weight19p7InvFb = 0.0552668358395599;
-  const float gga7Weight19p7InvFb = 0.0542857677477334;
-  const float gga9Weight19p7InvFb = 0.0584748299845453;
-  const float gga11Weight19p7InvFb = 0.000907280100622663;
-  const float gga13Weight19p7InvFb = 0.000567340969680438;
-  const float gga15Weight19p7InvFb = 0.00048980947568; //ggH
+  //const float Wh1a5Weight19p7InvFb = 0.00558166666666667; // Pythia xsec
+  const float Wh1a5Weight19p7InvFb = 0.04626873333; // SM xsec
+  //const float Wh1a7Weight19p7InvFb = 0.00545988813757409; // Pythia xsec
+  const float Wh1a7Weight19p7InvFb = 0.04634984556; // SM xsec
+  //const float Wh1a9Weight19p7InvFb = 0.00591; // Pythia xsec
+  const float Wh1a9Weight19p7InvFb = 0.04626873333; // SM xsec
+  //const float Wh1a11Weight19p7InvFb = 0.0000913508064516129; // Pythia xsec
+  const float Wh1a11Weight19p7InvFb = 0.04664186827; // SM xsec
+  //const float Wh1a13Weight19p7InvFb = 0.0000570729270729271; // Pythia xsec
+  const float Wh1a13Weight19p7InvFb = 0.04622251082; // SM xsec
+  //const float Wh1a15Weight19p7InvFb = 0.0000493486973947896; // Pythia xsec
+  const float Wh1a15Weight19p7InvFb = 0.04636145624; // SM xsec
+  //const float gga5Weight19p7InvFb = 0.0552668358395599; // Pythia xsec
+  const float gga5Weight19p7InvFb = 0.14925861038; // SM xsec
+  //const float gga7Weight19p7InvFb = 0.0542857677477334; // Pythia xsec
+  const float gga7Weight19p7InvFb = 0.15014179743; // SM xsec
+  //const float gga9Weight19p7InvFb = 0.0584748299845453; // Pythia xsec
+  const float gga9Weight19p7InvFb = 0.14914894205; // SM xsec
+  //const float gga11Weight19p7InvFb = 0.000907280100622663; // Pythia xsec
+  const float gga11Weight19p7InvFb = 0.15092320455; // SM xsec
+  //const float gga13Weight19p7InvFb = 0.000567340969680438; // Pythia xsec
+  const float gga13Weight19p7InvFb = 0.14969890127; // SM xsec
+  //const float gga15Weight19p7InvFb = 0.00048980947568; // Pythia xsec
+  const float gga15Weight19p7InvFb = 0.14992002225; // SM xsec
   float Wh1Weight19p7InvFb = 1.0;
   float ggWeight19p7InvFb = 1.0;
   if (a1Mass == "_a5") {
@@ -714,7 +726,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
     
   //hadd non-isolated W Drell-Yan samples
 
-  cout << "...non-isolated W Drell-Yan" << endl;
+  /*  cout << "...non-isolated W Drell-Yan" << endl;
   string NonIsoWDYJetsToLLSuffix(NonIsoWDYJetsToLLVTag + fileExt);
   string NonIsoWDYJetsToLLIsoPrefix(analysisFilePath + "nonIsoWDYJetsToLL/analysis/muHadIsoAnalysis" + MTBin +
 				    "_NonIsoWDYJetsToLL");
@@ -867,7 +879,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 		   graphNames2D, nullBlindLow, nullBlindHigh);
     }
   }
-  
+  */
 
   //hadd single photon data samples
   /*  cout << "...single photon data\n";
@@ -1676,16 +1688,16 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   dataVsMCReweightInputFiles.push_back(WZNonIsoReweightHaddOutputFile);
   dataVsMCReweightInputFiles.push_back(ZZNonIsoReweightHaddOutputFile);
   dataVsMCReweightInputFiles.push_back(WWNonIsoReweightHaddOutputFile);
-  vector<string> dataVsMCInputFilesRegionC;
-  dataVsMCInputFilesRegionC.push_back(nonIsoWDataIsoHaddOutputFile);
-  dataVsMCInputFilesRegionC.push_back(NonIsoWDYJetsToLLIsoHaddOutputFile);
-  dataVsMCInputFilesRegionC.push_back(NonIsoWTTJetsIsoHaddOutputFile);
-  dataVsMCInputFilesRegionC.push_back(NonIsoWWNJetsToLNuIsoHaddOutputFile);
-  vector<string> dataVsMCInputFilesRegionD;
-  dataVsMCInputFilesRegionD.push_back(nonIsoWDataNonIsoHaddOutputFile);
-  dataVsMCInputFilesRegionD.push_back(NonIsoWDYJetsToLLNonIsoHaddOutputFile);
-  dataVsMCInputFilesRegionD.push_back(NonIsoWTTJetsNonIsoHaddOutputFile);
-  dataVsMCInputFilesRegionD.push_back(NonIsoWWNJetsToLNuNonIsoHaddOutputFile);
+  //  vector<string> dataVsMCInputFilesRegionC;
+  //  dataVsMCInputFilesRegionC.push_back(nonIsoWDataIsoHaddOutputFile);
+  //  dataVsMCInputFilesRegionC.push_back(NonIsoWDYJetsToLLIsoHaddOutputFile);
+  //  dataVsMCInputFilesRegionC.push_back(NonIsoWTTJetsIsoHaddOutputFile);
+  //  dataVsMCInputFilesRegionC.push_back(NonIsoWWNJetsToLNuIsoHaddOutputFile);
+  //  vector<string> dataVsMCInputFilesRegionD;
+  // dataVsMCInputFilesRegionD.push_back(nonIsoWDataNonIsoHaddOutputFile);
+  //  dataVsMCInputFilesRegionD.push_back(NonIsoWDYJetsToLLNonIsoHaddOutputFile);
+  //  dataVsMCInputFilesRegionD.push_back(NonIsoWTTJetsNonIsoHaddOutputFile);
+  //  dataVsMCInputFilesRegionD.push_back(NonIsoWWNJetsToLNuNonIsoHaddOutputFile);
   std::reverse(dataVsMCReweightInputFiles.begin() + 1, dataVsMCReweightInputFiles.end());
   if (uncTag == "") {
     cout << "\nPlot data vs. MC normalized to data luminosity\n---\n";
@@ -1703,7 +1715,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
     drawDifferenceGraphsOn1Canvas(dataVsMCOutputDiff, dataVsMCInputFiles, 
 				  canvasNames1D, graphNames1D, legendHeaders19p7InvFb, colors, 
 				  styles, legendEntriesMCData, weightsMCData, setLogY, sigBkg);
-    if (MTBin == "_highMT")
+    /*if (MTBin == "_highMT")
       { // high-MT bkg subtraction in Regions C and D
 	drawDifferenceGraphsOn1Canvas(dataVsMCRegionCOutputDiff, dataVsMCInputFilesRegionC, 
 				      canvasNames1D, graphNames1D, legendHeaders19p7InvFb, colors, 
@@ -1712,9 +1724,10 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 				      canvasNames1D, graphNames1D, legendHeaders19p7InvFb, colors, 
 				      styles, legendEntriesNonIsoWMCData, weightsNonIsoWMCData, setLogY, sigBkg);
       } // high-MT bkg subtraction in Regions C and D
-    
+    */
   }
-    
+
+  /*    
   //draw data Vs MC in Region C
   cout <<"\nPlot data vs MC in Region C, normalized to data luminosity\n---\n";
   string nonIsoWDataVsMC_RegionCOutputFile(analysisFilePath + "results/nonIsoW_dataVsMC_muHadIsoAnalysis" + MTBin + 
@@ -1746,7 +1759,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 					  colors, styles, legendEntriesNonIsoWMCData, 
 					  weightsNonIsoWMCData, setLogY, drawStack, dataMC);
   }
-   
+*/   
 
   //compute data-driven QCD estimate in signal (i.e. isolated W muon + isolated tau) region
   string outputFileNameA(analysisFilePath + "results/dataVsMC_RegionAQCDEstimate" + MTBin + dataVTag + fileExt);
@@ -2231,7 +2244,7 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   		pair<string, float>(dataVsMCOutputFile, 1.0), 
   		vector<string>(1, "muHadMass"), vector<string>(1, "m_{#mu+had} (GeV)"), 
   		vector<int>(1, 1), vector<int>(1, 2), 
-  		analysisFilePath + "results/final" + MTBin + uncTag + outputVTag + fileExt, 
+  		analysisFilePath + "results/final" + a1Mass + MTBin + uncTag + outputVTag + fileExt, 
 		"main 5", true/*false*/); //ggH
 
 //   //print the hadronic tau pT weights and their statistical errors
