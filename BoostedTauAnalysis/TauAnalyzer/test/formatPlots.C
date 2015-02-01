@@ -443,18 +443,31 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   const bool sigBkg = false;
 
   //best available weights according to Dropbox spreadsheet
-  const float Wh1a5Weight19p7InvFb = 0.00558166666666667;
-  const float Wh1a7Weight19p7InvFb = 0.00545988813757409;
-  const float Wh1a9Weight19p7InvFb = 0.01507435; //SM WH cross section + 100% BR(H-->aa-->4tau)
-  const float Wh1a11Weight19p7InvFb = 0.0000913508064516129;
-  const float Wh1a13Weight19p7InvFb = 0.0000570729270729271;
-  const float Wh1a15Weight19p7InvFb = 0.0000493486973947896;
-  const float gga5Weight19p7InvFb = 0.0569761194222267;
-  const float gga7Weight19p7InvFb = 0.0559647090182818;
-  const float gga9Weight19p7InvFb = 0.1537618; //SM ggH cross section + 100% BR(H-->aa-->4tau)
-  const float gga11Weight19p7InvFb = 0.000935340309920271;
-  const float gga13Weight19p7InvFb = 0.000584887597608699;
-  const float gga15Weight19p7InvFb = 0.00050495822235356;
+  //const float Wh1a5Weight19p7InvFb = 0.00558166666666667; // Pythia xsec
+  const float Wh1a5Weight19p7InvFb = 0.01507435331999; // SM xsec
+  //const float Wh1a7Weight19p7InvFb = 0.00545988813757409; // Pythia xsec
+  const float Wh1a7Weight19p7InvFb = 0.01510077968443; // SM xsec
+  //const float Wh1a9Weight19p7InvFb = 0.00591; // Pythia xsec
+  const float Wh1a9Weight19p7InvFb = 0.01507435332; // SM xsec //oldvalue 0.04626873333
+  //const float Wh1a11Weight19p7InvFb = 0.0000913508064516129; // Pythia xsec
+  const float Wh1a11Weight19p7InvFb = 0.01519592068411; // SM xsec
+  //const float Wh1a13Weight19p7InvFb = 0.0000570729270729271; // Pythia xsec
+  const float Wh1a13Weight19p7InvFb = 0.01505930553923; // SM xsec
+  //const float Wh1a15Weight19p7InvFb = 0.0000493486973947896; // Pythia xsec
+  const float Wh1a15Weight19p7InvFb = 0.01510456244299; // SM xsec
+  //const float gga5Weight19p7InvFb = 0.0552668358395599; // Pythia xsec
+  const float gga5Weight19p7InvFb = 0.14925861038; // SM xsec
+  //const float gga7Weight19p7InvFb = 0.0542857677477334; // Pythia xsec
+  const float gga7Weight19p7InvFb = 0.15014179743; // SM xsec
+  //const float gga9Weight19p7InvFb = 0.0584748299845453; // Pythia xsec
+  const float gga9Weight19p7InvFb = 0.14914894205; // SM xsec
+  //const float gga11Weight19p7InvFb = 0.000907280100622663; // Pythia xsec
+  const float gga11Weight19p7InvFb = 0.15092320455; // SM xsec
+  //const float gga13Weight19p7InvFb = 0.000567340969680438; // Pythia xsec
+  const float gga13Weight19p7InvFb = 0.14969890127; // SM xsec
+  //const float gga15Weight19p7InvFb = 0.00048980947568; // Pythia xsec
+  const float gga15Weight19p7InvFb = 0.14992002225; // SM xsec
+
   const float ZHa9Weight19p7InvFb = 0.00277590622762097; /*SM ggH cross section + 100% 
 							   BR(H-->aa-->4tau)*/
   const float VBFa9Weight19p7InvFb = 0.0132638419622011; /*SM ggH cross section + 100% 
@@ -742,66 +755,62 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
     }
   }
     
-//   //hadd non-isolated W Drell-Yan samples
+  //hadd non-isolated W Drell-Yan samples
 
-//   cout << "...non-isolated W Drell-Yan" << endl;
-//   string NonIsoWDYJetsToLLSuffix(NonIsoWDYJetsToLLVTag + fileExt);
-//   string NonIsoWDYJetsToLLIsoPrefix(analysisFilePath + 
-// 				    "nonIsoWDYJetsToLL/analysis/muHadIsoAnalysis" + MTBin +
-// 				    "_NonIsoWDYJetsToLL");
-//   string NonIsoWDYJetsToLLIsoHaddOutputFile(NonIsoWDYJetsToLLIsoPrefix + NonIsoWDYJetsToLLSuffix);
-//   string NonIsoWDYJetsToLLNonIsoPrefix(analysisFilePath + 
-// 				       "nonIsoWDYJetsToLL/analysis/muHadNonIsoAnalysis" + MTBin + 
-// 				       "_NonIsoWDYJetsToLL");
-//   string NonIsoWDYJetsToLLNonIsoHaddOutputFile(NonIsoWDYJetsToLLNonIsoPrefix + 
-// 					       NonIsoWDYJetsToLLSuffix);
-//   string NonIsoWDYJetsToLLNonIsoReweightPrefix(analysisFilePath + "nonIsoWDYJetsToLL/analysis/muHadNonIsoReweightAnalysis_NonIsoWDYJetsToLL");
-//   string NonIsoWDYJetsToLLNonIsoReweightHaddOutputFile(NonIsoWDYJetsToLLNonIsoReweightPrefix + 
-// 						       NonIsoWDYJetsToLLSuffix);
-//   string NonIsoWDYJetsToLLAllPrefix(analysisFilePath + 
-// 				    "nonIsoWDYJetsToLL/analysis/muHadAnalysis" + MTBin + 
-// 				    "_NonIsoWDYJetsToLL");
-//   string NonIsoWDYJetsToLLAllHaddOutputFile(NonIsoWDYJetsToLLAllPrefix + NonIsoWDYJetsToLLSuffix);
-//   vector<string> NonIsoWDYJetsToLLIsoHaddInputFiles;
-//   vector<string> NonIsoWDYJetsToLLNonIsoHaddInputFiles;
-//   vector<string> NonIsoWDYJetsToLLNonIsoReweightHaddInputFiles;
-//   vector<string> NonIsoWDYJetsToLLAllHaddInputFiles;
-//   vector<string> massBins2;
-//   massBins2.push_back("_M-10To50");
-//   massBins2.push_back("_M-50");
-//   for (vector<string>::const_iterator iMassBin = massBins2.begin(); iMassBin != massBins2.end(); 
-//        ++iMassBin) {
-//     stringstream NonIsoWDYJetsToLLIsoName;
-//     NonIsoWDYJetsToLLIsoName << NonIsoWDYJetsToLLIsoPrefix << *iMassBin << NonIsoWDYJetsToLLSuffix;
-//     NonIsoWDYJetsToLLIsoHaddInputFiles.push_back(NonIsoWDYJetsToLLIsoName.str());
-//     stringstream NonIsoWDYJetsToLLNonIsoName;
-//     NonIsoWDYJetsToLLNonIsoName << NonIsoWDYJetsToLLNonIsoPrefix << *iMassBin;
-//     NonIsoWDYJetsToLLNonIsoName << NonIsoWDYJetsToLLSuffix;
-//     NonIsoWDYJetsToLLNonIsoHaddInputFiles.push_back(NonIsoWDYJetsToLLNonIsoName.str());
-//     stringstream NonIsoWDYJetsToLLNonIsoReweightName;
-//     NonIsoWDYJetsToLLNonIsoReweightName << NonIsoWDYJetsToLLNonIsoReweightPrefix << *iMassBin;
-//     NonIsoWDYJetsToLLNonIsoReweightName << NonIsoWDYJetsToLLSuffix;
-//     //NonIsoWDYJetsToLLNonIsoReweightHaddInputFiles.push_back(NonIsoWDYJetsToLLNonIsoReweightName.str());
-//     stringstream NonIsoWDYJetsToLLAllName;
-//     NonIsoWDYJetsToLLAllName << NonIsoWDYJetsToLLAllPrefix << *iMassBin << NonIsoWDYJetsToLLSuffix;
-//     NonIsoWDYJetsToLLAllHaddInputFiles.push_back(NonIsoWDYJetsToLLAllName.str());
-//   }
-//   if (uncTag == "") {
-//     haddCanvases(NonIsoWDYJetsToLLIsoHaddOutputFile, NonIsoWDYJetsToLLIsoHaddInputFiles, 
-// 		 NonIsoWDYJetsToLLRelXSecWeights, canvasNames1D, graphNames1D, canvasNames2D, 
-// 		 graphNames2D, nullBlindLow, nullBlindHigh);
-//     haddCanvases(NonIsoWDYJetsToLLNonIsoHaddOutputFile, NonIsoWDYJetsToLLNonIsoHaddInputFiles, 
-// 		 NonIsoWDYJetsToLLRelXSecWeights, canvasNames1D, graphNames1D, canvasNames2D, 
-// 		 graphNames2D, nullBlindLow, nullBlindHigh);
-// //     haddCanvases(NonIsoWDYJetsToLLNonIsoReweightHaddOutputFile, NonIsoWDYJetsToLLNonIsoReweightHaddInputFiles, 
-// // 		 NonIsoWDYJetsToLLRelXSecWeights, canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, 
-// // 		 nullBlindLow, nullBlindHigh);
-//     if (doNoHPSIsoCut) {
-//       haddCanvases(NonIsoWDYJetsToLLAllHaddOutputFile, NonIsoWDYJetsToLLAllHaddInputFiles, 
-// 		   NonIsoWDYJetsToLLRelXSecWeights, canvasNames1D, graphNames1D, canvasNames2D, 
-// 		   graphNames2D, nullBlindLow, nullBlindHigh);
-//     }
-//   }
+  /*  cout << "...non-isolated W Drell-Yan" << endl;
+  string NonIsoWDYJetsToLLSuffix(NonIsoWDYJetsToLLVTag + fileExt);
+  string NonIsoWDYJetsToLLIsoPrefix(analysisFilePath + "nonIsoWDYJetsToLL/analysis/muHadIsoAnalysis" + MTBin +
+				    "_NonIsoWDYJetsToLL");
+  string NonIsoWDYJetsToLLIsoHaddOutputFile(NonIsoWDYJetsToLLIsoPrefix + NonIsoWDYJetsToLLSuffix);
+  string NonIsoWDYJetsToLLNonIsoPrefix(analysisFilePath + 
+				       "nonIsoWDYJetsToLL/analysis/muHadNonIsoAnalysis" + MTBin + "_NonIsoWDYJetsToLL");
+  string NonIsoWDYJetsToLLNonIsoHaddOutputFile(NonIsoWDYJetsToLLNonIsoPrefix + NonIsoWDYJetsToLLSuffix);
+  string 
+    NonIsoWDYJetsToLLNonIsoReweightPrefix(analysisFilePath + 
+					  "nonIsoWDYJetsToLL/analysis/muHadNonIsoReweightAnalysis_NonIsoWDYJetsToLL");
+  string NonIsoWDYJetsToLLNonIsoReweightHaddOutputFile(NonIsoWDYJetsToLLNonIsoReweightPrefix + NonIsoWDYJetsToLLSuffix);
+  string NonIsoWDYJetsToLLAllPrefix(analysisFilePath + "nonIsoWDYJetsToLL/analysis/muHadAnalysis" + MTBin + 
+				    "_NonIsoWDYJetsToLL");
+  string NonIsoWDYJetsToLLAllHaddOutputFile(NonIsoWDYJetsToLLAllPrefix + NonIsoWDYJetsToLLSuffix);
+  vector<string> NonIsoWDYJetsToLLIsoHaddInputFiles;
+  vector<string> NonIsoWDYJetsToLLNonIsoHaddInputFiles;
+  vector<string> NonIsoWDYJetsToLLNonIsoReweightHaddInputFiles;
+  vector<string> NonIsoWDYJetsToLLAllHaddInputFiles;
+  vector<string> massBins2;
+  massBins2.push_back("_M-10To50");
+  massBins2.push_back("_M-50");
+  for (vector<string>::const_iterator iMassBin = massBins2.begin(); iMassBin != massBins2.end(); 
+       ++iMassBin) {
+    stringstream NonIsoWDYJetsToLLIsoName;
+    NonIsoWDYJetsToLLIsoName << NonIsoWDYJetsToLLIsoPrefix << *iMassBin << NonIsoWDYJetsToLLSuffix;
+    NonIsoWDYJetsToLLIsoHaddInputFiles.push_back(NonIsoWDYJetsToLLIsoName.str());
+    stringstream NonIsoWDYJetsToLLNonIsoName;
+    NonIsoWDYJetsToLLNonIsoName << NonIsoWDYJetsToLLNonIsoPrefix << *iMassBin << NonIsoWDYJetsToLLSuffix;
+    NonIsoWDYJetsToLLNonIsoHaddInputFiles.push_back(NonIsoWDYJetsToLLNonIsoName.str());
+    stringstream NonIsoWDYJetsToLLNonIsoReweightName;
+    NonIsoWDYJetsToLLNonIsoReweightName << NonIsoWDYJetsToLLNonIsoReweightPrefix << *iMassBin;
+    NonIsoWDYJetsToLLNonIsoReweightName << NonIsoWDYJetsToLLSuffix;
+    //NonIsoWDYJetsToLLNonIsoReweightHaddInputFiles.push_back(NonIsoWDYJetsToLLNonIsoReweightName.str());
+    stringstream NonIsoWDYJetsToLLAllName;
+    NonIsoWDYJetsToLLAllName << NonIsoWDYJetsToLLAllPrefix << *iMassBin << NonIsoWDYJetsToLLSuffix;
+    NonIsoWDYJetsToLLAllHaddInputFiles.push_back(NonIsoWDYJetsToLLAllName.str());
+  }
+  if (uncTag == "") {
+    haddCanvases(NonIsoWDYJetsToLLIsoHaddOutputFile, NonIsoWDYJetsToLLIsoHaddInputFiles, 
+		 NonIsoWDYJetsToLLRelXSecWeights, canvasNames1D, graphNames1D, canvasNames2D, 
+		 graphNames2D, nullBlindLow, nullBlindHigh);
+    haddCanvases(NonIsoWDYJetsToLLNonIsoHaddOutputFile, NonIsoWDYJetsToLLNonIsoHaddInputFiles, 
+		 NonIsoWDYJetsToLLRelXSecWeights, canvasNames1D, graphNames1D, canvasNames2D, 
+		 graphNames2D, nullBlindLow, nullBlindHigh);
+//     haddCanvases(NonIsoWDYJetsToLLNonIsoReweightHaddOutputFile, NonIsoWDYJetsToLLNonIsoReweightHaddInputFiles, 
+// 		 NonIsoWDYJetsToLLRelXSecWeights, canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, 
+// 		 nullBlindLow, nullBlindHigh);
+    if (doNoHPSIsoCut) {
+      haddCanvases(NonIsoWDYJetsToLLAllHaddOutputFile, NonIsoWDYJetsToLLAllHaddInputFiles, 
+		   NonIsoWDYJetsToLLRelXSecWeights, canvasNames1D, graphNames1D, canvasNames2D, 
+		   graphNames2D, nullBlindLow, nullBlindHigh);
+    }
+  }
 
 //   //"hadd" non-isolated W ttbar sample just to get the formatting of the 2D plots the same
 //   cout << "...non-isolated W ttbar\n";
@@ -900,18 +909,13 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
 //     haddCanvases(NonIsoWWNJetsToLNuIsoHaddOutputFile, NonIsoWWNJetsToLNuIsoHaddInputFiles, 
 // 		 NonIsoWWNJetsToLNuRelXSecWeights, canvasNames1D, graphNames1D, canvasNames2D, 
 // 		 graphNames2D, nullBlindLow, nullBlindHigh);
-//     haddCanvases(NonIsoWWNJetsToLNuNonIsoHaddOutputFile, NonIsoWWNJetsToLNuNonIsoHaddInputFiles, 
-// 		 NonIsoWWNJetsToLNuRelXSecWeights, canvasNames1D, graphNames1D, canvasNames2D, 
-// 		 graphNames2D, nullBlindLow, nullBlindHigh);
-// //     haddCanvases(NonIsoWWNJetsToLNuNonIsoReweightHaddOutputFile, NonIsoWWNJetsToLNuNonIsoReweightHaddInputFiles, 
-// // 		 NonIsoWWNJetsToLNuRelXSecWeights, canvasNames1D, graphNames1D, canvasNames2D, 
-// // 		 graphNames2D, nullBlindLow, nullBlindHigh);
-//     if (doNoHPSIsoCut) {
-//       haddCanvases(NonIsoWWNJetsToLNuAllTauHaddOutputFile, NonIsoWWNJetsToLNuAllTauHaddInputFiles, 
-// 		   NonIsoWWNJetsToLNuRelXSecWeights, canvasNames1D, graphNames1D, canvasNames2D, 
-// 		   graphNames2D, nullBlindLow, nullBlindHigh);
-//     }
-//   }
+    if (doNoHPSIsoCut) {
+      haddCanvases(NonIsoWWNJetsToLNuAllTauHaddOutputFile, NonIsoWWNJetsToLNuAllTauHaddInputFiles, 
+		   NonIsoWWNJetsToLNuRelXSecWeights, canvasNames1D, graphNames1D, canvasNames2D, 
+		   graphNames2D, nullBlindLow, nullBlindHigh);
+    }
+  }
+  */
 
   //hadd single photon data samples
   /*  cout << "...single photon data\n";
@@ -1780,83 +1784,65 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   dataVsMCReweightInputFiles.push_back(WZNonIsoReweightHaddOutputFile);
   dataVsMCReweightInputFiles.push_back(ZZNonIsoReweightHaddOutputFile);
   dataVsMCReweightInputFiles.push_back(WWNonIsoReweightHaddOutputFile);
-//   vector<string> dataVsMCInputFilesRegionC;
-//   dataVsMCInputFilesRegionC.push_back(nonIsoWDataIsoHaddOutputFile);
-//   dataVsMCInputFilesRegionC.push_back(NonIsoWDYJetsToLLIsoHaddOutputFile);
-//   dataVsMCInputFilesRegionC.push_back(NonIsoWTTJetsIsoHaddOutputFile);
-//   dataVsMCInputFilesRegionC.push_back(NonIsoWWNJetsToLNuIsoHaddOutputFile);
-//   vector<string> dataVsMCInputFilesRegionD;
-//   dataVsMCInputFilesRegionD.push_back(nonIsoWDataNonIsoHaddOutputFile);
-//   dataVsMCInputFilesRegionD.push_back(NonIsoWDYJetsToLLNonIsoHaddOutputFile);
-//   dataVsMCInputFilesRegionD.push_back(NonIsoWTTJetsNonIsoHaddOutputFile);
-//   dataVsMCInputFilesRegionD.push_back(NonIsoWWNJetsToLNuNonIsoHaddOutputFile);
-  std::reverse(dataVsMCReweightInputFiles.begin() + 1, dataVsMCReweightInputFiles.end());
-  if (uncTag == "") {
-    cout << "\nPlot data vs. MC normalized to data luminosity\n---\n";
-    drawMultipleEfficiencyGraphsOn1Canvas(dataVsMCOutputFile, dataVsMCInputFiles, 
-					  canvasNames1D, graphNames1D, legendHeaders19p7InvFb, 
-					  colorsMCData, styles, legendEntriesMCData, 
-					  weightsMCData, setLogY, drawStack, dataMC);
-//     cout << "\nPlot reweighted data vs. MC normalized to data luminosity\n---\n";
-//     drawMultipleEfficiencyGraphsOn1Canvas(dataVsMCReweightOutputFile, 
-// 					  dataVsMCReweightInputFiles, canvasNames1D, graphNames1D, 
-// 					  legendHeaders19p7InvFb, colorsMCData, styles, 
-// 					  legendEntriesMCData, weightsMCData, setLogY, drawStack, 
-// 					  dataMC);
-    cout << "\nPlot data minus MC normalized to data luminosity\n---\n";
-    drawDifferenceGraphsOn1Canvas(dataVsMCOutputDiff, dataVsMCInputFiles, 
-				  canvasNames1D, graphNames1D, legendHeaders19p7InvFb, 
-				  colorsMCData, styles, legendEntriesMCData, weightsMCData, 
-				  setLogY, sigBkg);
-//     if (MTBin == "_highMT")
-//       { // high-MT bkg subtraction in Regions C and D
-// 	drawDifferenceGraphsOn1Canvas(dataVsMCRegionCOutputDiff, dataVsMCInputFilesRegionC, 
-// 				      canvasNames1D, graphNames1D, legendHeaders19p7InvFb, 
-// 				      colorsMCData, styles, legendEntriesNonIsoWMCData, 
-// 				      weightsNonIsoWMCData, setLogY, sigBkg);
-// 	drawDifferenceGraphsOn1Canvas(dataVsMCRegionDOutputDiff, dataVsMCInputFilesRegionD, 
-// 				      canvasNames1D, graphNames1D, legendHeaders19p7InvFb, 
-// 				      colorsMCData, styles, legendEntriesNonIsoWMCData, 
-// 				      weightsNonIsoWMCData, setLogY, sigBkg);
-//       } // high-MT bkg subtraction in Regions C and D
+  //  vector<string> dataVsMCInputFilesRegionC;
+  //  dataVsMCInputFilesRegionC.push_back(nonIsoWDataIsoHaddOutputFile);
+  //  dataVsMCInputFilesRegionC.push_back(NonIsoWDYJetsToLLIsoHaddOutputFile);
+  //  dataVsMCInputFilesRegionC.push_back(NonIsoWTTJetsIsoHaddOutputFile);
+  //  dataVsMCInputFilesRegionC.push_back(NonIsoWWNJetsToLNuIsoHaddOutputFile);
+  //  vector<string> dataVsMCInputFilesRegionD;
+  // dataVsMCInputFilesRegionD.push_back(nonIsoWDataNonIsoHaddOutputFile);
+  //  dataVsMCInputFilesRegionD.push_back(NonIsoWDYJetsToLLNonIsoHaddOutputFile);
+  //  dataVsMCInputFilesRegionD.push_back(NonIsoWTTJetsNonIsoHaddOutputFile);
+  //  dataVsMCInputFilesRegionD.push_back(NonIsoWWNJetsToLNuNonIsoHaddOutputFile);
+
+  //				  canvasNames1D, graphNames1D, legendHeaders19p7InvFb, colors, 
+  //				  styles, legendEntriesMCData, weightsMCData, setLogY, sigBkg);
+
+    /*if (MTBin == "_highMT")
+      { // high-MT bkg subtraction in Regions C and D
+	drawDifferenceGraphsOn1Canvas(dataVsMCRegionCOutputDiff, dataVsMCInputFilesRegionC, 
+				      canvasNames1D, graphNames1D, legendHeaders19p7InvFb, colors, 
+				      styles, legendEntriesNonIsoWMCData, weightsNonIsoWMCData, setLogY, sigBkg);
+	drawDifferenceGraphsOn1Canvas(dataVsMCRegionDOutputDiff, dataVsMCInputFilesRegionD, 
+				      canvasNames1D, graphNames1D, legendHeaders19p7InvFb, colors, 
+				      styles, legendEntriesNonIsoWMCData, weightsNonIsoWMCData, setLogY, sigBkg);
+      } // high-MT bkg subtraction in Regions C and D
+    */
   }
-    
-//   //draw data Vs MC in Region C
-//   cout <<"\nPlot data vs MC in Region C, normalized to data luminosity\n---\n";
-//   string nonIsoWDataVsMC_RegionCOutputFile(analysisFilePath + 
-// 					   "results/nonIsoW_dataVsMC_muHadIsoAnalysis" + MTBin + 
-// 					   tag19p7InvFb + outputVTag + fileExt);
-//   vector<string> nonIsoWDataVsMC_RegionCInputFiles;
-//   nonIsoWDataVsMC_RegionCInputFiles.push_back(nonIsoWDataIsoHaddOutputFile); // Region C
-//   nonIsoWDataVsMC_RegionCInputFiles.push_back(NonIsoWDYJetsToLLIsoHaddOutputFile); // DY
-//   nonIsoWDataVsMC_RegionCInputFiles.push_back(NonIsoWTTJetsIsoHaddOutputFile); // TTJets
-//   nonIsoWDataVsMC_RegionCInputFiles.push_back(NonIsoWWNJetsToLNuIsoHaddOutputFile); // WNJets
-//   if (uncTag == "") {
-//     drawMultipleEfficiencyGraphsOn1Canvas(nonIsoWDataVsMC_RegionCOutputFile, 
-// 					  nonIsoWDataVsMC_RegionCInputFiles, 
-// 					  canvasNames1D, graphNames1D, legendHeaders19p7InvFb, 
-// 					  colorsMCData, styles, legendEntriesNonIsoWMCData, 
-// 					  weightsNonIsoWMCData, setLogY, drawStack, dataMC);
-//   }
+
+  /*    
+  //draw data Vs MC in Region C
+  cout <<"\nPlot data vs MC in Region C, normalized to data luminosity\n---\n";
+  string nonIsoWDataVsMC_RegionCOutputFile(analysisFilePath + "results/nonIsoW_dataVsMC_muHadIsoAnalysis" + MTBin + 
+				   tag19p7InvFb + outputVTag + fileExt);
+  vector<string> nonIsoWDataVsMC_RegionCInputFiles;
+  nonIsoWDataVsMC_RegionCInputFiles.push_back(nonIsoWDataIsoHaddOutputFile); // Region C
+  nonIsoWDataVsMC_RegionCInputFiles.push_back(NonIsoWDYJetsToLLIsoHaddOutputFile); // DY
+  nonIsoWDataVsMC_RegionCInputFiles.push_back(NonIsoWTTJetsIsoHaddOutputFile); // TTJets
+  nonIsoWDataVsMC_RegionCInputFiles.push_back(NonIsoWWNJetsToLNuIsoHaddOutputFile); // WNJets
+  if (uncTag == "") {
+    drawMultipleEfficiencyGraphsOn1Canvas(nonIsoWDataVsMC_RegionCOutputFile, nonIsoWDataVsMC_RegionCInputFiles, 
+					  canvasNames1D, graphNames1D, legendHeaders19p7InvFb, 
+					  colors, styles, legendEntriesNonIsoWMCData, 
+					  weightsNonIsoWMCData, setLogY, drawStack, dataMC);
+  }
   
-//   //draw data Vs MC in Region D
-//   cout <<"\nPlot data vs MC in Region D, normalized to data luminosity\n---\n";
-//   string nonIsoWDataVsMC_RegionDOutputFile(analysisFilePath + 
-// 					   "results/nonIsoW_dataVsMC_muHadNonIsoAnalysis" + 
-// 					   MTBin + tag19p7InvFb + outputVTag + fileExt);
-//   vector<string> nonIsoWDataVsMC_RegionDInputFiles;
-//   nonIsoWDataVsMC_RegionDInputFiles.push_back(nonIsoWDataNonIsoHaddOutputFile); // Region D
-//   nonIsoWDataVsMC_RegionDInputFiles.push_back(NonIsoWDYJetsToLLNonIsoHaddOutputFile); // DY
-//   nonIsoWDataVsMC_RegionDInputFiles.push_back(NonIsoWTTJetsNonIsoHaddOutputFile); // TTJets
-//   nonIsoWDataVsMC_RegionDInputFiles.push_back(NonIsoWWNJetsToLNuNonIsoHaddOutputFile); // WNJets
-//   if (uncTag == "") {
-//     drawMultipleEfficiencyGraphsOn1Canvas(nonIsoWDataVsMC_RegionDOutputFile, 
-// 					  nonIsoWDataVsMC_RegionDInputFiles, 
-// 					  canvasNames1D, graphNames1D, legendHeaders19p7InvFb, 
-// 					  colorsMCData, styles, legendEntriesNonIsoWMCData, 
-// 					  weightsNonIsoWMCData, setLogY, drawStack, dataMC);
-//   }
-   
+  //draw data Vs MC in Region D
+  cout <<"\nPlot data vs MC in Region D, normalized to data luminosity\n---\n";
+  string nonIsoWDataVsMC_RegionDOutputFile(analysisFilePath + "results/nonIsoW_dataVsMC_muHadNonIsoAnalysis" + MTBin + 
+					   tag19p7InvFb + outputVTag + fileExt);
+  vector<string> nonIsoWDataVsMC_RegionDInputFiles;
+  nonIsoWDataVsMC_RegionDInputFiles.push_back(nonIsoWDataNonIsoHaddOutputFile); // Region D
+  nonIsoWDataVsMC_RegionDInputFiles.push_back(NonIsoWDYJetsToLLNonIsoHaddOutputFile); // DY
+  nonIsoWDataVsMC_RegionDInputFiles.push_back(NonIsoWTTJetsNonIsoHaddOutputFile); // TTJets
+  nonIsoWDataVsMC_RegionDInputFiles.push_back(NonIsoWWNJetsToLNuNonIsoHaddOutputFile); // WNJets
+  if (uncTag == "") {
+      drawMultipleEfficiencyGraphsOn1Canvas(nonIsoWDataVsMC_RegionDOutputFile, nonIsoWDataVsMC_RegionDInputFiles, 
+					  canvasNames1D, graphNames1D, legendHeaders19p7InvFb, 
+					  colors, styles, legendEntriesNonIsoWMCData, 
+					  weightsNonIsoWMCData, setLogY, drawStack, dataMC);
+  }
+*/   
 
   //compute data-driven QCD estimate in signal (i.e. isolated W muon + isolated tau) region
   string outputFileNameA(analysisFilePath + "results/dataVsMC_RegionAQCDEstimate" + MTBin + 

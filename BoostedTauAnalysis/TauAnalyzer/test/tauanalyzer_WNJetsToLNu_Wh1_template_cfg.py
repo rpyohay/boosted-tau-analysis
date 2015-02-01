@@ -193,6 +193,11 @@ process.WIsoMuonSelector = cms.EDFilter('CustomMuonSelector',
                                         minNumObjsToPassFilter = cms.uint32(1)
                                         )
 
+#produce a collection with the highest pT W muon in the event
+process.highestPTWMuonSelector = cms.EDFilter('HighestPTMuonRefSelector',
+                                              objRefTag = cms.InputTag('WIsoMuonSelector')
+                                              )
+
 #search for a muon with pT > 5 GeV as in HZZ4l analysis and proceed if one can be found
 #this will produce a ref to the original muon collection
 process.tauMuonPTSelector = cms.EDFilter('MuonRefSelector',
@@ -312,7 +317,7 @@ process.muHadIsoTauSelector = cms.EDFilter(
     overlapCandTag = cms.InputTag('WIsoMuonSelector'),
     passDiscriminator = cms.bool(True),
     pTMin = cms.double(10.0),
-    etaMax = cms.double(2.4),
+    etaMax = cms.double(2.3),
     isoMax = cms.double(-1.0),
     dR = cms.double(0.5),
     minNumObjsToPassFilter = cms.uint32(1)
@@ -429,6 +434,7 @@ process.highMTMuHadIsoTauAnalyzer = cms.EDAnalyzer(
     RcutFactor = cms.double(0.5),
     CSVMax = cms.double(0.679),
     MC = cms.bool(True),
+    higgsReweight = cms.bool(HIGGSREW),
     reweight = cms.bool(REWEIGHT),
     bTagScaleShift = cms.string("mean"),
     sample = cms.string("SAMPLE"),
@@ -497,6 +503,7 @@ process.METFilter.METTag = cms.InputTag("patType1CorrectedPFMetPFlow")
 #MT filter
 process.MTFilter.minMT = cms.double(50.)
 process.MTFilter.METTag = cms.InputTag("patType1CorrectedPFMetPFlow")
+process.MTFilter.objTag = cms.InputTag('highestPTWMuonSelector')
 process.highMTFilter = process.MTFilter.clone()
 process.lowMTFilter = process.MTFilter.clone()
 process.lowMTFilter.passFilter = cms.bool(False)
@@ -560,7 +567,8 @@ process.begin = cms.Path(
     process.genWTauNuSelector*
     process.genPartonSelector*
     process.genMuSelector*
-    process.genTauMuSelector
+    process.genTauMuSelector*
+    process.highestPTWMuonSelector
     )
 process.baseIsoTauAnalysisSequence = cms.Sequence(
     process.muHadIsoTauSelector*

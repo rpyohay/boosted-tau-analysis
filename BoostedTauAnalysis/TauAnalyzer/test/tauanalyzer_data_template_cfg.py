@@ -185,6 +185,11 @@ process.WIsoMuonSelector = cms.EDFilter('CustomMuonSelector',
                                         minNumObjsToPassFilter = cms.uint32(1)
                                         )
 
+#produce a collection with the highest pT W muon in the event
+process.highestPTWMuonSelector = cms.EDFilter('HighestPTMuonRefSelector',
+                                              objRefTag = cms.InputTag('WIsoMuonSelector')
+                                              )
+
 #search for a muon with pT > 5 GeV as in HZZ4l analysis and proceed if one can be found
 #this will produce a ref to the original muon collection
 process.tauMuonPTSelector = cms.EDFilter('MuonRefSelector',
@@ -283,7 +288,7 @@ process.muHadIsoTauSelector = cms.EDFilter(
     overlapCandTag = cms.InputTag('OVERLAPCANDTAG'),
     passDiscriminator = cms.bool(True),
     pTMin = cms.double(10.0),
-    etaMax = cms.double(2.4),
+    etaMax = cms.double(2.3),
     isoMax = cms.double(-1.0),
     dR = cms.double(0.5),
     minNumObjsToPassFilter = cms.uint32(1)
@@ -401,6 +406,7 @@ process.highMTMuHadIsoTauAnalyzer = cms.EDAnalyzer(
     RcutFactor = cms.double(0.5),
     CSVMax = cms.double(0.679),
     MC = cms.bool(False),
+    higgsReweight = cms.bool(False),
     reweight = cms.bool(False),
     bTagScaleShift = cms.string("mean"),
     sample = cms.string(""),
@@ -469,6 +475,7 @@ process.METFilter.METTag = cms.InputTag("patType1CorrectedPFMetPFlow")
 #MT filter
 process.MTFilter.minMT = cms.double(50.)
 process.MTFilter.METTag = cms.InputTag("patType1CorrectedPFMetPFlow")
+process.MTFilter.objTag = cms.InputTag('highestPTWMuonSelector')
 process.highMTFilter = process.MTFilter.clone()
 process.lowMTFilter = process.MTFilter.clone()
 process.lowMTFilter.passFilter = cms.bool(False)
@@ -549,6 +556,7 @@ process.photonTriggerObjectFilter = cms.EDFilter(
 #sequences
 process.beginSequence = cms.Sequence(process.genPartonSelector*process.genMuSelector)
 process.baseIsoTauAnalysisSequence = cms.Sequence(
+    process.highestPTWMuonSelector*
     process.muHadIsoTauSelector*
     process.IsoBVetoFilter*
     process.corrJetDistinctIsoTauSelector*
@@ -573,6 +581,7 @@ process.baseSignalIsoTauAnalysisSequence = cms.Sequence(
     process.tauMuonPTSelector*
     process.tauMuonSelector*
     process.PFTau*
+    process.highestPTWMuonSelector*
     process.muHadIsoTauSelector*
     process.IsoBVetoFilter*
     process.TRIGGEROBJECTFILTER*
@@ -589,6 +598,7 @@ process.lowMTSignalIsoTauAnalysisSequence = cms.Sequence(
     process.lowMTMuHadIsoTauAnalyzer
     )
 process.baseNonIsoTauAnalysisSequence = cms.Sequence(
+    process.highestPTWMuonSelector*
     process.muHadNonIsoTauSelector*
     process.NonIsoBVetoFilter*
     process.corrJetDistinctNonIsoTauSelector*
@@ -606,6 +616,7 @@ process.lowMTNonIsoTauAnalysisSequence = cms.Sequence(
     process.lowMTMuHadNonIsoTauAnalyzer
     )
 process.baseTauAnalysisSequence = cms.Sequence(
+    process.highestPTWMuonSelector*
     process.muHadTauSelector*
     process.AllBVetoFilter*
     process.corrJetDistinctTauSelector*
