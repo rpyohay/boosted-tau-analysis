@@ -46,7 +46,7 @@ using namespace std;
 // class declaration
 //
 
-template<class T>
+template<class T, class U>
 class MTFilter : public edm::EDFilter {
    public:
       explicit MTFilter(const edm::ParameterSet&);
@@ -69,7 +69,7 @@ class MTFilter : public edm::EDFilter {
   double minMT_;
   bool passFilter_;
   edm::InputTag METTag_;
-  edm::InputTag muonTag_;
+  edm::InputTag objTag_;
 
 };
 
@@ -84,18 +84,18 @@ class MTFilter : public edm::EDFilter {
 //
 // constructors and destructor
 //
-template<class T>
-MTFilter<T>::MTFilter(const edm::ParameterSet& iConfig) :
+template<class T, class U>
+MTFilter<T, U>::MTFilter(const edm::ParameterSet& iConfig) :
   minMT_(iConfig.getParameter<double>("minMT")),
   passFilter_(iConfig.getParameter<bool>("passFilter")),
   METTag_(iConfig.getParameter<edm::InputTag>("METTag")),
-  muonTag_(iConfig.getParameter<edm::InputTag>("muonTag"))
+  objTag_(iConfig.getParameter<edm::InputTag>("objTag"))
 {
   //now do what ever initialization is needed
 }
 
-template<class T>
-MTFilter<T>::~MTFilter()
+template<class T, class U>
+MTFilter<T, U>::~MTFilter()
 {
  
    // do anything here that needs to be done at desctruction time
@@ -109,32 +109,37 @@ MTFilter<T>::~MTFilter()
 //
 
 // ------------ method called on each new Event  ------------
-template<class T>
+template<class T, class U>
 bool
-MTFilter<T>::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
+MTFilter<T, U>::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {   
   //get MET
   edm::Handle<edm::View<T> > pMET;
   iEvent.getByLabel(METTag_, pMET);
   edm::RefToBase<T> METRefToBase = pMET->refAt(0);
-  //get W muons
-  edm::Handle<reco::MuonRefVector> pMuons;
-  iEvent.getByLabel(muonTag_, pMuons);
+  //get objects
+  edm::Handle<edm::View<U> > pObjs;
+  iEvent.getByLabel(objTag_, pObjs);
+  edm::RefToBase<U> objRefToBase = pObjs->refAt(0);
 
-  //find the highest pT W muon
-  std::vector<reco::MuonRef> WMuonRefs;
-  for (reco::MuonRefVector::const_iterator iMuon = pMuons->begin(); iMuon != pMuons->end(); 
-       ++iMuon) { WMuonRefs.push_back(*iMuon); }
-  Common::sortByPT(WMuonRefs);
+  bool objsExist = (METRefToBase.isNonnull() && objRefToBase.isNonnull());
 
+//   //find the highest pT object
+//   std::vector<reco::MuonRef> WMuonRefs;
+//   for (reco::MuonRefVector::const_iterator iMuon = pMuons->begin(); iMuon != pMuons->end(); 
+//        ++iMuon) { WMuonRefs.push_back(*iMuon); }
+//   Common::sortByPT(WMuonRefs);
 
-  double MT = sqrt(2*WMuonRefs[WMuonRefs.size() - 1]->pt()*METRefToBase->et()*
-		   (1.0 - cos(reco::deltaPhi(WMuonRefs[WMuonRefs.size() - 1]->phi(), METRefToBase->phi()))));
+  if (objsExist) {
+    double MT = sqrt(2*objRefToBase->pt()*METRefToBase->et()*
+		     (1.0 - cos(reco::deltaPhi(objRefToBase->phi(), METRefToBase->phi()))));
 
-  if ((passFilter_ && (MT > minMT_)) || (!passFilter_ && (MT <= minMT_)))
-    return true;
-  else
-    return false;
+    if ((passFilter_ && (MT > minMT_)) || (!passFilter_ && (MT <= minMT_)))
+      return true;
+    else
+      return false;
+  }
+  else return false;
 
   /* if (MT < minMT_ && METRefToBase->et() < 30.)
     return false;
@@ -150,54 +155,54 @@ MTFilter<T>::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 }
 
 // ------------ method called once each job just before starting event loop  ------------
-template<class T>
+template<class T, class U>
 void 
-MTFilter<T>::beginJob()
+MTFilter<T, U>::beginJob()
 {
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
-template<class T>
+template<class T, class U>
 void 
-MTFilter<T>::endJob() {
+MTFilter<T, U>::endJob() {
 }
 
 // ------------ method called when starting to processes a run  ------------
-template<class T>
+template<class T, class U>
 bool 
-MTFilter<T>::beginRun(edm::Run&, edm::EventSetup const&)
+MTFilter<T, U>::beginRun(edm::Run&, edm::EventSetup const&)
 { 
   return true;
 }
 
 // ------------ method called when ending the processing of a run  ------------
-template<class T>
+template<class T, class U>
 bool 
-MTFilter<T>::endRun(edm::Run&, edm::EventSetup const&)
+MTFilter<T, U>::endRun(edm::Run&, edm::EventSetup const&)
 {
   return true;
 }
 
 // ------------ method called when starting to processes a luminosity block  ------------
-template<class T>
+template<class T, class U>
 bool 
-MTFilter<T>::beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
+MTFilter<T, U>::beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
 {
   return true;
 }
 
 // ------------ method called when ending the processing of a luminosity block  ------------
-template<class T>
+template<class T, class U>
 bool 
-MTFilter<T>::endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
+MTFilter<T, U>::endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
 {
   return true;
 }
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
-template<class T>
+template<class T, class U>
 void
-MTFilter<T>::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+MTFilter<T, U>::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   //The following says we do not know what parameters are allowed so do no validation
   // Please change this to state exactly what you do use, even if it is no parameters
   edm::ParameterSetDescription desc;
@@ -205,5 +210,7 @@ MTFilter<T>::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   descriptions.addDefault(desc);
 }
 //define this as a plug-in
-typedef MTFilter<pat::MET> PATMTFilter;
+typedef MTFilter<pat::MET, reco::Muon> PATMTFilter;
+typedef MTFilter<pat::MET, reco::PFTau> HPSPATMTFilter;
 DEFINE_FWK_MODULE(PATMTFilter);
+DEFINE_FWK_MODULE(HPSPATMTFilter);

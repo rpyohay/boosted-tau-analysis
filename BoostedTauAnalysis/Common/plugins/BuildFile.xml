@@ -10,4 +10,6 @@
   <use   name="CommonTools/UtilAlgos"/>
   <use   name="DataFormats/JetReco"/>
   <use   name="DataFormats/TauReco"/>
+  <use   name="DataFormats/MuonReco"/>
+  <use   name="BoostedTauAnalysis/Common"/>
 </library>

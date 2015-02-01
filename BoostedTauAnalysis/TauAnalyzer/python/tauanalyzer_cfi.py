@@ -40,7 +40,7 @@ MTFilter = cms.EDFilter(
     minMT = cms.double(50.),
     passFilter = cms.bool(True),
     METTag = cms.InputTag("patType1CorrectedPFMetPFlow"),
-    muonTag = cms.InputTag("WIsoMuonSelector")
+    objTag = cms.InputTag("WIsoMuonSelector")
     )
 
 DelPhiFilter = cms.EDFilter(
