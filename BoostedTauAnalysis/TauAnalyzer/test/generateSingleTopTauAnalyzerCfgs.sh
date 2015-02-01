@@ -1,8 +1,8 @@
 #!/bin/bash
 
-if [ $# -gt 3 ]
+if [ $# -gt 2 ]
     then
-    echo "Usage: ./generateSingleTopTauAnalyzerCfgs.sh <version> <template cfg> [reweightOnly]"
+    echo "Usage: ./generateSingleTopTauAnalyzerCfgs.sh <version> <template cfg>"
     exit 0
 fi
 
@@ -12,11 +12,6 @@ fi
 version=$1
 templateCfg=$2
 infoTag=""
-reweightOnly=0
-if [ "$3" == "reweightOnly" ]
-    then
-    reweightOnly=1
-fi
 dir=$version
 
 #number of samples
@@ -56,7 +51,6 @@ highMTIsoTauAnalyzerOutputFiles=( "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysi
 lowMTIsoTauAnalyzerOutputFiles=( "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_lowMT_T_s-channel_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_lowMT_Tbar_s-channel_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_lowMT_T_t-channel_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis_lowMT_Tbar_t-channel_${version}.root" )
 highMTNonIsoTauAnalyzerOutputFiles=( "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_highMT_T_s-channel_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_highMT_Tbar_s-channel_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_highMT_T_t-channel_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_highMT_Tbar_t-channel_${version}.root" )
 lowMTNonIsoTauAnalyzerOutputFiles=( "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_lowMT_T_s-channel_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_lowMT_Tbar_s-channel_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_lowMT_T_t-channel_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoAnalysis_lowMT_Tbar_t-channel_${version}.root" )
-nonIsoReweightTauAnalyzerOutputFiles=( "${tauAnalyzerOutputFilePrefix}muHadNonIsoReweightAnalysis_T_s-channel_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoReweightAnalysis_Tbar_s-channel_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoReweightAnalysis_T_t-channel_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadNonIsoReweightAnalysis_Tbar_t-channel_${version}.root" )
 highMTAllTauAnalyzerOutputFiles=( "${tauAnalyzerOutputFilePrefix}muHadAnalysis_highMT_T_s-channel_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadAnalysis_highMT_Tbar_s-channel_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadAnalysis_highMT_T_t-channel_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadAnalysis_highMT_Tbar_t-channel_${version}.root" )
 lowMTAllTauAnalyzerOutputFiles=( "${tauAnalyzerOutputFilePrefix}muHadAnalysis_lowMT_T_s-channel_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadAnalysis_lowMT_Tbar_s-channel_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadAnalysis_lowMT_T_t-channel_${version}.root" "${tauAnalyzerOutputFilePrefix}muHadAnalysis_lowMT_Tbar_t-channel_${version}.root" )
 
@@ -98,45 +92,20 @@ fileNamePrefix="tauanalyzer_${samples[${i}]}"
 cd \$jobDir
 eval \`scramv1 runtime -sh\`
 cd -
-cp \$jobDir/\${fileNamePrefix}_iso_cfg.py \$jobDir/\${fileNamePrefix}_nonIso_cfg.py \$jobDir/\${fileNamePrefix}_nonIsoReweight_cfg.py .
-cmsRun \${fileNamePrefix}_iso_cfg.py
-if [ $reweightOnly -eq 0 ]
-    then
-    cmsRun \${fileNamePrefix}_nonIso_cfg.py
-    cmsStage -f ${highMTNonIsoTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/
-    cmsStage -f ${lowMTNonIsoTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/
-    rm ${highMTNonIsoTauAnalyzerOutputFiles[${i}]} ${lowMTNonIsoTauAnalyzerOutputFiles[${i}]}
-fi
-#cmsRun \${fileNamePrefix}_nonIsoReweight_cfg.py
+cp \$jobDir/\${fileNamePrefix}_cfg.py .
+cmsRun \${fileNamePrefix}_cfg.py
+cmsStage -f ${highMTNonIsoTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/
+cmsStage -f ${lowMTNonIsoTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/
 cmsStage -f ${highMTIsoTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/
 cmsStage -f ${lowMTIsoTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/
-#cmsStage -f ${nonIsoReweightTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/
-rm ${highMTIsoTauAnalyzerOutputFiles[${i}]} ${lowMTIsoTauAnalyzerOutputFiles[${i}]}
-#rm ${nonIsoReweightTauAnalyzerOutputFiles[${i}]} 
+cmsStage -f ${highMTAllTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/
+cmsStage -f ${lowMTAllTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/
+rm ${highMTNonIsoTauAnalyzerOutputFiles[${i}]} ${lowMTNonIsoTauAnalyzerOutputFiles[${i}]} ${highMTIsoTauAnalyzerOutputFiles[${i}]} ${lowMTIsoTauAnalyzerOutputFiles[${i}]} ${highMTAllTauAnalyzerOutputFiles[${i}]} ${lowMTAllTauAnalyzerOutputFiles[${i}]}
 
 exit 0
 EOF
   chmod a+x tauanalyzer_${samples[${i}]}_cfg.sh
 
-  #generate noIsoCut job submission script for LSF
-  cat <<EOF > tauanalyzer_${samples[${i}]}_all_cfg.sh
-#!/bin/bash
-
-jobDir="`pwd`"
-fileNamePrefix="tauanalyzer_${samples[${i}]}"
-
-cd \$jobDir
-eval \`scramv1 runtime -sh\`
-cd -
-cp \$jobDir/\${fileNamePrefix}_all_cfg.py .
-cmsRun \${fileNamePrefix}_all_cfg.py
-cmsStage -f ${highMTAllTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/
-cmsStage -f ${lowMTAllTauAnalyzerOutputFiles[${i}]} /store/user/`whoami`/
-rm ${highMTAllTauAnalyzerOutputFiles[${i}]} ${lowMTAllTauAnalyzerOutputFiles[${i}]}
-
-exit 0
-EOF
-  chmod a+x tauanalyzer_${samples[${i}]}_all_cfg.sh
 done
 
 #generate run cfg that runs all files in the directory
@@ -153,11 +122,11 @@ exit 0
 EOF
 chmod a+x runSingleTopTauAnalyzerCfgs.sh
 
-#generate script that submits all iso+nonIso+reweight jobs to LSF
+#generate script that submits all jobs to LSF
 cat <<EOF > submitSingleTopTauAnalyzerJobs.sh
 #!/bin/bash
 
-for file in \`ls -alh tauanalyzer*T*channel*.sh | grep -v all | awk '{ print \$9 }'\`
+for file in \`ls -alh tauanalyzer*T*channel*.sh | awk '{ print \$9 }'\`
   do
   jobName=\`echo \$file | sed -e "s%\(.*\)\.sh%\1%"\`
   bsub -q 8nh -J \$jobName < \$file
@@ -167,37 +136,19 @@ exit 0
 EOF
 chmod a+x submitSingleTopTauAnalyzerJobs.sh
 
-#generate script that submits all noIsoCut jobs to LSF
-cat <<EOF > submitSingleTopAllTauAnalyzerJobs.sh
-#!/bin/bash
-
-for file in \`ls -alh tauanalyzer*T*channel*all*.sh | awk '{ print \$9 }'\`
-  do
-  jobName=\`echo \$file | sed -e "s%\(.*\)\.sh%\1%"\`
-  bsub -q 8nh -J \$jobName < \$file
-done
-
-exit 0
-EOF
-chmod a+x submitSingleTopAllTauAnalyzerJobs.sh
-
-#generate script that copies all iso+nonIso+reweight files locally from EOS
+#generate script that copies all files locally from EOS
 cat <<EOF > copySingleTopFromEOS.sh
 #!/bin/bash
 
 eval \`scramv1 runtime -sh\`
 for sample in "_s" "bar_s" "_t" "bar_t"
   do
-  #for cut in Iso NonIso NonIsoReweight
-  for cut in Iso NonIso
+  for cut in "Iso" "NonIso" ""
     do
     for MTBin in high low
       do
-      if [ "\$cut" != "NonIso" ] || [ $reweightOnly -eq 0 ]
-          then
-          cmsStage -f /store/user/`whoami`/muHad\${cut}Analysis_\${MTBin}MT_T\${sample}-channel_${version}.root /data1/`whoami`/SingleTop/analysis/
-          cmsRm /store/user/`whoami`/muHad\${cut}Analysis_\${MTBin}MT_T\${sample}-channel_${version}.root
-      fi
+      cmsStage -f /store/user/`whoami`/muHad\${cut}Analysis_\${MTBin}MT_T\${sample}-channel_${version}.root /data1/`whoami`/SingleTop/analysis/
+      cmsRm /store/user/`whoami`/muHad\${cut}Analysis_\${MTBin}MT_T\${sample}-channel_${version}.root
     done
   done
 done
@@ -205,23 +156,5 @@ done
 exit 0
 EOF
 chmod a+x copySingleTopFromEOS.sh
-
-#generate script that copies all noIsoCut files locally from EOS
-cat <<EOF > copyAllSingleTopFromEOS.sh
-#!/bin/bash
-
-eval \`scramv1 runtime -sh\`
-for sample in "_s" "bar_s" "_t" "bar_t"
-  do
-  for MTBin in high low
-    do
-    cmsStage -f /store/user/`whoami`/muHadAnalysis_\${MTBin}MT_T\${sample}-channel_${version}.root /data1/`whoami`/SingleTop/analysis/
-    cmsRm /store/user/`whoami`/muHadAnalysis_\${MTBin}MT_T\${sample}-channel_${version}.root
-  done
-done
-
-exit 0
-EOF
-chmod a+x copyAllSingleTopFromEOS.sh
 
 exit 0

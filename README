@@ -65,8 +65,18 @@ mkdir -p /data1/`whoami`/WZ/analysis
 mkdir -p /data1/`whoami`/WZ/EDM_files
 mkdir -p /data1/`whoami`/Wh1_Medium/EDM_files
 mkdir -p /data1/`whoami`/gg/EDM_files
+mkdir -p /data1/`whoami`/ZH/analysis
+mkdir -p /data1/`whoami`/ZH/EDM_files
+mkdir -p /data1/`whoami`/VBF/analysis
+mkdir -p /data1/`whoami`/VBF/EDM_files
 mkdir -p /data1/`whoami`/ZZ/analysis
 mkdir -p /data1/`whoami`/ZZ/EDM_files
+mkdir -p /data1/`whoami`/nonIsoWDYJetsToLL/analysis
+mkdir -p /data1/`whoami`/nonIsoWDYJetsToLL/EDM_files
+mkdir -p /data1/`whoami`/nonIsoWTTJets/analysis
+mkdir -p /data1/`whoami`/nonIsoWTTJets/EDM_files
+mkdir -p /data1/`whoami`/nonIsoWWNJetsToLNu/analysis
+mkdir -p /data1/`whoami`/nonIsoWWNJetsToLNu/EDM_files
 mkdir -p /data1/`whoami`/data/analysis
 mkdir -p /data1/`whoami`/data/EDM_files
 mkdir -p /data1/`whoami`/nonIsoWData/analysis
@@ -102,10 +112,7 @@ cd ~/CMSSW_5_3_11/src/BoostedTauAnalysis/TauAnalyzer/test
 ./generateJobFiles.sh v<version_number>
 ./submitAll.sh v<version_number>
 
-to launch the batch jobs.  The STDOUT files created by the batch jobs will be written to ~/CMSSW_5_3_11/src/BoostedTauAnalysis/TauAnalyzer/test/v<version_number>/LSFJOB_XXXXXXXXX/STDOUT, where is XXXXXXXXX is the job number.  These files will tell you whether the jobs finished successfully or not.  If you want to launch the jobs for plotting quantities without the tau isolation cut, execute
-
-cd ~/CMSSW_5_3_11/src/BoostedTauAnalysis/TauAnalyzer/test
-./submitNoHPSIso.sh v<version_number>
+to launch the batch jobs.  The STDOUT files created by the batch jobs will be written to ~/CMSSW_5_3_11/src/BoostedTauAnalysis/TauAnalyzer/test/v<version_number>/LSFJOB_XXXXXXXXX/STDOUT, where is XXXXXXXXX is the job number.  These files will tell you whether the jobs finished successfully or not.
 
 3. Once the batch jobs are finished, login to ucdavis.cern.ch and execute
 
@@ -113,19 +120,12 @@ cd ~/CMSSW_5_3_11/src/BoostedTauAnalysis/TauAnalyzer/test
 cmsenv
 ./copyAll.sh v<version_number>
 cd v<version_number>
-./runggIsoTauAnalyzerCfgs.sh
-./runWh1IsoTauAnalyzerCfgs.sh
+./runggTauAnalyzerCfgs.sh
+./runWh1TauAnalyzerCfgs.sh
+./runZHTauAnalyzerCfgs.sh
+./runVBFTauAnalyzerCfgs.sh
 ./runWh1IsoSignalMETUncertaintyTauAnalyzerCfgs.sh
 ./runggIsoSignalMETUncertaintyTauAnalyzerCfgs.sh
-
-If you want to run the jobs for plotting quantities without the tau isolation cut, execute
-
-cd ~/CMSSW_5_3_11/src/BoostedTauAnalysis/TauAnalyzer/test
-cmsenv
-./copyNoHPSIso.sh v<version_number>
-cd v<version_number>
-cmsRun tauanalyzer_Wh1_all_cfg.py
-cmsRun tauanalyzer_gg_all_cfg.py
 
 4. Make sure that in your rootlogon.C script, you DO NOT have the line
 
@@ -135,8 +135,8 @@ Then execute
 
 cd ~/CMSSW_5_3_11/src/BoostedTauAnalysis/TauAnalyzer/test
 cmsenv
-root -l -b -q 'formatPlots.C("v<input_version>", "v<output_version>", [true|false], "", "_a9", "_lowMT")'
-root -l -b -q 'formatPlots.C("v<input_version>", "v<output_version>", [true|false], "", "_a9", "_highMT")'
+root -l -b -q 'formatPlots.C("v<input_version>", "v<output_version>", [true|false], "", "_a<mass>", "_lowMT")'
+root -l -b -q 'formatPlots.C("v<input_version>", "v<output_version>", [true|false], "", "_a<mass>", "_highMT")'
 
 where
 
@@ -144,13 +144,13 @@ where
 <output_version> is the version number that will be assigned to the output files you create (typically it's the same as the input version but there might be special cases where you'd like them to be different)
 "true" means recompile the code, "false" means do not recompile the code
 "" is the tag for calculating signal uncertainties ("" means just run the nominal, not the +/1sigma shifted)
-"_a9" means ma1 = 9 GeV (for gg fusion this is the only supported option, for Wh1 the mass can be 5, 7, 9, 11, 13, or 15 GeV)
+"_a<mass>" is the pseudoscalar mass, i.e. "_a9" for 9 GeV pseudoscalar
 "_lowMT"/"_highMT" refer to the MT bins (<=50 GeV / >50 GeV)
 
 If you want to also make plots where no HPS tau isolation cut is applied, do
 
-root -l -b -q 'formatPlots.C("v<input_version>", "v<output_version>", [true|false], "", "_a9", "_lowMT", true)'
-root -l -b -q 'formatPlots.C("v<input_version>", "v<output_version>", [true|false], "", "_a9", "_highMT", true)'
+root -l -b -q 'formatPlots.C("v<input_version>", "v<output_version>", [true|false], "", "_a<mass>", "_lowMT", true)'
+root -l -b -q 'formatPlots.C("v<input_version>", "v<output_version>", [true|false], "", "_a<mass>", "_highMT", true)'
 
 instead of the root command given above.
 
@@ -164,67 +164,74 @@ They will be printed as text.
 
 5. Check the output files:
 
-/data1/<your_username>/QCD/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
-/data1/<your_username>/QCD/analysis/muHadIsoAnalysis_QCD_v<version_number>.root
-/data1/<your_username>/QCD/analysis/muHadNonIsoAnalysis_QCD_v<version_number>.root
-
-/data1/<your_username>/QCDB/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
-/data1/<your_username>/QCDB/analysis/muHadIsoAnalysis_QCDB_v<version_number>.root
-/data1/<your_username>/QCDB/analysis/muHadNonIsoAnalysis_QCDB_v<version_number>.root
-
-/data1/<your_username>/QCDBMu/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
-/data1/<your_username>/QCDBMu/analysis/muHadIsoAnalysis_QCDBMu_v<version_number>.root
-/data1/<your_username>/QCDBMu/analysis/muHadNonIsoAnalysis_QCDBMu_v<version_number>.root
-
 /data1/<your_username>/DYJetsToLL/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
 /data1/<your_username>/DYJetsToLL/analysis/muHadIsoAnalysis_DYJetsToLL_v<version_number>.root
 /data1/<your_username>/DYJetsToLL/analysis/muHadNonIsoAnalysis_DYJetsToLL_v<version_number>.root
+/data1/<your_username>/DYJetsToLL/analysis/muHadAnalysis_DYJetsToLL_v<version_number>.root
 
 /data1/<your_username>/SingleTop/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
 /data1/<your_username>/SingleTop/analysis/muHadIsoAnalysis_T_v<version_number>.root
 /data1/<your_username>/SingleTop/analysis/muHadNonIsoAnalysis_T_v<version_number>.root
+/data1/<your_username>/SingleTop/analysis/muHadAnalysis_T_v<version_number>.root
 
 /data1/<your_username>/TTJets/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
 /data1/<your_username>/TTJets/analysis/muHadIsoAnalysis_TTJets_v<version_number>.root
 /data1/<your_username>/TTJets/analysis/muHadNonIsoAnalysis_TTJets_v<version_number>.root
+/data1/<your_username>/TTJets/analysis/muHadAnalysis_TTJets_v<version_number>.root
 
 /data1/<your_username>/WNJetsToLNu/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
 /data1/<your_username>/WNJetsToLNu/analysis/muHadIsoAnalysis_WNJetsToLNu_v<version_number>.root
 /data1/<your_username>/WNJetsToLNu/analysis/muHadNonIsoAnalysis_WNJetsToLNu_v<version_number>.root
-
-/data1/<your_username>/Wbb/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
-/data1/<your_username>/Wbb/analysis/muHadIsoAnalysis_Wbb_v<version_number>.root
-/data1/<your_username>/Wbb/analysis/muHadNonIsoAnalysis_Wbb_v<version_number>.root
-
-/data1/<your_username>/WJetsToLNu/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
-/data1/<your_username>/WJetsToLNu/analysis/muHadIsoAnalysis_WJetsToLNu_v<version_number>.root
-/data1/<your_username>/WJetsToLNu/analysis/muHadNonIsoAnalysis_WJetsToLNu_v<version_number>.root
+/data1/<your_username>/WNJetsToLNu/analysis/muHadAnalysis_WNJetsToLNu_v<version_number>.root
 
 /data1/<your_username>/WW/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
 /data1/<your_username>/WW/analysis/muHadIsoAnalysis_WW_v<version_number>.root
 /data1/<your_username>/WW/analysis/muHadNonIsoAnalysis_WW_v<version_number>.root
+/data1/<your_username>/WW/analysis/muHadAnalysis_WW_v<version_number>.root
 
 /data1/<your_username>/WZ/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
 /data1/<your_username>/WZ/analysis/muHadIsoAnalysis_WZ_v<version_number>.root
 /data1/<your_username>/WZ/analysis/muHadNonIsoAnalysis_WZ_v<version_number>.root
+/data1/<your_username>/WZ/analysis/muHadAnalysis_WZ_v<version_number>.root
 
 /data1/<your_username>/Wh1_Medium/muHadIsoAnalysis_<MT_Bin>_Wh1_a<a1_mass>_v<version_number>.root
+/data1/<your_username>/Wh1_Medium/muHadIsoAnalysis_<MT_Bin>_Wh1_a<a1_mass>_v<version_number>.root
 
-/data1/<your_username>/gg/muHadIsoAnalysis_<MT_Bin>_Wh1_a<a1_mass>_v<version_number>.root
+/data1/<your_username>/gg/muHadIsoAnalysis_<MT_Bin>_gg_a<a1_mass>_v<version_number>.root
+/data1/<your_username>/gg/muHadIsoAnalysis_<MT_Bin>_gg_a<a1_mass>_v<version_number>.root
+
+/data1/<your_username>/ZH/muHadIsoAnalysis_<MT_Bin>_ZH_a<a1_mass>_v<version_number>.root
+/data1/<your_username>/ZH/muHadIsoAnalysis_<MT_Bin>_ZH_a<a1_mass>_v<version_number>.root
+
+/data1/<your_username>/VBF/muHadIsoAnalysis_<MT_Bin>_VBF_a<a1_mass>_v<version_number>.root
+/data1/<your_username>/VBF/muHadIsoAnalysis_<MT_Bin>_VBF_a<a1_mass>_v<version_number>.root
 
 /data1/<your_username>/ZZ/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
 /data1/<your_username>/ZZ/analysis/muHadIsoAnalysis_ZZ_v<version_number>.root
 /data1/<your_username>/ZZ/analysis/muHadNonIsoAnalysis_ZZ_v<version_number>.root
+/data1/<your_username>/ZZ/analysis/muHadAnalysis_ZZ_v<version_number>.root
+
+/data1/<your_username>/nonIsoWDYJetsToLL/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
+/data1/<your_username>/nonIsoWDYJetsToLL/analysis/muHadIsoAnalysis_nonIsoWDYJetsToLL_v<version_number>.root
+/data1/<your_username>/nonIsoWDYJetsToLL/analysis/muHadNonIsoAnalysis_nonIsoWDYJetsToLL_v<version_number>.root
+/data1/<your_username>/nonIsoWDYJetsToLL/analysis/muHadAnalysis_nonIsoWDYJetsToLL_v<version_number>.root
+
+/data1/<your_username>/nonIsoWTTJets/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
+/data1/<your_username>/nonIsoWTTJets/analysis/muHadIsoAnalysis_nonIsoWTTJets_v<version_number>.root
+/data1/<your_username>/nonIsoWTTJets/analysis/muHadNonIsoAnalysis_nonIsoWTTJets_v<version_number>.root
+/data1/<your_username>/nonIsoWTTJets/analysis/muHadAnalysis_nonIsoWTTJets_v<version_number>.root
+
+/data1/<your_username>/nonIsoWWNJetsToLNu/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
+/data1/<your_username>/nonIsoWWNJetsToLNu/analysis/muHadIsoAnalysis_nonIsoWWNJetsToLNu_v<version_number>.root
+/data1/<your_username>/nonIsoWWNJetsToLNu/analysis/muHadNonIsoAnalysis_nonIsoWWNJetsToLNu_v<version_number>.root
+/data1/<your_username>/nonIsoWWNJetsToLNu/analysis/muHadAnalysis_nonIsoWWNJetsToLNu_v<version_number>.root
 
 /data1/<your_username>/data/analysis/muHadNonIsoAnalysis_SingleMu_v<version_number>.root
 
 /data1/<your_username>/nonIsoWData/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
 /data1/<your_username>/nonIsoWData/analysis/nonIsoW_muHadIsoAnalysis_SingleMu_v<version_number>.root
 /data1/<your_username>/nonIsoWData/analysis/nonIsoW_muHadNonIsoAnalysis_SingleMu_v<version_number>.root
-
-/data1/<your_username>/SinglePhotonParkedData/analysis/isoVsNonIsoTaus_normalizedTo1_v<version_number>.root
-/data1/<your_username>/SinglePhotonParkedData/analysis/muHadIsoAnalysis_SinglePhotonParked_Run2012D_v<version_number>.root
-/data1/<your_username>/SinglePhotonParkedData/analysis/muHadNonIsoAnalysis_SinglePhotonParked_Run2012D_v<version_number>.root
+/data1/<your_username>/nonIsoWData/analysis/nonIsoW_muHadAnalysis_SingleMu_v<version_number>.root
 
 /data1/<your_username>/results/MC_closure_v<version_number>.root
 /data1/<your_username>/results/dataVsMCQCDFromData_muHadNonIsoAnalysis_19p7fb-1_v<version_number>.root
@@ -288,7 +295,9 @@ where
 ~/CMSSW_5_3_11/src/BoostedTauAnalysis/TauAnalyzer/test/generateWWTauAnalyzerCfgs.sh
 ~/CMSSW_5_3_11/src/BoostedTauAnalysis/TauAnalyzer/test/generateWZTauAnalyzerCfgs.sh
 ~/CMSSW_5_3_11/src/BoostedTauAnalysis/TauAnalyzer/test/generateZZTauAnalyzerCfgs.sh
-
+~/CMSSW_5_3_11/src/BoostedTauAnalysis/TauAnalyzer/test/generatenonIsoWDYJetsToLLTauAnalyzerCfgs.sh
+~/CMSSW_5_3_11/src/BoostedTauAnalysis/TauAnalyzer/test/generatenonIsoWTTJetsTauAnalyzerCfgs.sh
+~/CMSSW_5_3_11/src/BoostedTauAnalysis/TauAnalyzer/test/generatenonIsoWWNJetsToLNuTauAnalyzerCfgs.sh
 
 
 
@@ -375,9 +384,13 @@ cd ~/CMSSW_5_3_11/src/BoostedTauAnalysis/TauSkimmer/test
 cmsenv
 ./generateWh1SkimCfgs.sh <version> tauSelectionSkim_Wh1.py
 ./generateggSkimCfgs.sh <version> tauSelectionSkim_gg.py
+./generateZHSkimCfgs.sh <version> tauSelectionSkim_ZH.py
+./generateVBFSkimCfgs.sh <version> tauSelectionSkim_VBF.py
 
 where <version> is the desired skim version.  Then execute
 
 cd <version>
 ./runWh1SkimCfgs.sh
 ./runggSkimCfgs.sh
+./runZHSkimCfgs.sh
+./runVBFSkimCfgs.sh

@@ -532,6 +532,9 @@ private:
   //histogram of the opening angle between the photon and the other hadronic tau constituents
   TH1F* dThetaPhotonOtherTauConstituents_;
 
+  //histogram of the hardest corrected jet eta
+  TH1F* hardestCorrJetEta_;
+
   //histogram of cleaned jet pT vs. cleaned tau pT
   TH2F* cleanedJetPTVsCleanedTauPT_;
 
@@ -1571,12 +1574,14 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
   //fill collection of all corrected jets (preserve order of original jet collection)
   std::vector<reco::PFJet> correctedJets;
+  std::vector<reco::PFJet*> correctedJetPtrs;
   for (reco::PFJetCollection::const_iterator iJet = pOldJets->begin(); iJet != pOldJets->end(); 
        ++iJet) {
     reco::PFJet correctedJet = *iJet;
     double JEC = corrector->correction(*iJet, iEvent, iSetup);
     correctedJet.scaleEnergy(JEC);
     correctedJets.push_back(correctedJet);
+    correctedJetPtrs.push_back(&correctedJet);
   }  
 
   //fill collection of all corrected jets excluding the jet associated to the W muon or photon
@@ -1590,12 +1595,11 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     }
   }
 
-  /*number of jets in event with |eta| < 2.4 and corrected pT > 20
-    that do not overlap with the W muon or HPS tau*/
+  //number of jets in event that do not overlap with the W muon or HPS tau
   int NJets = pCorrJets->size();
 
   /*make and sort by pT refs to AK5 PF jets in the selected corrected collection (distinct from 
-    this tau and the W muon and passing |eta| < 2.4)*/
+    this tau and the W muon*/
   std::vector<reco::PFJetRef> oldJetRefsExcludingTau;
   for (reco::PFJetCollection::const_iterator iCorrectedJetExcludingTau = pCorrJets->begin(); 
        iCorrectedJetExcludingTau != pCorrJets->end(); ++iCorrectedJetExcludingTau) {
@@ -2509,7 +2513,7 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       }
       else muHadUncleanedJetPTRank_->Fill(-1, PUWeight);
 
-      /*plot the number of additional loose isolated tight muons with pT > 25 GeV in the event 
+      /*plot the number of additional tight isolated tight muons with pT > 25 GeV in the event 
 	(not counting the W muon)*/
       nAddlHardMuons_->Fill(WMuonRefs.size() - 1, PUWeight);
 
@@ -2783,6 +2787,13 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       muHad_Nchtrk_1_->Fill(Nchtrk_1, PUWeight);
       muHad_Nchtrk_10_->Fill(Nchtrk_10, PUWeight);
       muHad_Nchtrk_30_->Fill(Nchtrk_30, PUWeight);
+
+      //plot hardest corrected jet eta
+      double hardestCorrJetEta = -100.0;
+      if (oldJetRefsExcludingTau.size() > 0) {
+	hardestCorrJetEta = oldJetRefsExcludingTau[oldJetRefsExcludingTau.size() - 1]->eta();
+      }
+      hardestCorrJetEta_->Fill(hardestCorrJetEta, PUWeight);
 
       //plot mu+had mass vs. dR(tagged soft muon, tau axis)
       const double dRSoftMuTau = 
@@ -3094,7 +3105,7 @@ void TauAnalyzer::beginJob()
   hadPVdz_ = new TH1F("hadPVdz", ";dz(#tau_{had},PV) (cm);", 100, 0, 1);
   bTagDiscrim_ = new TH1F("bTagDiscrim", ";CSV discriminator;", 25, 0.0, 1.0);
   WMuIso_ = new TH1F("WMuIso", ";W muon PFRelIso;", 2000, 0.0, 40.0);
-  WMuMT_ = new TH1F("WMuMT", ";W muon M_{T} (GeV);", 100, 0.0, 400.0);
+  WMuMT_ = new TH1F("WMuMT", ";W muon M_{T} (GeV);", 100, 0.0, 500.0);
   tauMuMT_ = new TH1F("tauMuMT", ";#tau muon M_{T} (GeV);", 25, 0.0, 200.0);
   tauHadMT_ = new TH1F("tauHadMT", ";#tau_{had} M_{T} (GeV);", 25, 0.0, 200.0);
   dPhiWMuMET_ = new TH1F("dPhiWMuMET", ";#Delta#phi(W muon, #slash{E}_{T});", 32, 0.0, 3.2);
@@ -3167,6 +3178,7 @@ void TauAnalyzer::beginJob()
     new TH1F("tauHadPhotonEnergyFraction", ";#frac{E_{T#gamma}}{E_{T#tau}};", 20, 0.0, 1.0);
   dThetaPhotonOtherTauConstituents_ = 
     new TH1F("dThetaPhotonOtherTauConstituents", ";#Delta#theta;", 50, 0.0, 0.5);
+  hardestCorrJetEta_ = new TH1F("hardestCorrJetEta", ";#eta;", 47, -4.7, 4.7);
   cleanedJetPTVsCleanedTauPT_ = 
     new TH2F("cleanedJetPTVsCleanedTauPT", ";#tau p_{T} (GeV);Jet p_{T} (GeV)", 
 	     50, 0.0, 100.0, 50, 0.0, 100.0);
@@ -3274,8 +3286,8 @@ void TauAnalyzer::beginJob()
     new TH2F("muHadMassVsNAddlJets", ";N_{j};m_{#mu+X} (GeV)", 10, -0.5, 9.5, 20, 0.0, 20.0);
   muHadMassVsCSVScore_ = new TH2F("muHadMassVsCSVScore", ";CSV score;m_{#mu+X} (GeV)", 25, 0.0, 
 				  1.0, muHadMassBins_.size() - 1, &muHadMassBins_[0]);
-  muHadMassVsWMuMT_ = new TH2F("muHadMassVsWMuMT", ";W muon M_{T} (GeV);m_{#mu+X} (GeV)", 100, 0.0, 400.0,
-			       muHadMassBins_.size() - 1, &muHadMassBins_[0]);
+  muHadMassVsWMuMT_ = new TH2F("muHadMassVsWMuMT", ";W muon M_{T} (GeV);m_{#mu+X} (GeV)", 
+			       100, 0.0, 500.0, muHadMassBins_.size() - 1, &muHadMassBins_[0]);
   WMuMTVsMET_ = new TH2F("WMuMTVsMET", ";#slash{E}_{T} (GeV);W muon M_{T} (GeV)", 40, 0.0, 200.0, 
 			 100, 0.0, 400.0);
   dzWMuVsdzTauMu_ = new TH2F("dzWMuVsdzTauMu", ";dz(#tau_{#mu},PV) (cm);dz(W_{#mu},PV) (cm)", 200, 0, 1, 200, 0, 1);
@@ -3287,7 +3299,7 @@ void TauAnalyzer::beginJob()
   tauHadCleanedJetEnergyFractionVsTauHadIso_ = 
     new TH2F("tauHadCleanedJetEnergyFractionVsTauHadIso", 
 	     ";Isolation energy (GeV);#frac{E_{#tau}}{E_{j}}", 20, 0.0, 20.0, 20, 0.0, 1.0);
-  jet_eta = new TH1F("jet_eta", "#eta", 35, -3.5, 3.5);
+  jet_eta = new TH1F("jet_eta", "#eta", 47, -4.7, 4.7);
   jet_phi = new TH1F("jet_phi", "#phi", 14, -3.5, 3.5);
   jet_mass_etacut = new TH1F("jet_mass_etacut", "m (GeV)", 20, 0., 200.);
   jet_ptmj_etacut = new TH1F("jet_ptmj_etacut", "#frac{p_{T}}{m}", 80, 0., 80.);
@@ -3476,6 +3488,7 @@ void TauAnalyzer::beginJob()
   WMu3rdTightMuChargeProduct_->Sumw2();
   tauHadPhotonEnergyFraction_->Sumw2();
   dThetaPhotonOtherTauConstituents_->Sumw2();
+  hardestCorrJetEta_->Sumw2();
   cleanedJetPTVsCleanedTauPT_->Sumw2();
   uncleanedJetPTVsCleanedTauPT_->Sumw2();
   muHadMassVsDRSoftMuTau_->Sumw2();
@@ -3644,6 +3657,7 @@ void TauAnalyzer::endJob()
   TCanvas tauHadPhotonEnergyFractionCanvas("tauHadPhotonEnergyFractionCanvas", "", 600, 600);
   TCanvas 
     dThetaPhotonOtherTauConstituentsCanvas("dThetaPhotonOtherTauConstituentsCanvas", "", 600, 600);
+  TCanvas hardestCorrJetEtaCanvas("hardestCorrJetEtaCanvas", "", 600, 600);
   TCanvas cleanedJetPTVsCleanedTauPTCanvas("cleanedJetPTVsCleanedTauPTCanvas", "", 600, 600);
   TCanvas uncleanedJetPTVsCleanedTauPTCanvas("uncleanedJetPTVsCleanedTauPTCanvas", "", 600, 600);
   TCanvas muHadMassVsDRSoftMuTauCanvas("muHadMassVsDRSoftMuTauCanvas", "", 600, 600);
@@ -3845,6 +3859,7 @@ void TauAnalyzer::endJob()
   Common::draw1DHistograms(dThetaPhotonOtherTauConstituentsCanvas, 
 			   dThetaPhotonOtherTauConstituents_);
   //  Common::draw1DHistograms(dRWMuTriggerObjectCanvas, dRWMuTriggerObject_);
+  Common::draw1DHistograms(hardestCorrJetEtaCanvas, hardestCorrJetEta_);
 
   //format and draw 2D plots
   Common::draw2DHistograms(cleanedJetPTVsCleanedTauPTCanvas, cleanedJetPTVsCleanedTauPT_);
@@ -3984,6 +3999,7 @@ void TauAnalyzer::endJob()
   WMu3rdTightMuChargeProductCanvas.Write();
   tauHadPhotonEnergyFractionCanvas.Write();
   dThetaPhotonOtherTauConstituentsCanvas.Write();
+  hardestCorrJetEtaCanvas.Write();
   cleanedJetPTVsCleanedTauPTCanvas.Write();
   uncleanedJetPTVsCleanedTauPTCanvas.Write();
   muHadMassVsDRSoftMuTauCanvas.Write();
@@ -4425,8 +4441,68 @@ void TauAnalyzer::fillMistagEffPlot()
     mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
   }
   else if (sample_ == "gg_a13") {
+    mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(2, 1, 0.3);
+    mistagEffVsPTAndEta_->SetBinContent(2, 2, 0.25);
+    mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.230769);
+    mistagEffVsPTAndEta_->SetBinContent(3, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(3, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(4, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(4, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(4, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(5, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(5, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(5, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(6, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(6, 2, 0.5);
+    mistagEffVsPTAndEta_->SetBinContent(6, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(7, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(7, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(8, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(8, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
   }
   else if (sample_ == "gg_a15") {
+    mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(2, 1, 1);
+    mistagEffVsPTAndEta_->SetBinContent(2, 2, 0.125);
+    mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.142857);
+    mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.25);
+    mistagEffVsPTAndEta_->SetBinContent(3, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(4, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(4, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(4, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(5, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(5, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(5, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(6, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(6, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(6, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(7, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(7, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(8, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(8, 2, 1);
+    mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
+    mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
+    mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
+    mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
   }
 }
 
@@ -4862,6 +4938,9 @@ void TauAnalyzer::reset(const bool doDelete)
     delete dThetaPhotonOtherTauConstituents_;
   }
   dThetaPhotonOtherTauConstituents_ = NULL;
+  if (doDelete && (hardestCorrJetEta_ != NULL)) {
+    delete hardestCorrJetEta_;
+  }
   if (doDelete && (cleanedJetPTVsCleanedTauPT_ != NULL)) delete cleanedJetPTVsCleanedTauPT_;
   cleanedJetPTVsCleanedTauPT_ = NULL;
   if (doDelete && (uncleanedJetPTVsCleanedTauPT_ != NULL)) delete uncleanedJetPTVsCleanedTauPT_;
