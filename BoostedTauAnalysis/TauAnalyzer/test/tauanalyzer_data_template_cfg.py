@@ -185,6 +185,11 @@ process.WIsoMuonSelector = cms.EDFilter('CustomMuonSelector',
                                         minNumObjsToPassFilter = cms.uint32(1)
                                         )
 
+#produce a collection with the highest pT W muon in the event
+process.highestPTWMuonSelector = cms.EDFilter('HighestPTMuonRefSelector',
+                                              objRefTag = cms.InputTag('WIsoMuonSelector')
+                                              )
+
 #search for a muon with pT > 5 GeV as in HZZ4l analysis and proceed if one can be found
 #this will produce a ref to the original muon collection
 process.tauMuonPTSelector = cms.EDFilter('MuonRefSelector',
@@ -469,6 +474,7 @@ process.METFilter.METTag = cms.InputTag("patType1CorrectedPFMetPFlow")
 #MT filter
 process.MTFilter.minMT = cms.double(50.)
 process.MTFilter.METTag = cms.InputTag("patType1CorrectedPFMetPFlow")
+process.MTFilter.objTag = cms.InputTag('highestPTWMuonSelector')
 process.highMTFilter = process.MTFilter.clone()
 process.lowMTFilter = process.MTFilter.clone()
 process.lowMTFilter.passFilter = cms.bool(False)
@@ -549,6 +555,7 @@ process.photonTriggerObjectFilter = cms.EDFilter(
 #sequences
 process.beginSequence = cms.Sequence(process.genPartonSelector*process.genMuSelector)
 process.baseIsoTauAnalysisSequence = cms.Sequence(
+    process.highestPTWMuonSelector*
     process.muHadIsoTauSelector*
     process.IsoBVetoFilter*
     process.corrJetDistinctIsoTauSelector*
@@ -573,6 +580,7 @@ process.baseSignalIsoTauAnalysisSequence = cms.Sequence(
     process.tauMuonPTSelector*
     process.tauMuonSelector*
     process.PFTau*
+    process.highestPTWMuonSelector*
     process.muHadIsoTauSelector*
     process.IsoBVetoFilter*
     process.TRIGGEROBJECTFILTER*
@@ -589,6 +597,7 @@ process.lowMTSignalIsoTauAnalysisSequence = cms.Sequence(
     process.lowMTMuHadIsoTauAnalyzer
     )
 process.baseNonIsoTauAnalysisSequence = cms.Sequence(
+    process.highestPTWMuonSelector*
     process.muHadNonIsoTauSelector*
     process.NonIsoBVetoFilter*
     process.corrJetDistinctNonIsoTauSelector*
@@ -606,6 +615,7 @@ process.lowMTNonIsoTauAnalysisSequence = cms.Sequence(
     process.lowMTMuHadNonIsoTauAnalyzer
     )
 process.baseTauAnalysisSequence = cms.Sequence(
+    process.highestPTWMuonSelector*
     process.muHadTauSelector*
     process.AllBVetoFilter*
     process.corrJetDistinctTauSelector*
