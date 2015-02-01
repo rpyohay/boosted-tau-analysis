@@ -2328,8 +2328,8 @@ void formatPlots(const string& inputVersion, const string& outputVersion,
   		pair<string, float>(dataVsMCOutputFile, 1.0), 
   		vector<string>(1, "muHadMass"), vector<string>(1, "m_{#mu+had} (GeV)"), 
   		vector<int>(1, 1), vector<int>(1, 2), 
-  		analysisFilePath + "results/final" + a1Mass + MTBin + uncTag + outputVTag + fileExt, 
-		"main 5", true/*false*/); //ggH
+  		analysisFilePath + "results/final" + MTBin + uncTag + a1Mass + outputVTag + 
+		fileExt, "main 5", a1Mass == "_a9" ? true : false);
 
 //   //print the hadronic tau pT weights and their statistical errors
 //   printWeightsAndErrors(nonIsoWDataIsoHaddOutputFile, dataNonIsoHaddOutputFile);
