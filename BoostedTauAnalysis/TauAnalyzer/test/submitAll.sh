@@ -33,9 +33,9 @@ cd $version
 #./submitNonIsoWQCDTauAnalyzerJobs.sh
 #./submitNonIsoWQCDBTauAnalyzerJobs.sh
 #./submitNonIsoWQCDBMuTauAnalyzerJobs.sh
-./submitNonIsoWDYJetsToLLTauAnalyzerJobs.sh
-./submitNonIsoWTTJetsTauAnalyzerJobs.sh
-./submitNonIsoWWNJetsToLNuTauAnalyzerJobs.sh
+#./submitNonIsoWDYJetsToLLTauAnalyzerJobs.sh
+#./submitNonIsoWTTJetsTauAnalyzerJobs.sh
+#./submitNonIsoWWNJetsToLNuTauAnalyzerJobs.sh
 cd ..
 
 exit 0
