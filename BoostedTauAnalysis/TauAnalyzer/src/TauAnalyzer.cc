@@ -3106,7 +3106,7 @@ void TauAnalyzer::beginJob()
   bTagDiscrim_ = new TH1F("bTagDiscrim", ";CSV discriminator;", 25, 0.0, 1.0);
   WMuIso_ = new TH1F("WMuIso", ";W muon PFRelIso;", 2000, 0.0, 40.0);
   WMuMT_ = new TH1F("WMuMT", ";W muon M_{T} (GeV);", 100, 0.0, 500.0);
-  tauMuMT_ = new TH1F("tauMuMT", ";#tau muon M_{T} (GeV);", 25, 0.0, 200.0);
+  tauMuMT_ = new TH1F("tauMuMT", ";#tau muon M_{T} (GeV);", 40, 0.0, 200.0);
   tauHadMT_ = new TH1F("tauHadMT", ";#tau_{had} M_{T} (GeV);", 25, 0.0, 200.0);
   dPhiWMuMET_ = new TH1F("dPhiWMuMET", ";#Delta#phi(W muon, #slash{E}_{T});", 32, 0.0, 3.2);
   dPhiTauMuMET_ = 

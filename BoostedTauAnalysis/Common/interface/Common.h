@@ -95,6 +95,12 @@ class Common {
 
   static void sortByPT(std::vector<reco::PhotonRef>&);
 
+  template<typename T>
+    static void sortByPT(std::vector<edm::Ref<T> >& objects)
+    {
+      std::sort(objects.begin(), objects.end(), comparePT);
+    }
+
   template<typename T, typename U>
     static const T* nearestObject(const U& obj, const std::vector<T*>& objs, int& index)
     {
@@ -307,6 +313,12 @@ class Common {
   static bool comparePFTauRefPT(reco::PFTauRef, reco::PFTauRef);
 
   static bool comparePhotonRefPT(reco::PhotonRef, reco::PhotonRef);
+
+  template<typename T>
+    bool comparePT(edm::Ref<T> object1, edm::Ref<T> object2)
+    {
+      return (object1->pt() < object2->pt());
+    }
 
   static std::vector<reco::MuonRef> 
     getTightIsolatedRecoMuons(const edm::Handle<reco::MuonCollection>&, const reco::Vertex*, 
