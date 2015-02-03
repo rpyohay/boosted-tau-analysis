@@ -1990,7 +1990,6 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
 	cout << "prediction from QCD (data): " << stackHist->GetBinContent(5) << " +/- " << stackHist->GetBinError(5) << endl;
       }
     }
-    cout << "stat error on total MC histogram = " << isoBkgAllHist->GetBinError(1) << endl;
 //     setHistogramOptions(isoBkgAllHist, kBlue, 0.7, 21, 1.0, unit.c_str(), "");
     isoBkgAllHist->GetYaxis()->SetRangeUser(0.01, 10000.0);
     isoBkgAll.Add(isoBkgAllHist, "HISTE C");

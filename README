@@ -135,22 +135,25 @@ Then execute
 
 cd ~/CMSSW_5_3_11/src/BoostedTauAnalysis/TauAnalyzer/test
 cmsenv
-root -l -b -q 'formatPlots.C("v<input_version>", "v<output_version>", [true|false], "", "_a<mass>", "_lowMT")'
-root -l -b -q 'formatPlots.C("v<input_version>", "v<output_version>", [true|false], "", "_a<mass>", "_highMT")'
+root -l -b -q 'formatDataBkgPlots.C("v<input_version>", "v<output_version>", [true|false], "_lowMT")'
+root -l -b -q 'formatDataBkgPlots.C("v<input_version>", "v<output_version>", [true|false], "_highMT")'
+root -l -b -q 'formatSigPlots.C("v<input_version>", "v<output_version>", [true|false], "", "_a<a_mass>", _lowMT")'
+root -l -b -q 'formatSigPlots.C("v<input_version>", "v<output_version>", [true|false], "", "_a<a_mass>", _highMT")'
 
 where
 
 <input_version> is the integer version number associated to the input files you want to analyze
 <output_version> is the version number that will be assigned to the output files you create (typically it's the same as the input version but there might be special cases where you'd like them to be different)
 "true" means recompile the code, "false" means do not recompile the code
-"" is the tag for calculating signal uncertainties ("" means just run the nominal, not the +/1sigma shifted)
-"_a<mass>" is the pseudoscalar mass, i.e. "_a9" for 9 GeV pseudoscalar
+a_mass is the pseudoscalar mass
 "_lowMT"/"_highMT" refer to the MT bins (<=50 GeV / >50 GeV)
 
 If you want to also make plots where no HPS tau isolation cut is applied, do
 
-root -l -b -q 'formatPlots.C("v<input_version>", "v<output_version>", [true|false], "", "_a<mass>", "_lowMT", true)'
-root -l -b -q 'formatPlots.C("v<input_version>", "v<output_version>", [true|false], "", "_a<mass>", "_highMT", true)'
+root -l -b -q 'formatDataBkgPlots.C("v<input_version>", "v<output_version>", [true|false], "_lowMT", true)'
+root -l -b -q 'formatDataBkgPlots.C("v<input_version>", "v<output_version>", [true|false], "_highMT", true)'
+root -l -b -q 'formatSigPlots.C("v<input_version>", "v<output_version>", [true|false], "", "_a<a_mass>", _lowMT", true)'
+root -l -b -q 'formatSigPlots.C("v<input_version>", "v<output_version>", [true|false], "", "_a<a_mass>", _highMT", true)'
 
 instead of the root command given above.
 
