@@ -166,8 +166,10 @@
 //        ++iFile) {
 //     const unsigned int strLen = iFile->find(".root");
 //     const string outputFileName(iFile->substr(0, strLen) + "_final.root");
-//     float weight = 1.95295217378794;
-//     if ((iFile - effInputFiles.begin()) == 1) weight = 0.0709988;
+//     // float weight = 1.95295217378794; //Pythia WH cross section scaled by SM ggH:WH ratio
+//     float weight = 3.79619; //SM ggH cross section
+//     // if ((iFile - effInputFiles.begin()) == 1) weight = 0.0709988; //Pythia WH cross section
+//     if ((iFile - effInputFiles.begin()) == 1) weight = 0.138806; //SM WH cross section * BR(W-->leptons)
 //     plotNice(*iFile, effHistMap1D, effHistMap2D, binLabelMap, hist1DMap, outputFileName, "noPDF", weight);
 //   }
 }
