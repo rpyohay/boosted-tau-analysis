@@ -43,4 +43,20 @@ fi
 #./generateNonIsoWDYJetsToLLTauAnalyzerCfgs.sh $version $MCTemplateCfg
 #./generateNonIsoWTTJetsTauAnalyzerCfgs.sh $version $MCTemplateCfg
 #./generateNonIsoWWNJetsToLNuTauAnalyzerCfgs.sh $version $MCTemplateCfg
+
+#generate run cfg that runs all signals in the directory
+cd $version
+cat <<EOF > runSigTauAnalyzerCfgs.sh
+#!/bin/bash
+
+./runggTauAnalyzerCfgs.sh
+./runVBFTauAnalyzerCfgs.sh
+sleep 10m
+./runWh1TauAnalyzerCfgs.sh
+./runZHTauAnalyzerCfgs.sh
+
+exit 0
+EOF
+chmod a+x runSigTauAnalyzerCfgs.sh
+
 exit 0
