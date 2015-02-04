@@ -56,6 +56,7 @@
 #include "TCanvas.h"
 #include "TLegend.h"
 #include "TF1.h"
+#include "TSystem.h"
 #include <fastjet/JetDefinition.hh>
 #include <fastjet/PseudoJet.hh>
 #include <fastjet/ClusterSequence.hh>
@@ -1184,7 +1185,16 @@ TauAnalyzer::TauAnalyzer(const edm::ParameterSet& iConfig):
 
   //get histogram of higgs pT weights
 
-  std::string inputFileName_weight = "/afs/cern.ch/user/f/friccita/myNMSSMAnalysis/CMSSW_5_3_11/src/BoostedTauAnalysis/TauAnalyzer/test/HRes_weight_pTH_mH125_8TeV.root";
+  //get CMSSW path
+  const char* CMSSWPathCString = gSystem->Getenv("CMSSW_BASE");
+  if (!CMSSWPathCString) {
+    CMSSWPathCString = "";
+    cout << "Error: environment variable CMSSW_BASE is not set.  ";
+    cout << "Please run cmsenv from within your CMSSW project area.\n";
+  }
+  string CMSSWPathCPPString(CMSSWPathCString);
+
+  std::string inputFileName_weight = CMSSWPathCPPString + "/src/BoostedTauAnalysis/TauAnalyzer/test/HRes_weight_pTH_mH125_8TeV.root";
   TFile* inputFile_weight = new TFile(inputFileName_weight.data());
   std::string lutName_weight;
   /*  if      ( reweightOption == "reweighted"   ) lutName_weight = Form("A_mA%1.0f_mu200/mssmHiggsPtReweight_A_mA%1.0f_mu200_central", mA, mA);
