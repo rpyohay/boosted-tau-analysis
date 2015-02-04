@@ -132,8 +132,8 @@ process.WIsoMuonSelector = cms.EDFilter('CustomMuonSelector',
                                         muonTag = cms.InputTag('WMuonPTSelector'),
                                         vtxTag = cms.InputTag('offlinePrimaryVertices'),
                                         muonID = cms.string('tight'),
-                                        PFIsoMax = cms.double(-1.0),
-#                                        PFIsoMax = cms.double(0.12),
+#                                        PFIsoMax = cms.double(-1.0),
+                                        PFIsoMax = cms.double(0.12),
                                         detectorIsoMax = cms.double(-1.0),
                                         PUSubtractionCoeff = cms.double(0.5),
                                         usePFIso = cms.bool(True),
@@ -1627,7 +1627,7 @@ readFiles.extend([
 #analyze gen infor for Wh sample
 process.analyzeGenInfo = cms.EDAnalyzer(
     'GenAnalyzer',
-    outFileName = cms.string('ggHTriggerStudy/gg_WmuID_a9_gen_analysis_GenMatch.root'),
+    outFileName = cms.string('ggHTriggerStudy/gg_preskim_a9_gen_analysis_GenMatch_TriggerMatch_HLTPass.root'),
 #    outFileName = cms.string('triggertest.root'),
     genParticleTag = cms.InputTag('genParticles'),
     PUTag = cms.InputTag('addPileupInfo'),
@@ -1659,10 +1659,9 @@ process.analyzeGenInfo = cms.EDAnalyzer(
     HLTSubFilters = cms.untracked.VInputTag("")
     )
 
-process.p = cms.Path(#process.IsoMu24eta2p1Selector*
-                     process.WMuonPTSelector*
-                     process.WIsoMuonSelector*
-#                     process.IsoMu24eta2p1Selector*
+process.p = cms.Path(process.IsoMu24eta2p1Selector*
+#                     process.WMuonPTSelector*
+#                     process.WIsoMuonSelector*
 #                     process.tauMuonPTSelector*
 #                     process.tauMuonSelector*
 #                     process.PFTau*
