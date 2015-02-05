@@ -455,7 +455,7 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 		}
 	      
 	      //make sure this reco mu is matched to a trigger object
-// 	      bool trigger_matched = false;
+	      bool trigger_matched = false;
 	      if (firedHLT)
 		{ // firedHLT
 		  // Did this reco muon cause an HLT trigger?
@@ -466,9 +466,9 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 		    
 		    std::cout << "dR(reco mu, TO) = " << deltaR((*recoMuPtrs.at(muMatch)), TO) << std::endl;
 		    //save RECO objects matched to trigger objects
-// 		    if ((deltaR((*recoMuPtrs.at(muMatch)), TO) < delRMatchingCut_)) {
-// 		      trigger_matched = true;
-// 		    }
+		    if ((deltaR((*recoMuPtrs.at(muMatch)), TO) < delRMatchingCut_)) {
+		      trigger_matched = true;
+		    }
 		  }
 		} //firedHLT
 	      
