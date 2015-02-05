@@ -1183,8 +1183,6 @@ TauAnalyzer::TauAnalyzer(const edm::ParameterSet& iConfig):
   tauHadPTBins_.push_back(595.0);
   tauHadPTBins_.push_back(600.0);
 
-  //get histogram of higgs pT weights
-
   //get CMSSW path
   const char* CMSSWPathCString = gSystem->Getenv("CMSSW_BASE");
   if (!CMSSWPathCString) {
@@ -1194,7 +1192,9 @@ TauAnalyzer::TauAnalyzer(const edm::ParameterSet& iConfig):
   }
   string CMSSWPathCPPString(CMSSWPathCString);
 
-  std::string inputFileName_weight = CMSSWPathCPPString + "/src/BoostedTauAnalysis/TauAnalyzer/test/HRes_weight_pTH_mH125_8TeV.root";
+  //get histogram of higgs pT weights
+  std::string inputFileName_weight = CMSSWPathCPPString + 
+    "/src/BoostedTauAnalysis/TauAnalyzer/test/HRes_weight_pTH_mH125_8TeV.root";
   TFile* inputFile_weight = new TFile(inputFileName_weight.data());
   std::string lutName_weight;
   /*  if      ( reweightOption == "reweighted"   ) lutName_weight = Form("A_mA%1.0f_mu200/mssmHiggsPtReweight_A_mA%1.0f_mu200_central", mA, mA);
@@ -1629,7 +1629,6 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   }
   Common::sortByPT(oldJetRefsInclTauNoPTCut);
 
-
 //   //debug
 //   for (reco::MuonCollection::const_iterator iMu = pAllMuons->begin(); iMu != pAllMuons->end(); 
 //        ++iMu) {
@@ -1682,7 +1681,7 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     const reco::PFJetRef& tauOldJetRef = (*pOldNewJetMap)[tauJetRef];
     const reco::PFJet correctedTauJet = correctedJets[tauOldJetRef.key()];
     const reco::MuonRefVector& removedMuons = (*pMuonJetMap)[tauJetRef];
-    
+
     double b_discriminant = 999.;
     for (unsigned int i = 0; i != bTags.size(); ++i)
       { // loop over btags
@@ -1889,7 +1888,6 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     const double muHadMass = 
       (removedMuonRefs[removedMuonRefs.size() - 1]->p4() + (*iTau)->p4()).M();
 
-
     /*get charge product of W muon and all third tight muons
       - 3rd muon not overlapping the tau muon or the W muon and passing tight ID*/
     std::vector<reco::MuonRef> thirdMuons = 
@@ -1920,7 +1918,7 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     double mu_px = removedMuonRefs[removedMuonRefs.size() - 1]->p4().px();
     double mu_py = removedMuonRefs[removedMuonRefs.size() - 1]->p4().py();
     double mu_pz = removedMuonRefs[removedMuonRefs.size() - 1]->p4().pz();
-    
+
     double tau_vx = (*iTau)->vertex().x();
     double tau_vy = (*iTau)->vertex().y();
     double tau_vz = (*iTau)->vertex().z();
@@ -2074,12 +2072,15 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	sqrt(2*(*iTau)->pt()*METRefToBase->et()*
 	     (1.0 - cos(reco::deltaPhi((*iTau)->phi(), METRefToBase->phi()))));
       tauHadMT_->Fill(tauHad_TransverseMass, PUWeight);      
-      
+
       //plot HT (tau muon + hadronic tau + leading distinct corrected jet)
-      reco::Candidate* leadDistinctCorrJet = 
-	dynamic_cast<reco::Candidate*>(const_cast<reco::PFJet*>
-				       (oldJetRefsExclTauNoPTCut
-					[oldJetRefsExclTauNoPTCut.size() - 1].get()));
+      reco::Candidate* leadDistinctCorrJet = NULL;
+      if (oldJetRefsExclTauNoPTCut.size() > 0) {
+	leadDistinctCorrJet = 
+	  dynamic_cast<reco::Candidate*>(const_cast<reco::PFJet*>
+					 (oldJetRefsExclTauNoPTCut
+					  [oldJetRefsExclTauNoPTCut.size() - 1].get()));
+      }
       std::vector<reco::Candidate*> tauMuTauHadJet;
       tauMuTauHadJet.push_back(dynamic_cast<reco::Candidate*>
 			       (const_cast<reco::Muon*>
@@ -4521,7 +4522,7 @@ double TauAnalyzer::HT(const std::vector<reco::Candidate*>& cands) const
   double theHT = 0.0;
   for (std::vector<reco::Candidate*>::const_iterator iCand = cands.begin(); iCand != cands.end(); 
        ++iCand) {
-    theHT+=(*iCand)->pt();
+    if (*iCand != NULL) theHT+=(*iCand)->pt();
   }
   return theHT;
 }
