@@ -97,11 +97,17 @@ private:
   //PU info tag
   edm::InputTag PUTag_;
 
+  //vertex tag
+  edm::InputTag vtxTag_;
+
   //reco muon tag
   edm::InputTag muonTag_;
 
-  //gen tau-->mu tag
-  //  edm::InputTag genTauMuTag_;
+  //PU subtraction coefficient for muon PF isolation
+  double muonPFIsoPUSubtractionCoeff_;
+
+  //muon PFRelIso cut
+  double PFIsoMax_;
 
   //set of parameters for GenTauDecayID class
   edm::ParameterSet genTauDecayIDPSet_;
@@ -201,8 +207,11 @@ GenAnalyzer::GenAnalyzer(const edm::ParameterSet& iConfig):hltConfig_(),
   outFileName_(iConfig.getParameter<std::string>("outFileName")),
   genParticleTag_(iConfig.getParameter<edm::InputTag>("genParticleTag")),
   PUTag_(iConfig.getParameter<edm::InputTag>("PUTag")),
+  vtxTag_(iConfig.getParameter<edm::InputTag>("vtxTag")),
   muonTag_(iConfig.existsAs<edm::InputTag>("muonTag") ? 
 	   iConfig.getParameter<edm::InputTag>("muonTag") : edm::InputTag()),
+  muonPFIsoPUSubtractionCoeff_(iConfig.getParameter<double>("muonPFIsoPUSubtractionCoeff")),
+  PFIsoMax_(iConfig.getParameter<double>("PFIsoMax")),
   genTauDecayIDPSet_(iConfig.getParameter<edm::ParameterSet>("genTauDecayIDPSet"))
 {
   //now do what ever initialization is needed
@@ -255,6 +264,13 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   //get PU info
   edm::Handle<std::vector<PileupSummaryInfo> > pPU;
   iEvent.getByLabel(PUTag_, pPU);
+
+  //get vertices
+  edm::Handle<reco::VertexCollection> pVertices;
+  iEvent.getByLabel(vtxTag_, pVertices);
+
+  //identify the first good vertex (the "primary" (?))
+  reco::Vertex* pPV = Common::getPrimaryVertex(pVertices);
 
   //get reco muons
   edm::Handle<reco::MuonCollection> pMuons;
@@ -432,20 +448,19 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 		{
 		  for (unsigned int j = 0; j < (*reco::GenParticleRef(pGenParticles, iTau->getTauIndex())).daughter(i)->numberOfDaughters(); ++j)
 		    {
-		      if ((*reco::GenParticleRef(pGenParticles, iTau->getTauIndex())).daughter(i)->daughter(j)->pdgId() == 13)
+		      if (fabs((*reco::GenParticleRef(pGenParticles, iTau->getTauIndex())).daughter(i)->daughter(j)->pdgId()) == 13)
 			genMuRef = (&*reco::GenParticleRef(pGenParticles, iTau->getTauIndex()));
 		    }
 		}
 	    }
 
-	  if (genMuRef != NULL)
+	  if ((genMuRef != NULL) && (recoMuPtrs.size() != 0))
 	    {
 	      //loop over reco mu refs to find match (dR < 0.3)
 	      double delR_recogen = 9999.;
 	      unsigned int muMatch = -1;
 	      for (unsigned int iRecoMu = 0; iRecoMu != recoMuPtrs.size(); ++iRecoMu)
 		{
-		  //double compareDR = reco::deltaR(*genMuRef, **iRecoMu);
 		  double compareDR = reco::deltaR(*genMuRef, *recoMuPtrs.at(iRecoMu));
 		  if (compareDR < delR_recogen)
 		    {
@@ -472,11 +487,20 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 		  }
 		} //firedHLT
 	      
+	      double etaMax = 2.1;
+	      bool isTightMu = false;
+	      double recoMuRelIso = (Common::getMuonCombPFIso((*recoMuPtrs.at(muMatch)), muonPFIsoPUSubtractionCoeff_)/(*recoMuPtrs.at(muMatch)).pt());
+
+	      isTightMu = Common::isTightIsolatedRecoMuon(&*recoMuPtrs.at(muMatch), pPV, muonPFIsoPUSubtractionCoeff_,
+							       true, PFIsoMax_, etaMax, true);
+	      if (recoMuRelIso > PFIsoMax_)
+		cout << "WAIT! muon PFRelIso = " << recoMuRelIso << " and isTightMu = " << isTightMu << endl;
+
 	      //if there was a match...
-	      if ((delR_recogen < 0.3) && trigger_matched)
+	      if ((delR_recogen < 0.3) /*&& trigger_matched */&& isTightMu)
 		{
 		  //if reco mu pT > 25 and |eta| < 2.1 ...
-		  if (((*recoMuPtrs.at(muMatch)).pt() > 25.) && ((*recoMuPtrs.at(muMatch)).eta() < 2.1))
+		  if (((*recoMuPtrs.at(muMatch)).pt() > 25.) && ((*recoMuPtrs.at(muMatch)).eta() < etaMax))
 		    {
 		      // - plot delR(gen tau_mu, gen tau_sister)
 		      dRA1TauDaughtersGenMatch_->Fill(reco::deltaR(*reco::GenParticleRef(pGenParticles, iTau->getTauIndex()), 
@@ -494,7 +518,6 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 		      tauSisterPTVsdR_->Fill(reco::deltaR(*reco::GenParticleRef(pGenParticles, iTau->getTauIndex()), 
 							  *reco::GenParticleRef(pGenParticles, iTau->getSisterIndex())), iTau->getVisibleTauSisterP4().Pt());
 		      // - plot PFRelIso vs pT of reco mu
-		      double recoMuRelIso = Common::getMuonCombPFIso((*recoMuPtrs.at(muMatch)), 0.5)/(*recoMuPtrs.at(muMatch)).pt();
 		      recoMuPFRelIso_->Fill(recoMuRelIso);
 		      recoMuPFRelIsoVsdRA1TauDaughters_->Fill(reco::deltaR(*reco::GenParticleRef(pGenParticles, iTau->getTauIndex()), 
 									   *reco::GenParticleRef(pGenParticles, iTau->getSisterIndex())), recoMuRelIso);

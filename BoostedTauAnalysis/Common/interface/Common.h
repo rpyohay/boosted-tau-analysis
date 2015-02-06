@@ -294,6 +294,18 @@ class Common {
   static double rhoCorrPhotonIso(const edm::Handle<edm::ValueMap<double> >&, 
 				 const edm::Handle<double>&, const reco::PhotonRef&);
 
+  //decide if muon passes tight ID or not
+  static bool isTightIsolatedRecoMuon(const reco::Muon* iMuon, 
+				      const reco::Vertex* pPV, const bool usePFIso, 
+				      const double PUSubtractionCoeff, const double isoMax, 
+				      const double etaMax, const bool passIso);
+
+  //decide if muon passes tight ID or not
+  static bool isTightIsolatedRecoMuon(const edm::RefToBase<reco::Muon> iMuon, 
+				      const reco::Vertex* pPV, const bool usePFIso, 
+				      const double PUSubtractionCoeff, const double isoMax, 
+				      const double etaMax, const bool passIso);
+    
  private:
 
   static bool compareCandidatePT(reco::Candidate*, reco::Candidate*);

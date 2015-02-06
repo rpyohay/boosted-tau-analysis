@@ -55,10 +55,11 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.source = cms.Source(
     "PoolSource",
-    fileNames = cms.untracked.vstring(
+#    fileNames = cms.untracked.vstring(
 #    'root://eoscms//eos/cms/store/data/Run2012A/SingleMu/AOD/22Jan2013-v1/20000/002F5062-346F-E211-BF00-1CC1DE04DF20.root'
-    'root://eoscms//eos/cms/store/user/friccita/isoTest/0012AB48-AA02-E211-ACF7-001E67398043.root'
-    ),
+#    'root://eoscms//eos/cms/store/user/friccita/isoTest/0012AB48-AA02-E211-ACF7-001E67398043.root'
+#    ),
+    fileNames = cms.untracked.vstring('file:/afs/cern.ch/work/f/friccita/00B16DF1-8FD1-E111-ADBB-F04DA23BCE4C.root'),
     skipEvents = cms.untracked.uint32(0)
     )
 
@@ -141,16 +142,62 @@ process.WMuonPTSelector = cms.EDFilter('MuonRefSelector',
                                        filter = cms.bool(True)
                                        )
 
+#search for a tight PF isolated tight muon in |eta| < 2.1 with pT > 25 GeV
+#(see https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Muon_Isolation_AN1 for
+#isolation definition; CMS AN-2012/349 uses loose isolation working point for WHbb muon selection)
+#this will produce a ref to the original muon collection
+process.WIsoMuonSelector = cms.EDFilter('CustomMuonSelector',
+                                        baseMuonTag = cms.InputTag('muons'),
+                                        muonTag = cms.InputTag('WMuonPTSelector'),
+                                        vtxTag = cms.InputTag('offlinePrimaryVertices'),
+                                        muonID = cms.string('tight'),
+                                        PFIsoMax = cms.double(-1.0),
+#                                        PFIsoMax = cms.double(0.12),
+                                        detectorIsoMax = cms.double(-1.0),
+                                        PUSubtractionCoeff = cms.double(0.5),
+                                        usePFIso = cms.bool(True),
+                                        passIso = cms.bool(True),
+                                        etaMax = cms.double(2.1),
+                                        minNumObjsToPassFilter = cms.uint32(1)
+                                        )
+
 process.MuonIsolationAnalyzer = cms.EDAnalyzer('MuonIsolationAnalyzer',
-                                               outFileName = cms.string('isoOverPT.root'),
+                                               outFileName = cms.string('isoOverPT_test.root'),
                                                muonTag = cms.InputTag('WMuonPTSelector'),
                                                muonPFIsoPUSubtractionCoeff = cms.double(0.5)
                                                )
 
 process.IsolationAnalyzer = cms.EDAnalyzer('IsolationAnalyzer',
-                                           outFileName = cms.string('isoVsPT.root'),
-                                           muonTag = cms.InputTag('WMuonPTSelector'),
-                                           muonPFIsoPUSubtractionCoeff = cms.double(0.5)
+                                           outFileName = cms.string('isoVsPT_DY.root'),
+                                           genParticleTag = cms.InputTag('genParticles'),
+                                           vtxTag = cms.InputTag('offlinePrimaryVertices'),
+                                           muonTag = cms.InputTag('muons'),
+                                           muonPFIsoPUSubtractionCoeff = cms.double(0.5),
+                                           PFIsoMax = cms.double(1.2),
+                                           triggerEventTag = cms.untracked.InputTag("hltTriggerSummaryAOD", "", "HLT"),
+    triggerResultsTag = cms.untracked.InputTag("TriggerResults", "", "HLT"),
+    triggerDelRMatch = cms.untracked.double(0.1),
+    hltTags = cms.VInputTag(cms.InputTag("HLT_IsoMu24_eta2p1_v1", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v2", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v3", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v4", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v5", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v6", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v7", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v8", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v9", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v10", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v11", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v12", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v13", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v14", "", "HLT"),
+                            cms.InputTag("HLT_IsoMu24_eta2p1_v15", "", "HLT")
+                            ),
+    theRightHLTTag = cms.InputTag("HLT_IsoMu24_eta2p1"),
+#    theRightHLTTag = cms.InputTag("HLT_Mu24_eta2p1"),
+    theRightHLTSubFilter = cms.InputTag("hltL3crIsoL1sMu16Eta2p1L1f0L2f16QL3f24QL3cr"),
+#    theRightHLTSubFilter = cms.InputTag("hltL3fL1sMu7L1fEta2p1L2fEta2p1f7L3FilteredEta2p1Filtered15"),
+    HLTSubFilters = cms.untracked.VInputTag("")
                                            )
 
 #search for a loose PF isolated tight muon in |eta| < 2.1 with pT > 25 GeV
@@ -188,7 +235,7 @@ process.tauMuonSelector = cms.EDFilter('CustomMuonSelector',
                                        baseMuonTag = cms.InputTag('muons'),
                                        muonTag = cms.InputTag('tauMuonPTSelector'),
                                        vtxTag = cms.InputTag('offlinePrimaryVertices'),
-                                       vetoMuonTag = cms.InputTag('WIsoMuonSelector'),
+                                       vetoMuonTag = cms.InputTag('WIsoMuonSelecor'),
                                        muonID = cms.string('soft'),
                                        PFIsoMax = cms.double(0.2),
                                        detectorIsoMax = cms.double(-1.0),
@@ -283,8 +330,11 @@ process.muHadNonIsoTauSelector = cms.EDFilter(
 #    )
 
 #sequences
-process.noSelectionSequence = cms.Sequence(process.IsoMu24eta2p1Selector*process.WMuonPTSelector*
-                                           process.MuonIsolationAnalyzer*process.IsolationAnalyzer)
+process.noSelectionSequence = cms.Sequence(process.IsoMu24eta2p1Selector*
+                                           process.WMuonPTSelector*
+					   process.WIsoMuonSelector* 
+#                                           process.MuonIsolationAnalyzer*
+                                           process.IsolationAnalyzer)
 
 #no selection path
 process.p = cms.Path(process.noSelectionSequence)

@@ -746,3 +746,57 @@ double Common::rhoCorrPhotonIso(const edm::Handle<edm::ValueMap<double> >& pIso,
 {
   return rhoCorrIso(pIso, pRho, photonRef, photonIsoEAs);
 }
+
+bool Common::isTightIsolatedRecoMuon(const reco::Muon* iMuon, 
+				     const reco::Vertex* pPV, const bool usePFIso, 
+				     const double PUSubtractionCoeff, const double isoMax, 
+				     const double etaMax, const bool passIso)
+{
+  bool result = false;
+  if ((pPV != NULL) && 
+      muon::isTightMuon(*iMuon, *pPV) && 
+      iMuon->isPFMuon() && 
+      (fabs(iMuon->innerTrack()->dz(pPV->position())) < 0.5) && 
+      (iMuon->track()->hitPattern().trackerLayersWithMeasurement() > 5) && 
+      ((etaMax == -1.0) || (fabs(iMuon->eta()) < etaMax))) {
+    float iso = 0.0;
+    if (usePFIso) {
+      iso = getMuonCombPFIso(*iMuon, PUSubtractionCoeff)/iMuon->pt();
+    }
+    else {
+      const reco::MuonIsolation isoBlock = iMuon->isolationR03();
+      iso = (isoBlock.sumPt + isoBlock.emEt + isoBlock.hadEt)/iMuon->pt();
+    }
+    if ((isoMax == -1.0) || (passIso && (iso < isoMax)) || (!passIso && (iso >= isoMax))) {
+      result = true;
+    }
+  }
+  return result;
+}
+
+bool Common::isTightIsolatedRecoMuon(const edm::RefToBase<reco::Muon> iMuon, 
+				     const reco::Vertex* pPV, const bool usePFIso, 
+				     const double PUSubtractionCoeff, const double isoMax, 
+				     const double etaMax, const bool passIso)
+{
+  bool result = false;
+  if ((pPV != NULL) && 
+      muon::isTightMuon(*iMuon, *pPV) && 
+      iMuon->isPFMuon() && 
+      (fabs(iMuon->innerTrack()->dz(pPV->position())) < 0.5) && 
+      (iMuon->track()->hitPattern().trackerLayersWithMeasurement() > 5) && 
+      ((etaMax == -1.0) || (fabs(iMuon->eta()) < etaMax))) {
+    float iso = 0.0;
+    if (usePFIso) {
+      iso = getMuonCombPFIso(*iMuon, PUSubtractionCoeff)/iMuon->pt();
+    }
+    else {
+      const reco::MuonIsolation isoBlock = iMuon->isolationR03();
+      iso = (isoBlock.sumPt + isoBlock.emEt + isoBlock.hadEt)/iMuon->pt();
+    }
+    if ((isoMax == -1.0) || (passIso && (iso < isoMax)) || (!passIso && (iso >= isoMax))) {
+      result = true;
+    }
+  }
+  return result;
+}

@@ -49,7 +49,7 @@ process.load("FWCore.MessageService.MessageLogger_cfi")
 #process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(1000)
 process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(1)
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
 
 process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
 process.GlobalTag.globaltag = cms.string('START53_V7F::All')
@@ -1627,12 +1627,16 @@ readFiles.extend([
 #analyze gen infor for Wh sample
 process.analyzeGenInfo = cms.EDAnalyzer(
     'GenAnalyzer',
-    outFileName = cms.string('ggHTriggerStudy/gg_preskim_a9_gen_analysis_GenMatch_TriggerMatch_HLTPass.root'),
+    outFileName = cms.string('ggHTriggerStudy/gg_WmuID_WmuIso_a9_gen_analysis_GenMatch_test.root'),
 #    outFileName = cms.string('triggertest.root'),
     genParticleTag = cms.InputTag('genParticles'),
     PUTag = cms.InputTag('addPileupInfo'),
+    vtxTag = cms.InputTag('offlinePrimaryVertices'),
     muonTag = cms.InputTag('muons'),
     genTauDecayIDPSet = commonGenTauDecayIDPSet,
+    muonPFIsoPUSubtractionCoeff = cms.double(0.5),
+#    PFIsoMax = cms.double(-1.0),
+    PFIsoMax = cms.double(0.12),
     triggerEventTag = cms.untracked.InputTag("hltTriggerSummaryAOD", "", "HLT"),
     triggerResultsTag = cms.untracked.InputTag("TriggerResults", "", "HLT"),
     triggerDelRMatch = cms.untracked.double(0.1),
@@ -1659,12 +1663,12 @@ process.analyzeGenInfo = cms.EDAnalyzer(
     HLTSubFilters = cms.untracked.VInputTag("")
     )
 
-process.p = cms.Path(process.IsoMu24eta2p1Selector*
+#process.p = cms.Path(process.IsoMu24eta2p1Selector*
 #                     process.WMuonPTSelector*
 #                     process.WIsoMuonSelector*
 #                     process.tauMuonPTSelector*
 #                     process.tauMuonSelector*
 #                     process.PFTau*
 #                     process.muHadTauSelector*
-                     process.analyzeGenInfo)
-#process.p = cms.Path(process.analyzeGenInfo)
+#                     process.analyzeGenInfo)
+process.p = cms.Path(process.analyzeGenInfo)
