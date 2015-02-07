@@ -357,7 +357,7 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   std::vector<reco::Muon*> recoMuPtrs;
   for(reco::MuonCollection::const_iterator iMuon = pMuons->begin(); iMuon != pMuons->end(); ++iMuon)
     {
-      recoMuPtrs.push_back(const_cast<reco::Muon*>((&*iMuon)));
+      recoMuPtrs.push_back(const_cast<reco::Muon*>(&*iMuon));
     }
 
 
@@ -461,7 +461,7 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	      unsigned int muMatch = -1;
 	      for (unsigned int iRecoMu = 0; iRecoMu != recoMuPtrs.size(); ++iRecoMu)
 		{
-		  double compareDR = reco::deltaR(*genMuRef, *recoMuPtrs.at(iRecoMu));
+		  double compareDR = reco::deltaR(*genMuRef, *(recoMuPtrs.at(iRecoMu)));
 		  if (compareDR < delR_recogen)
 		    {
 		      delR_recogen = compareDR;
@@ -479,9 +479,9 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 		    
 		    const trigger::TriggerObject& TO = TOC[KEYS[ipart]];	
 		    
-		    std::cout << "dR(reco mu, TO) = " << deltaR((*recoMuPtrs.at(muMatch)), TO) << std::endl;
+		    std::cout << "dR(reco mu, TO) = " << deltaR(*(recoMuPtrs.at(muMatch)), TO) << std::endl;
 		    //save RECO objects matched to trigger objects
-		    if ((deltaR((*recoMuPtrs.at(muMatch)), TO) < delRMatchingCut_)) {
+		    if ((deltaR(*(recoMuPtrs.at(muMatch)), TO) < delRMatchingCut_)) {
 		      trigger_matched = true;
 		    }
 		  }
@@ -489,18 +489,18 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	      
 	      double etaMax = 2.1;
 	      bool isTightMu = false;
-	      double recoMuRelIso = (Common::getMuonCombPFIso((*recoMuPtrs.at(muMatch)), muonPFIsoPUSubtractionCoeff_)/(*recoMuPtrs.at(muMatch)).pt());
+	      double recoMuRelIso = (Common::getMuonCombPFIso(*(recoMuPtrs.at(muMatch)), muonPFIsoPUSubtractionCoeff_)/(recoMuPtrs.at(muMatch))->pt());
 
-	      isTightMu = Common::isTightIsolatedRecoMuon(&*recoMuPtrs.at(muMatch), pPV, muonPFIsoPUSubtractionCoeff_,
-							       true, PFIsoMax_, etaMax, true);
+	      isTightMu = Common::isTightIsolatedRecoMuon(const_cast<const reco::Muon*>(recoMuPtrs.at(muMatch)), pPV, true, muonPFIsoPUSubtractionCoeff_,
+							  PFIsoMax_, etaMax, true);
 	      if (recoMuRelIso > PFIsoMax_)
 		cout << "WAIT! muon PFRelIso = " << recoMuRelIso << " and isTightMu = " << isTightMu << endl;
 
 	      //if there was a match...
-	      if ((delR_recogen < 0.3) /*&& trigger_matched */&& isTightMu)
+	      if ((delR_recogen < 0.3)/* && trigger_matched*/ && isTightMu)
 		{
 		  //if reco mu pT > 25 and |eta| < 2.1 ...
-		  if (((*recoMuPtrs.at(muMatch)).pt() > 25.) && ((*recoMuPtrs.at(muMatch)).eta() < etaMax))
+		  if (((recoMuPtrs.at(muMatch))->pt() > 25.) && ((recoMuPtrs.at(muMatch))->eta() < etaMax))
 		    {
 		      // - plot delR(gen tau_mu, gen tau_sister)
 		      dRA1TauDaughtersGenMatch_->Fill(reco::deltaR(*reco::GenParticleRef(pGenParticles, iTau->getTauIndex()), 
@@ -514,7 +514,7 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 		      tauSisterPTGenMatch_->Fill(iTau->getVisibleTauSisterP4().Pt());
 		      // - plot pT(gen tau_sister) vs decay mode of tau_sister
 		      tauSisterPTVsDecayMode_->Fill(sisterDecay.second, iTau->getVisibleTauSisterP4().Pt());
-		      recoMuEtaGenMatch_->Fill((*recoMuPtrs.at(muMatch)).eta());
+		      recoMuEtaGenMatch_->Fill((recoMuPtrs.at(muMatch))->eta());
 		      tauSisterPTVsdR_->Fill(reco::deltaR(*reco::GenParticleRef(pGenParticles, iTau->getTauIndex()), 
 							  *reco::GenParticleRef(pGenParticles, iTau->getSisterIndex())), iTau->getVisibleTauSisterP4().Pt());
 		      // - plot PFRelIso vs pT of reco mu
@@ -522,9 +522,9 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 		      recoMuPFRelIsoVsdRA1TauDaughters_->Fill(reco::deltaR(*reco::GenParticleRef(pGenParticles, iTau->getTauIndex()), 
 									   *reco::GenParticleRef(pGenParticles, iTau->getSisterIndex())), recoMuRelIso);
 		      recoMuPFRelIsoVsTauSisterPT_->Fill(iTau->getVisibleTauSisterP4().Pt(), recoMuRelIso);
-		      recoMuPFRelIsoVsRecoMuPT_->Fill((*recoMuPtrs.at(muMatch)).pt(), recoMuRelIso);
+		      recoMuPFRelIsoVsRecoMuPT_->Fill((recoMuPtrs.at(muMatch))->pt(), recoMuRelIso);
 		      recoMuPFRelIsoVsTauSisterDecayMode_->Fill(sisterDecay.second, recoMuRelIso);
-		      recoMuPTVsTauSisterPT_->Fill(iTau->getVisibleTauSisterP4().Pt(),(*recoMuPtrs.at(muMatch)).pt());
+		      recoMuPTVsTauSisterPT_->Fill(iTau->getVisibleTauSisterP4().Pt(),(recoMuPtrs.at(muMatch))->pt());
 		      tauMuPTVsTauSisterPT_->Fill(iTau->getVisibleTauSisterP4().Pt(),iTau->getVisibleTauP4().Pt());
 		    }
 		}

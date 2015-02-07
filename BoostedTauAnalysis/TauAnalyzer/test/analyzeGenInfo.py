@@ -49,7 +49,7 @@ process.load("FWCore.MessageService.MessageLogger_cfi")
 #process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(1000)
 process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(1)
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
 process.GlobalTag.globaltag = cms.string('START53_V7F::All')
@@ -1627,7 +1627,7 @@ readFiles.extend([
 #analyze gen infor for Wh sample
 process.analyzeGenInfo = cms.EDAnalyzer(
     'GenAnalyzer',
-    outFileName = cms.string('ggHTriggerStudy/gg_WmuID_WmuIso_a9_gen_analysis_GenMatch_test.root'),
+    outFileName = cms.string('ggHTriggerStudy/gg_WmuID_WmuIso_a9_gen_analysis_GenMatch.root'),
 #    outFileName = cms.string('triggertest.root'),
     genParticleTag = cms.InputTag('genParticles'),
     PUTag = cms.InputTag('addPileupInfo'),
