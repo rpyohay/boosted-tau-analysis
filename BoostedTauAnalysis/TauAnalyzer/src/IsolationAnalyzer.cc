@@ -135,7 +135,7 @@ IsolationAnalyzer::IsolationAnalyzer(const edm::ParameterSet& iConfig):hltConfig
   vtxTag_(iConfig.getParameter<edm::InputTag>("vtxTag")),
   muonTag_(iConfig.getParameter<edm::InputTag>("muonTag")),
   muonPFIsoPUSubtractionCoeff_(iConfig.getParameter<double>("muonPFIsoPUSubtractionCoeff")),
-  PFIsoMax_(iConfig.getParameter<double>("PFRelIsoMax"))
+  PFIsoMax_(iConfig.getParameter<double>("PFIsoMax"))
 {
   //now do what ever initialization is needed
   reset(false);
@@ -277,7 +277,7 @@ void IsolationAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	     pos = i;
 	   }
        } // loop over DY gen muons and look for match
-     if ((dRmin < 0.3) && (pos < genZMuPtrs.size()) && (std::find(muonsToIgnore.begin(), muonsToIgnore.end(), pos) == muonsToIgnore.end()))
+     if ((dRmin < 0.1) && (pos < genZMuPtrs.size()) && (std::find(muonsToIgnore.begin(), muonsToIgnore.end(), pos) == muonsToIgnore.end()))
        {
 	 
 	 bool trigger_matched = false;
@@ -294,9 +294,10 @@ void IsolationAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	       }
 	   } // firedHLT
 	 
-	 double etaMax = 2.1;
-	 bool isTightMu = Common::isTightIsolatedRecoMuon(muon, pPV, muonPFIsoPUSubtractionCoeff_,
-							  true, PFIsoMax_, etaMax, true);
+	 double etaMax = 1.2;
+	 bool isTightMu = false;
+	 isTightMu = Common::isTightIsolatedRecoMuon(muon, pPV, true, muonPFIsoPUSubtractionCoeff_,
+						     PFIsoMax_, etaMax, true);
 	 
 	 if ((muon->pt() > 25) && (fabs(muon->eta()) < etaMax)  && trigger_matched && isTightMu)
 	   {
@@ -348,7 +349,7 @@ void IsolationAnalyzer::endJob()
   //write output file
   out_->cd();
 //  recoMuPFRelIsoCanvas.Write();
-//  recoMuPFRelIso_.Write();
+  recoMuPFRelIso_->Write();
 //  combParticleIsoVsMuonPTCanvas.Write();
   out_->Write();
   out_->Close();

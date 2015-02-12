@@ -344,7 +344,7 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
        iGenParticle != pGenParticles->end(); ++iGenParticle) {
     if (fabs(iGenParticle->pdgId()) == 35)
       { // if it's an H
-	std::cout << "mass of H = " << iGenParticle->mass() << std::endl;
+	//std::cout << "mass of H = " << iGenParticle->mass() << std::endl;
 	HPT_->Fill(iGenParticle->pt());
       } // if it's an H
     if (fabs(iGenParticle->pdgId()) == 36)
@@ -398,7 +398,7 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	if (reco::deltaR(*reco::GenParticleRef(pGenParticles, tauKey), 
 			 *reco::GenParticleRef(pGenParticles, iSister)) > 0.3)
 	  {
-	    std::cout << "dR = " << reco::deltaR(*reco::GenParticleRef(pGenParticles, tauKey), 
+	    std::cout << "dR(tau, sister) = " << reco::deltaR(*reco::GenParticleRef(pGenParticles, tauKey), 
 						 *reco::GenParticleRef(pGenParticles, iSister)) << std::endl;
 	    std::cout << "tau's decay type: " << iTau->tauDecayType(false, true).second << std::endl;
 	    std::cout << "sister tau's decay type: " << iTau->sisterDecayType(false,true).second << std::endl;
@@ -437,11 +437,17 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       }
 
       //is this a mu+X decay?
-      if (thisDecay.second == GenTauDecayID::MU)
+      //if (thisDecay.second == GenTauDecayID::MU)
+      if (((thisDecay.second == GenTauDecayID::MU) && 
+	   (sisterDecay.second == GenTauDecayID::HAD))// || 
+	  //((thisDecay.second == GenTauDecayID::HAD) && 
+	  //(sisterDecay.second == GenTauDecayID::MU))
+	)
 	{ // if this tau decayed to a mu
-
+	  
 	  //get ref to gen mu
-	  const reco::GenParticle* genMuRef = NULL;
+	  //const reco::GenParticle* genMuRef = NULL;
+	  const reco::Candidate* genMuRef = NULL;
 	  for (unsigned int i = 0; i < (*reco::GenParticleRef(pGenParticles, iTau->getTauIndex())).numberOfDaughters(); ++i)
 	    {
 	      if (fabs((*reco::GenParticleRef(pGenParticles, iTau->getTauIndex())).daughter(i)->pdgId()) == 15)
@@ -449,7 +455,8 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 		  for (unsigned int j = 0; j < (*reco::GenParticleRef(pGenParticles, iTau->getTauIndex())).daughter(i)->numberOfDaughters(); ++j)
 		    {
 		      if (fabs((*reco::GenParticleRef(pGenParticles, iTau->getTauIndex())).daughter(i)->daughter(j)->pdgId()) == 13)
-			genMuRef = (&*reco::GenParticleRef(pGenParticles, iTau->getTauIndex()));
+			//genMuRef = (&*reco::GenParticleRef(pGenParticles, iTau->getTauIndex()));
+			genMuRef = (*reco::GenParticleRef(pGenParticles, iTau->getTauIndex())).daughter(i)->daughter(j);
 		    }
 		}
 	    }
@@ -482,26 +489,35 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 		    std::cout << "dR(reco mu, TO) = " << deltaR(*(recoMuPtrs.at(muMatch)), TO) << std::endl;
 		    //save RECO objects matched to trigger objects
 		    if ((deltaR(*(recoMuPtrs.at(muMatch)), TO) < delRMatchingCut_)) {
+		      cout << "trigger-matched: true" << endl;
+		      cout << "TO pt = " << TO.pt() << endl;
+		      cout << "TO eta = " << TO.eta() << endl;
+		      cout << "TO phi = " << TO.phi() << endl;
 		      trigger_matched = true;
 		    }
 		  }
 		} //firedHLT
 	      
 	      double etaMax = 2.1;
+	      //double etaMax = 0.9;
 	      bool isTightMu = false;
 	      double recoMuRelIso = (Common::getMuonCombPFIso(*(recoMuPtrs.at(muMatch)), muonPFIsoPUSubtractionCoeff_)/(recoMuPtrs.at(muMatch))->pt());
 
 	      isTightMu = Common::isTightIsolatedRecoMuon(const_cast<const reco::Muon*>(recoMuPtrs.at(muMatch)), pPV, true, muonPFIsoPUSubtractionCoeff_,
 							  PFIsoMax_, etaMax, true);
-	      if (recoMuRelIso > PFIsoMax_)
-		cout << "WAIT! muon PFRelIso = " << recoMuRelIso << " and isTightMu = " << isTightMu << endl;
-
 	      //if there was a match...
-	      if ((delR_recogen < 0.3)/* && trigger_matched*/ && isTightMu)
+	      if ((delR_recogen < 0.1) && trigger_matched && isTightMu)
 		{
 		  //if reco mu pT > 25 and |eta| < 2.1 ...
 		  if (((recoMuPtrs.at(muMatch))->pt() > 25.) && ((recoMuPtrs.at(muMatch))->eta() < etaMax))
 		    {
+
+		      cout << "kinematic properties of trigger-matched reco muon" << endl;
+		      cout << "reco muon pT = " << (recoMuPtrs.at(muMatch))->pt() << endl;
+		      cout << "reco muon eta = " << (recoMuPtrs.at(muMatch))->eta() << endl;
+		      cout << "reco muon phi = " << (recoMuPtrs.at(muMatch))->phi() << endl;
+		      cout << "reco muon PFRelIso = " << recoMuRelIso << endl;
+
 		      // - plot delR(gen tau_mu, gen tau_sister)
 		      dRA1TauDaughtersGenMatch_->Fill(reco::deltaR(*reco::GenParticleRef(pGenParticles, iTau->getTauIndex()), 
 								   *reco::GenParticleRef(pGenParticles, iTau->getSisterIndex())));
