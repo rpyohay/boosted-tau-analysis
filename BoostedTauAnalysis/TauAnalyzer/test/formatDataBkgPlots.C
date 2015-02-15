@@ -1105,14 +1105,13 @@ void formatDataBkgPlots(const string& inputVersion, const string& outputVersion,
   const string variable("muHadMass");
   const string theunit("m_{#mu+X} (GeV)");
   RegionBQCDVsMCInputFiles.push_back(inputFileNameD);
-  RegionBQCDVsMCInputFiles.push_back(DYJetsToLLNonIsoHaddOutputFile);
-  RegionBQCDVsMCInputFiles.push_back(TTJetsNonIsoHaddOutputFile);
-  RegionBQCDVsMCInputFiles.push_back(TNonIsoHaddOutputFile);
-  RegionBQCDVsMCInputFiles.push_back(WNJetsToLNuNonIsoHaddOutputFile);
-  RegionBQCDVsMCInputFiles.push_back(WZNonIsoHaddOutputFile);
-  RegionBQCDVsMCInputFiles.push_back(ZZNonIsoHaddOutputFile);
   RegionBQCDVsMCInputFiles.push_back(WWNonIsoHaddOutputFile);
-  std::reverse(RegionBQCDVsMCInputFiles.begin() + 1, RegionBQCDVsMCInputFiles.end());
+  RegionBQCDVsMCInputFiles.push_back(ZZNonIsoHaddOutputFile);
+  RegionBQCDVsMCInputFiles.push_back(WZNonIsoHaddOutputFile);
+  RegionBQCDVsMCInputFiles.push_back(WNJetsToLNuNonIsoHaddOutputFile);
+  RegionBQCDVsMCInputFiles.push_back(TNonIsoHaddOutputFile);
+  RegionBQCDVsMCInputFiles.push_back(TTJetsNonIsoHaddOutputFile);
+  RegionBQCDVsMCInputFiles.push_back(DYJetsToLLNonIsoHaddOutputFile);
   string RegionBQCDVsMCOutputFile(analysisFilePath + "results/QCDVsMC_RegionB" + MTBin + 
 				  tag19p7InvFb + outputVTag + fileExt);
   QCDVsMCClosurePlots(RegionBQCDVsMCInputFiles, variable, theunit, 1, 2, RegionBQCDVsMCOutputFile);
@@ -1120,14 +1119,13 @@ void formatDataBkgPlots(const string& inputVersion, const string& outputVersion,
   //compare data-driven QCD to total MC in signal region
   vector<string>RegionAQCDVsMCInputFiles;
   RegionAQCDVsMCInputFiles.push_back(outputFileNameA);
-  RegionAQCDVsMCInputFiles.push_back(DYJetsToLLIsoHaddOutputFile);
-  RegionAQCDVsMCInputFiles.push_back(TTJetsIsoHaddOutputFile);
-  RegionAQCDVsMCInputFiles.push_back(TIsoHaddOutputFile);
-  RegionAQCDVsMCInputFiles.push_back(WNJetsToLNuIsoHaddOutputFile);
-  RegionAQCDVsMCInputFiles.push_back(WZIsoHaddOutputFile);
-  RegionAQCDVsMCInputFiles.push_back(ZZIsoHaddOutputFile);
   RegionAQCDVsMCInputFiles.push_back(WWIsoHaddOutputFile);
-  std::reverse(RegionAQCDVsMCInputFiles.begin() + 1, RegionAQCDVsMCInputFiles.end());
+  RegionAQCDVsMCInputFiles.push_back(ZZIsoHaddOutputFile);
+  RegionAQCDVsMCInputFiles.push_back(WZIsoHaddOutputFile);
+  RegionAQCDVsMCInputFiles.push_back(WNJetsToLNuIsoHaddOutputFile);
+  RegionAQCDVsMCInputFiles.push_back(TIsoHaddOutputFile);
+  RegionAQCDVsMCInputFiles.push_back(TTJetsIsoHaddOutputFile);
+  RegionAQCDVsMCInputFiles.push_back(DYJetsToLLIsoHaddOutputFile);
   string RegionAQCDVsMCOutputFile(analysisFilePath + "results/QCDVsMC_RegionA" + MTBin + 
 				  tag19p7InvFb + outputVTag + fileExt);
   QCDVsMCClosurePlots(RegionAQCDVsMCInputFiles, variable, theunit, 1, 2, RegionAQCDVsMCOutputFile);
