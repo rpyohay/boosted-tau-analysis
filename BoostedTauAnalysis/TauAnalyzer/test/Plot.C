@@ -1060,6 +1060,12 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 	if (i == 0) stackSumHist = stackHist;
 	else stackSumHist->Add(stackHist);
       }
+      if (*iCanvasName == "muHadMassCanvas") {
+	Double_t regBMCQCDErr;
+	Double_t regBMCQCD = stackSumHist->IntegralAndError(5, -1, regBMCQCDErr);
+	cout << endl << "MC (optionally + QCD) prediction in region B, m >= 4 GeV: ";
+	cout << regBMCQCD << " +/- " << regBMCQCDErr << endl;
+      }
       TH1F* dataHist = (TH1F*)hists[canvasIndex][0]->Clone();
       stackSumHist->Add(dataHist, -1.0);
       stackSumHist->Divide(dataHist);
