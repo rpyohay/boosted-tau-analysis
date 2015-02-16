@@ -1524,7 +1524,7 @@ process.WIsoMuonSelector = cms.EDFilter('CustomMuonSelector',
                                         PUSubtractionCoeff = cms.double(0.5),
                                         usePFIso = cms.bool(True),
                                         passIso = cms.bool(True),
-                                        etaMax = cms.double(2.1),
+                                        etaMax = cms.double(2.4),
                                         minNumObjsToPassFilter = cms.uint32(1)
                                         )
 
@@ -1540,6 +1540,8 @@ process.genTauMuSelector = cms.EDFilter(
     primaryTauPTRank = cms.int32(ANY_PT_RANK),
     primaryTauHadronicDecayType = cms.int32(TAU_ALL_HAD),
     sisterHadronicDecayType = cms.int32(TAU_ALL_HAD),
+#    primaryTauHadronicDecayType = cms.int32(TAU_MU),
+#    sisterHadronicDecayType = cms.int32(TAU_HAD),
     primaryTauAbsEtaMax = cms.double(-1.0),
     primaryTauPTMin = cms.double(-1.0),
     countSister = cms.bool(False),

@@ -154,6 +154,9 @@ private:
   //histogram of gen-matched reco mu PFRelIso
   TH1F* recoMuPFRelIso_;
 
+  //histogram of gen-matched reco mu PFRelIso with visible gen tau_sister pT subtracted
+  TH1F* recoMuPFRelIsoSansTau_;
+
   //histogram of true no. in-time interactions
   TH1D* trueNInt_;
 
@@ -502,6 +505,7 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	      //double etaMax = 0.9;
 	      bool isTightMu = false;
 	      double recoMuRelIso = (Common::getMuonCombPFIso(*(recoMuPtrs.at(muMatch)), muonPFIsoPUSubtractionCoeff_)/(recoMuPtrs.at(muMatch))->pt());
+	      double recoMuRelIsoSansTauSister = (Common::getMuonCombPFIsoMinusTau(*(recoMuPtrs.at(muMatch)), iTau->getVisibleTauSisterP4(), muonPFIsoPUSubtractionCoeff_)/(recoMuPtrs.at(muMatch))->pt());
 
 	      isTightMu = Common::isTightIsolatedRecoMuon(const_cast<const reco::Muon*>(recoMuPtrs.at(muMatch)), pPV, true, muonPFIsoPUSubtractionCoeff_,
 							  PFIsoMax_, etaMax, true);
@@ -535,6 +539,7 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 							  *reco::GenParticleRef(pGenParticles, iTau->getSisterIndex())), iTau->getVisibleTauSisterP4().Pt());
 		      // - plot PFRelIso vs pT of reco mu
 		      recoMuPFRelIso_->Fill(recoMuRelIso);
+		      recoMuPFRelIsoSansTau_->Fill(recoMuRelIsoSansTauSister);
 		      recoMuPFRelIsoVsdRA1TauDaughters_->Fill(reco::deltaR(*reco::GenParticleRef(pGenParticles, iTau->getTauIndex()), 
 									   *reco::GenParticleRef(pGenParticles, iTau->getSisterIndex())), recoMuRelIso);
 		      recoMuPFRelIsoVsTauSisterPT_->Fill(iTau->getVisibleTauSisterP4().Pt(), recoMuRelIso);
@@ -615,6 +620,7 @@ void GenAnalyzer::beginJob()
   recoMuEtaGenMatch_ = new TH1F("recoMuEtaGenMatch", "", recoMuEtaBins_.size() - 1, &recoMuEtaBins_[0]);
   tauHadPT_ = new TH1F("tauHadPT", "", 50, 0.0, 100.0);
   recoMuPFRelIso_ = new TH1F("recoMuPFRelIso", "", 2000, 0.0, 40.0);
+  recoMuPFRelIsoSansTau_ = new TH1F("recoMuPFRelIsoSansTau", "", 2000, 0.0, 40.0);
   trueNInt_ = new TH1D("trueNInt", "", 60, 0.0, 60.0);
   a2TauPairDecayVsA1TauPairDecay_ = new TH2F("a2TauPairDecayVsA1TauPairDecay", 
 					     ";a_{1} di-tau decay;a_{2} di-tau decay", 
@@ -688,6 +694,8 @@ void GenAnalyzer::endJob()
   Common::setCanvasOptions(tauHadPTCanvas, 1, 0, 0);
   TCanvas recoMuPFRelIsoCanvas("recoMuPFRelIsoCanvas", "", 600, 600);
   Common::setCanvasOptions(recoMuPFRelIsoCanvas, 1, 0, 0);
+  TCanvas recoMuPFRelIsoSansTauCanvas("recoMuPFRelIsoSansTauCanvas", "", 600, 600);
+  Common::setCanvasOptions(recoMuPFRelIsoSansTauCanvas, 1, 0, 0);
   TCanvas trueNIntCanvas("trueNIntCanvas", "", 600, 600);
   Common::setCanvasOptions(trueNIntCanvas, 1, 0, 0);
   TCanvas a2TauPairDecayVsA1TauPairDecayCanvas("a2TauPairDecayVsA1TauPairDecayCanvas", "", 
@@ -725,6 +733,8 @@ void GenAnalyzer::endJob()
   tauHadPT_->SetLineWidth(2);
   Common::setHistogramOptions(recoMuPFRelIso_, kBlack, 0.7, 20, 1.0, "reco #mu PFRelIso", "", 0.05);
   recoMuPFRelIso_->SetLineWidth(2);
+  Common::setHistogramOptions(recoMuPFRelIsoSansTau_, kBlack, 0.7, 20, 1.0, "reco #mu PFRelIso", "", 0.05);
+  recoMuPFRelIsoSansTau_->SetLineWidth(2);
   Common::setHistogramOptions(trueNInt_, kBlack, 0.7, 20, 1.0, "No. interactions", "", 0.05);
   trueNInt_->SetLineWidth(2);
 
@@ -751,6 +761,8 @@ void GenAnalyzer::endJob()
   tauHadPT_->Draw();
   recoMuPFRelIsoCanvas.cd();
   recoMuPFRelIso_->Draw();
+  recoMuPFRelIsoSansTauCanvas.cd();
+  recoMuPFRelIsoSansTau_->Draw();
   trueNIntCanvas.cd();
   trueNInt_->Draw();
   Common::draw2DHistograms(a2TauPairDecayVsA1TauPairDecayCanvas, a2TauPairDecayVsA1TauPairDecay_);
@@ -776,6 +788,7 @@ void GenAnalyzer::endJob()
   recoMuEtaGenMatchCanvas.Write();
   tauHadPTCanvas.Write();
   recoMuPFRelIsoCanvas.Write();
+  recoMuPFRelIsoSansTauCanvas.Write();
   trueNIntCanvas.Write();
   a2TauPairDecayVsA1TauPairDecayCanvas.Write();
   tauMuPTVsdRCanvas.Write();
@@ -847,6 +860,8 @@ void GenAnalyzer::reset(const bool doDelete)
   tauHadPT_ = NULL;
   if ((doDelete) && (recoMuPFRelIso_ != NULL)) delete recoMuPFRelIso_;
   recoMuPFRelIso_ = NULL;
+  if ((doDelete) && (recoMuPFRelIsoSansTau_ != NULL)) delete recoMuPFRelIsoSansTau_;
+  recoMuPFRelIsoSansTau_ = NULL;
   if ((doDelete) && (trueNInt_ != NULL)) delete trueNInt_;
   trueNInt_ = NULL;
   if (doDelete && (a2TauPairDecayVsA1TauPairDecay_ != NULL)) {

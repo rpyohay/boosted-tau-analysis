@@ -199,6 +199,15 @@ float Common::getMuonLeptonPFIso(const reco::Muon& muon)
   return (isoBlock.sumChargedParticlePt - isoBlock.sumChargedHadronPt);
 }
 
+float Common::getMuonCombPFIsoMinusTau(const reco::Muon& muon, const reco::LeafCandidate::LorentzVector tauP4, const double PUSubtractionCoeff)
+{
+  const reco::MuonPFIsolation isoBlock = muon.pfIsolationR04();
+  return (isoBlock.sumChargedHadronPt + 
+	  std::max(0.0, (double)(isoBlock.sumNeutralHadronEt + isoBlock.sumPhotonEt - 
+				 PUSubtractionCoeff*isoBlock.sumPUPt)) -
+	  tauP4.pt());
+}
+
 std::vector<reco::MuonRef>
 Common::getTightPFIsolatedRecoMuons(const edm::Handle<reco::MuonCollection>& pMuons, 
 				    const reco::Vertex* pPV, const double PUSubtractionCoeff, 

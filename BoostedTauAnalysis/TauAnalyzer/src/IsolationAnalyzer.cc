@@ -252,7 +252,7 @@ void IsolationAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
      {
        if ((iGenParticle->status() == 1) && (fabs(iGenParticle->pdgId()) == 13))
 	 { // if status-1 muon
-	   if ((iGenParticle->mother()->mother()->pdgId() == 23) || (iGenParticle->mother()->mother()->pdgId() == 22))
+	   if ((iGenParticle->mother()->mother()->pdgId() == 23)/* || (iGenParticle->mother()->mother()->pdgId() == 22)*/)
 	     { // if it came from a Z or gamma
 	       genZMuPtrs.push_back(const_cast<reco::GenParticle*>(&*iGenParticle));
 	     } // if it came from a Z or gamma
@@ -294,14 +294,14 @@ void IsolationAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	       }
 	   } // firedHLT
 	 
-	 double etaMax = 1.2;
+	 double etaMax = 2.1;
 	 bool isTightMu = false;
 	 isTightMu = Common::isTightIsolatedRecoMuon(muon, pPV, true, muonPFIsoPUSubtractionCoeff_,
 						     PFIsoMax_, etaMax, true);
 	 
 	 if ((muon->pt() > 25) && (fabs(muon->eta()) < etaMax)  && trigger_matched && isTightMu)
 	   {
-	     recoMuPFRelIso_->Fill(Common::getMuonCombPFIso(*muon, muonPFIsoPUSubtractionCoeff_));
+	     recoMuPFRelIso_->Fill(Common::getMuonCombPFIso(*muon, muonPFIsoPUSubtractionCoeff_)/muon->pt());
 	     muonsToIgnore.push_back(pos);
 	   }
        }

@@ -136,6 +136,9 @@ class Common {
   //get muon isolation computed from leptons only
   static float getMuonLeptonPFIso(const reco::Muon&);
 
+  //get muon isolation with tau pt subtracted
+  static float getMuonCombPFIsoMinusTau(const reco::Muon&, const reco::LeafCandidate::LorentzVector, const double);
+
   /*fill STL container with muons passing the 2012 tight selection, PF isolation, and |eta|
     (cf. https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId and 
     https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Muon_Isolation_AN1)*/
