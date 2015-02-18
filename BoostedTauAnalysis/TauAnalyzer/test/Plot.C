@@ -1061,10 +1061,22 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 	else stackSumHist->Add(stackHist);
       }
       if (*iCanvasName == "muHadMassCanvas") {
-	Double_t regBMCQCDErr;
-	Double_t regBMCQCD = stackSumHist->IntegralAndError(5, -1, regBMCQCDErr);
-	cout << endl << "MC (optionally + QCD) prediction in region B, m >= 4 GeV: ";
-	cout << regBMCQCD << " +/- " << regBMCQCDErr << endl;
+	Double_t MCQCDErrSigReg, MCQCDErrNormReg;
+	Double_t MCQCDSigReg = stackSumHist->IntegralAndError(5, -1, MCQCDErrSigReg);
+	Double_t MCQCDNormReg = stackSumHist->IntegralAndError(1, 2, MCQCDErrNormReg);
+	Double_t MCQCDNormRegFracErr = ((MCQCDNormReg > 0.0) ? (MCQCDErrNormReg/MCQCDNormReg) : 0.0);
+	Double_t MCQCDSigRegFracErr = ((MCQCDSigReg > 0.0) ? (MCQCDErrSigReg/MCQCDSigReg) : 0.0);
+	Double_t MCQCDNormToSigRatio = ((MCQCDSigReg > 0.0) ? (MCQCDNormReg/MCQCDSigReg) : 0.0);
+	Double_t MCQCDNormToSigRatioErr2 = MCQCDNormToSigRatio*MCQCDNormToSigRatio*
+	  (MCQCDNormRegFracErr*MCQCDNormRegFracErr + MCQCDSigRegFracErr*MCQCDSigRegFracErr);
+	string reg = (dataMC ? "B" : "A");
+	cout << endl << "MC (optionally + QCD) prediction in region ";
+	cout << reg << ", m >= 4 GeV: ";
+	cout << MCQCDSigReg << " +/- " << MCQCDErrSigReg << endl;
+	cout << "MC (optionally + QCD) prediction in region ";
+	cout << reg << ", m < 2 GeV: ";
+	cout << MCQCDNormReg << " +/- " << MCQCDErrNormReg << endl;
+	cout << "(m < 2 GeV)/(m >= 4 GeV): " << MCQCDNormToSigRatio << " +/- " << sqrt(MCQCDNormToSigRatioErr2) << endl;
       }
       TH1F* dataHist = (TH1F*)hists[canvasIndex][0]->Clone();
       stackSumHist->Add(dataHist, -1.0);
@@ -1648,7 +1660,7 @@ void makeMCClosurePlots(const string& sigVsBkgIsoFileName, const vector<string>&
 }
 
 void QCDVsMCClosurePlots(const vector<string>& QCDVsMCInputFileNames, const string& var, 
-			 const string& units, 
+			 const string& units, const pair<string, string>& legend, 
 			 const int normRegionLowerBin, 
 			 const int normRegionUpperBin,
 			 const string& outputFileName)
@@ -1684,6 +1696,8 @@ void QCDVsMCClosurePlots(const vector<string>& QCDVsMCInputFileNames, const stri
 
   hists[0]->SetLineColor(4); // blue for QCD
   hists[1]->SetLineColor(2); // red for bkg
+  hists[0]->SetMarkerColor(4); // blue for QCD
+  hists[1]->SetMarkerColor(2); // red for bkg
   hists[0]->Scale(hists[1]->Integral(normRegionLowerBin,normRegionUpperBin)/hists[0]->Integral(normRegionLowerBin,normRegionUpperBin));
   //hists[0]->Scale(1./hists[0]->Integral());
   //hists[1]->Scale(1./hists[1]->Integral());
@@ -1692,13 +1706,15 @@ void QCDVsMCClosurePlots(const vector<string>& QCDVsMCInputFileNames, const stri
   TH1F* ratioHist = (TH1F*)hists[0]->Clone();
   ratioHist->Add(hists[1],-1.);
   ratioHist->Divide(hists[1]);
-  ratioHist->GetYaxis()->SetTitle("#frac{QCD-MC}{MC}");
+  ratioHist->GetYaxis()->SetTitle("Fractional difference");
   ratioHist->GetYaxis()->SetRangeUser(-2.0,2.0);
   ratioHist->SetLineColor(1);
+  ratioHist->SetMarkerColor(1);
 
   TLegend *leg = new TLegend(0.35, 0.55, 0.75, 0.75, "");
-  leg->AddEntry(hists[0], "QCD (data-driven)", "lp");
-  leg->AddEntry(hists[1], "EWK+TOP+DY (MC)", "lp");
+  setLegendOptions(*leg, "");
+  leg->AddEntry(hists[0], legend.first.c_str(), "lp");
+  leg->AddEntry(hists[1], legend.second.c_str(), "lp");
 
   //write to file
   outStream.cd();
@@ -2162,7 +2178,9 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
     cout << " (S/sqrt(S+B) = " << S/sqrt(S + B) << ")" << endl;
   }
   isoData->Draw("ESAME");
-  cout << "Region A data, m < 2: " << isoData->Integral(1, 2) << endl;
+  Double_t regANormErr;
+  Double_t regANorm = isoData->IntegralAndError(1, 2, regANormErr);
+  cout << "Region A data, m < 2: " << regANorm << " +/- " << regANormErr << endl;
   if (option == "separate") legendBkgSep.Draw();
   else if (option == "main 5") legendBkgMain5.Draw();
   else if (option == "combined") legendBkgAll.Draw();
