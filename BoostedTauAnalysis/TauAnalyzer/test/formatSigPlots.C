@@ -1,8 +1,7 @@
 //REGION A DATA 2D HISTOGRAMS ARE NOT BLINDED!!!  BEWARE!!!
 
-void formatSigPlots(const string& inputVersion, const string& outputVersion, 
-		    const bool compile, const string& uncTag, const string& a1Mass, 
-		    const string& MTBin, const bool doNoHPSIsoCut = false)
+void formatSigPlots(const string& inputVersion, const string& outputVersion, const string& uncTag, 
+		    const string& a1Mass, const string& MTBin, const bool doNoHPSIsoCut = false)
 {
   //initial
   gROOT->Reset();
@@ -20,16 +19,9 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   string macroPath(CMSSWPathCPPString + "/src/BoostedTauAnalysis/TauAnalyzer/test/");
   gROOT->ProcessLine("#include <utility>");
   gSystem->Load((macroPath + "STLDictionary.so").c_str());
-  if (compile) {
-    gROOT->LoadMacro((macroPath + "Miscellaneous.C++").c_str());
-    gROOT->LoadMacro((macroPath + "Error.C++").c_str());
-    gROOT->LoadMacro((macroPath + "Plot.C++").c_str());
-  }
-  else {
-    gSystem->Load((macroPath + "Miscellaneous_C.so").c_str());
-    gSystem->Load((macroPath + "Error_C.so").c_str());
-    gSystem->Load((macroPath + "Plot_C.so").c_str());
-  }
+  gSystem->Load((macroPath + "Miscellaneous_C.so").c_str());
+  gSystem->Load((macroPath + "Error_C.so").c_str());
+  gSystem->Load((macroPath + "Plot_C.so").c_str());
 
   //ignore warnings
   gErrorIgnoreLevel = kError;

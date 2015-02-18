@@ -22,8 +22,8 @@ iEndMTBin=`expr $nMTBins - 1`
 #run
 for iMTBin in `seq $iBeg $iEndMTBin`
   do
-  root -l -b -q 'formatDataBkgPlots.C("'${version}'", "'${version}'", false, "'${MTBin[${iMTBin}]}'")'
-  root -l -b -q 'formatSigPlots.C("'${version}'", "'${version}'", false, "", "_a9", "'${MTBin[${iMTBin}]}'")'
+  root -l -b -q 'formatDataBkgPlots.C("'${version}'", "'${version}'", "'${MTBin[${iMTBin}]}'")'
+  root -l -b -q 'formatSigPlots.C("'${version}'", "'${version}'", "", "_a9", "'${MTBin[${iMTBin}]}'")'
 done
 
 exit 0

@@ -1,7 +1,7 @@
 //REGION A DATA 2D HISTOGRAMS ARE NOT BLINDED!!!  BEWARE!!!
 
 void formatDataBkgPlots(const string& inputVersion, const string& outputVersion, 
-			const bool compile, const string& MTBin, const bool doNoHPSIsoCut = false)
+			const string& MTBin, const bool doNoHPSIsoCut = false)
 {
   //initial
   gROOT->Reset();
@@ -19,16 +19,9 @@ void formatDataBkgPlots(const string& inputVersion, const string& outputVersion,
   string macroPath(CMSSWPathCPPString + "/src/BoostedTauAnalysis/TauAnalyzer/test/");
   gROOT->ProcessLine("#include <utility>");
   gSystem->Load((macroPath + "STLDictionary.so").c_str());
-  if (compile) {
-    gROOT->LoadMacro((macroPath + "Miscellaneous.C++").c_str());
-    gROOT->LoadMacro((macroPath + "Error.C++").c_str());
-    gROOT->LoadMacro((macroPath + "Plot.C++").c_str());
-  }
-  else {
-    gSystem->Load((macroPath + "Miscellaneous_C.so").c_str());
-    gSystem->Load((macroPath + "Error_C.so").c_str());
-    gSystem->Load((macroPath + "Plot_C.so").c_str());
-  }
+  gSystem->Load((macroPath + "Miscellaneous_C.so").c_str());
+  gSystem->Load((macroPath + "Error_C.so").c_str());
+  gSystem->Load((macroPath + "Plot_C.so").c_str());
 
   //ignore warnings
   gErrorIgnoreLevel = kError;
@@ -1114,7 +1107,9 @@ void formatDataBkgPlots(const string& inputVersion, const string& outputVersion,
   RegionBQCDVsMCInputFiles.push_back(DYJetsToLLNonIsoHaddOutputFile);
   string RegionBQCDVsMCOutputFile(analysisFilePath + "results/QCDVsMC_RegionB" + MTBin + 
 				  tag19p7InvFb + outputVTag + fileExt);
-  QCDVsMCClosurePlots(RegionBQCDVsMCInputFiles, variable, theunit, 1, 2, RegionBQCDVsMCOutputFile);
+  QCDVsMCClosurePlots(RegionBQCDVsMCInputFiles, variable, theunit, 
+		      pair<string, string>("QCD (data-driven)", "EWK+TOP+DY (MC)"), 1, 2, 
+		      RegionBQCDVsMCOutputFile);
 
   //compare data-driven QCD to total MC in signal region
   vector<string>RegionAQCDVsMCInputFiles;
@@ -1128,7 +1123,9 @@ void formatDataBkgPlots(const string& inputVersion, const string& outputVersion,
   RegionAQCDVsMCInputFiles.push_back(DYJetsToLLIsoHaddOutputFile);
   string RegionAQCDVsMCOutputFile(analysisFilePath + "results/QCDVsMC_RegionA" + MTBin + 
 				  tag19p7InvFb + outputVTag + fileExt);
-  QCDVsMCClosurePlots(RegionAQCDVsMCInputFiles, variable, theunit, 1, 2, RegionAQCDVsMCOutputFile);
+  QCDVsMCClosurePlots(RegionAQCDVsMCInputFiles, variable, theunit, 
+		      pair<string, string>("QCD (data-driven)", "EWK+TOP+DY (MC)"), 1, 2, 
+		      RegionAQCDVsMCOutputFile);
 
   //compare region B MC+QCD to region A MC+QCD
   cout << "\nCompare region B MC+ddQCD to regionA MC+ddQCD \n\n";
@@ -1136,6 +1133,27 @@ void formatDataBkgPlots(const string& inputVersion, const string& outputVersion,
 					  tag19p7InvFb + outputVTag + fileExt);
   compareTotalMCBToA(RegionBQCDVsMCInputFiles, RegionAQCDVsMCInputFiles, variable, theunit, 1, 2, 
 		     RegionBVsAMCComparisonOutputFile);
+
+  //compare region B data - MC to region D data
+  vector<string> compRegBDataMinusMCToRegDDataInputFiles;
+  compRegBDataMinusMCToRegDDataInputFiles.push_back(outputFileNameB);
+  compRegBDataMinusMCToRegDDataInputFiles.push_back(dataVsMCOutputDiff);
+  string compRegBDataMinusMCToRegDDataOutputFile(analysisFilePath + 
+						 "results/regBDataMinusMCVsRegDData" + MTBin + 
+						 tag19p7InvFb + outputVTag + fileExt);
+  QCDVsMCClosurePlots(compRegBDataMinusMCToRegDDataInputFiles, variable, theunit, 
+		      pair<string, string>("Region D data", "Region B data - MC"), 1, 2, 
+		      compRegBDataMinusMCToRegDDataOutputFile);
+
+  //compare region C data to region D data
+  vector<string> compRegCDataToRegDDataInputFiles;
+  compRegCDataToRegDDataInputFiles.push_back(outputFileNameB);
+  compRegCDataToRegDDataInputFiles.push_back(inputFileNameB);
+  string compRegCDataToRegDDataOutputFile(analysisFilePath + "results/regCDataVsRegDData" + 
+					  MTBin + tag19p7InvFb + outputVTag + fileExt);
+  QCDVsMCClosurePlots(compRegCDataToRegDDataInputFiles, variable, theunit, 
+		      pair<string, string>("Region D data", "Region C data"), 1, 2, 
+		      compRegCDataToRegDDataOutputFile);
 
   cout << "\nBegin region A vs. region B plots, sample by sample...\n\n";
   
