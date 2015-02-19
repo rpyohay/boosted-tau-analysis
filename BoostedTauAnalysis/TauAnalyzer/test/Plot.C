@@ -1666,7 +1666,7 @@ void QCDVsMCClosurePlots(const vector<string>& QCDVsMCInputFileNames, const stri
 			 const string& outputFileName)
 {
 
-  TFile outStream(outputFileName.c_str(), "RECREATE");
+  TFile outStream(outputFileName.c_str(), "UPDATE");
   vector<TFile*> inputStreams;
   vector<TCanvas*> outputCanvases;
   vector<TH1F*> hists(2);

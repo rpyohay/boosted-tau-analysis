@@ -1155,6 +1155,29 @@ void formatDataBkgPlots(const string& inputVersion, const string& outputVersion,
 		      pair<string, string>("Region D data", "Region C data"), 1, 2, 
 		      compRegCDataToRegDDataOutputFile);
 
+  //compare region C data to region B data - MC
+  vector<string> compRegCDataToRegBDataMinusMCInputFiles;
+  compRegCDataToRegBDataMinusMCInputFiles.push_back(dataVsMCOutputDiff);
+  compRegCDataToRegBDataMinusMCInputFiles.push_back(inputFileNameB);
+  string compRegCDataToRegBDataMinusMCOutputFile(analysisFilePath + 
+						 "results/regCDataVsRegBDataMinusMC" + MTBin + 
+						 tag19p7InvFb + outputVTag + fileExt);
+  QCDVsMCClosurePlots(compRegCDataToRegBDataMinusMCInputFiles, variable, theunit, 
+		      pair<string, string>("Region B data - MC", "Region C data"), 1, 2, 
+		      compRegCDataToRegBDataMinusMCOutputFile);
+  QCDVsMCClosurePlots(compRegCDataToRegBDataMinusMCInputFiles, "muHadMass1Prong", theunit, 
+		      pair<string, string>("Region B data - MC", "Region C data"), 1, 2, 
+		      compRegCDataToRegBDataMinusMCOutputFile);
+  QCDVsMCClosurePlots(compRegCDataToRegBDataMinusMCInputFiles, "muHadMass1Prong1Pi0", theunit, 
+		      pair<string, string>("Region B data - MC", "Region C data"), 1, 2, 
+		      compRegCDataToRegBDataMinusMCOutputFile);
+  QCDVsMCClosurePlots(compRegCDataToRegBDataMinusMCInputFiles, "muHadMass1Prong2Pi0", theunit, 
+		      pair<string, string>("Region B data - MC", "Region C data"), 1, 2, 
+		      compRegCDataToRegBDataMinusMCOutputFile);
+  QCDVsMCClosurePlots(compRegCDataToRegBDataMinusMCInputFiles, "muHadMass3Prong", theunit, 
+		      pair<string, string>("Region B data - MC", "Region C data"), 1, 2, 
+		      compRegCDataToRegBDataMinusMCOutputFile);
+
   cout << "\nBegin region A vs. region B plots, sample by sample...\n\n";
   
   //compare Drell-Yan+jets search sample to control sample
