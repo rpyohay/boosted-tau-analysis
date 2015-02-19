@@ -538,13 +538,15 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion, con
   stringstream ZHAllName;
   ZHAllName << ZHAllPrefix << ZHSuffix;
   ZHAllHaddInputFiles.push_back(ZHAllName.str());
-  haddCanvases(ZHIsoHaddOutputFile, ZHIsoHaddInputFiles, vector<float>(1, ZHWeight19p7InvFb), 
-  	       canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
-  	       nullBlindHigh);
-  if (doNoHPSIsoCut) {
-    haddCanvases(ZHAllHaddOutputFile, ZHAllHaddInputFiles, vector<float>(1, ZHWeight19p7InvFb), 
-  		 canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
-  		 nullBlindHigh);
+  if (ma9GeV) {
+    haddCanvases(ZHIsoHaddOutputFile, ZHIsoHaddInputFiles, vector<float>(1, ZHWeight19p7InvFb), 
+		 canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
+		 nullBlindHigh);
+    if (doNoHPSIsoCut) {
+      haddCanvases(ZHAllHaddOutputFile, ZHAllHaddInputFiles, vector<float>(1, ZHWeight19p7InvFb), 
+		   canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
+		   nullBlindHigh);
+    }
   }
 
   //"hadd" VBF sample just to get the formatting of the 2D plots the same
@@ -563,13 +565,15 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion, con
   stringstream VBFAllName;
   VBFAllName << VBFAllPrefix << VBFSuffix;
   VBFAllHaddInputFiles.push_back(VBFAllName.str());
-  haddCanvases(VBFIsoHaddOutputFile, VBFIsoHaddInputFiles, vector<float>(1, VBFWeight19p7InvFb), 
-  	       canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
-  	       nullBlindHigh);
-  if (doNoHPSIsoCut) {
-    haddCanvases(VBFAllHaddOutputFile, VBFAllHaddInputFiles, vector<float>(1, VBFWeight19p7InvFb), 
-  		 canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
-  		 nullBlindHigh);
+  if (ma9GeV) {
+    haddCanvases(VBFIsoHaddOutputFile, VBFIsoHaddInputFiles, vector<float>(1, VBFWeight19p7InvFb), 
+		 canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
+		 nullBlindHigh);
+    if (doNoHPSIsoCut) {
+      haddCanvases(VBFAllHaddOutputFile, VBFAllHaddInputFiles, 
+		   vector<float>(1, VBFWeight19p7InvFb), canvasNames1D, graphNames1D, 
+		   canvasNames2D, graphNames2D, nullBlindLow, nullBlindHigh);
+    }
   }
 
   cout << endl;
