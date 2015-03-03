@@ -40,6 +40,9 @@
 #include "TCanvas.h"
 #include "TLegend.h"
 
+using namespace std;
+using namespace edm;
+using namespace reco;
 //
 // class declaration
 //
@@ -76,11 +79,20 @@ private:
   //muon tag
   edm::InputTag muonTag_;
 
+  //collection of associated HPS reco taus (for signal only!)
+  edm::InputTag tauTag_;
+
+  //map of reco muons to to associated cleaned jets (for signal only!)
+  edm::InputTag muonJetMapTag_;
+
+  //flag for signal
+  bool isSignal_;
+
   //PU subtraction coefficient for muon PF isolation
   double muonPFIsoPUSubtractionCoeff_;
 
-  //histogram of combined particle isolation vs. muon pT
-  TH1F* combParticleIsoOverMuonPT_;
+   //histogram of combined particle isolation vs. muon pT
+  TH1F* recoMuPFRelIso_;
 };
 
 //
@@ -97,6 +109,11 @@ private:
 MuonIsolationAnalyzer::MuonIsolationAnalyzer(const edm::ParameterSet& iConfig) :
   outFileName_(iConfig.getParameter<std::string>("outFileName")),
   muonTag_(iConfig.getParameter<edm::InputTag>("muonTag")),
+  tauTag_(iConfig.existsAs<edm::InputTag>("tauTag") ?
+  	  iConfig.getParameter<edm::InputTag>("tauTag") : edm::InputTag()),
+  muonJetMapTag_(iConfig.existsAs<edm::InputTag>("muonJetMapTag") ?
+  	  iConfig.getParameter<edm::InputTag>("muonJetMapTag") : edm::InputTag()),
+  isSignal_(iConfig.getParameter<bool>("isSignal")),
   muonPFIsoPUSubtractionCoeff_(iConfig.getParameter<double>("muonPFIsoPUSubtractionCoeff"))
 {
   //now do what ever initialization is needed
@@ -120,23 +137,73 @@ MuonIsolationAnalyzer::~MuonIsolationAnalyzer()
 void MuonIsolationAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   //get muon collection
-  edm::Handle<edm::View<reco::Muon> > pMuons;
+  // edm::Handle<edm::View<reco::Muon> > pMuons;
+  //iEvent.getByLabel(muonTag_, pMuons);
+  edm::Handle<reco::MuonRefVector> pMuons;
   iEvent.getByLabel(muonTag_, pMuons);
 
-  double highestpT = -99999.9;
-  double iso;
+  edm::Handle<reco::PFTauRefVector> pTaus;
+  if (tauTag_ == edm::InputTag()) {} // do nothing
+  else iEvent.getByLabel(tauTag_, pTaus);
 
+  std::vector<reco::PFTauRef> pTSortedTaus;
+  std::vector<reco::PFTauRef> taus;
+  if (isSignal_ && pTaus.isValid())
+    {
+      //sort selected taus by descending order in pT
+      for (reco::PFTauRefVector::const_iterator iTau = pTaus->begin(); iTau != pTaus->end(); 
+	   ++iTau) { pTSortedTaus.push_back(*iTau); }
+      taus = pTSortedTaus;
+      Common::sortByPT(pTSortedTaus);
+      std::reverse(pTSortedTaus.begin(), pTSortedTaus.end());
+      cout << "number of taus = " << taus.size() << endl;
+    }
+
+  edm::Handle<edm::ValueMap<reco::MuonRefVector> > pMuonJetMap;
+  if (muonJetMapTag_ == edm::InputTag()) {} // do nothing
+  else iEvent.getByLabel(muonJetMapTag_, pMuonJetMap);
+
+  std::vector<reco::MuonRef> muonRefs;
+  for (reco::MuonRefVector::const_iterator iMuon = pMuons->begin(); iMuon != pMuons->end(); ++iMuon)
+    {
+	muonRefs.push_back(*iMuon);
+    }
+  Common::sortByPT(muonRefs);
+  cout << "number of muon refs = " << muonRefs.size() << endl;
   //plot combined particle isolation vs. muon pT
-  for (unsigned int iMuon = 0; iMuon < pMuons->size(); ++iMuon) {
-    edm::RefToBase<reco::Muon> muon(pMuons->refAt(iMuon));
-//     if (muon->pt() > highestpT)
-//       {
-	highestpT = muon->pt();
-	iso = Common::getMuonCombPFIso(*muon, muonPFIsoPUSubtractionCoeff_);
-  combParticleIsoOverMuonPT_->Fill(iso/highestpT);
-//       }
-  }
-//   combParticleIsoOverMuonPT_->Fill(iso/highestpT);
+  //  for (std::vector<reco::MuonRef>::const_iterator iMuon = muonRefs.begin(); iMuon != muonRefs.end(); ++iMuon) {
+  //edm::RefToBase<reco::Muon> muon(pMuons->refAt(iMuon));
+
+  double iso;
+  double pT = (muonRefs[muonRefs.size() - 1])->pt();
+  
+  if (isSignal_ && pTaus.isValid())
+    { // calculate modified tau isolation
+      bool foundRemovedMu = false;
+      std::vector<reco::PFTauRef>::const_iterator iTau = taus.begin();
+      while ((iTau != taus.end()) && !foundRemovedMu)
+	{ // loop over tau refs
+	  const reco::MuonRefVector& removedMuons = (*pMuonJetMap)[(*iTau)->jetRef()]; // get removed muons for tau
+	  reco::LeafCandidate::LorentzVector tauHadVisibleP4 = (*iTau)->p4();
+	  for (reco::MuonRefVector::const_iterator iMuon = removedMuons.begin(); 
+	       iMuon != removedMuons.end(); ++iMuon) { // loop over removed muons
+	    if ((*iMuon).key() == muonRefs[muonRefs.size() - 1].key())
+	      { // if this is the highest-pT mu
+		iso = Common::getMuonCombPFIsoMinusTau(*(muonRefs[muonRefs.size() - 1]), tauHadVisibleP4, muonPFIsoPUSubtractionCoeff_);
+		recoMuPFRelIso_->Fill(iso/pT);
+		foundRemovedMu = true;
+		break;
+	      } // if this is the highest-pT mu
+	  } // loop over removed muons
+	  ++iTau;  
+	} // loop over tau refs
+    } // calculate modified tau isolation
+  else
+    {
+      iso = Common::getMuonCombPFIso(*(muonRefs[muonRefs.size() - 1]), muonPFIsoPUSubtractionCoeff_);
+      recoMuPFRelIso_->Fill(iso/pT);
+    }
+  //  }
 }
 
 
@@ -147,28 +214,28 @@ void MuonIsolationAnalyzer::beginJob()
   out_ = new TFile(outFileName_.c_str(), "RECREATE");
 
   //book muon isolation histograms
-  combParticleIsoOverMuonPT_ = 
-    new TH1F("combParticleIsoOverMuonPT", "", 100, 0.0, 10.0);
+  recoMuPFRelIso_ = 
+    new TH1F("recoMuPFRelIso", "", 1000, 0.0, 20.0);
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
 void MuonIsolationAnalyzer::endJob() 
 {
   //make the muon isolation canvases
-  TCanvas combParticleIsoOverMuonPTCanvas("combParticleIsoOverMuonPTCanvas", "", 600, 600);
-  Common::setCanvasOptions(combParticleIsoOverMuonPTCanvas, 0, 0, 0);
-  Common::setCanvasMargins(combParticleIsoOverMuonPTCanvas, 0.2, 0.2, 0.2, 0.2);
+  //TCanvas recoMuPFRelIsoCanvas("recoMuPFRelIsoCanvas", "", 600, 600);
+  //Common::setCanvasOptions(recoMuPFRelIsoCanvas, 0, 0, 0);
+  //Common::setCanvasMargins(recoMuPFRelIsoCanvas, 0.2, 0.2, 0.2, 0.2);
 
   //format the muon isolation plots
-  Common::setHistogramOptions(combParticleIsoOverMuonPT_, kBlack, 0.7, 20, 1.0, "Muon isolation/pT", "", 0.04);
+  Common::setHistogramOptions(recoMuPFRelIso_, kBlack, 0.7, 20, 1.0, "Muon PFRelIso", "", 0.04);
 
   //draw muon isolation plots
-  combParticleIsoOverMuonPTCanvas.cd();
-  combParticleIsoOverMuonPT_->Draw();
+  //recoMuPFRelIsoCanvas.cd();
+  //recoMuPFRelIso_->Draw();
 
   //write output file
   out_->cd();
-  combParticleIsoOverMuonPTCanvas.Write();
+  recoMuPFRelIso_->Write();
   out_->Write();
   out_->Close();
 }
@@ -208,8 +275,8 @@ void MuonIsolationAnalyzer::reset(const bool doDelete)
 {
   if ((doDelete) && (out_ != NULL)) delete out_;
   out_ = NULL;
-  if ((doDelete) && (combParticleIsoOverMuonPT_ != NULL)) delete combParticleIsoOverMuonPT_;
-  combParticleIsoOverMuonPT_ = NULL;
+  if ((doDelete) && (recoMuPFRelIso_ != NULL)) delete recoMuPFRelIso_;
+  recoMuPFRelIso_ = NULL;
 }
 
 //define this as a plug-in

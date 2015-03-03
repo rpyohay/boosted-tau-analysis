@@ -532,54 +532,60 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   }
 
   //"hadd" ZH sample just to get the formatting of the 2D plots the same
-  cout << "...ZH\n";
-  string ZHSuffix(ZHSigVTag + fileExt);
-  string ZHIsoPrefix(analysisFilePath + "ZH/muHadIsoAnalysis" + MTBin + uncTag + "_ZH" + a1Mass);
-  string ZHIsoHaddOutputFile(ZHIsoPrefix + "_hadd" + ZHSuffix);
-  string ZHAllPrefix(analysisFilePath + "ZH/muHadAnalysis" + MTBin + uncTag + "_ZH" + a1Mass);
-  string ZHAllHaddOutputFile(ZHAllPrefix + "_hadd" + ZHSuffix);
-  vector<string> ZHIsoHaddInputFiles;
-  vector<string> ZHAllHaddInputFiles;
-  stringstream ZHIsoName;
-  ZHIsoName << ZHIsoPrefix << ZHSuffix;
-  ZHIsoHaddInputFiles.push_back(ZHIsoName.str());
-  stringstream ZHAllName;
-  ZHAllName << ZHAllPrefix << ZHSuffix;
-  ZHAllHaddInputFiles.push_back(ZHAllName.str());
-  haddCanvases(ZHIsoHaddOutputFile, ZHIsoHaddInputFiles, vector<float>(1, ZHWeight19p7InvFb), 
-  	       canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
-  	       nullBlindHigh);
-  if (doNoHPSIsoCut) {
-    haddCanvases(ZHAllHaddOutputFile, ZHAllHaddInputFiles, vector<float>(1, ZHWeight19p7InvFb), 
-  		 canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
-  		 nullBlindHigh);
-  }
+  if (ma9GeV)
+    {
+      cout << "...ZH\n";
+      string ZHSuffix(ZHSigVTag + fileExt);
+      string ZHIsoPrefix(analysisFilePath + "ZH/muHadIsoAnalysis" + MTBin + uncTag + "_ZH" + a1Mass);
+      string ZHIsoHaddOutputFile(ZHIsoPrefix + "_hadd" + ZHSuffix);
+      string ZHAllPrefix(analysisFilePath + "ZH/muHadAnalysis" + MTBin + uncTag + "_ZH" + a1Mass);
+      string ZHAllHaddOutputFile(ZHAllPrefix + "_hadd" + ZHSuffix);
+      vector<string> ZHIsoHaddInputFiles;
+      vector<string> ZHAllHaddInputFiles;
+      stringstream ZHIsoName;
+      ZHIsoName << ZHIsoPrefix << ZHSuffix;
+      ZHIsoHaddInputFiles.push_back(ZHIsoName.str());
+      stringstream ZHAllName;
+      ZHAllName << ZHAllPrefix << ZHSuffix;
+      ZHAllHaddInputFiles.push_back(ZHAllName.str());
+      haddCanvases(ZHIsoHaddOutputFile, ZHIsoHaddInputFiles, vector<float>(1, ZHWeight19p7InvFb), 
+		   canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
+		   nullBlindHigh);
+      if (doNoHPSIsoCut) {
+	haddCanvases(ZHAllHaddOutputFile, ZHAllHaddInputFiles, vector<float>(1, ZHWeight19p7InvFb), 
+		     canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
+		     nullBlindHigh);
+      }
+    }
 
   //"hadd" VBF sample just to get the formatting of the 2D plots the same
-  cout << "...VBF\n";
-  string VBFSuffix(VBFSigVTag + fileExt);
-  string 
-    VBFIsoPrefix(analysisFilePath + "VBF/muHadIsoAnalysis" + MTBin + uncTag + "_VBF" + a1Mass);
-  string VBFIsoHaddOutputFile(VBFIsoPrefix + "_hadd" + VBFSuffix);
-  string VBFAllPrefix(analysisFilePath + "VBF/muHadAnalysis" + MTBin + uncTag + "_VBF" + a1Mass);
-  string VBFAllHaddOutputFile(VBFAllPrefix + "_hadd" + VBFSuffix);
-  vector<string> VBFIsoHaddInputFiles;
-  vector<string> VBFAllHaddInputFiles;
-  stringstream VBFIsoName;
-  VBFIsoName << VBFIsoPrefix << VBFSuffix;
-  VBFIsoHaddInputFiles.push_back(VBFIsoName.str());
-  stringstream VBFAllName;
-  VBFAllName << VBFAllPrefix << VBFSuffix;
-  VBFAllHaddInputFiles.push_back(VBFAllName.str());
-  haddCanvases(VBFIsoHaddOutputFile, VBFIsoHaddInputFiles, vector<float>(1, VBFWeight19p7InvFb), 
-  	       canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
-  	       nullBlindHigh);
-  if (doNoHPSIsoCut) {
-    haddCanvases(VBFAllHaddOutputFile, VBFAllHaddInputFiles, vector<float>(1, VBFWeight19p7InvFb), 
-  		 canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
-  		 nullBlindHigh);
-  }
-
+  if (ma9GeV)
+    {
+      cout << "...VBF\n";
+      string VBFSuffix(VBFSigVTag + fileExt);
+      string 
+	VBFIsoPrefix(analysisFilePath + "VBF/muHadIsoAnalysis" + MTBin + uncTag + "_VBF" + a1Mass);
+      string VBFIsoHaddOutputFile(VBFIsoPrefix + "_hadd" + VBFSuffix);
+      string VBFAllPrefix(analysisFilePath + "VBF/muHadAnalysis" + MTBin + uncTag + "_VBF" + a1Mass);
+      string VBFAllHaddOutputFile(VBFAllPrefix + "_hadd" + VBFSuffix);
+      vector<string> VBFIsoHaddInputFiles;
+      vector<string> VBFAllHaddInputFiles;
+      stringstream VBFIsoName;
+      VBFIsoName << VBFIsoPrefix << VBFSuffix;
+      VBFIsoHaddInputFiles.push_back(VBFIsoName.str());
+      stringstream VBFAllName;
+      VBFAllName << VBFAllPrefix << VBFSuffix;
+      VBFAllHaddInputFiles.push_back(VBFAllName.str());
+      haddCanvases(VBFIsoHaddOutputFile, VBFIsoHaddInputFiles, vector<float>(1, VBFWeight19p7InvFb), 
+		   canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
+		   nullBlindHigh);
+      if (doNoHPSIsoCut) {
+	haddCanvases(VBFAllHaddOutputFile, VBFAllHaddInputFiles, vector<float>(1, VBFWeight19p7InvFb), 
+		     canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
+		     nullBlindHigh);
+      }
+    }
+  
   cout << endl;
 
   //data region A files
