@@ -137,8 +137,8 @@ cd ~/CMSSW_5_3_11/src/BoostedTauAnalysis/TauAnalyzer/test
 cmsenv
 root -l -b -q 'formatDataBkgPlots.C("v<input_version>", "v<output_version>", [true|false], "_lowMT")'
 root -l -b -q 'formatDataBkgPlots.C("v<input_version>", "v<output_version>", [true|false], "_highMT")'
-root -l -b -q 'formatSigPlots.C("v<input_version>", "v<output_version>", [true|false], "", "_a<a_mass>", _lowMT")'
-root -l -b -q 'formatSigPlots.C("v<input_version>", "v<output_version>", [true|false], "", "_a<a_mass>", _highMT")'
+root -l -b -q 'formatSigPlots.C("v<input_version>", "v<output_version>", [true|false], "", "_a<a_mass>", "_lowMT")'
+root -l -b -q 'formatSigPlots.C("v<input_version>", "v<output_version>", [true|false], "", "_a<a_mass>", "_highMT")'
 
 where
 
