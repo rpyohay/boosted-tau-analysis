@@ -91,8 +91,12 @@ private:
   //PU subtraction coefficient for muon PF isolation
   double muonPFIsoPUSubtractionCoeff_;
 
-   //histogram of combined particle isolation vs. muon pT
+  //histogram of combined particle isolation vs. muon pT
+  TH1F* recoMuPFIso_;
+  
+  //histogram of combined particle relative isolation vs. muon pT
   TH1F* recoMuPFRelIso_;
+  
 };
 
 //
@@ -189,8 +193,11 @@ void MuonIsolationAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
 	       iMuon != removedMuons.end(); ++iMuon) { // loop over removed muons
 	    if ((*iMuon).key() == muonRefs[muonRefs.size() - 1].key())
 	      { // if this is the highest-pT mu
-		iso = Common::getMuonCombPFIsoMinusTau(*(muonRefs[muonRefs.size() - 1]), tauHadVisibleP4, muonPFIsoPUSubtractionCoeff_);
+		//		iso = Common::getMuonCombPFIsoMinusTau(*(muonRefs[muonRefs.size() - 1]), tauHadVisibleP4, muonPFIsoPUSubtractionCoeff_); // this is wrong!!!!
+		//iso = Common::getMuonCombPFIsoModified(*(muonRefs[muonRefs.size() - 1]), *iTau, muonPFIsoPUSubtractionCoeff_);
+		iso = Common::getMuonCombPFIso(*(muonRefs[muonRefs.size() - 1]), muonPFIsoPUSubtractionCoeff_);
 		recoMuPFRelIso_->Fill(iso/pT);
+		recoMuPFIso_->Fill(iso);
 		foundRemovedMu = true;
 		break;
 	      } // if this is the highest-pT mu
@@ -202,6 +209,7 @@ void MuonIsolationAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
     {
       iso = Common::getMuonCombPFIso(*(muonRefs[muonRefs.size() - 1]), muonPFIsoPUSubtractionCoeff_);
       recoMuPFRelIso_->Fill(iso/pT);
+      recoMuPFIso_->Fill(iso);
     }
   //  }
 }
@@ -214,6 +222,8 @@ void MuonIsolationAnalyzer::beginJob()
   out_ = new TFile(outFileName_.c_str(), "RECREATE");
 
   //book muon isolation histograms
+  recoMuPFIso_ = 
+    new TH1F("recoMuPFIso", "", 1000, 0.0, 20.0);
   recoMuPFRelIso_ = 
     new TH1F("recoMuPFRelIso", "", 1000, 0.0, 20.0);
 }
@@ -227,6 +237,7 @@ void MuonIsolationAnalyzer::endJob()
   //Common::setCanvasMargins(recoMuPFRelIsoCanvas, 0.2, 0.2, 0.2, 0.2);
 
   //format the muon isolation plots
+  Common::setHistogramOptions(recoMuPFIso_, kBlack, 0.7, 20, 1.0, "Muon PFIso", "", 0.04);
   Common::setHistogramOptions(recoMuPFRelIso_, kBlack, 0.7, 20, 1.0, "Muon PFRelIso", "", 0.04);
 
   //draw muon isolation plots
@@ -235,6 +246,7 @@ void MuonIsolationAnalyzer::endJob()
 
   //write output file
   out_->cd();
+  recoMuPFIso_->Write();
   recoMuPFRelIso_->Write();
   out_->Write();
   out_->Close();
@@ -275,6 +287,8 @@ void MuonIsolationAnalyzer::reset(const bool doDelete)
 {
   if ((doDelete) && (out_ != NULL)) delete out_;
   out_ = NULL;
+  if ((doDelete) && (recoMuPFIso_ != NULL)) delete recoMuPFIso_;
+  recoMuPFIso_ = NULL;
   if ((doDelete) && (recoMuPFRelIso_ != NULL)) delete recoMuPFRelIso_;
   recoMuPFRelIso_ = NULL;
 }

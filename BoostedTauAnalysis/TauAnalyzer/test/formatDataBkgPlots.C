@@ -1141,6 +1141,17 @@ void formatDataBkgPlots(const string& inputVersion, const string& outputVersion,
 
   cout << "\nBegin region A vs. region B plots, sample by sample...\n\n";
   
+  //calculate bkg uncertainty if region A bkg had...
+  //1. the shape of data-driven QCD from region B
+  //2. the shape of MC EWK from region B
+  cout << "\nCalculate bkg uncertainty with all-QCD and all-EWK assumptions \n\n";
+  string allQCDEWKAssumptionOutputFile(analysisFilePath + "results/allQCDorEWK_bkgUncertainty" + MTBin +
+					  tag19p7InvFb + outputVTag + fileExt);
+  arcQuest(RegionBQCDVsMCInputFiles, dataIsoHaddOutputFile, 
+	   dataNonIsoHaddOutputFile,
+	   variable, theunit, 1, 2,
+	   allQCDEWKAssumptionOutputFile);
+
   //compare Drell-Yan+jets search sample to control sample
   cout << "...Drell-Yan\n";
   string DYJetsToLLSearchVsControlOutputFile(analysisFilePath + 

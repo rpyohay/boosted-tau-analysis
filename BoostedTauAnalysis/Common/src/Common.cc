@@ -193,6 +193,43 @@ float Common::getMuonCombPFIso(const reco::Muon& muon, const double PUSubtractio
 				 PUSubtractionCoeff*isoBlock.sumPUPt)));
 }
 
+float Common::getMuonCombPFIsoModified(const reco::Muon& muon, const reco::PFTauRef& tau, const double PUSubtractionCoeff)
+{
+  const reco::MuonPFIsolation isoBlock = muon.pfIsolationR04();
+  reco::PFCandidateRefVector tauChargedCands = (*tau).signalPFChargedHadrCands();
+  reco::PFCandidateRefVector tauNeutralCands = (*tau).signalPFNeutrHadrCands();
+  reco::PFCandidateRefVector tauGammaCands = (*tau).signalPFGammaCands();
+
+  double tauChargedHadronPt = 0.;
+  double tauNeutralHadronPt = 0.;
+  double tauPhotonPt = 0.;
+
+  for (reco::PFCandidateRefVector::const_iterator iCand = tauChargedCands.begin(); iCand != tauChargedCands.end(); ++iCand)
+    {
+      if (deltaR(muon.p4(), (*iCand)->p4()) < 0.4)
+	tauChargedHadronPt += (*iCand)->pt();
+    }
+
+  for (reco::PFCandidateRefVector::const_iterator iCand = tauNeutralCands.begin(); iCand != tauNeutralCands.end(); ++iCand)
+    {
+      if (deltaR(muon.p4(), (*iCand)->p4()) < 0.4)
+	tauNeutralHadronPt += (*iCand)->pt();
+    }
+
+  for (reco::PFCandidateRefVector::const_iterator iCand = tauGammaCands.begin(); iCand != tauGammaCands.end(); ++iCand)
+    {
+      if (deltaR(muon.p4(), (*iCand)->p4()) < 0.4)
+	tauPhotonPt += (*iCand)->pt();
+    }
+
+  double result = isoBlock.sumChargedHadronPt - tauChargedHadronPt +
+    std::max(0.0, (double)(isoBlock.sumNeutralHadronEt - tauNeutralHadronPt +
+			   isoBlock.sumPhotonEt - tauPhotonPt - 
+			   PUSubtractionCoeff*isoBlock.sumPUPt));
+
+  return result;
+}
+
 float Common::getMuonLeptonPFIso(const reco::Muon& muon)
 {
   const reco::MuonPFIsolation isoBlock = muon.pfIsolationR04();

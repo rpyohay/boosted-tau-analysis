@@ -1602,7 +1602,8 @@ process.recoATauMuMatchSelector = cms.EDFilter(
     'GenMatchedMuonProducer',
     genParticleTag = cms.InputTag('genParticles'),
     selectedGenParticleTag = cms.InputTag('genTauMuSelector'),
-    recoObjTag = cms.InputTag('muonTriggerObjectFilter'),
+#    recoObjTag = cms.InputTag('muonTriggerObjectFilter'),
+    recoObjTag = cms.InputTag('WIsoMuonSelector'),
     baseRecoObjTag = cms.InputTag('muons'),
     genTauDecayIDPSet = commonGenTauDecayIDPSet,
     applyPTCuts = cms.bool(False),
@@ -1622,14 +1623,15 @@ process.recoDYMuMatchSelector = cms.EDFilter(
     'GenMatchedDYMuonProducer',
     genParticleTag = cms.InputTag('genParticles'),
     selectedGenParticleTag = cms.InputTag('genDYMuSelector'),
-    recoObjTag = cms.InputTag('muonTriggerObjectFilter'),
+#    recoObjTag = cms.InputTag('muonTriggerObjectFilter'),
+    recoObjTag = cms.InputTag('WIsoMuonSelector'),
     baseRecoObjTag = cms.InputTag('muons'),
     dR = cms.double(0.1),
     minNumGenObjectsToPassFilter = cms.uint32(1)
     )
 
 process.MuonIsolationAnalyzerSignal = cms.EDAnalyzer('MuonIsolationAnalyzer',
-                                                     outFileName = cms.string('isoVsPT_signal_DMF.root'),
+                                                     outFileName = cms.string('isoVsPT_signal_DMF_noModTau_noHLT.root'),
                                                      muonTag = cms.InputTag('recoATauMuMatchSelector'),
                                                      tauTag = cms.InputTag('muHadTauSelector'),
                                                      muonJetMapTag = cms.InputTag('CleanJets', '', 'SKIM'),
@@ -1637,7 +1639,7 @@ process.MuonIsolationAnalyzerSignal = cms.EDAnalyzer('MuonIsolationAnalyzer',
                                                      muonPFIsoPUSubtractionCoeff = cms.double(0.5)
                                                      )
 process.MuonIsolationAnalyzerDY = cms.EDAnalyzer('MuonIsolationAnalyzer',
-                                                     outFileName = cms.string('isoVsPT_DY.root'),
+                                                     outFileName = cms.string('isoVsPT_DY_noHLT.root'),
                                                      muonTag = cms.InputTag('recoDYMuMatchSelector'),
                                                      tauTag = cms.InputTag(''),
                                                      muonJetMapTag = cms.InputTag('CleanJets', '', 'SKIM'),
@@ -1726,8 +1728,8 @@ process.tauMuonSelector = cms.EDFilter('CustomMuonSelector',
                                        )
 
 #clean the jets of soft muons, then rebuild the taus
-process.CleanJets.muonSrc = cms.InputTag('recoATauMuMatchSelector')
-#process.CleanJets.muonSrc = cms.InputTag('recoDYMuMatchSelector')
+#process.CleanJets.muonSrc = cms.InputTag('recoATauMuMatchSelector')
+process.CleanJets.muonSrc = cms.InputTag('recoDYMuMatchSelector')
 process.CleanJets.PFCandSrc = cms.InputTag('particleFlow')
 process.CleanJets.cutOnGenMatches = cms.bool(False)
 process.CleanJets.outFileName = cms.string('NMSSMSignal_MuProperties.root')
@@ -1814,7 +1816,7 @@ process.muHadNonIsoTauSelector = cms.EDFilter(
 process.SignalSequence = cms.Sequence(process.IsoMu24eta2p1Selector*
                                       process.WMuonPTSelector*
                                       process.WIsoMuonSelector*
-                                      process.muonTriggerObjectFilter*
+#                                      process.muonTriggerObjectFilter*
                                       process.genTauMuSelector*
                                       process.recoATauMuMatchSelector*
                                       process.PFTau*
@@ -1823,7 +1825,7 @@ process.SignalSequence = cms.Sequence(process.IsoMu24eta2p1Selector*
 process.DYSequence = cms.Sequence(process.IsoMu24eta2p1Selector*
                                       process.WMuonPTSelector*
                                       process.WIsoMuonSelector*
-                                      process.muonTriggerObjectFilter*
+#                                      process.muonTriggerObjectFilter*
                                       process.genDYMuSelector*
                                       process.recoDYMuMatchSelector*
 #                                      process.PFTau*
@@ -1831,6 +1833,6 @@ process.DYSequence = cms.Sequence(process.IsoMu24eta2p1Selector*
                                       process.MuonIsolationAnalyzerDY)
 
 #no selection path
-process.p = cms.Path(process.SignalSequence)
-#process.p = cms.Path(process.DYSequence)
+#process.p = cms.Path(process.SignalSequence)
+process.p = cms.Path(process.DYSequence)
 #process.e = cms.EndPath(process.noSelectedOutput)

@@ -133,6 +133,9 @@ class Common {
   //get muon combined particle isolation with adjustable PU subtraction
   static float getMuonCombPFIso(const reco::Muon&, const double);
 
+  //get muon combined particle isolation with nearby tau candidates' pT subtracted
+  static float getMuonCombPFIsoModified(const reco::Muon&, const reco::PFTauRef&, const double);
+
   //get muon isolation computed from leptons only
   static float getMuonLeptonPFIso(const reco::Muon&);
 

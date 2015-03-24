@@ -202,6 +202,22 @@ void setLegendOptions(TLegend& legend, const char* header)
   legend.SetHeader(header);
 }
 
+
+//for agreement plotting/assessment:
+//set bin content equal to sqrt(bin^2 + sigma_bin^2)
+TH1F* denomErrorScale(TH1F* histInput)
+{
+  TH1F* hist = (TH1F*)histInput->Clone();
+  for (int i = 1; i < (hist->GetNbinsX() - 2); ++i)
+    {
+      double bin = hist->GetBinContent(i);
+      double binErr = hist->GetBinError(i);
+      double newContent = sqrt((bin*bin) + (binErr*binErr));
+      hist->SetBinContent(i, newContent);
+    }
+  return hist;
+}
+
 //make efficiency plots from input TH1s and save them to the output file
 ErrorCode plotEfficiency(TFile& in, TFile& out, const map<string, pair<string, string> >& 
 			 effHistMap, const map<string, vector<string> >& binLabelMap, 
@@ -1061,11 +1077,14 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 	else stackSumHist->Add(stackHist);
       }
       TH1F* dataHist = (TH1F*)hists[canvasIndex][0]->Clone();
+      TH1F* denomHist = denomErrorScale((TH1F*)stackSumHist->Clone()); 
       stackSumHist->Add(dataHist, -1.0);
-      stackSumHist->Divide(dataHist);
+     //stackSumHist->Divide(dataHist);
+      stackSumHist->Divide(denomHist);
       setHistogramOptions(stackSumHist, kBlack, 0.7, 20, 1.0, 
 			  stackSumHist->GetXaxis()->GetTitle(), 
-			  "#frac{N_{MC} - N_{data}}{N_{data}}");
+			  //"#frac{N_{MC} - N_{data}}{N_{data}}");
+			  "#frac{N_{MC} - N_{data}}{sqrt(N_{MC}^2 + #sigma_{MC}^2}");
       stackSumHist->GetYaxis()->SetRangeUser(-1.0, 1.0);
       if (dataMC) {
 	outputCanvases[canvasIndex]->cd(dataMC ? 2 : 0);
@@ -2163,15 +2182,21 @@ void addFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
   outCanvas.cd(2);
   TH1F* nonIsoDataMinusIsoBkgAll = (TH1F*)nonIsoData->Clone();
   nonIsoDataMinusIsoBkgAll->Add(isoBkgAllHist, -1.0);
-  nonIsoDataMinusIsoBkgAll->Divide(nonIsoData);
-  nonIsoDataMinusIsoBkgAll->GetYaxis()->SetTitle("#frac{Data (B) - MC (A)}{Data (B)}");
+  TH1F* nonIsoDataMinusIsoBkgAllDenom = denomErrorScale((TH1F*)nonIsoData->Clone());
+  //  nonIsoDataMinusIsoBkgAll->Divide(nonIsoData);
+  nonIsoDataMinusIsoBkgAll->Divide(nonIsoDataMinusIsoBkgAllDenom);
+  //  nonIsoDataMinusIsoBkgAll->GetYaxis()->SetTitle("#frac{Data (B) - MC (A)}{Data (B)}");
+  nonIsoDataMinusIsoBkgAll->GetYaxis()->SetTitle("#frac{Data (B) - Data (A)}{sqrt(Data(B)^2 + #sigma_{DataB}^2)}");
   nonIsoDataMinusIsoBkgAll->GetYaxis()->SetRangeUser(-1.0, 1.0);
   nonIsoDataMinusIsoBkgAll->Draw();
   cout << "percent deviation in final bin: " << nonIsoDataMinusIsoBkgAll->GetBinContent(5) << " +/- " << nonIsoDataMinusIsoBkgAll->GetBinError(5) << endl;
   TH1F* nonIsoDataMinusIsoData = (TH1F*)nonIsoData->Clone();
   nonIsoDataMinusIsoData->Add(isoData, -1.0);
-  nonIsoDataMinusIsoData->Divide(nonIsoData);
-  nonIsoDataMinusIsoData->GetYaxis()->SetTitle("#frac{Data (B) - Data (A)}{Data (B)}");
+  TH1F* nonIsoDataMinusIsoDataDenom = denomErrorScale((TH1F*)nonIsoData->Clone());
+  //  nonIsoDataMinusIsoData->Divide(nonIsoData);
+  nonIsoDataMinusIsoData->Divide(nonIsoDataMinusIsoDataDenom);
+  //  nonIsoDataMinusIsoData->GetYaxis()->SetTitle("#frac{Data (B) - Data (A)}{Data (B)}");
+  nonIsoDataMinusIsoData->GetYaxis()->SetTitle("#frac{Data (B) - Data (A)}{sqrt(Data(B)^2 + #sigma_{DataB}^2)}");
   nonIsoDataMinusIsoData->GetYaxis()->SetRangeUser(-1.0, 1.0);
   nonIsoDataMinusIsoData->SetMarkerColor(kBlack);
   nonIsoDataMinusIsoData->SetLineColor(kBlack);
@@ -2230,6 +2255,216 @@ void makeFinalPlot(const pair<string, float>& isoMC, const string& isoDataFileNa
   delete isoSigBkgFile.first;
   delete nonIsoDataFile.first;
 }
+
+void arcQuest(const vector<string>& QCDVsMCInputFileNames, const string& isoDataFileName, 
+		  const string& nonIsoDataFileName, const string& var, const string& unit, 
+		  const int normRegionLowerBin, const int normRegionUpperBin, 
+		  const string& outputFileName)
+{ // beginning
+  //top level declarations
+  TFile outStream(outputFileName.c_str(), "RECREATE");
+  TFile isoDataFile(isoDataFileName.c_str(), "read");
+  TFile nonIsoDataFile(nonIsoDataFileName.c_str(), "read");
+  string canvasName(var + "Canvas");
+  string canvasReweightErrSqName(var + "ReweightErrSqCanvas");
+  string varReweightErrSq(var + "ReweightErrSq");
+  vector<TFile*> inputStreams;
+  vector<TH1F*> hists(2);
+
+  TLegend legendBkgQCD(0.35, 0.55, 0.75, 0.95);
+  TLegend legendBkgEWK(0.35, 0.55, 0.75, 0.95);
+  setLegendOptions(legendBkgQCD, "CMS 19.7 fb^{-1}");
+  setLegendOptions(legendBkgEWK, "CMS 19.7 fb^{-1}");
+
+  cout << "arcQuest: looping over QCDMC input files" << endl;
+  for (vector<string>::const_iterator iInputFile = QCDVsMCInputFileNames.begin(); 
+       iInputFile != QCDVsMCInputFileNames.end(); ++iInputFile) { // loop over input files
+    const unsigned int fileIndex = iInputFile - QCDVsMCInputFileNames.begin();
+    inputStreams.push_back(new TFile(iInputFile->c_str()));
+    cout << "arcQuest: filename = " << iInputFile->c_str() << endl;
+    TCanvas* pCanvas;
+    inputStreams[inputStreams.size() - 1]->GetObject(canvasName.c_str(), pCanvas);
+    TH1F* pHist = (TH1F*)pCanvas->GetPrimitive(var.c_str());
+    if (fileIndex == 0)
+      { // if this is the QCD file
+	hists[0] = (TH1F*)pHist->Clone();
+	hists[0]->SetLineColor(3); // green QCD
+      } // if this is the QCD file
+    else if (fileIndex == 1)
+      { // if this is the first MC bkg file
+	hists[1] = (TH1F*)pHist->Clone();
+	hists[1]->SetLineColor(4); // blue EWK
+      } // if this is the first MC bkg file
+    else
+      { // if this is another MC bkg file
+	hists[1]->Add(pHist,1.);
+      } // if this is another MC bkg file
+    
+  } // loop over input files
+
+  if (hists[0] != NULL)
+    legendBkgQCD.AddEntry(hists[0], "QCD (data-driven, from Region B)", "lp");
+  if (hists[1] != NULL)
+    legendBkgEWK.AddEntry(hists[1], "EWK (MC, from Region B)", "lp");
+
+  //get the data histogram, non-isolated tau sample
+  TCanvas* canvasNonIsoData = NULL;
+  nonIsoDataFile.GetObject(canvasName.c_str(), canvasNonIsoData);
+  TH1F* nonIsoData = NULL;
+  if (canvasNonIsoData != NULL) {
+    canvasNonIsoData->Draw();
+    nonIsoData = (TH1F*)canvasNonIsoData->cd(1)->GetPrimitive(var.c_str())->Clone();
+    nonIsoData->SetName((var + "DataControl").c_str());
+    setHistogramOptions(nonIsoData, kRed, 0.7, 20, 1.0, unit.c_str(), "");
+    nonIsoData->GetYaxis()->SetRangeUser(0.01, 10000.0);
+    legendBkgQCD.AddEntry(nonIsoData, "Background (from data)", "lp");
+    legendBkgEWK.AddEntry(nonIsoData, "Background (from data)", "lp");
+  }
+  else {
+    cerr << "Error opening canvas " << canvasName << " from file ";
+    cerr << nonIsoDataFile.GetName() << ".\n";
+    return;
+  }
+
+  //get the reweighting error histogram, non-isolated tau sample
+  TCanvas* canvasNonIsoDataReweightErrSq = NULL;
+  nonIsoDataFile.GetObject(canvasReweightErrSqName.c_str(), canvasNonIsoDataReweightErrSq);
+  TH1F* nonIsoDataReweightErrSq = NULL;
+  if (canvasNonIsoDataReweightErrSq != NULL) {
+    canvasNonIsoDataReweightErrSq->Draw();
+    nonIsoDataReweightErrSq = 
+      (TH1F*)canvasNonIsoDataReweightErrSq->cd(1)->GetPrimitive(varReweightErrSq.c_str())->Clone();
+  }
+  else {
+    cerr << "Error opening canvas " << canvasReweightErrSqName << " from file ";
+    cerr << nonIsoDataFile.GetName() << ".\n";
+    return;
+  }
+
+  //get the data histogram, isolated tau sample
+  TCanvas* canvasIsoData = NULL;
+  isoDataFile.GetObject(canvasName.c_str(), canvasIsoData);
+  TH1F* isoData = NULL;
+  if (canvasIsoData != NULL) {
+    isoData = (TH1F*)canvasIsoData->GetPrimitive(var.c_str())->Clone();
+    isoData->SetName((var + "DataSearch").c_str());
+    legendBkgQCD.AddEntry(isoData, "Data", "p");
+    legendBkgEWK.AddEntry(isoData, "Data", "p");
+//     setHistogramOptions(isoData, kBlack, 0.7, 20, 1.0, unit.c_str(), "");
+    isoData->GetYaxis()->SetRangeUser(0.01, 10000.0);
+  }
+  else {
+    cerr << "Error opening canvas " << canvasName << " from file " << isoDataFile.GetName();
+    cerr << ".\n";
+    return;
+  }
+
+  //calculate the normalization factor
+  Double_t norm = isoData->Integral(normRegionLowerBin, normRegionUpperBin)/
+    nonIsoData->Integral(normRegionLowerBin, normRegionUpperBin);
+  cout << "The normalization constant is: " << norm << endl;
+  /*calculate the statistical error on the background prediction from the non-isolated data, 
+    including the term from the error on the normalization factor*/
+  const TH1* nonIsoDataPtrCast = dynamic_cast<const TH1*>(nonIsoData);
+  const TH1* nonIsoDataReweightErrSqPtrCast = dynamic_cast<const TH1*>(nonIsoDataReweightErrSq);
+  vector<Double_t> nonIsoDataStatErrSq;
+  for (Int_t iBin = 1; iBin <= nonIsoData->GetNbinsX(); ++iBin) {
+    nonIsoDataStatErrSq.
+      push_back(bkgErrSq(nonIsoDataPtrCast, nonIsoDataReweightErrSqPtrCast, iBin, norm, 
+			 normErrSq(dynamic_cast<const TH1*>(isoData), nonIsoDataPtrCast, 
+				   nonIsoDataReweightErrSqPtrCast, normRegionLowerBin, 
+				   normRegionUpperBin, norm)));
+  }
+
+  //normalize non-isolated data histogram to isolated data in signal-depleted region
+  cout << "Region B m > 4 integral before normalization = " << nonIsoData->Integral(5,-1) << endl;
+  nonIsoData->Scale(norm);
+  cout << "Normalization constant for region B = " << norm << endl;
+
+  //set statistical error in each bin of the non-isolated data histogram
+  for (Int_t iBin = 1; iBin <= nonIsoData->GetNbinsX(); ++iBin) {
+    nonIsoData->SetBinError(iBin, sqrt(nonIsoDataStatErrSq[iBin - 1]));
+  }
+
+  //normalize region B QCD histogram to isolated data in signal-depleted region
+  Double_t normQCD = isoData->Integral(normRegionLowerBin, normRegionUpperBin)/
+    hists[0]->Integral(normRegionLowerBin, normRegionUpperBin);
+  hists[0]->Scale(normQCD);
+
+  //normalize region B total EWK histogram to isolated data in signal-depleted region
+  //normalize region B QCD histogram to isolated data in signal-depleted region
+  Double_t normEWK = isoData->Integral(normRegionLowerBin, normRegionUpperBin)/
+    hists[1]->Integral(normRegionLowerBin, normRegionUpperBin);
+  hists[1]->Scale(normEWK);
+
+  //errors on m > 4 integral for QCD and EWK histograms
+  Float_t sum0 = 0.0;
+  Float_t err0 = 0.0;
+  Float_t sum1 = 0.0;
+  Float_t err1 = 0.0;
+  for (Int_t iBin = 5; iBin <= (hists[0]->GetNbinsX() + 1); ++iBin) {
+    sum0+=hists[0]->GetBinContent(iBin);
+    err0+=(hists[0]->GetBinError(iBin)*hists[0]->GetBinError(iBin));
+  }
+  for (Int_t iBin = 5; iBin <= (hists[1]->GetNbinsX() + 1); ++iBin) {
+    sum1+=hists[1]->GetBinContent(iBin);
+    err1+=(hists[1]->GetBinError(iBin)*hists[1]->GetBinError(iBin));
+  }
+
+  //write to file
+  outStream.cd();
+  TCanvas outCanvasAllQCD("Region B data vs all QCD bkg", "", 600, 900);
+  outCanvasAllQCD.Divide(1, 2);
+  outCanvasAllQCD.cd(1)->SetPad(0.0, 0.33, 1.0, 1.0);
+  setCanvasOptions(*outCanvasAllQCD.cd(1), 1, 1, 0);
+  outCanvasAllQCD.cd(2)->SetPad(0.0, 0.0, 1.0, 0.33);
+  setCanvasOptions(*outCanvasAllQCD.cd(2), 1, 0, 0);
+  TCanvas outCanvasAllEWK("Region B data vs all EWK bkg", "", 600, 900);
+  outCanvasAllEWK.Divide(1, 2);
+  outCanvasAllEWK.cd(1)->SetPad(0.0, 0.33, 1.0, 1.0);
+  setCanvasOptions(*outCanvasAllEWK.cd(1), 1, 1, 0);
+  outCanvasAllEWK.cd(2)->SetPad(0.0, 0.0, 1.0, 0.33);
+  setCanvasOptions(*outCanvasAllEWK.cd(2), 1, 0, 0);
+
+  outCanvasAllQCD.cd(1);
+  nonIsoData->Draw("HISTE");
+  hists[0]->Draw("HISTESAME");
+  legendBkgQCD.Draw();
+  Double_t statErrNonIsoData;
+  nonIsoData->IntegralAndError(5, -1, statErrNonIsoData);
+  cout << "Region B data, m > 4: " << setprecision(3) << nonIsoData->Integral(5, -1) << " +/- ";
+  cout << setprecision(3) << statErrNonIsoData << endl;
+  cout << "Region B QCD normalized, m > 4: " << setprecision(3) << sum0 << " +/- " << setprecision(3) << sqrt(err0) << endl;
+  outCanvasAllQCD.cd(2);
+  TH1F* nonIsoDataMinusRegBQCD = (TH1F*)nonIsoData->Clone();
+  nonIsoDataMinusRegBQCD->Add(hists[0], -1.0);
+  TH1F* nonIsoDataMinusRegBQCDDenom = denomErrorScale((TH1F*)nonIsoData->Clone());
+  nonIsoDataMinusRegBQCD->Divide(nonIsoDataMinusRegBQCDDenom);
+  nonIsoDataMinusRegBQCD->GetYaxis()->SetTitle("#frac{Data (B) - QCD (B)}{sqrt(Data(B)^2 + #sigma_{DataB}^2)}");
+  nonIsoDataMinusRegBQCD->GetYaxis()->SetRangeUser(-1.0, 1.0);
+  nonIsoDataMinusRegBQCD->Draw();
+  cout << "percent deviation in final bin: " << nonIsoDataMinusRegBQCD->GetBinContent(5) << " +/- " << nonIsoDataMinusRegBQCD->GetBinError(5) << endl;
+
+  outCanvasAllEWK.cd(1);
+  nonIsoData->Draw("HISTE");
+  hists[1]->Draw("HISTESAME");
+  legendBkgEWK.Draw();
+  cout << "Region B EWK normalized, m > 4: " << setprecision(3) << sum1 << " +/- " << setprecision(3) << sqrt(err1) << endl;
+  outCanvasAllEWK.cd(2);
+  TH1F* nonIsoDataMinusRegBEWK = (TH1F*)nonIsoData->Clone();
+  nonIsoDataMinusRegBEWK->Add(hists[1], -1.0);
+  TH1F* nonIsoDataMinusRegBEWKDenom = denomErrorScale((TH1F*)nonIsoData->Clone());
+  nonIsoDataMinusRegBEWK->Divide(nonIsoDataMinusRegBEWKDenom);
+  nonIsoDataMinusRegBEWK->GetYaxis()->SetTitle("#frac{Data (B) - EWK (B)}{sqrt(Data(B)^2 + #sigma_{DataB}^2)}");
+  nonIsoDataMinusRegBEWK->GetYaxis()->SetRangeUser(-1.0, 1.0);
+  nonIsoDataMinusRegBEWK->Draw();
+  cout << "percent deviation in final bin: " << nonIsoDataMinusRegBEWK->GetBinContent(5) << " +/- " << nonIsoDataMinusRegBEWK->GetBinError(5) << endl;
+
+  outCanvasAllQCD.Write();
+  outCanvasAllEWK.Write();
+
+} // end
+
 
 TH2F* twoDimTotalBackgroundHistogram(const vector<string>& files, const string& histName)
 {
