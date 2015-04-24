@@ -73,6 +73,7 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   canvasNames1D.push_back("diJetWMuHTCanvas");
   canvasNames1D.push_back("jetTauJetWMuHTCanvas");
   canvasNames1D.push_back("dRSoftMuTauHadCanvas");
+  canvasNames1D.push_back("HPTCanvas");
   canvasNames1D.push_back("tauMuPTCanvas");
   canvasNames1D.push_back("tauHadPTCanvas");
   canvasNames1D.push_back("tauHadPT1ProngCanvas");
@@ -216,6 +217,7 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   graphNames1D.push_back("diJetWMuHT");
   graphNames1D.push_back("jetTauJetWMuHT");
   graphNames1D.push_back("dRSoftMuTauHad");
+  graphNames1D.push_back("HPT");
   graphNames1D.push_back("tauMuPT");
   graphNames1D.push_back("tauHadPT");
   graphNames1D.push_back("tauHadPT1Prong");

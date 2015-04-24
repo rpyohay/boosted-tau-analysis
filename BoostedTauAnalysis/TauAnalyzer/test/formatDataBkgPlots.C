@@ -72,6 +72,7 @@ void formatDataBkgPlots(const string& inputVersion, const string& outputVersion,
   canvasNames1D.push_back("diJetWMuHTCanvas");
   canvasNames1D.push_back("jetTauJetWMuHTCanvas");
   canvasNames1D.push_back("dRSoftMuTauHadCanvas");
+  canvasNames1D.push_back("HPTCanvas");
   canvasNames1D.push_back("tauMuPTCanvas");
   canvasNames1D.push_back("tauHadPTCanvas");
   canvasNames1D.push_back("tauHadPT1ProngCanvas");
@@ -215,6 +216,7 @@ void formatDataBkgPlots(const string& inputVersion, const string& outputVersion,
   graphNames1D.push_back("diJetWMuHT");
   graphNames1D.push_back("jetTauJetWMuHT");
   graphNames1D.push_back("dRSoftMuTauHad");
+  graphNames1D.push_back("HPT");
   graphNames1D.push_back("tauMuPT");
   graphNames1D.push_back("tauHadPT");
   graphNames1D.push_back("tauHadPT1Prong");
@@ -436,13 +438,17 @@ void formatDataBkgPlots(const string& inputVersion, const string& outputVersion,
   DYJetsToLLRelXSecWeights.push_back(2.26606084150487); //m > 50 GeV using SM@8TeV Twiki
   vector<float> TRelXSecWeights; //weighted to 19.7 fb^-1 using SM@8TeV Twiki
   TRelXSecWeights.push_back(0.287208465885267); //t s-channel
-  TRelXSecWeights.push_back(0.34672); //tbar s-channel
-  TRelXSecWeights.push_back(0.321286023155796); //t t-channel
+  //TRelXSecWeights.push_back(0.34672); //tbar s-channel
+  //TRelXSecWeights.push_back(0.321286023155796); //t t-channel
+  TRelXSecWeights.push_back(0.2477031449); //tbar s-channel
+  TRelXSecWeights.push_back(0.2956394066); //t t-channel
   TRelXSecWeights.push_back(0.312541342130939); //tbar t-channel
   vector<float> WNJetsToLNuRelXSecWeights; //weighted to 19.7 fb^-1 using PREP cross sections
   WNJetsToLNuRelXSecWeights.push_back(5.61973075498071); //W + 1 jet
-  WNJetsToLNuRelXSecWeights.push_back(1.22833526483929); //W + 2 jets
-  WNJetsToLNuRelXSecWeights.push_back(0.819050332546934); //W + 3 jets
+  //  WNJetsToLNuRelXSecWeights.push_back(1.22833526483929); //W + 2 jets
+  WNJetsToLNuRelXSecWeights.push_back(1.2211192971); //W + 2 jets
+  //  WNJetsToLNuRelXSecWeights.push_back(0.819050332546934); //W + 3 jets
+  WNJetsToLNuRelXSecWeights.push_back(0.8032380444); //W + 3 jets
   WNJetsToLNuRelXSecWeights.push_back(0.31501621894905); //W + 4 jets
 
   //space-saving constant definitions
@@ -902,14 +908,14 @@ void formatDataBkgPlots(const string& inputVersion, const string& outputVersion,
   WZAllName << WZAllPrefix << WZSuffix;
   WZAllHaddInputFiles.push_back(WZAllName.str());
   haddCanvases(WZIsoHaddOutputFile, WZIsoHaddInputFiles, 
-	       vector<float>(1, 0.0667569497737973), canvasNames1D, graphNames1D, 
+	       vector<float>(1, /*0.0667569497737973*/0.0654218486), canvasNames1D, graphNames1D, 
 	       canvasNames2D, graphNames2D, nullBlindLow, nullBlindHigh);
   haddCanvases(WZNonIsoHaddOutputFile, WZNonIsoHaddInputFiles, 
-	       vector<float>(1, 0.0667569497737973), canvasNames1D, graphNames1D, 
+	       vector<float>(1, /*0.0667569497737973*/0.0654218486), canvasNames1D, graphNames1D, 
 	       canvasNames2D, graphNames2D, nullBlindLow, nullBlindHigh);
   if (doNoHPSIsoCut) {
     haddCanvases(WZAllHaddOutputFile, WZAllHaddInputFiles, 
-		 vector<float>(1, 0.0667569497737973), canvasNames1D, graphNames1D, 
+		 vector<float>(1, /*0.0667569497737973*/0.0654218486), canvasNames1D, graphNames1D, 
 		 canvasNames2D, graphNames2D, nullBlindLow, nullBlindHigh);
   }
 
@@ -935,14 +941,14 @@ void formatDataBkgPlots(const string& inputVersion, const string& outputVersion,
   ZZAllName << ZZAllPrefix << ZZSuffix;
   ZZAllHaddInputFiles.push_back(ZZAllName.str());
   haddCanvases(ZZIsoHaddOutputFile, ZZIsoHaddInputFiles, 
-	       vector<float>(1, 0.0377509625152821), canvasNames1D, graphNames1D, 
+	       vector<float>(1, /*0.0377509625152821*/0.035488476), canvasNames1D, graphNames1D, 
 	       canvasNames2D, graphNames2D, nullBlindLow, nullBlindHigh);
   haddCanvases(ZZNonIsoHaddOutputFile, ZZNonIsoHaddInputFiles, 
-	       vector<float>(1, 0.0377509625152821), canvasNames1D, graphNames1D, 
+	       vector<float>(1, /*0.0377509625152821*/0.035488476), canvasNames1D, graphNames1D, 
 	       canvasNames2D, graphNames2D, nullBlindLow, nullBlindHigh);
   if (doNoHPSIsoCut) {
     haddCanvases(ZZAllHaddOutputFile, ZZAllHaddInputFiles, 
-		 vector<float>(1, 0.0377509625152821), canvasNames1D, graphNames1D, 
+		 vector<float>(1, /*0.0377509625152821*/0.035488476), canvasNames1D, graphNames1D, 
 		 canvasNames2D, graphNames2D, nullBlindLow, nullBlindHigh);
   }
 
@@ -968,14 +974,14 @@ void formatDataBkgPlots(const string& inputVersion, const string& outputVersion,
   WWAllName << WWAllPrefix << WWSuffix;
   WWAllHaddInputFiles.push_back(WWAllName.str());
   haddCanvases(WWIsoHaddOutputFile, WWIsoHaddInputFiles, 
-	       vector<float>(1, 0.124167251024691), canvasNames1D, 
+	       vector<float>(1, /*0.124167251024691*/0.1080262041), canvasNames1D, 
 	       graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, nullBlindHigh);
   haddCanvases(WWNonIsoHaddOutputFile, WWNonIsoHaddInputFiles, 
-	       vector<float>(1, 0.124167251024691), canvasNames1D, 
+	       vector<float>(1, /*0.124167251024691*/0.1080262041), canvasNames1D, 
 	       graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, nullBlindHigh);
   if (doNoHPSIsoCut) {
     haddCanvases(WWAllHaddOutputFile, WWAllHaddInputFiles, 
-		 vector<float>(1, 0.124167251024691), canvasNames1D, 
+		 vector<float>(1, /*0.124167251024691*/0.1080262041), canvasNames1D, 
 		 graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, nullBlindHigh);
   }
   cout << endl;

@@ -1627,7 +1627,8 @@ readFiles.extend([
 #analyze gen infor for Wh sample
 process.analyzeGenInfo = cms.EDAnalyzer(
     'GenAnalyzer',
-    outFileName = cms.string('ggHTriggerStudy/gg_WmuID_WmuIso_a9_gen_analysis_GenMatch.root'),
+    outFileName = cms.string('ggHTriggerStudy/gg_WmuID_WmuIso_a9_gen_analysis_GenMatch_TriggerMatch_HLTPass_chP_muAll.root'),
+#    outFileName = cms.string('ggHTriggerStudy/gg_WmuID_WmuIso_a9_gen_analysis_GenMatch_muHad.root'),
 #    outFileName = cms.string('triggertest.root'),
     genParticleTag = cms.InputTag('genParticles'),
     PUTag = cms.InputTag('addPileupInfo'),
@@ -1663,12 +1664,12 @@ process.analyzeGenInfo = cms.EDAnalyzer(
     HLTSubFilters = cms.untracked.VInputTag("")
     )
 
-#process.p = cms.Path(process.IsoMu24eta2p1Selector*
+process.p = cms.Path(process.IsoMu24eta2p1Selector*
 #                     process.WMuonPTSelector*
 #                     process.WIsoMuonSelector*
 #                     process.tauMuonPTSelector*
 #                     process.tauMuonSelector*
 #                     process.PFTau*
 #                     process.muHadTauSelector*
-#                     process.analyzeGenInfo)
-process.p = cms.Path(process.analyzeGenInfo)
+                     process.analyzeGenInfo)
+#process.p = cms.Path(process.analyzeGenInfo)

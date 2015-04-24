@@ -189,6 +189,7 @@ float Common::getMuonCombPFIso(const reco::Muon& muon, const double PUSubtractio
 {
   const reco::MuonPFIsolation isoBlock = muon.pfIsolationR04();
   return (isoBlock.sumChargedHadronPt + 
+  //return (isoBlock.sumChargedParticlePt + 
 	  std::max(0.0, (double)(isoBlock.sumNeutralHadronEt + isoBlock.sumPhotonEt - 
 				 PUSubtractionCoeff*isoBlock.sumPUPt)));
 }

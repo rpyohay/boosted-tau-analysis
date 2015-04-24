@@ -130,6 +130,9 @@ private:
   //histogram of dR between gen objects from a1 decay after gen match
   TH1F* dRA1TauDaughtersGenMatch_;
 
+  //histogram of dpT between gen objects from a1 decay after gen match
+  TH1F* dpTA1TauRecoTauGenMatch_;
+
   //histogram of Higgs pT
   TH1F* HPT_;
 
@@ -153,9 +156,6 @@ private:
 
   //histogram of gen-matched reco mu PFRelIso
   TH1F* recoMuPFRelIso_;
-
-  //histogram of gen-matched reco mu PFRelIso with visible gen tau_sister pT subtracted
-  TH1F* recoMuPFRelIsoSansTau_;
 
   //histogram of true no. in-time interactions
   TH1D* trueNInt_;
@@ -439,10 +439,10 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	if (thisDecay.second == GenTauDecayID::HAD) tauHadPT_->Fill(visibleP4.Pt());
       }
 
-      //is this a mu+X decay?
+      //is this a mu+X decay? //mu+mu
       //if (thisDecay.second == GenTauDecayID::MU)
-      if (((thisDecay.second == GenTauDecayID::MU) && 
-	   (sisterDecay.second == GenTauDecayID::HAD))// || 
+      if (((thisDecay.second == GenTauDecayID::MU))// && 
+	   //(sisterDecay.second == GenTauDecayID::HAD))// || 
 	  //((thisDecay.second == GenTauDecayID::HAD) && 
 	  //(sisterDecay.second == GenTauDecayID::MU))
 	)
@@ -505,12 +505,12 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	      //double etaMax = 0.9;
 	      bool isTightMu = false;
 	      double recoMuRelIso = (Common::getMuonCombPFIso(*(recoMuPtrs.at(muMatch)), muonPFIsoPUSubtractionCoeff_)/(recoMuPtrs.at(muMatch))->pt());
-	      double recoMuRelIsoSansTauSister = (Common::getMuonCombPFIsoMinusTau(*(recoMuPtrs.at(muMatch)), iTau->getVisibleTauSisterP4(), muonPFIsoPUSubtractionCoeff_)/(recoMuPtrs.at(muMatch))->pt());
 
 	      isTightMu = Common::isTightIsolatedRecoMuon(const_cast<const reco::Muon*>(recoMuPtrs.at(muMatch)), pPV, true, muonPFIsoPUSubtractionCoeff_,
 							  PFIsoMax_, etaMax, true);
+	      double delPT_recogen = iTau->getVisibleTauP4().Pt() - (recoMuPtrs.at(muMatch))->pt();
 	      //if there was a match...
-	      if ((delR_recogen < 0.1) && trigger_matched && isTightMu)
+	      if (/*(delR_recogen < 0.1)*/(fabs(delPT_recogen) < 0.5) && trigger_matched && isTightMu)
 		{
 		  //if reco mu pT > 25 and |eta| < 2.1 ...
 		  if (((recoMuPtrs.at(muMatch))->pt() > 25.) && ((recoMuPtrs.at(muMatch))->eta() < etaMax))
@@ -525,6 +525,8 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 		      // - plot delR(gen tau_mu, gen tau_sister)
 		      dRA1TauDaughtersGenMatch_->Fill(reco::deltaR(*reco::GenParticleRef(pGenParticles, iTau->getTauIndex()), 
 								   *reco::GenParticleRef(pGenParticles, iTau->getSisterIndex())));
+		      // - plot dpT(gen tau_mu, gen reco_mu)
+		      dpTA1TauRecoTauGenMatch_->Fill(delPT_recogen);
 		      // - plot decay mode of sister
 		      tauSisterDecayModeGenMatch_->Fill(sisterDecay.second);
 		      // - plot pT of tau_mu
@@ -539,7 +541,6 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 							  *reco::GenParticleRef(pGenParticles, iTau->getSisterIndex())), iTau->getVisibleTauSisterP4().Pt());
 		      // - plot PFRelIso vs pT of reco mu
 		      recoMuPFRelIso_->Fill(recoMuRelIso);
-		      recoMuPFRelIsoSansTau_->Fill(recoMuRelIsoSansTauSister);
 		      recoMuPFRelIsoVsdRA1TauDaughters_->Fill(reco::deltaR(*reco::GenParticleRef(pGenParticles, iTau->getTauIndex()), 
 									   *reco::GenParticleRef(pGenParticles, iTau->getSisterIndex())), recoMuRelIso);
 		      recoMuPFRelIsoVsTauSisterPT_->Fill(iTau->getVisibleTauSisterP4().Pt(), recoMuRelIso);
@@ -610,6 +611,7 @@ void GenAnalyzer::beginJob()
   //book histograms
   dRA1TauDaughters_ = new TH1F("dRA1TauDaughters", "", 60, 0.0, 3.0);
   dRA1TauDaughtersGenMatch_ = new TH1F("dRA1TauDaughtersGenMatch", "", 60, 0.0, 3.0);
+  dpTA1TauRecoTauGenMatch_ = new TH1F("dpTA1TauRecoTauGenMatch", "", 80, -2., 2.0);
   aMass_ = new TH1F("aMass", "", 100, 0.0, 25.0);
   HPT_ = new TH1F("HPT", "", 100, 0.0, 200.0);
   tauMuPT_ = new TH1F("tauMuPT", "", 50, 0.0, 100.0);
@@ -620,7 +622,6 @@ void GenAnalyzer::beginJob()
   recoMuEtaGenMatch_ = new TH1F("recoMuEtaGenMatch", "", recoMuEtaBins_.size() - 1, &recoMuEtaBins_[0]);
   tauHadPT_ = new TH1F("tauHadPT", "", 50, 0.0, 100.0);
   recoMuPFRelIso_ = new TH1F("recoMuPFRelIso", "", 2000, 0.0, 40.0);
-  recoMuPFRelIsoSansTau_ = new TH1F("recoMuPFRelIsoSansTau", "", 2000, 0.0, 40.0);
   trueNInt_ = new TH1D("trueNInt", "", 60, 0.0, 60.0);
   a2TauPairDecayVsA1TauPairDecay_ = new TH2F("a2TauPairDecayVsA1TauPairDecay", 
 					     ";a_{1} di-tau decay;a_{2} di-tau decay", 
@@ -676,6 +677,8 @@ void GenAnalyzer::endJob()
   Common::setCanvasOptions(dRA1TauDaughtersCanvas, 1, 0, 0);
   TCanvas dRA1TauDaughtersGenMatchCanvas("dRA1TauDaughtersGenMatchCanvas", "", 600, 600);
   Common::setCanvasOptions(dRA1TauDaughtersGenMatchCanvas, 1, 0, 0);
+  TCanvas dpTA1TauRecoTauGenMatchCanvas("dpTA1TauRecoTauGenMatchCanvas", "", 600, 600);
+  Common::setCanvasOptions(dpTA1TauRecoTauGenMatchCanvas, 1, 0, 0);
   TCanvas aMassCanvas("aMassCanvas", "", 600, 600);
   Common::setCanvasOptions(aMassCanvas, 1, 0, 0);
   TCanvas HPTCanvas("HPTCanvas", "", 600, 600);
@@ -694,8 +697,6 @@ void GenAnalyzer::endJob()
   Common::setCanvasOptions(tauHadPTCanvas, 1, 0, 0);
   TCanvas recoMuPFRelIsoCanvas("recoMuPFRelIsoCanvas", "", 600, 600);
   Common::setCanvasOptions(recoMuPFRelIsoCanvas, 1, 0, 0);
-  TCanvas recoMuPFRelIsoSansTauCanvas("recoMuPFRelIsoSansTauCanvas", "", 600, 600);
-  Common::setCanvasOptions(recoMuPFRelIsoSansTauCanvas, 1, 0, 0);
   TCanvas trueNIntCanvas("trueNIntCanvas", "", 600, 600);
   Common::setCanvasOptions(trueNIntCanvas, 1, 0, 0);
   TCanvas a2TauPairDecayVsA1TauPairDecayCanvas("a2TauPairDecayVsA1TauPairDecayCanvas", "", 
@@ -714,6 +715,8 @@ void GenAnalyzer::endJob()
   dRA1TauDaughters_->SetLineWidth(2);
   Common::setHistogramOptions(dRA1TauDaughtersGenMatch_, kBlack, 0.7, 20, 1.0, "#DeltaR", "", 0.05);
   dRA1TauDaughtersGenMatch_->SetLineWidth(2);
+  Common::setHistogramOptions(dpTA1TauRecoTauGenMatch_, kBlack, 0.7, 20, 1.0, "#Delta p_{T} (GeV)", "", 0.05);
+  dpTA1TauRecoTauGenMatch_->SetLineWidth(2);
   Common::setHistogramOptions(aMass_, kBlack, 0.7, 20, 1.0, "m_{a} (GeV)", "", 0.05);
   aMass_->SetLineWidth(2);
   Common::setHistogramOptions(HPT_, kBlack, 0.7, 20, 1.0, "Higgs pT (GeV)", "", 0.05);
@@ -733,8 +736,6 @@ void GenAnalyzer::endJob()
   tauHadPT_->SetLineWidth(2);
   Common::setHistogramOptions(recoMuPFRelIso_, kBlack, 0.7, 20, 1.0, "reco #mu PFRelIso", "", 0.05);
   recoMuPFRelIso_->SetLineWidth(2);
-  Common::setHistogramOptions(recoMuPFRelIsoSansTau_, kBlack, 0.7, 20, 1.0, "reco #mu PFRelIso", "", 0.05);
-  recoMuPFRelIsoSansTau_->SetLineWidth(2);
   Common::setHistogramOptions(trueNInt_, kBlack, 0.7, 20, 1.0, "No. interactions", "", 0.05);
   trueNInt_->SetLineWidth(2);
 
@@ -743,6 +744,8 @@ void GenAnalyzer::endJob()
   dRA1TauDaughters_->Draw();
   dRA1TauDaughtersGenMatchCanvas.cd();
   dRA1TauDaughtersGenMatch_->Draw();
+  dpTA1TauRecoTauGenMatchCanvas.cd();
+  dpTA1TauRecoTauGenMatch_->Draw();
   aMassCanvas.cd();
   aMass_->Draw();
   HPTCanvas.cd();
@@ -761,8 +764,6 @@ void GenAnalyzer::endJob()
   tauHadPT_->Draw();
   recoMuPFRelIsoCanvas.cd();
   recoMuPFRelIso_->Draw();
-  recoMuPFRelIsoSansTauCanvas.cd();
-  recoMuPFRelIsoSansTau_->Draw();
   trueNIntCanvas.cd();
   trueNInt_->Draw();
   Common::draw2DHistograms(a2TauPairDecayVsA1TauPairDecayCanvas, a2TauPairDecayVsA1TauPairDecay_);
@@ -779,6 +780,7 @@ void GenAnalyzer::endJob()
   out_->cd();
   dRA1TauDaughtersCanvas.Write();
   dRA1TauDaughtersGenMatchCanvas.Write();
+  dpTA1TauRecoTauGenMatchCanvas.Write();
   aMassCanvas.Write();
   HPTCanvas.Write();
   tauMuPTCanvas.Write();
@@ -788,7 +790,6 @@ void GenAnalyzer::endJob()
   recoMuEtaGenMatchCanvas.Write();
   tauHadPTCanvas.Write();
   recoMuPFRelIsoCanvas.Write();
-  recoMuPFRelIsoSansTauCanvas.Write();
   trueNIntCanvas.Write();
   a2TauPairDecayVsA1TauPairDecayCanvas.Write();
   tauMuPTVsdRCanvas.Write();
@@ -860,8 +861,6 @@ void GenAnalyzer::reset(const bool doDelete)
   tauHadPT_ = NULL;
   if ((doDelete) && (recoMuPFRelIso_ != NULL)) delete recoMuPFRelIso_;
   recoMuPFRelIso_ = NULL;
-  if ((doDelete) && (recoMuPFRelIsoSansTau_ != NULL)) delete recoMuPFRelIsoSansTau_;
-  recoMuPFRelIsoSansTau_ = NULL;
   if ((doDelete) && (trueNInt_ != NULL)) delete trueNInt_;
   trueNInt_ = NULL;
   if (doDelete && (a2TauPairDecayVsA1TauPairDecay_ != NULL)) {

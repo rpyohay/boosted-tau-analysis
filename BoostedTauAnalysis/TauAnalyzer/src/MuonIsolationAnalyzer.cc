@@ -194,8 +194,8 @@ void MuonIsolationAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
 	    if ((*iMuon).key() == muonRefs[muonRefs.size() - 1].key())
 	      { // if this is the highest-pT mu
 		//		iso = Common::getMuonCombPFIsoMinusTau(*(muonRefs[muonRefs.size() - 1]), tauHadVisibleP4, muonPFIsoPUSubtractionCoeff_); // this is wrong!!!!
-		//iso = Common::getMuonCombPFIsoModified(*(muonRefs[muonRefs.size() - 1]), *iTau, muonPFIsoPUSubtractionCoeff_);
-		iso = Common::getMuonCombPFIso(*(muonRefs[muonRefs.size() - 1]), muonPFIsoPUSubtractionCoeff_);
+		iso = Common::getMuonCombPFIsoModified(*(muonRefs[muonRefs.size() - 1]), *iTau, muonPFIsoPUSubtractionCoeff_);
+		//iso = Common::getMuonCombPFIso(*(muonRefs[muonRefs.size() - 1]), muonPFIsoPUSubtractionCoeff_);
 		recoMuPFRelIso_->Fill(iso/pT);
 		recoMuPFIso_->Fill(iso);
 		foundRemovedMu = true;
