@@ -11,8 +11,8 @@ fi
 version=$1
 
 #a1 mass
-#a1Mass=( "_a5" "_a7" "_a9" "_a11" "_a13" "_a15" ) #ggH
-a1Mass=( "_a5" "_a7" "_a9" "_a11" "_a13" ) #ggH
+a1Mass=( "_a5" "_a7" "_a9" "_a11" "_a13" "_a15" ) #ggH
+#a1Mass=( "_a5" "_a7" "_a9" "_a11" "_a13" ) #ggH
 nMasses=${#a1Mass[@]}
 iBeg=0
 iEndMass=`expr $nMasses - 1`
@@ -41,13 +41,13 @@ do
     ### WH ###
 
     #get the nominal expected signal
-    outputNom=`root -l -b -q 'formatPlots.C("'${version}'", "'${version}'", false, "", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
+    outputNom=`root -l -b -q 'formatSigPlots.C("'${version}'", "'${version}'", true, "", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
     nWh1Nom=`echo $outputNom | sed -e "s%.*Region A signal 0, m > 4: \([0-9\.]*\).*%\1%"`
     echo "No. Wh1 (nominal): $nWh1Nom"
 
     #get the +/-1sigma b veto data/MC scale expected signal
-    outputMinus1SigmaBVetoScale=`root -l -b -q 'formatPlots.C("'${version}'", "'${version}'", false, "_minus1SigmaBVetoScale", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
-    outputPlus1SigmaBVetoScale=`root -l -b -q 'formatPlots.C("'${version}'", "'${version}'", false, "_plus1SigmaBVetoScale", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
+    outputMinus1SigmaBVetoScale=`root -l -b -q 'formatSigPlots.C("'${version}'", "'${version}'", true, "_minus1SigmaBVetoScale", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
+    outputPlus1SigmaBVetoScale=`root -l -b -q 'formatSigPlots.C("'${version}'", "'${version}'", true, "_plus1SigmaBVetoScale", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
 
     #initialize fractional errors to 0--only set nonzero if nWh1Nom != 0
     Wh1FracErrLowBVetoScale=0
@@ -66,13 +66,13 @@ do
     echo "$Wh1ErrLowBVetoScale($Wh1FracErrLowBVetoScale%)/$Wh1ErrHighBVetoScale($Wh1FracErrHighBVetoScale%) (b veto data/MC scale)"
 
     #get the central expected signal for MET uncertainties
-    outputCen=`root -l -b -q 'formatPlots.C("'${version}'", "'${version}'", false, "_central", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
+    outputCen=`root -l -b -q 'formatSigPlots.C("'${version}'", "'${version}'", true, "_central", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
     nWh1Cen=`echo $outputCen | sed -e "s%.*Region A signal 0, m > 4: \([0-9\.]*\).*%\1%"`
     echo "No. Wh1 (central value for MET uncertainties): $nWh1Cen"
 
     #get the +/-1sigma e/gamma data/MC scale expected signal
-    outputMinus1SigmaEGScale=`root -l -b -q 'formatPlots.C("'${version}'", "'${version}'", false, "_minus1SigmaEGScale", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
-    outputPlus1SigmaEGScale=`root -l -b -q 'formatPlots.C("'${version}'", "'${version}'", false, "_plus1SigmaEGScale", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
+    outputMinus1SigmaEGScale=`root -l -b -q 'formatSigPlots.C("'${version}'", "'${version}'", true, "_minus1SigmaEGScale", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
+    outputPlus1SigmaEGScale=`root -l -b -q 'formatSigPlots.C("'${version}'", "'${version}'", true, "_plus1SigmaEGScale", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
 
     #initialize fractional errors to 0--only set nonzero if nWh1Cen != 0
     Wh1FracErrLowEGScale=0
@@ -102,8 +102,8 @@ do
     echo "-1sigma: $nWh1Minus1SigmaEGScale, +1sigma: $nWh1Plus1SigmaEGScale"
 
     #get the +/-1sigma jet energy data/MC scale expected signal
-    outputMinus1SigmaJES=`root -l -b -q 'formatPlots.C("'${version}'", "'${version}'", false, "_minus1SigmaJES", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
-    outputPlus1SigmaJES=`root -l -b -q 'formatPlots.C("'${version}'", "'${version}'", false, "_plus1SigmaJES", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
+    outputMinus1SigmaJES=`root -l -b -q 'formatSigPlots.C("'${version}'", "'${version}'", true, "_minus1SigmaJES", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
+    outputPlus1SigmaJES=`root -l -b -q 'formatSigPlots.C("'${version}'", "'${version}'", true, "_plus1SigmaJES", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
 
     #calculate the uncertainty due to jet energy data/MC scale
     nWh1Minus1SigmaJES=`echo $outputMinus1SigmaJES | sed -e "s%.*Region A signal 0, m > 4: \([0-9\.]*\).*%\1%"`
@@ -120,8 +120,8 @@ do
 
 #v6 WH and v7 ggH skims don't apply JER smearing
 #    #get the +/-1sigma MC jet energy resolution smeared expected signal
-#    outputMinus1SigmaJER=`root -l -b -q 'formatPlots.C("'${version}'", "'${version}'", false, "_minus1SigmaJER", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
-#    outputPlus1SigmaJER=`root -l -b -q 'formatPlots.C("'${version}'", "'${version}'", false, "_plus1SigmaJER", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
+#    outputMinus1SigmaJER=`root -l -b -q 'formatSigPlots.C("'${version}'", "'${version}'", true, "_minus1SigmaJER", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
+#    outputPlus1SigmaJER=`root -l -b -q 'formatSigPlots.C("'${version}'", "'${version}'", true, "_plus1SigmaJER", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
 
 #    #calculate the uncertainty due to MC jet energy resolution smearing
 #    nWh1Minus1SigmaJER=`echo $outputMinus1SigmaJER | sed -e "s%.*Region A signal 0, m > 4: \([0-9\.]*\).*%\1%"`
@@ -137,8 +137,8 @@ do
 #    echo "-1sigma: $nWh1Minus1SigmaJER, +1sigma: $nWh1Plus1SigmaJER"
 
     #get the +/-1sigma muon energy data/MC scale expected signal
-    outputMinus1SigmaMuEnergyScale=`root -l -b -q 'formatPlots.C("'${version}'", "'${version}'", false, "_minus1SigmaMuEnergyScale", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
-    outputPlus1SigmaMuEnergyScale=`root -l -b -q 'formatPlots.C("'${version}'", "'${version}'", false, "_plus1SigmaMuEnergyScale", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
+    outputMinus1SigmaMuEnergyScale=`root -l -b -q 'formatSigPlots.C("'${version}'", "'${version}'", true, "_minus1SigmaMuEnergyScale", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
+    outputPlus1SigmaMuEnergyScale=`root -l -b -q 'formatSigPlots.C("'${version}'", "'${version}'", true, "_plus1SigmaMuEnergyScale", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
 
     #calculate the uncertainty due to muon energy data/MC scale
     nWh1Minus1SigmaMuEnergyScale=`echo $outputMinus1SigmaMuEnergyScale | sed -e "s%.*Region A signal 0, m > 4: \([0-9\.]*\).*%\1%"`
@@ -154,8 +154,8 @@ do
     echo "-1sigma: $nWh1Minus1SigmaMuEnergyScale, +1sigma: $nWh1Plus1SigmaMuEnergyScale"
 
     #get the +/-1sigma tau energy data/MC scale expected signal
-    outputMinus1SigmaTauEnergyScale=`root -l -b -q 'formatPlots.C("'${version}'", "'${version}'", false, "_minus1SigmaTauEnergyScale", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
-    outputPlus1SigmaTauEnergyScale=`root -l -b -q 'formatPlots.C("'${version}'", "'${version}'", false, "_plus1SigmaTauEnergyScale", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
+    outputMinus1SigmaTauEnergyScale=`root -l -b -q 'formatSigPlots.C("'${version}'", "'${version}'", true, "_minus1SigmaTauEnergyScale", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
+    outputPlus1SigmaTauEnergyScale=`root -l -b -q 'formatSigPlots.C("'${version}'", "'${version}'", true, "_plus1SigmaTauEnergyScale", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
 
     #calculate the uncertainty due to tau energy data/MC scale
     nWh1Minus1SigmaTauEnergyScale=`echo $outputMinus1SigmaTauEnergyScale | sed -e "s%.*Region A signal 0, m > 4: \([0-9\.]*\).*%\1%"`
@@ -171,8 +171,8 @@ do
     echo "-1sigma: $nWh1Minus1SigmaTauEnergyScale, +1sigma: $nWh1Plus1SigmaTauEnergyScale"
 
     #get the +/-1sigma unclustered energy data/MC scale expected signal
-    outputMinus1SigmaUnclusteredEnergyScale=`root -l -b -q 'formatPlots.C("'${version}'", "'${version}'", false, "_minus1SigmaUnclusteredEnergyScale", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
-    outputPlus1SigmaUnclusteredEnergyScale=`root -l -b -q 'formatPlots.C("'${version}'", "'${version}'", false, "_plus1SigmaUnclusteredEnergyScale", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
+    outputMinus1SigmaUnclusteredEnergyScale=`root -l -b -q 'formatSigPlots.C("'${version}'", "'${version}'", true, "_minus1SigmaUnclusteredEnergyScale", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
+    outputPlus1SigmaUnclusteredEnergyScale=`root -l -b -q 'formatSigPlots.C("'${version}'", "'${version}'", true, "_plus1SigmaUnclusteredEnergyScale", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
 
     #calculate the uncertainty due to unclustered energy data/MC scale
     nWh1Minus1SigmaUnclusteredEnergyScale=`echo $outputMinus1SigmaUnclusteredEnergyScale | sed -e "s%.*Region A signal 0, m > 4: \([0-9\.]*\).*%\1%"`
@@ -296,8 +296,8 @@ do
     echo "-1sigma: $nggMinus1SigmaEGScale, +1sigma: $nggPlus1SigmaEGScale"
 	
     #get the +/-1sigma jet energy data/MC scale expected signal
-    outputMinus1SigmaJES=`root -l -b -q 'formatPlots.C("'${version}'", "'${version}'", false, "_minus1SigmaJES", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
-    outputPlus1SigmaJES=`root -l -b -q 'formatPlots.C("'${version}'", "'${version}'", false, "_plus1SigmaJES", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
+    outputMinus1SigmaJES=`root -l -b -q 'formatSigPlots.C("'${version}'", "'${version}'", true, "_minus1SigmaJES", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
+    outputPlus1SigmaJES=`root -l -b -q 'formatSigPlots.C("'${version}'", "'${version}'", true, "_plus1SigmaJES", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
 
     #calculate the uncertainty due to jet energy data/MC scale
     nggMinus1SigmaJES=`echo $outputMinus1SigmaJES | sed -e "s%.*Region A signal 1, m > 4: \([0-9\.]*\).*%\1%"`
@@ -314,8 +314,8 @@ do
 
 #v6 WH and v7 ggH skims don't apply JER smearing
 #    #get the +/-1sigma MC jet energy resolution smeared expected signal
-#    outputMinus1SigmaJER=`root -l -b -q 'formatPlots.C("'${version}'", "'${version}'", false, "_minus1SigmaJER", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
-#    outputPlus1SigmaJER=`root -l -b -q 'formatPlots.C("'${version}'", "'${version}'", false, "_plus1SigmaJER", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
+#    outputMinus1SigmaJER=`root -l -b -q 'formatSigPlots.C("'${version}'", "'${version}'", true, "_minus1SigmaJER", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
+#    outputPlus1SigmaJER=`root -l -b -q 'formatSigPlots.C("'${version}'", "'${version}'", true, "_plus1SigmaJER", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
 
 #    #calculate the uncertainty due to MC jet energy resolution smearing
 #    nggMinus1SigmaJER=`echo $outputMinus1SigmaJER | sed -e "s%.*Region A signal 1, m > 4: \([0-9\.]*\).*%\1%"`
@@ -331,8 +331,8 @@ do
 #    echo "-1sigma: $nggMinus1SigmaJER, +1sigma: $nggPlus1SigmaJER"
 
     #get the +/-1sigma muon energy data/MC scale expected signal
-    outputMinus1SigmaMuEnergyScale=`root -l -b -q 'formatPlots.C("'${version}'", "'${version}'", false, "_minus1SigmaMuEnergyScale", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
-    outputPlus1SigmaMuEnergyScale=`root -l -b -q 'formatPlots.C("'${version}'", "'${version}'", false, "_plus1SigmaMuEnergyScale", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
+    outputMinus1SigmaMuEnergyScale=`root -l -b -q 'formatSigPlots.C("'${version}'", "'${version}'", true, "_minus1SigmaMuEnergyScale", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
+    outputPlus1SigmaMuEnergyScale=`root -l -b -q 'formatSigPlots.C("'${version}'", "'${version}'", true, "_plus1SigmaMuEnergyScale", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
 
     #calculate the uncertainty due to muon energy data/MC scale
     nggMinus1SigmaMuEnergyScale=`echo $outputMinus1SigmaMuEnergyScale | sed -e "s%.*Region A signal 1, m > 4: \([0-9\.]*\).*%\1%"`
@@ -348,8 +348,8 @@ do
     echo "-1sigma: $nggMinus1SigmaMuEnergyScale, +1sigma: $nggPlus1SigmaMuEnergyScale"
 
     #get the +/-1sigma tau energy data/MC scale expected signal
-    outputMinus1SigmaTauEnergyScale=`root -l -b -q 'formatPlots.C("'${version}'", "'${version}'", false, "_minus1SigmaTauEnergyScale", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
-    outputPlus1SigmaTauEnergyScale=`root -l -b -q 'formatPlots.C("'${version}'", "'${version}'", false, "_plus1SigmaTauEnergyScale", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
+    outputMinus1SigmaTauEnergyScale=`root -l -b -q 'formatSigPlots.C("'${version}'", "'${version}'", true, "_minus1SigmaTauEnergyScale", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
+    outputPlus1SigmaTauEnergyScale=`root -l -b -q 'formatSigPlots.C("'${version}'", "'${version}'", true, "_plus1SigmaTauEnergyScale", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
 
     #calculate the uncertainty due to tau energy data/MC scale
     nggMinus1SigmaTauEnergyScale=`echo $outputMinus1SigmaTauEnergyScale | sed -e "s%.*Region A signal 1, m > 4: \([0-9\.]*\).*%\1%"`
@@ -365,8 +365,8 @@ do
     echo "-1sigma: $nggMinus1SigmaTauEnergyScale, +1sigma: $nggPlus1SigmaTauEnergyScale"
 
     #get the +/-1sigma unclustered energy data/MC scale expected signal
-    outputMinus1SigmaUnclusteredEnergyScale=`root -l -b -q 'formatPlots.C("'${version}'", "'${version}'", false, "_minus1SigmaUnclusteredEnergyScale", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
-    outputPlus1SigmaUnclusteredEnergyScale=`root -l -b -q 'formatPlots.C("'${version}'", "'${version}'", false, "_plus1SigmaUnclusteredEnergyScale", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
+    outputMinus1SigmaUnclusteredEnergyScale=`root -l -b -q 'formatSigPlots.C("'${version}'", "'${version}'", true, "_minus1SigmaUnclusteredEnergyScale", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
+    outputPlus1SigmaUnclusteredEnergyScale=`root -l -b -q 'formatSigPlots.C("'${version}'", "'${version}'", true, "_plus1SigmaUnclusteredEnergyScale", "'${a1Mass[${iMass}]}'", "'${MTBin[${iMTBin}]}'")'`
 
     #calculate the uncertainty due to unclustered energy data/MC scale
     nggMinus1SigmaUnclusteredEnergyScale=`echo $outputMinus1SigmaUnclusteredEnergyScale | sed -e "s%.*Region A signal 1, m > 4: \([0-9\.]*\).*%\1%"`

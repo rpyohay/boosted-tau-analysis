@@ -1631,7 +1631,7 @@ process.recoDYMuMatchSelector = cms.EDFilter(
     )
 
 process.MuonIsolationAnalyzerSignal = cms.EDAnalyzer('MuonIsolationAnalyzer',
-                                                     outFileName = cms.string('isoVsPT_signal_DMF_noModTau_noHLT.root'),
+                                                     outFileName = cms.string('isoVsPT_signal_DMF_modIsoTau_noHLT.root'),
                                                      muonTag = cms.InputTag('recoATauMuMatchSelector'),
                                                      tauTag = cms.InputTag('muHadTauSelector'),
                                                      muonJetMapTag = cms.InputTag('CleanJets', '', 'SKIM'),
@@ -1728,8 +1728,8 @@ process.tauMuonSelector = cms.EDFilter('CustomMuonSelector',
                                        )
 
 #clean the jets of soft muons, then rebuild the taus
-#process.CleanJets.muonSrc = cms.InputTag('recoATauMuMatchSelector')
-process.CleanJets.muonSrc = cms.InputTag('recoDYMuMatchSelector')
+process.CleanJets.muonSrc = cms.InputTag('recoATauMuMatchSelector')
+#process.CleanJets.muonSrc = cms.InputTag('recoDYMuMatchSelector')
 process.CleanJets.PFCandSrc = cms.InputTag('particleFlow')
 process.CleanJets.cutOnGenMatches = cms.bool(False)
 process.CleanJets.outFileName = cms.string('NMSSMSignal_MuProperties.root')
@@ -1772,7 +1772,11 @@ process.muHadTauSelector = cms.EDFilter(
     'CustomTauSepFromMuonSelector',
     baseTauTag = cms.InputTag('hpsPFTauProducer', '', 'SKIM'),
     tauHadIsoTag = cms.InputTag('hpsPFTauDiscriminationByRawCombinedIsolationDBSumPtCorr', '', 'SKIM'),
-    tauDiscriminatorTags = cms.VInputTag(cms.InputTag('hpsPFTauDiscriminationByDecayModeFinding', '', 'SKIM')
+#    tauDiscriminatorTags = cms.VInputTag(cms.InputTag('hpsPFTauDiscriminationByDecayModeFinding', '', 'SKIM')
+#    ),
+    tauDiscriminatorTags = cms.VInputTag(
+    cms.InputTag('hpsPFTauDiscriminationByDecayModeFinding', '', 'SKIM'), 
+    cms.InputTag('hpsPFTauDiscriminationByMediumCombinedIsolationDBSumPtCorr', '', 'SKIM')
     ),
     jetTag = cms.InputTag('CleanJets', 'ak5PFJetsNoMu', 'SKIM'),
     muonRemovalDecisionTag = cms.InputTag('CleanJets'),
@@ -1833,6 +1837,6 @@ process.DYSequence = cms.Sequence(process.IsoMu24eta2p1Selector*
                                       process.MuonIsolationAnalyzerDY)
 
 #no selection path
-#process.p = cms.Path(process.SignalSequence)
-process.p = cms.Path(process.DYSequence)
+process.p = cms.Path(process.SignalSequence)
+#process.p = cms.Path(process.DYSequence)
 #process.e = cms.EndPath(process.noSelectedOutput)

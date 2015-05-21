@@ -242,6 +242,12 @@ private:
   //b jet tag
   edm::InputTag bJetTag_;
 
+  //TEMPORARY ANTI-LEPTON PLOTS
+  //tags for leptons to veto
+  //edm::InputTag eleTriggerVetoTag_;
+  //edm::InputTag muTriggerVetoTag_;
+  //edm::InputTag tauTriggerVetoTag_;
+
   //dR matching distance
   double dR_;
 
@@ -313,9 +319,6 @@ private:
 
   //histogram of mu+had mass
   TH1F* muHadMass_;
-
-  //histogram of mu+had mass for VBF estimation (only filled for ggH)
-  TH1F* muHadMassVBF_;
 
   //histogram of mu+had mass (truth Z->mumu)
   TH1F* muHadMassZMu_;
@@ -713,6 +716,12 @@ private:
   //histogram of pruned, cleaned tau3/tau1 vs HPS tau decay mode
   TH2F* muHad_t3t1VsDecayMode_;
 
+  //TEMPORARY ANTI-LEPTON PLOTS//
+  //TH2F* muHadMassVsDRtrigMuonEle_;
+  //TH2F* muHadMassVsDRtrigMuonMu_;
+  //TH2F* muHadMassVsDRtrigMuonTau_;
+  //TEMPORARY ANTI-LEPTON PLOTS//
+
   //histogram of mu+had mass vs. Nj
   TH2F* muHadMassVsNAddlJets_;
 
@@ -743,9 +752,6 @@ private:
 
   //histogram of Higgs pT weights for ggH correction
   TH1F* lut_weight;
-
-  //histogram of Higgs pT weights for VBF estimation from ggH
-  TH1F* gghvbf_weight;
 
   //mu+had mass bins
   std::vector<double> muHadMassBins_;
@@ -827,6 +833,10 @@ TauAnalyzer::TauAnalyzer(const edm::ParameterSet& iConfig):
   allGenParticleTag_(iConfig.getParameter<edm::InputTag>("allGenParticleTag")),
   corrJetTag_(iConfig.getParameter<edm::InputTag>("corrJetTag")),
   bJetTag_(iConfig.getParameter<edm::InputTag>("bJetTag")),
+  //TEMPORARY ANTI-LEPTON PLOTS//
+  //eleTriggerVetoTag_(iConfig.getParameter<edm::InputTag>("eleTriggerVetoTag")), // remove
+  //muTriggerVetoTag_(iConfig.getParameter<edm::InputTag>("muTriggerVetoTag")), // remove
+  //tauTriggerVetoTag_(iConfig.getParameter<edm::InputTag>("tauTriggerVetoTag")), // remove
   dR_(iConfig.getParameter<double>("dR")),
   tauPTMin_(iConfig.getParameter<double>("tauPTMin")),
   tauDecayMode_(static_cast<reco::PFTau::hadronicDecayMode>
@@ -1223,19 +1233,6 @@ TauAnalyzer::TauAnalyzer(const edm::ParameterSet& iConfig):
     }
   }
 
-  std::string inputFileName_vbfweight = CMSSWPathCPPString + 
-    "/src/BoostedTauAnalysis/TauAnalyzer/test/ggHVBFHiggsPTWeights_a9_sumMT_rebin50.root";
-  TFile* inputFile_vbfweight = new TFile(inputFileName_vbfweight.data());
-  std::string gghvbfName = "HPT";
-  gghvbf_weight = 0;
-  if (gghvbfName != "") {
-    gghvbf_weight = dynamic_cast<TH1F*>(inputFile_vbfweight->Get(gghvbfName.data()));
-    if (!gghvbf_weight) {
-     std::cerr << " Failed to load histogram = " << gghvbfName << " from file = " << inputFile_vbfweight->GetName() << " !!" << std::endl;
-      assert(0);
-    }
-  }
-
   //fill mu+had mass bins
   muHadMassBins_.push_back(0.0);
   muHadMassBins_.push_back(1.0);
@@ -1403,6 +1400,18 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   //get selected corrected jets
   edm::Handle<reco::PFJetCollection> pCorrJets;
   iEvent.getByLabel(corrJetTag_, pCorrJets);
+
+  //TEMPORARY ANTI-LEPTON PLOTS//
+  //edm::Handle<reco::GsfElectronRefVector> electronsToVeto;
+  //iEvent.getByLabel(eleTriggerVetoTag_, electronsToVeto);
+
+  //edm::Handle<reco::MuonRefVector> muonsToVeto;
+  //iEvent.getByLabel(muTriggerVetoTag_, muonsToVeto);
+
+  //edm::Handle<reco::PFTauRefVector> tausToVeto;
+  //iEvent.getByLabel(tauTriggerVetoTag_, tausToVeto);
+  //TEMPORARY ANTI-LEPTON PLOTS//
+
 
 //   //debug
 //   for (reco::PFTauRefVector::const_iterator iTau = pTaus->begin(); iTau != pTaus->end(); 
@@ -1574,7 +1583,6 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	      if (higgsReweight_)
 		{
 		  HiggsPTWeight = getHiggsPTWeight(iGenParticle->pt(), lut_weight);
-		  ggHToVBFWeight = getHiggsPTWeight(iGenParticle->pt(), gghvbf_weight);
 		}
 	    } // if it's an H
 	  //	}
@@ -2066,10 +2074,6 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       //plot the mu + tau invariant mass for the highest pT muon
       muHadMass_->Fill(muHadMass, PUWeight*tauHadPTWeight*HiggsPTWeight);
 
-      //plot the mu + tau invariant mass for the highest pT muon
-      if (higgsReweight_)
-	muHadMassVBF_->Fill(muHadMass, PUWeight*tauHadPTWeight*HiggsPTWeight*ggHToVBFWeight);
-
      //plot the mu + tau invariant mass for the highest pT muon
       //if (muHadMass >= 4.)
       //muHadMassFinalSel_->Fill(muHadMass, PUWeight);
@@ -2100,6 +2104,27 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       /*plot the mu + tau invariant mass for the highest pT muon weighted by the statistical error 
 	on the hadronic tau pT weight for this event*/
       muHadMassReweightErrSq_->Fill(muHadMass, tauHadPTWeightErr);
+
+      //TEMPORARY ANTI-LEPTON PLOTS
+      //WMuonRefs[WMuonRefs.size() - 1]
+      /*for (reco::GsfElectronRefVector::const_iterator iObj = electronsToVeto->begin(); iObj != electronsToVeto->end(); ++iObj)
+	{
+	  double deltaR_objWMuon = deltaR((**iObj),(*WMuonRefs[WMuonRefs.size() - 1]));
+	  muHadMassVsDRtrigMuonEle_->Fill(deltaR_objWMuon, muHadMass, PUWeight);
+	}
+
+      for (reco::MuonRefVector::const_iterator iObj = muonsToVeto->begin(); iObj != muonsToVeto->end(); ++iObj)
+	{
+	  double deltaR_objWMuon = deltaR((**iObj),(*WMuonRefs[WMuonRefs.size() - 1]));
+	  muHadMassVsDRtrigMuonMu_->Fill(deltaR_objWMuon, muHadMass, PUWeight);
+	}
+
+      for (reco::PFTauRefVector::const_iterator iObj = tausToVeto->begin(); iObj != tausToVeto->end(); ++iObj)
+	{
+	  double deltaR_objWMuon = deltaR((**iObj),(*WMuonRefs[WMuonRefs.size() - 1]));
+	  muHadMassVsDRtrigMuonTau_->Fill(deltaR_objWMuon, muHadMass, PUWeight);
+	  }*/
+      //TEMPORARY ANTI-LEPTON PLOTS
 
       //plot the mu + tau charge for the highest pT muon
       muHadCharge_->
@@ -3133,8 +3158,6 @@ void TauAnalyzer::beginJob()
     new TH1F("hadTauAssociatedMuMultiplicity", ";N_{#mu}/#tau;", 2, 0.5, 2.5);
   muHadMass_ = 
     new TH1F("muHadMass", ";m_{#mu+X} (GeV);", muHadMassBins_.size() - 1, &muHadMassBins_[0]);
-  muHadMassVBF_ = 
-    new TH1F("muHadMassVBF", ";m_{#mu+X} (GeV);", muHadMassBins_.size() - 1, &muHadMassBins_[0]);
   muHadMassZMu_ = 
     new TH1F("muHadMassZMu", ";m_{#mu+X} (GeV);", muHadMassBins_.size() - 1, &muHadMassBins_[0]);
   muHadMassZTauMu_ = 
@@ -3342,6 +3365,14 @@ void TauAnalyzer::beginJob()
   muHad_t3t1VsDecayMode_ = new TH2F("muHad_t3t1VsDecayMode", 
 				    ";HPS #tau decay mode;#frac{#tau_{3}}{#tau_{1}}", 
 				    16, -1.5, 14.5, 500, 0.0, 2.0);
+  //TEMPORARY ANTI-LEPTON PLOTS//
+  //muHadMassVsDRtrigMuonEle_ = 
+  //new TH2F("muHadMassVsDRtrigMuonEle", ";#DeltaR(e, trigger #mu);m_{#mu+X} (GeV)", 50, 0., 5., 20, 0.0, 20.0);
+  //muHadMassVsDRtrigMuonMu_ = 
+  //new TH2F("muHadMassVsDRtrigMuonMu", ";#DeltaR(#mu, trigger #mu);m_{#mu+X} (GeV)", 50, 0., 5., 20, 0.0, 20.0);
+  //muHadMassVsDRtrigMuonTau_ = 
+  //new TH2F("muHadMassVsDRtrigMuonTau", ";#DeltaR(#tau, trigger #mu);m_{#mu+X} (GeV)", 50, 0., 5., 20, 0.0, 20.0);
+
   muHadMassVsNAddlJets_ = 
     new TH2F("muHadMassVsNAddlJets", ";N_{j};m_{#mu+X} (GeV)", 10, -0.5, 9.5, 20, 0.0, 20.0);
   muHadMassVsCSVScore_ = new TH2F("muHadMassVsCSVScore", ";CSV score;m_{#mu+X} (GeV)", 25, 0.0, 
@@ -3600,6 +3631,10 @@ void TauAnalyzer::beginJob()
   mWMuTauMuVsMWMuTauMuTauHad_->Sumw2();
   mWMuTauMuVsMWMuTauMuTauHadGenFSR_->Sumw2();
   muHadMassVsMWMuTauMuTauHad_->Sumw2();
+  //TEMPORARY ANTI-LEPTON PLOTS//
+  //muHadMassVsDRtrigMuonEle_->Sumw2();
+  //muHadMassVsDRtrigMuonMu_->Sumw2();
+  //muHadMassVsDRtrigMuonTau_->Sumw2();
   muHadMassVsNAddlJets_->Sumw2();
   muHadMassVsCSVScore_->Sumw2();
   muHadMassVsWMuMT_->Sumw2();
@@ -3641,7 +3676,6 @@ void TauAnalyzer::endJob()
   TCanvas hadTauAssociatedMuMultiplicityCanvas("hadTauAssociatedMuMultiplicityCanvas", "", 
 					       600, 600);
   TCanvas muHadMassCanvas("muHadMassCanvas", "", 600, 600);
-  TCanvas muHadMassVBFCanvas("muHadMassVBFCanvas", "", 600, 600);
   TCanvas muHadMassZMuCanvas("muHadMassZMuCanvas", "", 600, 600);
   TCanvas muHadMassZTauMuCanvas("muHadMassZTauMuCanvas", "", 600, 600);
   TCanvas muHadMassOtherTauMuCanvas("muHadMassOtherTauMuCanvas", "", 600, 600);
@@ -3787,6 +3821,10 @@ void TauAnalyzer::endJob()
   TCanvas 
     mWMuTauMuVsMWMuTauMuTauHadGenFSRCanvas("mWMuTauMuVsMWMuTauMuTauHadGenFSRCanvas", "", 600, 600);
   TCanvas muHadMassVsMWMuTauMuTauHadCanvas("muHadMassVsMWMuTauMuTauHadCanvas", "", 600, 600);
+  //TEMPORARY ANTI-LEPTON PLOTS//
+  //TCanvas muHadMassVsDRtrigMuonEleCanvas("muHadMassVsDRtrigMuonEleCanvas", "", 600, 600);
+  //TCanvas muHadMassVsDRtrigMuonMuCanvas("muHadMassVsDRtrigMuonMuCanvas", "", 600, 600);
+  //TCanvas muHadMassVsDRtrigMuonTauCanvas("muHadMassVsDRtrigMuonTauCanvas", "", 600, 600);
   TCanvas muHadMassVsNAddlJetsCanvas("muHadMassVsNAddlJetsCanvas", "", 600, 600);
   TCanvas muHadMassVsCSVScoreCanvas("muHadMassVsCSVScoreCanvas", "", 600, 600);
   TCanvas muHadMassVsWMuMTCanvas("muHadMassVsWMuMTCanvas", "", 600, 600);
@@ -3813,7 +3851,6 @@ void TauAnalyzer::endJob()
   Common::draw1DHistograms(METCanvas, MET_);
   Common::draw1DHistograms(hadTauAssociatedMuMultiplicityCanvas, hadTauAssociatedMuMultiplicity_);
   Common::draw1DHistograms(muHadMassCanvas, muHadMass_);
-  Common::draw1DHistograms(muHadMassVBFCanvas, muHadMassVBF_);
   Common::draw1DHistograms(muHadMassZMuCanvas, muHadMassZMu_);
   Common::draw1DHistograms(muHadMassZTauMuCanvas, muHadMassZTauMu_);
   Common::draw1DHistograms(muHadMassOtherTauMuCanvas, muHadMassOtherTauMu_);
@@ -3970,6 +4007,10 @@ void TauAnalyzer::endJob()
   Common::draw2DHistograms(dzTauMuVsdzTauHadCanvas, dzTauMuVsdzTauHad_);
   Common::draw2DHistograms(muHad_t3t1VsptmjCanvas, muHad_t3t1Vsptmj_);
   Common::draw2DHistograms(muHad_t3t1VsDecayModeCanvas, muHad_t3t1VsDecayMode_);
+  //TEMPORARY ANTI-LEPTON PLOTS//
+  //Common::draw2DHistograms(muHadMassVsDRtrigMuonEleCanvas, muHadMassVsDRtrigMuonEle_);
+  //Common::draw2DHistograms(muHadMassVsDRtrigMuonMuCanvas, muHadMassVsDRtrigMuonMu_);
+  //Common::draw2DHistograms(muHadMassVsDRtrigMuonTauCanvas, muHadMassVsDRtrigMuonTau_);
   Common::draw2DHistograms(muHadMassVsNAddlJetsCanvas, muHadMassVsNAddlJets_);
   Common::draw2DHistograms(muHadMassVsCSVScoreCanvas, muHadMassVsCSVScore_);
   Common::draw2DHistograms(muHadMassVsWMuMTCanvas, muHadMassVsWMuMT_);
@@ -3988,7 +4029,6 @@ void TauAnalyzer::endJob()
   METCanvas.Write();
   hadTauAssociatedMuMultiplicityCanvas.Write();
   muHadMassCanvas.Write();
-  muHadMassVBFCanvas.Write();
   muHadMassZMuCanvas.Write();
   muHadMassZTauMuCanvas.Write();
   muHadMassOtherTauMuCanvas.Write();
@@ -4120,6 +4160,10 @@ void TauAnalyzer::endJob()
   mWMuTauMuVsMWMuTauMuTauHadCanvas.Write();
   mWMuTauMuVsMWMuTauMuTauHadGenFSRCanvas.Write();
   muHadMassVsMWMuTauMuTauHadCanvas.Write();
+  //TEMPORARY ANTI-LEPTON PLOTS//
+  //muHadMassVsDRtrigMuonEleCanvas.Write();
+  //muHadMassVsDRtrigMuonMuCanvas.Write();
+  //muHadMassVsDRtrigMuonTauCanvas.Write();
   muHadMassVsNAddlJetsCanvas.Write();
   muHadMassVsCSVScoreCanvas.Write();
   muHadMassVsWMuMTCanvas.Write();
@@ -4895,8 +4939,6 @@ void TauAnalyzer::reset(const bool doDelete)
   hadTauAssociatedMuMultiplicity_ = NULL;
   if (doDelete && (muHadMass_ != NULL)) delete muHadMass_;
   muHadMass_ = NULL;
-  if (doDelete && (muHadMassVBF_ != NULL)) delete muHadMassVBF_;
-  muHadMassVBF_ = NULL;
   if (doDelete && (muHadMass1Prong_ != NULL)) delete muHadMass1Prong_;
   muHadMass1Prong_ = NULL;
   if (doDelete && (muHadMass1Prong1Pi0_ != NULL)) delete muHadMass1Prong1Pi0_;
@@ -5082,6 +5124,14 @@ void TauAnalyzer::reset(const bool doDelete)
   mWMuTauMuVsMWMuTauMuTauHadGenFSR_ = NULL;
   if (doDelete && (muHadMassVsMWMuTauMuTauHad_ != NULL)) delete muHadMassVsMWMuTauMuTauHad_;
   muHadMassVsMWMuTauMuTauHad_ = NULL;
+  //TEMPORARY ANTI-LEPTON PLOTS//
+  //if (doDelete && (muHadMassVsDRtrigMuonEle_ != NULL)) delete muHadMassVsDRtrigMuonEle_;
+  //muHadMassVsDRtrigMuonEle_ = NULL;
+  //if (doDelete && (muHadMassVsDRtrigMuonMu_ != NULL)) delete muHadMassVsDRtrigMuonMu_;
+  //muHadMassVsDRtrigMuonMu_ = NULL;
+  //if (doDelete && (muHadMassVsDRtrigMuonTau_ != NULL)) delete muHadMassVsDRtrigMuonTau_;
+  //muHadMassVsDRtrigMuonTau_ = NULL;
+
   if (doDelete && (muHadMassVsNAddlJets_ != NULL)) delete muHadMassVsNAddlJets_;
   muHadMassVsNAddlJets_ = NULL;
   if (doDelete && (muHadMassVsCSVScore_ != NULL)) delete muHadMassVsCSVScore_;

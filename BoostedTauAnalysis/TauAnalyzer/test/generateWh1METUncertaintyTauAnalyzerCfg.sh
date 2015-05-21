@@ -56,7 +56,7 @@ for i in `seq $iBeg $iEnd`
 
   #generate cfg file for the isolated sample, energy and b veto efficiency data/MC scale 
   #uncertainties shifted up(down) by +(-)1 sigma
-  sed -e "s%FILES%${inputFileBlocks[${i}]}%" -e "s%PREFIX%${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis%g" -e "s%VERSION%${version}%g" -e "s%EDMOUTFILE%${EDMOutputFiles[${i}]}%" -e "s%PUSCENARIO%S10%" -e "s%SAMPLE%${samples[${i}]}%" ../${templateCfg} > tauanalyzer_${samples[${i}]}_iso_signal_MET_uncertainties_cfg.py
+  sed -e "s%FILES%${inputFileBlocks[${i}]}%" -e "s%PREFIX%${tauAnalyzerOutputFilePrefix}muHadIsoAnalysis%g" -e "s%VERSION%${version}%g" -e "s%EDMOUTFILE%${EDMOutputFiles[${i}]}%" -e "s%HIGGSREW%False%" -e "s%PUSCENARIO%S10%" -e "s%SAMPLE%${samples[${i}]}%" ../${templateCfg} > tauanalyzer_${samples[${i}]}_iso_signal_MET_uncertainties_cfg.py
 
 done
 

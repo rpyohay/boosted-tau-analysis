@@ -962,6 +962,8 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 	  cout << "m < 2 GeV: " << pHist->Integral(1,2) << " +/- " << error2 << endl;
 	  double errorRatio = sqrt((error2*error2/(pHist->Integral(1,2)*pHist->Integral(1,2))) + (pHist->GetBinError(5)*pHist->GetBinError(5)/(pHist->Integral(5, -1)*pHist->Integral(5, -1))));
 	  cout << "(m<2)/(m>4): " << pHist->Integral(1,2)/pHist->Integral(5, -1) << " +/- " << errorRatio*pHist->Integral(1,2)/pHist->Integral(5, -1) << endl;
+	  if (!data)
+	    cout << "m integral 0->inf: " << pHist->Integral() << endl;
 	}
 	string histName(pHist->GetName());
 	if (histName == "jet_pt_etacut") pHist->GetXaxis()->SetTitle("p_{T} (GeV)");
@@ -2455,6 +2457,49 @@ void arcQuest(const vector<string>& QCDVsMCInputFileNames, const string& isoData
 
 } // end
 
+void GetVBFZHEstimate(const string& vbfOutputFileName, const string& isoggHFileName, double ggHWeight, double VBFWeight)
+{ // start VBFEstimateFromGGH
+  // N.B. this routine can also get ZH from WH
+  TFile outStream(vbfOutputFileName.c_str(), "RECREATE");
+  TFile isoggHFile(isoggHFileName.c_str(), "read"); // make sure this is the ggH iso file after hadding!
+
+  string var = "muHadMass";
+  string canvasName(var + "Canvas");
+  string canvasReweightErrSqName(var + "ReweightErrSqCanvas");
+  string varReweightErrSq(var + "ReweightErrSq");
+
+  //get the ggH m_(mu+had) histogram, isolated tau sample
+  TCanvas* canvasIsoGGH = NULL;
+  isoggHFile.GetObject(canvasName.c_str(), canvasIsoGGH);
+  TH1F* isoGGH = NULL;
+  if (canvasIsoGGH != NULL) {
+    isoGGH = (TH1F*)canvasIsoGGH->GetPrimitive(var.c_str())->Clone();
+    isoGGH->SetName(var.c_str());
+    isoGGH->GetYaxis()->SetRangeUser(0.01, 10000.0);
+  }
+  else {
+    cerr << "Error opening canvas " << canvasName << " from file " << isoggHFile.GetName();
+    cerr << ".\n";
+    return;
+  }
+
+  //calculate normalization
+  double norm = VBFWeight/ggHWeight;
+
+  isoGGH->Scale(norm);
+  cout << "Sample used for estimate: " << isoggHFileName.c_str() << endl;
+  cout << "Estimate: m > 4 = " << isoGGH->Integral(5,-1) << " +/- " << isoGGH->GetBinError(5) << endl;
+
+  TCanvas outCanvas(canvasName.c_str(), "", 600, 600);
+  outCanvas.cd();
+  isoGGH->Draw();
+
+  outStream.cd();
+  outCanvas.Write();
+  outStream.Write();
+  outStream.Close();
+
+} // end VBFEstimateFromGGH
 
 TH2F* twoDimTotalBackgroundHistogram(const vector<string>& files, const string& histName)
 {
