@@ -66,7 +66,6 @@ class SSSFFilter : public edm::EDFilter {
 
       // ----------member data ---------------------------
 
-//   edm::InputTag WMuonTag_;
   edm::InputTag tauTag_;
   edm::InputTag jetMuonMapTag_;
   bool passFilter_;
@@ -87,7 +86,6 @@ class SSSFFilter : public edm::EDFilter {
 SSSFFilter::SSSFFilter(const edm::ParameterSet& iConfig)
 {
    //now do what ever initialization is needed
-//   WMuonTag_ = iConfig.getParameter<edm::InputTag>("WMuonTag");
   tauTag_ = iConfig.getParameter<edm::InputTag>("tauTag");
   jetMuonMapTag_ = iConfig.getParameter<edm::InputTag>("jetMuonMapTag");
   passFilter_ = iConfig.getParameter<bool>("passFilter");
@@ -113,17 +111,6 @@ SSSFFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   bool SignSelector = false; 
   
-//   //get W muons
-//   edm::Handle<reco::MuonRefVector> pMuons;
-//   iEvent.getByLabel(WMuonTag_, pMuons);
-  
-//   //find the highest pT W muon
-//   std::vector<reco::MuonRef> WMuonRefs;
-//   for (reco::MuonRefVector::const_iterator iMuon = pMuons->begin(); iMuon != pMuons->end(); 
-//        ++iMuon) { WMuonRefs.push_back(*iMuon); }
-//   Common::sortByPT(WMuonRefs);  
-//   double chargeWMuon = WMuonRefs[WMuonRefs.size() - 1]->charge();
-
   //get jet-muon map
   edm::Handle<edm::ValueMap<reco::MuonRefVector> > pMuonJetMap;
   iEvent.getByLabel(jetMuonMapTag_, pMuonJetMap);
@@ -153,12 +140,12 @@ SSSFFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
     Common::sortByPT(removedMuonRefs);
     double chargeTauMuon = removedMuonRefs[removedMuonRefs.size() - 1]->charge();
     if ((passFilter_ && (chargeTauMuon*chargeTauHad < 0)) || //select opposite charge tau pairs
-	(!passFilter_ && (chargeTauMuon*chargeTauHad >= 0))) //select same charge tau pairs
+	(!passFilter_ && (chargeTauMuon*chargeTauHad >= 0))) { //select same charge tau pairs
       SignSelector = true;
-    
+    }
     ++iTau; 
   }
-  
+
   return SignSelector;
 
 }
