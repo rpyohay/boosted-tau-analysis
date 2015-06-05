@@ -155,7 +155,7 @@ process.genTauMuSelector = cms.EDFilter(
     makeAllCollections = cms.bool(False)
     )
 
-#find taus in |eta| < 2.4 matched to muon-tagged cleaned jets that pass the isolation
+#find taus in |eta| < 2.3 matched to muon-tagged cleaned jets that pass the isolation
 #discriminator
 #this will produce a ref to the cleaned tau collection
 process.muHadIsoTauSelector = cms.EDFilter(
@@ -173,7 +173,7 @@ process.muHadIsoTauSelector = cms.EDFilter(
     overlapCandTag = cms.InputTag('WIsoMuonSelector'),
     passDiscriminator = cms.bool(True),
     pTMin = cms.double(10.0),
-    etaMax = cms.double(2.4),
+    etaMax = cms.double(2.3),
     isoMax = cms.double(-1.0),
     dR = cms.double(0.5),
     minNumObjsToPassFilter = cms.uint32(1)
