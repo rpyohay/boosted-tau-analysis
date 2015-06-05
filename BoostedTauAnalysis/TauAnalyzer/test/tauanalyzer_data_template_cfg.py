@@ -410,6 +410,7 @@ process.highMTMuHadIsoTauAnalyzer = cms.EDAnalyzer(
     reweight = cms.bool(False),
     bTagScaleShift = cms.string("mean"),
     sample = cms.string(""),
+    muHadMassBins = cms.vdouble(0.0, 1.0, 2.0, 3.0, 4.0, 11.0),
     pTRankColors = cms.vuint32(1, 2, 4, 6),
     pTRankStyles = cms.vuint32(20, 21, 22, 23),
     pTRankEntries = cms.vstring('Highest p_{T}', 'Second highest p_{T}', 'Third highest p_{T}',
