@@ -67,6 +67,7 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   canvasNames1D.push_back("diJetWMuHTCanvas");
   canvasNames1D.push_back("jetTauJetWMuHTCanvas");
   canvasNames1D.push_back("dRSoftMuTauHadCanvas");
+  canvasNames1D.push_back("HPTCanvas");
   canvasNames1D.push_back("tauMuPTCanvas");
   canvasNames1D.push_back("tauHadPTCanvas");
   canvasNames1D.push_back("tauHadPT1ProngCanvas");
@@ -213,6 +214,7 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   graphNames1D.push_back("diJetWMuHT");
   graphNames1D.push_back("jetTauJetWMuHT");
   graphNames1D.push_back("dRSoftMuTauHad");
+  graphNames1D.push_back("HPT");
   graphNames1D.push_back("tauMuPT");
   graphNames1D.push_back("tauHadPT");
   graphNames1D.push_back("tauHadPT1Prong");
@@ -396,7 +398,7 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   //const float Wh1a7Weight19p7InvFb = 0.00545988813757409; // Pythia xsec
   const float Wh1a7Weight19p7InvFb = 0.01510077968443; // SM xsec
   //const float Wh1a9Weight19p7InvFb = 0.00591; // Pythia xsec
-  const float Wh1a9Weight19p7InvFb = 0.01507435332; // SM xsec //oldvalue 0.04626873333
+  const float Wh1a9Weight19p7InvFb = 0.01507435332; // SM xsec
   //const float Wh1a11Weight19p7InvFb = 0.0000913508064516129; // Pythia xsec
   const float Wh1a11Weight19p7InvFb = 0.01519592068411; // SM xsec
   //const float Wh1a13Weight19p7InvFb = 0.0000570729270729271; // Pythia xsec
@@ -450,6 +452,49 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
     ggWeight19p7InvFb = gga15Weight19p7InvFb;
   }
   else cout << "Unrecognized a1 mass, weight defaulting to 1\n";
+
+  //weights for getting VBF estimates from ggH samples
+  const float VBFa5WeightFromggH = 0.01248931;
+  const float VBFa7WeightFromggH = 0.0125632114;
+  const float VBFa9WeightFromggH = 0.012480134;
+  const float VBFa11WeightFromggH = 0.012628596;
+  const float VBFa13WeightFromggH = 0.01256152;
+  const float VBFa15WeightFromggH = 0.012544654;
+  //weights for getting ZH estimates from WH samples
+  const float ZHa5WeightFromWH = 0.002781679*1.1;
+  const float ZHa7WeightFromWH = 0.002786556*1.1;
+  const float ZHa9WeightFromWH = 0.002781679*1.1;
+  const float ZHa11WeightFromWH = 0.0028041123*1.1;
+  const float ZHa13WeightFromWH = 0.0027789*1.1;
+  const float ZHa15WeightFromWH = 0.002787254*1.1;
+
+  float VBFWeightFromggH = 1.0;
+  float ZHWeightFromWH = 1.0;
+  if (a1Mass == "_a5") {
+    VBFWeightFromggH = VBFa5WeightFromggH;
+    ZHWeightFromWH = ZHa5WeightFromWH;
+  }
+  else if (a1Mass == "_a7") {
+    VBFWeightFromggH = VBFa7WeightFromggH;
+    ZHWeightFromWH = ZHa7WeightFromWH;
+  }
+  else if (a1Mass == "_a9") {
+    VBFWeightFromggH = VBFa9WeightFromggH;
+    ZHWeightFromWH = ZHa9WeightFromWH;
+  }
+  else if (a1Mass == "_a11") {
+    VBFWeightFromggH = VBFa11WeightFromggH;
+    ZHWeightFromWH = ZHa11WeightFromWH;
+  }
+  else if (a1Mass == "_a13") {
+    VBFWeightFromggH = VBFa13WeightFromggH;
+    ZHWeightFromWH = ZHa13WeightFromWH;
+  }
+  else if (a1Mass == "_a15") {
+    VBFWeightFromggH = VBFa15WeightFromggH;
+    ZHWeightFromWH = ZHa15WeightFromWH;
+  }
+
   vector<float> weights1(15, 0.0);
   vector<float> weightsSigBkg(11, 1.0); //MC samples already properly weighted during hadding
   vector<float> weightsSigBkgQCDFromData(12, 1.0);
@@ -478,7 +523,7 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   const string WWVTag("_" + inputVersion);
   const string narrowBinsVTag("_" + versionNarrow);
 
-//   cout << "Begin hadding...\n";
+  cout << "Begin hadding...\n";
 
   //"hadd" Wh1 sample just to get the formatting of the 2D plots the same
   cout << "...Wh1\n";
@@ -530,8 +575,23 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   		 nullBlindHigh);
   }
 
+  //get VBF estimates from hadded ggH sample
+   cout << "...VBF estimates from ggH\n";
+  string VBFEstSuffix(VBFSigVTag + fileExt);
+  string 
+    VBFIsoEstPrefix(analysisFilePath + "VBF/muHadIsoAnalysis" + MTBin + uncTag + "_VBFEst" + a1Mass);
+  string VBFIsoEstHaddOutputFile(VBFIsoEstPrefix + "_hadd" + VBFEstSuffix);
+  GetVBFZHEstimate(VBFIsoEstHaddOutputFile, ggIsoHaddOutputFile, ggWeight19p7InvFb, VBFWeightFromggH);
+
+  //get ZH estimates from hadded WH sample
+   cout << "...ZH estimates from WH\n";
+  string ZHEstSuffix(ZHSigVTag + fileExt);
+  string 
+    ZHIsoEstPrefix(analysisFilePath + "ZH/muHadIsoAnalysis" + MTBin + uncTag + "_ZHEst" + a1Mass);
+  string ZHIsoEstHaddOutputFile(ZHIsoEstPrefix + "_hadd" + ZHEstSuffix);
+  GetVBFZHEstimate(ZHIsoEstHaddOutputFile, Wh1IsoHaddOutputFile, Wh1Weight19p7InvFb, ZHWeightFromWH);
+
   //"hadd" ZH sample just to get the formatting of the 2D plots the same
-  cout << "...ZH\n";
   string ZHSuffix(ZHSigVTag + fileExt);
   string ZHIsoPrefix(analysisFilePath + "ZH/muHadIsoAnalysis" + MTBin + uncTag + "_ZH" + a1Mass);
   string ZHIsoHaddOutputFile(ZHIsoPrefix + "_hadd" + ZHSuffix);
@@ -545,19 +605,20 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   stringstream ZHAllName;
   ZHAllName << ZHAllPrefix << ZHSuffix;
   ZHAllHaddInputFiles.push_back(ZHAllName.str());
-  if (ma9GeV) {
-    haddCanvases(ZHIsoHaddOutputFile, ZHIsoHaddInputFiles, vector<float>(1, ZHWeight19p7InvFb), 
-		 canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
-		 nullBlindHigh);
-    if (doNoHPSIsoCut) {
-      haddCanvases(ZHAllHaddOutputFile, ZHAllHaddInputFiles, vector<float>(1, ZHWeight19p7InvFb), 
+  if (ma9GeV)
+    {
+      cout << "...ZH\n";
+      haddCanvases(ZHIsoHaddOutputFile, ZHIsoHaddInputFiles, vector<float>(1, ZHWeight19p7InvFb), 
 		   canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
 		   nullBlindHigh);
+      if (doNoHPSIsoCut) {
+	haddCanvases(ZHAllHaddOutputFile, ZHAllHaddInputFiles, vector<float>(1, ZHWeight19p7InvFb), 
+		     canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
+		     nullBlindHigh);
+      }
     }
-  }
 
   //"hadd" VBF sample just to get the formatting of the 2D plots the same
-  cout << "...VBF\n";
   string VBFSuffix(VBFSigVTag + fileExt);
   string 
     VBFIsoPrefix(analysisFilePath + "VBF/muHadIsoAnalysis" + MTBin + uncTag + "_VBF" + a1Mass);
@@ -572,17 +633,19 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   stringstream VBFAllName;
   VBFAllName << VBFAllPrefix << VBFSuffix;
   VBFAllHaddInputFiles.push_back(VBFAllName.str());
-  if (ma9GeV) {
-    haddCanvases(VBFIsoHaddOutputFile, VBFIsoHaddInputFiles, vector<float>(1, VBFWeight19p7InvFb), 
-		 canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
-		 nullBlindHigh);
-    if (doNoHPSIsoCut) {
-      haddCanvases(VBFAllHaddOutputFile, VBFAllHaddInputFiles, 
-		   vector<float>(1, VBFWeight19p7InvFb), canvasNames1D, graphNames1D, 
-		   canvasNames2D, graphNames2D, nullBlindLow, nullBlindHigh);
+  if (ma9GeV)
+    {
+      cout << "...VBF\n";
+      haddCanvases(VBFIsoHaddOutputFile, VBFIsoHaddInputFiles, vector<float>(1, VBFWeight19p7InvFb), 
+		   canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
+		   nullBlindHigh);
+      if (doNoHPSIsoCut) {
+	haddCanvases(VBFAllHaddOutputFile, VBFAllHaddInputFiles, vector<float>(1, VBFWeight19p7InvFb), 
+		     canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
+		     nullBlindHigh);
+      }
     }
-  }
-
+  
   cout << endl;
 
   //data region A files

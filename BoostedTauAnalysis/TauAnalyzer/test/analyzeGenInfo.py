@@ -1627,12 +1627,17 @@ readFiles.extend([
 #analyze gen infor for Wh sample
 process.analyzeGenInfo = cms.EDAnalyzer(
     'GenAnalyzer',
-    outFileName = cms.string('ggHTriggerStudy/gg_preskim_a9_gen_analysis_GenMatch_TriggerMatch_HLTPass.root'),
+    outFileName = cms.string('ggHTriggerStudy/gg_WmuID_WmuIso_a9_gen_analysis_GenMatch_TriggerMatch_HLTPass_chP_muAll.root'),
+#    outFileName = cms.string('ggHTriggerStudy/gg_WmuID_WmuIso_a9_gen_analysis_GenMatch_muHad.root'),
 #    outFileName = cms.string('triggertest.root'),
     genParticleTag = cms.InputTag('genParticles'),
     PUTag = cms.InputTag('addPileupInfo'),
+    vtxTag = cms.InputTag('offlinePrimaryVertices'),
     muonTag = cms.InputTag('muons'),
     genTauDecayIDPSet = commonGenTauDecayIDPSet,
+    muonPFIsoPUSubtractionCoeff = cms.double(0.5),
+#    PFIsoMax = cms.double(-1.0),
+    PFIsoMax = cms.double(0.12),
     triggerEventTag = cms.untracked.InputTag("hltTriggerSummaryAOD", "", "HLT"),
     triggerResultsTag = cms.untracked.InputTag("TriggerResults", "", "HLT"),
     triggerDelRMatch = cms.untracked.double(0.1),

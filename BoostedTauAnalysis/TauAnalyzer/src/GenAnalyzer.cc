@@ -97,11 +97,17 @@ private:
   //PU info tag
   edm::InputTag PUTag_;
 
+  //vertex tag
+  edm::InputTag vtxTag_;
+
   //reco muon tag
   edm::InputTag muonTag_;
 
-  //gen tau-->mu tag
-  //  edm::InputTag genTauMuTag_;
+  //PU subtraction coefficient for muon PF isolation
+  double muonPFIsoPUSubtractionCoeff_;
+
+  //muon PFRelIso cut
+  double PFIsoMax_;
 
   //set of parameters for GenTauDecayID class
   edm::ParameterSet genTauDecayIDPSet_;
@@ -123,6 +129,9 @@ private:
 
   //histogram of dR between gen objects from a1 decay after gen match
   TH1F* dRA1TauDaughtersGenMatch_;
+
+  //histogram of dpT between gen objects from a1 decay after gen match
+  TH1F* dpTA1TauRecoTauGenMatch_;
 
   //histogram of Higgs pT
   TH1F* HPT_;
@@ -201,8 +210,11 @@ GenAnalyzer::GenAnalyzer(const edm::ParameterSet& iConfig):hltConfig_(),
   outFileName_(iConfig.getParameter<std::string>("outFileName")),
   genParticleTag_(iConfig.getParameter<edm::InputTag>("genParticleTag")),
   PUTag_(iConfig.getParameter<edm::InputTag>("PUTag")),
+  vtxTag_(iConfig.getParameter<edm::InputTag>("vtxTag")),
   muonTag_(iConfig.existsAs<edm::InputTag>("muonTag") ? 
 	   iConfig.getParameter<edm::InputTag>("muonTag") : edm::InputTag()),
+  muonPFIsoPUSubtractionCoeff_(iConfig.getParameter<double>("muonPFIsoPUSubtractionCoeff")),
+  PFIsoMax_(iConfig.getParameter<double>("PFIsoMax")),
   genTauDecayIDPSet_(iConfig.getParameter<edm::ParameterSet>("genTauDecayIDPSet"))
 {
   //now do what ever initialization is needed
@@ -255,6 +267,13 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   //get PU info
   edm::Handle<std::vector<PileupSummaryInfo> > pPU;
   iEvent.getByLabel(PUTag_, pPU);
+
+  //get vertices
+  edm::Handle<reco::VertexCollection> pVertices;
+  iEvent.getByLabel(vtxTag_, pVertices);
+
+  //identify the first good vertex (the "primary" (?))
+  reco::Vertex* pPV = Common::getPrimaryVertex(pVertices);
 
   //get reco muons
   edm::Handle<reco::MuonCollection> pMuons;
@@ -328,7 +347,7 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
        iGenParticle != pGenParticles->end(); ++iGenParticle) {
     if (fabs(iGenParticle->pdgId()) == 35)
       { // if it's an H
-	std::cout << "mass of H = " << iGenParticle->mass() << std::endl;
+	//std::cout << "mass of H = " << iGenParticle->mass() << std::endl;
 	HPT_->Fill(iGenParticle->pt());
       } // if it's an H
     if (fabs(iGenParticle->pdgId()) == 36)
@@ -341,7 +360,7 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   std::vector<reco::Muon*> recoMuPtrs;
   for(reco::MuonCollection::const_iterator iMuon = pMuons->begin(); iMuon != pMuons->end(); ++iMuon)
     {
-      recoMuPtrs.push_back(const_cast<reco::Muon*>((&*iMuon)));
+      recoMuPtrs.push_back(const_cast<reco::Muon*>(&*iMuon));
     }
 
 
@@ -382,7 +401,7 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	if (reco::deltaR(*reco::GenParticleRef(pGenParticles, tauKey), 
 			 *reco::GenParticleRef(pGenParticles, iSister)) > 0.3)
 	  {
-	    std::cout << "dR = " << reco::deltaR(*reco::GenParticleRef(pGenParticles, tauKey), 
+	    std::cout << "dR(tau, sister) = " << reco::deltaR(*reco::GenParticleRef(pGenParticles, tauKey), 
 						 *reco::GenParticleRef(pGenParticles, iSister)) << std::endl;
 	    std::cout << "tau's decay type: " << iTau->tauDecayType(false, true).second << std::endl;
 	    std::cout << "sister tau's decay type: " << iTau->sisterDecayType(false,true).second << std::endl;
@@ -420,33 +439,39 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	if (thisDecay.second == GenTauDecayID::HAD) tauHadPT_->Fill(visibleP4.Pt());
       }
 
-      //is this a mu+X decay?
-      if (thisDecay.second == GenTauDecayID::MU)
+      //is this a mu+X decay? //mu+mu
+      //if (thisDecay.second == GenTauDecayID::MU)
+      if (((thisDecay.second == GenTauDecayID::MU))// && 
+	   //(sisterDecay.second == GenTauDecayID::HAD))// || 
+	  //((thisDecay.second == GenTauDecayID::HAD) && 
+	  //(sisterDecay.second == GenTauDecayID::MU))
+	)
 	{ // if this tau decayed to a mu
-
+	  
 	  //get ref to gen mu
-	  const reco::GenParticle* genMuRef = NULL;
+	  //const reco::GenParticle* genMuRef = NULL;
+	  const reco::Candidate* genMuRef = NULL;
 	  for (unsigned int i = 0; i < (*reco::GenParticleRef(pGenParticles, iTau->getTauIndex())).numberOfDaughters(); ++i)
 	    {
 	      if (fabs((*reco::GenParticleRef(pGenParticles, iTau->getTauIndex())).daughter(i)->pdgId()) == 15)
 		{
 		  for (unsigned int j = 0; j < (*reco::GenParticleRef(pGenParticles, iTau->getTauIndex())).daughter(i)->numberOfDaughters(); ++j)
 		    {
-		      if ((*reco::GenParticleRef(pGenParticles, iTau->getTauIndex())).daughter(i)->daughter(j)->pdgId() == 13)
-			genMuRef = (&*reco::GenParticleRef(pGenParticles, iTau->getTauIndex()));
+		      if (fabs((*reco::GenParticleRef(pGenParticles, iTau->getTauIndex())).daughter(i)->daughter(j)->pdgId()) == 13)
+			//genMuRef = (&*reco::GenParticleRef(pGenParticles, iTau->getTauIndex()));
+			genMuRef = (*reco::GenParticleRef(pGenParticles, iTau->getTauIndex())).daughter(i)->daughter(j);
 		    }
 		}
 	    }
 
-	  if (genMuRef != NULL)
+	  if ((genMuRef != NULL) && (recoMuPtrs.size() != 0))
 	    {
 	      //loop over reco mu refs to find match (dR < 0.3)
 	      double delR_recogen = 9999.;
 	      unsigned int muMatch = -1;
 	      for (unsigned int iRecoMu = 0; iRecoMu != recoMuPtrs.size(); ++iRecoMu)
 		{
-		  //double compareDR = reco::deltaR(*genMuRef, **iRecoMu);
-		  double compareDR = reco::deltaR(*genMuRef, *recoMuPtrs.at(iRecoMu));
+		  double compareDR = reco::deltaR(*genMuRef, *(recoMuPtrs.at(iRecoMu)));
 		  if (compareDR < delR_recogen)
 		    {
 		      delR_recogen = compareDR;
@@ -464,23 +489,44 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 		    
 		    const trigger::TriggerObject& TO = TOC[KEYS[ipart]];	
 		    
-		    std::cout << "dR(reco mu, TO) = " << deltaR((*recoMuPtrs.at(muMatch)), TO) << std::endl;
+		    std::cout << "dR(reco mu, TO) = " << deltaR(*(recoMuPtrs.at(muMatch)), TO) << std::endl;
 		    //save RECO objects matched to trigger objects
-		    if ((deltaR((*recoMuPtrs.at(muMatch)), TO) < delRMatchingCut_)) {
+		    if ((deltaR(*(recoMuPtrs.at(muMatch)), TO) < delRMatchingCut_)) {
+		      cout << "trigger-matched: true" << endl;
+		      cout << "TO pt = " << TO.pt() << endl;
+		      cout << "TO eta = " << TO.eta() << endl;
+		      cout << "TO phi = " << TO.phi() << endl;
 		      trigger_matched = true;
 		    }
 		  }
 		} //firedHLT
 	      
+	      double etaMax = 2.1;
+	      //double etaMax = 0.9;
+	      bool isTightMu = false;
+	      double recoMuRelIso = (Common::getMuonCombPFIso(*(recoMuPtrs.at(muMatch)), muonPFIsoPUSubtractionCoeff_)/(recoMuPtrs.at(muMatch))->pt());
+
+	      isTightMu = Common::isTightIsolatedRecoMuon(const_cast<const reco::Muon*>(recoMuPtrs.at(muMatch)), pPV, true, muonPFIsoPUSubtractionCoeff_,
+							  PFIsoMax_, etaMax, true);
+	      double delPT_recogen = iTau->getVisibleTauP4().Pt() - (recoMuPtrs.at(muMatch))->pt();
 	      //if there was a match...
-	      if ((delR_recogen < 0.3) && trigger_matched)
+	      if (/*(delR_recogen < 0.1)*/(fabs(delPT_recogen) < 0.5) && trigger_matched && isTightMu)
 		{
 		  //if reco mu pT > 25 and |eta| < 2.1 ...
-		  if (((*recoMuPtrs.at(muMatch)).pt() > 25.) && ((*recoMuPtrs.at(muMatch)).eta() < 2.1))
+		  if (((recoMuPtrs.at(muMatch))->pt() > 25.) && ((recoMuPtrs.at(muMatch))->eta() < etaMax))
 		    {
+
+		      cout << "kinematic properties of trigger-matched reco muon" << endl;
+		      cout << "reco muon pT = " << (recoMuPtrs.at(muMatch))->pt() << endl;
+		      cout << "reco muon eta = " << (recoMuPtrs.at(muMatch))->eta() << endl;
+		      cout << "reco muon phi = " << (recoMuPtrs.at(muMatch))->phi() << endl;
+		      cout << "reco muon PFRelIso = " << recoMuRelIso << endl;
+
 		      // - plot delR(gen tau_mu, gen tau_sister)
 		      dRA1TauDaughtersGenMatch_->Fill(reco::deltaR(*reco::GenParticleRef(pGenParticles, iTau->getTauIndex()), 
 								   *reco::GenParticleRef(pGenParticles, iTau->getSisterIndex())));
+		      // - plot dpT(gen tau_mu, gen reco_mu)
+		      dpTA1TauRecoTauGenMatch_->Fill(delPT_recogen);
 		      // - plot decay mode of sister
 		      tauSisterDecayModeGenMatch_->Fill(sisterDecay.second);
 		      // - plot pT of tau_mu
@@ -490,18 +536,17 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 		      tauSisterPTGenMatch_->Fill(iTau->getVisibleTauSisterP4().Pt());
 		      // - plot pT(gen tau_sister) vs decay mode of tau_sister
 		      tauSisterPTVsDecayMode_->Fill(sisterDecay.second, iTau->getVisibleTauSisterP4().Pt());
-		      recoMuEtaGenMatch_->Fill((*recoMuPtrs.at(muMatch)).eta());
+		      recoMuEtaGenMatch_->Fill((recoMuPtrs.at(muMatch))->eta());
 		      tauSisterPTVsdR_->Fill(reco::deltaR(*reco::GenParticleRef(pGenParticles, iTau->getTauIndex()), 
 							  *reco::GenParticleRef(pGenParticles, iTau->getSisterIndex())), iTau->getVisibleTauSisterP4().Pt());
 		      // - plot PFRelIso vs pT of reco mu
-		      double recoMuRelIso = Common::getMuonCombPFIso((*recoMuPtrs.at(muMatch)), 0.5)/(*recoMuPtrs.at(muMatch)).pt();
 		      recoMuPFRelIso_->Fill(recoMuRelIso);
 		      recoMuPFRelIsoVsdRA1TauDaughters_->Fill(reco::deltaR(*reco::GenParticleRef(pGenParticles, iTau->getTauIndex()), 
 									   *reco::GenParticleRef(pGenParticles, iTau->getSisterIndex())), recoMuRelIso);
 		      recoMuPFRelIsoVsTauSisterPT_->Fill(iTau->getVisibleTauSisterP4().Pt(), recoMuRelIso);
-		      recoMuPFRelIsoVsRecoMuPT_->Fill((*recoMuPtrs.at(muMatch)).pt(), recoMuRelIso);
+		      recoMuPFRelIsoVsRecoMuPT_->Fill((recoMuPtrs.at(muMatch))->pt(), recoMuRelIso);
 		      recoMuPFRelIsoVsTauSisterDecayMode_->Fill(sisterDecay.second, recoMuRelIso);
-		      recoMuPTVsTauSisterPT_->Fill(iTau->getVisibleTauSisterP4().Pt(),(*recoMuPtrs.at(muMatch)).pt());
+		      recoMuPTVsTauSisterPT_->Fill(iTau->getVisibleTauSisterP4().Pt(),(recoMuPtrs.at(muMatch))->pt());
 		      tauMuPTVsTauSisterPT_->Fill(iTau->getVisibleTauSisterP4().Pt(),iTau->getVisibleTauP4().Pt());
 		    }
 		}
@@ -566,6 +611,7 @@ void GenAnalyzer::beginJob()
   //book histograms
   dRA1TauDaughters_ = new TH1F("dRA1TauDaughters", "", 60, 0.0, 3.0);
   dRA1TauDaughtersGenMatch_ = new TH1F("dRA1TauDaughtersGenMatch", "", 60, 0.0, 3.0);
+  dpTA1TauRecoTauGenMatch_ = new TH1F("dpTA1TauRecoTauGenMatch", "", 80, -2., 2.0);
   aMass_ = new TH1F("aMass", "", 100, 0.0, 25.0);
   HPT_ = new TH1F("HPT", "", 100, 0.0, 200.0);
   tauMuPT_ = new TH1F("tauMuPT", "", 50, 0.0, 100.0);
@@ -631,6 +677,8 @@ void GenAnalyzer::endJob()
   Common::setCanvasOptions(dRA1TauDaughtersCanvas, 1, 0, 0);
   TCanvas dRA1TauDaughtersGenMatchCanvas("dRA1TauDaughtersGenMatchCanvas", "", 600, 600);
   Common::setCanvasOptions(dRA1TauDaughtersGenMatchCanvas, 1, 0, 0);
+  TCanvas dpTA1TauRecoTauGenMatchCanvas("dpTA1TauRecoTauGenMatchCanvas", "", 600, 600);
+  Common::setCanvasOptions(dpTA1TauRecoTauGenMatchCanvas, 1, 0, 0);
   TCanvas aMassCanvas("aMassCanvas", "", 600, 600);
   Common::setCanvasOptions(aMassCanvas, 1, 0, 0);
   TCanvas HPTCanvas("HPTCanvas", "", 600, 600);
@@ -667,6 +715,8 @@ void GenAnalyzer::endJob()
   dRA1TauDaughters_->SetLineWidth(2);
   Common::setHistogramOptions(dRA1TauDaughtersGenMatch_, kBlack, 0.7, 20, 1.0, "#DeltaR", "", 0.05);
   dRA1TauDaughtersGenMatch_->SetLineWidth(2);
+  Common::setHistogramOptions(dpTA1TauRecoTauGenMatch_, kBlack, 0.7, 20, 1.0, "#Delta p_{T} (GeV)", "", 0.05);
+  dpTA1TauRecoTauGenMatch_->SetLineWidth(2);
   Common::setHistogramOptions(aMass_, kBlack, 0.7, 20, 1.0, "m_{a} (GeV)", "", 0.05);
   aMass_->SetLineWidth(2);
   Common::setHistogramOptions(HPT_, kBlack, 0.7, 20, 1.0, "Higgs pT (GeV)", "", 0.05);
@@ -694,6 +744,8 @@ void GenAnalyzer::endJob()
   dRA1TauDaughters_->Draw();
   dRA1TauDaughtersGenMatchCanvas.cd();
   dRA1TauDaughtersGenMatch_->Draw();
+  dpTA1TauRecoTauGenMatchCanvas.cd();
+  dpTA1TauRecoTauGenMatch_->Draw();
   aMassCanvas.cd();
   aMass_->Draw();
   HPTCanvas.cd();
@@ -728,6 +780,7 @@ void GenAnalyzer::endJob()
   out_->cd();
   dRA1TauDaughtersCanvas.Write();
   dRA1TauDaughtersGenMatchCanvas.Write();
+  dpTA1TauRecoTauGenMatchCanvas.Write();
   aMassCanvas.Write();
   HPTCanvas.Write();
   tauMuPTCanvas.Write();

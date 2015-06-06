@@ -189,14 +189,61 @@ float Common::getMuonCombPFIso(const reco::Muon& muon, const double PUSubtractio
 {
   const reco::MuonPFIsolation isoBlock = muon.pfIsolationR04();
   return (isoBlock.sumChargedHadronPt + 
+  //return (isoBlock.sumChargedParticlePt + 
 	  std::max(0.0, (double)(isoBlock.sumNeutralHadronEt + isoBlock.sumPhotonEt - 
 				 PUSubtractionCoeff*isoBlock.sumPUPt)));
+}
+
+float Common::getMuonCombPFIsoModified(const reco::Muon& muon, const reco::PFTauRef& tau, const double PUSubtractionCoeff)
+{
+  const reco::MuonPFIsolation isoBlock = muon.pfIsolationR04();
+  reco::PFCandidateRefVector tauChargedCands = (*tau).signalPFChargedHadrCands();
+  reco::PFCandidateRefVector tauNeutralCands = (*tau).signalPFNeutrHadrCands();
+  reco::PFCandidateRefVector tauGammaCands = (*tau).signalPFGammaCands();
+
+  double tauChargedHadronPt = 0.;
+  double tauNeutralHadronPt = 0.;
+  double tauPhotonPt = 0.;
+
+  for (reco::PFCandidateRefVector::const_iterator iCand = tauChargedCands.begin(); iCand != tauChargedCands.end(); ++iCand)
+    {
+      if (deltaR(muon.p4(), (*iCand)->p4()) < 0.4)
+	tauChargedHadronPt += (*iCand)->pt();
+    }
+
+  for (reco::PFCandidateRefVector::const_iterator iCand = tauNeutralCands.begin(); iCand != tauNeutralCands.end(); ++iCand)
+    {
+      if (deltaR(muon.p4(), (*iCand)->p4()) < 0.4)
+	tauNeutralHadronPt += (*iCand)->pt();
+    }
+
+  for (reco::PFCandidateRefVector::const_iterator iCand = tauGammaCands.begin(); iCand != tauGammaCands.end(); ++iCand)
+    {
+      if (deltaR(muon.p4(), (*iCand)->p4()) < 0.4)
+	tauPhotonPt += (*iCand)->pt();
+    }
+
+  double result = isoBlock.sumChargedHadronPt - tauChargedHadronPt +
+    std::max(0.0, (double)(isoBlock.sumNeutralHadronEt - tauNeutralHadronPt +
+			   isoBlock.sumPhotonEt - tauPhotonPt - 
+			   PUSubtractionCoeff*isoBlock.sumPUPt));
+
+  return result;
 }
 
 float Common::getMuonLeptonPFIso(const reco::Muon& muon)
 {
   const reco::MuonPFIsolation isoBlock = muon.pfIsolationR04();
   return (isoBlock.sumChargedParticlePt - isoBlock.sumChargedHadronPt);
+}
+
+float Common::getMuonCombPFIsoMinusTau(const reco::Muon& muon, const reco::LeafCandidate::LorentzVector tauP4, const double PUSubtractionCoeff)
+{
+  const reco::MuonPFIsolation isoBlock = muon.pfIsolationR04();
+  return (isoBlock.sumChargedHadronPt + 
+	  std::max(0.0, (double)(isoBlock.sumNeutralHadronEt + isoBlock.sumPhotonEt - 
+				 PUSubtractionCoeff*isoBlock.sumPUPt)) -
+	  tauP4.pt());
 }
 
 std::vector<reco::MuonRef>
@@ -745,4 +792,58 @@ double Common::rhoCorrPhotonIso(const edm::Handle<edm::ValueMap<double> >& pIso,
 				const reco::PhotonRef& photonRef)
 {
   return rhoCorrIso(pIso, pRho, photonRef, photonIsoEAs);
+}
+
+bool Common::isTightIsolatedRecoMuon(const reco::Muon* iMuon, 
+				     const reco::Vertex* pPV, const bool usePFIso, 
+				     const double PUSubtractionCoeff, const double isoMax, 
+				     const double etaMax, const bool passIso)
+{
+  bool result = false;
+  if ((pPV != NULL) && 
+      muon::isTightMuon(*iMuon, *pPV) && 
+      iMuon->isPFMuon() && 
+      (fabs(iMuon->innerTrack()->dz(pPV->position())) < 0.5) && 
+      (iMuon->track()->hitPattern().trackerLayersWithMeasurement() > 5) && 
+      ((etaMax == -1.0) || (fabs(iMuon->eta()) < etaMax))) {
+    float iso = 0.0;
+    if (usePFIso) {
+      iso = getMuonCombPFIso(*iMuon, PUSubtractionCoeff)/iMuon->pt();
+    }
+    else {
+      const reco::MuonIsolation isoBlock = iMuon->isolationR03();
+      iso = (isoBlock.sumPt + isoBlock.emEt + isoBlock.hadEt)/iMuon->pt();
+    }
+    if ((isoMax == -1.0) || (passIso && (iso < isoMax)) || (!passIso && (iso >= isoMax))) {
+      result = true;
+    }
+  }
+  return result;
+}
+
+bool Common::isTightIsolatedRecoMuon(const edm::RefToBase<reco::Muon> iMuon, 
+				     const reco::Vertex* pPV, const bool usePFIso, 
+				     const double PUSubtractionCoeff, const double isoMax, 
+				     const double etaMax, const bool passIso)
+{
+  bool result = false;
+  if ((pPV != NULL) && 
+      muon::isTightMuon(*iMuon, *pPV) && 
+      iMuon->isPFMuon() && 
+      (fabs(iMuon->innerTrack()->dz(pPV->position())) < 0.5) && 
+      (iMuon->track()->hitPattern().trackerLayersWithMeasurement() > 5) && 
+      ((etaMax == -1.0) || (fabs(iMuon->eta()) < etaMax))) {
+    float iso = 0.0;
+    if (usePFIso) {
+      iso = getMuonCombPFIso(*iMuon, PUSubtractionCoeff)/iMuon->pt();
+    }
+    else {
+      const reco::MuonIsolation isoBlock = iMuon->isolationR03();
+      iso = (isoBlock.sumPt + isoBlock.emEt + isoBlock.hadEt)/iMuon->pt();
+    }
+    if ((isoMax == -1.0) || (passIso && (iso < isoMax)) || (!passIso && (iso >= isoMax))) {
+      result = true;
+    }
+  }
+  return result;
 }

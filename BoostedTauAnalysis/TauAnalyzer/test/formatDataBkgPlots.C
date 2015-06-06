@@ -66,6 +66,7 @@ void formatDataBkgPlots(const string& inputVersion, const string& outputVersion,
   canvasNames1D.push_back("diJetWMuHTCanvas");
   canvasNames1D.push_back("jetTauJetWMuHTCanvas");
   canvasNames1D.push_back("dRSoftMuTauHadCanvas");
+  canvasNames1D.push_back("HPTCanvas");
   canvasNames1D.push_back("tauMuPTCanvas");
   canvasNames1D.push_back("tauHadPTCanvas");
   canvasNames1D.push_back("tauHadPT1ProngCanvas");
@@ -212,6 +213,7 @@ void formatDataBkgPlots(const string& inputVersion, const string& outputVersion,
   graphNames1D.push_back("diJetWMuHT");
   graphNames1D.push_back("jetTauJetWMuHT");
   graphNames1D.push_back("dRSoftMuTauHad");
+  graphNames1D.push_back("HPT");
   graphNames1D.push_back("tauMuPT");
   graphNames1D.push_back("tauHadPT");
   graphNames1D.push_back("tauHadPT1Prong");
@@ -909,14 +911,14 @@ void formatDataBkgPlots(const string& inputVersion, const string& outputVersion,
   WZAllName << WZAllPrefix << WZSuffix;
   WZAllHaddInputFiles.push_back(WZAllName.str());
   haddCanvases(WZIsoHaddOutputFile, WZIsoHaddInputFiles, 
-	       vector<float>(1, 0.0667569497737973), canvasNames1D, graphNames1D, 
+	       vector<float>(1, /*0.0667569497737973*/0.0654218486), canvasNames1D, graphNames1D, 
 	       canvasNames2D, graphNames2D, nullBlindLow, nullBlindHigh);
   haddCanvases(WZNonIsoHaddOutputFile, WZNonIsoHaddInputFiles, 
-	       vector<float>(1, 0.0667569497737973), canvasNames1D, graphNames1D, 
+	       vector<float>(1, /*0.0667569497737973*/0.0654218486), canvasNames1D, graphNames1D, 
 	       canvasNames2D, graphNames2D, nullBlindLow, nullBlindHigh);
   if (doNoHPSIsoCut) {
     haddCanvases(WZAllHaddOutputFile, WZAllHaddInputFiles, 
-		 vector<float>(1, 0.0667569497737973), canvasNames1D, graphNames1D, 
+		 vector<float>(1, /*0.0667569497737973*/0.0654218486), canvasNames1D, graphNames1D, 
 		 canvasNames2D, graphNames2D, nullBlindLow, nullBlindHigh);
   }
 
@@ -942,14 +944,14 @@ void formatDataBkgPlots(const string& inputVersion, const string& outputVersion,
   ZZAllName << ZZAllPrefix << ZZSuffix;
   ZZAllHaddInputFiles.push_back(ZZAllName.str());
   haddCanvases(ZZIsoHaddOutputFile, ZZIsoHaddInputFiles, 
-	       vector<float>(1, 0.0377509625152821), canvasNames1D, graphNames1D, 
+	       vector<float>(1, /*0.0377509625152821*/0.035488476), canvasNames1D, graphNames1D, 
 	       canvasNames2D, graphNames2D, nullBlindLow, nullBlindHigh);
   haddCanvases(ZZNonIsoHaddOutputFile, ZZNonIsoHaddInputFiles, 
-	       vector<float>(1, 0.0377509625152821), canvasNames1D, graphNames1D, 
+	       vector<float>(1, /*0.0377509625152821*/0.035488476), canvasNames1D, graphNames1D, 
 	       canvasNames2D, graphNames2D, nullBlindLow, nullBlindHigh);
   if (doNoHPSIsoCut) {
     haddCanvases(ZZAllHaddOutputFile, ZZAllHaddInputFiles, 
-		 vector<float>(1, 0.0377509625152821), canvasNames1D, graphNames1D, 
+		 vector<float>(1, /*0.0377509625152821*/0.035488476), canvasNames1D, graphNames1D, 
 		 canvasNames2D, graphNames2D, nullBlindLow, nullBlindHigh);
   }
 
@@ -975,14 +977,14 @@ void formatDataBkgPlots(const string& inputVersion, const string& outputVersion,
   WWAllName << WWAllPrefix << WWSuffix;
   WWAllHaddInputFiles.push_back(WWAllName.str());
   haddCanvases(WWIsoHaddOutputFile, WWIsoHaddInputFiles, 
-	       vector<float>(1, 0.124167251024691), canvasNames1D, 
+	       vector<float>(1, /*0.124167251024691*/0.1080262041), canvasNames1D, 
 	       graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, nullBlindHigh);
   haddCanvases(WWNonIsoHaddOutputFile, WWNonIsoHaddInputFiles, 
-	       vector<float>(1, 0.124167251024691), canvasNames1D, 
+	       vector<float>(1, /*0.124167251024691*/0.1080262041), canvasNames1D, 
 	       graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, nullBlindHigh);
   if (doNoHPSIsoCut) {
     haddCanvases(WWAllHaddOutputFile, WWAllHaddInputFiles, 
-		 vector<float>(1, 0.124167251024691), canvasNames1D, 
+		 vector<float>(1, /*0.124167251024691*/0.1080262041), canvasNames1D, 
 		 graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, nullBlindHigh);
   }
   cout << endl;
@@ -1224,6 +1226,17 @@ void formatDataBkgPlots(const string& inputVersion, const string& outputVersion,
 
   cout << "\nBegin region A vs. region B plots, sample by sample...\n\n";
   
+  //calculate bkg uncertainty if region A bkg had...
+  //1. the shape of data-driven QCD from region B
+  //2. the shape of MC EWK from region B
+  cout << "\nCalculate bkg uncertainty with all-QCD and all-EWK assumptions \n\n";
+  string allQCDEWKAssumptionOutputFile(analysisFilePath + "results/allQCDorEWK_bkgUncertainty" + MTBin +
+					  tag19p7InvFb + outputVTag + fileExt);
+  arcQuest(RegionBQCDVsMCInputFiles, dataIsoHaddOutputFile, 
+	   dataNonIsoHaddOutputFile,
+	   variable, theunit, 1, 2,
+	   allQCDEWKAssumptionOutputFile);
+
   //compare Drell-Yan+jets search sample to control sample
   cout << "...Drell-Yan\n";
   string DYJetsToLLSearchVsControlOutputFile(analysisFilePath + 

@@ -17,6 +17,11 @@ if [ -n "$3" ]
     then
     dataTemplateCfg=$3
 fi
+nonisodataTemplateCfg="tauanalyzer_nonisodata_template_cfg.py"
+if [ -n "$3" ]
+    then
+    dataTemplateCfg=$3
+fi
 
 ./generateDYJetsToLLTauAnalyzerCfgs.sh $version $MCTemplateCfg
 ./generateDataTauAnalyzerCfgs.sh $version $dataTemplateCfg

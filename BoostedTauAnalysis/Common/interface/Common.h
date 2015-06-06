@@ -133,8 +133,14 @@ class Common {
   //get muon combined particle isolation with adjustable PU subtraction
   static float getMuonCombPFIso(const reco::Muon&, const double);
 
+  //get muon combined particle isolation with nearby tau candidates' pT subtracted
+  static float getMuonCombPFIsoModified(const reco::Muon&, const reco::PFTauRef&, const double);
+
   //get muon isolation computed from leptons only
   static float getMuonLeptonPFIso(const reco::Muon&);
+
+  //get muon isolation with tau pt subtracted
+  static float getMuonCombPFIsoMinusTau(const reco::Muon&, const reco::LeafCandidate::LorentzVector, const double);
 
   /*fill STL container with muons passing the 2012 tight selection, PF isolation, and |eta|
     (cf. https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId and 
@@ -294,6 +300,18 @@ class Common {
   static double rhoCorrPhotonIso(const edm::Handle<edm::ValueMap<double> >&, 
 				 const edm::Handle<double>&, const reco::PhotonRef&);
 
+  //decide if muon passes tight ID or not
+  static bool isTightIsolatedRecoMuon(const reco::Muon* iMuon, 
+				      const reco::Vertex* pPV, const bool usePFIso, 
+				      const double PUSubtractionCoeff, const double isoMax, 
+				      const double etaMax, const bool passIso);
+
+  //decide if muon passes tight ID or not
+  static bool isTightIsolatedRecoMuon(const edm::RefToBase<reco::Muon> iMuon, 
+				      const reco::Vertex* pPV, const bool usePFIso, 
+				      const double PUSubtractionCoeff, const double isoMax, 
+				      const double etaMax, const bool passIso);
+    
  private:
 
   static bool compareCandidatePT(reco::Candidate*, reco::Candidate*);

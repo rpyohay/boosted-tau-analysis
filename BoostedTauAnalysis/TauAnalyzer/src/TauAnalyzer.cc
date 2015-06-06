@@ -242,6 +242,12 @@ private:
   //b jet tag
   edm::InputTag bJetTag_;
 
+  //TEMPORARY ANTI-LEPTON PLOTS
+  //tags for leptons to veto
+  //edm::InputTag eleTriggerVetoTag_;
+  //edm::InputTag muTriggerVetoTag_;
+  //edm::InputTag tauTriggerVetoTag_;
+
   //dR matching distance
   double dR_;
 
@@ -441,7 +447,7 @@ private:
   TH1F* dRSoftMuTauHad_;
 
   //histogram of Higgs pT
-  //TH1F* HPT_;
+  TH1F* HPT_;
 
   //histogram of tau muon pT
   TH1F* tauMuPT_;
@@ -716,6 +722,12 @@ private:
   //histogram of pruned, cleaned tau3/tau1 vs HPS tau decay mode
   TH2F* muHad_t3t1VsDecayMode_;
 
+  //TEMPORARY ANTI-LEPTON PLOTS//
+  //TH2F* muHadMassVsDRtrigMuonEle_;
+  //TH2F* muHadMassVsDRtrigMuonMu_;
+  //TH2F* muHadMassVsDRtrigMuonTau_;
+  //TEMPORARY ANTI-LEPTON PLOTS//
+
   //histogram of mu+had mass vs. Nj
   TH2F* muHadMassVsNAddlJets_;
 
@@ -750,7 +762,7 @@ private:
   //hadronic tau pT bins
   std::vector<double> tauHadPTBins_;
 
-  //histogram of Higgs pT weights
+  //histogram of Higgs pT weights for ggH correction
   TH1F* lut_weight;
 
   //hadronic tau pT bins for fake rate corrections
@@ -830,6 +842,10 @@ TauAnalyzer::TauAnalyzer(const edm::ParameterSet& iConfig):
   allGenParticleTag_(iConfig.getParameter<edm::InputTag>("allGenParticleTag")),
   corrJetTag_(iConfig.getParameter<edm::InputTag>("corrJetTag")),
   bJetTag_(iConfig.getParameter<edm::InputTag>("bJetTag")),
+  //TEMPORARY ANTI-LEPTON PLOTS//
+  //eleTriggerVetoTag_(iConfig.getParameter<edm::InputTag>("eleTriggerVetoTag")), // remove
+  //muTriggerVetoTag_(iConfig.getParameter<edm::InputTag>("muTriggerVetoTag")), // remove
+  //tauTriggerVetoTag_(iConfig.getParameter<edm::InputTag>("tauTriggerVetoTag")), // remove
   dR_(iConfig.getParameter<double>("dR")),
   tauPTMin_(iConfig.getParameter<double>("tauPTMin")),
   tauDecayMode_(static_cast<reco::PFTau::hadronicDecayMode>
@@ -1375,6 +1391,18 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   edm::Handle<reco::PFJetCollection> pCorrJets;
   iEvent.getByLabel(corrJetTag_, pCorrJets);
 
+  //TEMPORARY ANTI-LEPTON PLOTS//
+  //edm::Handle<reco::GsfElectronRefVector> electronsToVeto;
+  //iEvent.getByLabel(eleTriggerVetoTag_, electronsToVeto);
+
+  //edm::Handle<reco::MuonRefVector> muonsToVeto;
+  //iEvent.getByLabel(muTriggerVetoTag_, muonsToVeto);
+
+  //edm::Handle<reco::PFTauRefVector> tausToVeto;
+  //iEvent.getByLabel(tauTriggerVetoTag_, tausToVeto);
+  //TEMPORARY ANTI-LEPTON PLOTS//
+
+
 //   //debug
 //   for (reco::PFTauRefVector::const_iterator iTau = pTaus->begin(); iTau != pTaus->end(); 
 //        ++iTau) {
@@ -1393,6 +1421,7 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   //get PU weight
   double PUWeight = 1.0;
   double HiggsPTWeight = 1.0;
+  double ggHToVBFWeight = 1.0;
   float trueNInt = -1;
   if (MC_ && ((PUScenario_ == "S7") || (PUScenario_ == "S10"))) {
     std::vector<PileupSummaryInfo>::const_iterator iPU = pPU->begin();
@@ -1536,14 +1565,17 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     for (reco::GenParticleCollection::const_iterator iGenParticle = pAllGenParticles->begin(); 
 	 iGenParticle != pAllGenParticles->end(); ++iGenParticle) {
       allGenParticlePtrs.push_back(const_cast<reco::GenParticle*>((&*iGenParticle)));
-      if (higgsReweight_)
-	{
+      //if (higgsReweight_)
+      //{
 	  if (fabs(iGenParticle->pdgId()) == 35)
 	    { // if it's an H
-	      //HPT_->Fill(iGenParticle->pt());
-	      HiggsPTWeight = getHiggsPTWeight(iGenParticle->pt(), lut_weight);
+	      HPT_->Fill(iGenParticle->pt());
+	      if (higgsReweight_)
+		{
+		  HiggsPTWeight = getHiggsPTWeight(iGenParticle->pt(), lut_weight);
+		}
 	    } // if it's an H
-	}
+	  //	}
       if (iGenParticle->status() == 1) {
 	status1GenParticlePtrs.push_back(const_cast<reco::GenParticle*>(&*iGenParticle));
 	// 	std::cerr << iGenParticle->pdgId() << std::endl;
@@ -1672,6 +1704,24 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     const reco::PFJet correctedTauJet = correctedJets[tauOldJetRef.key()];
     const reco::MuonRefVector& removedMuons = (*pMuonJetMap)[tauJetRef];
 
+    bool noOtherBTaggedJets = true;
+    //loop again over btags to veto corrected old jets that pass CSVM
+    for (unsigned int i = 0; i != bTags.size(); ++i)
+      { // loop over btags
+	PFJetRef myBJetRef(pOldJets,i);
+	for (std::vector<reco::PFJetRef>::const_iterator iJet = correctedOldJetRefs.begin(); 
+	     iJet != correctedOldJetRefs.end(); ++iJet)
+	  { // loop over corrected old jets not matched to W_mu, tau_mu, or tau_had
+
+	    if (myBJetRef.key() == iJet->key()) // if a b-tagged jet is found
+	      {
+		if (((*iJet)->pt() > 30.) && (bTags[i].second > 0.679)) // if jet pT > 30 and csv_ > CSVM
+		  noOtherBTaggedJets = false;
+	      }
+	  } // loop over corrected old jets not matched to W_mu, tau_mu, or tau_had
+
+      } // loop over btags
+    
     //make a collection of corrected old jets in |eta| < 2.4 not overlapping the W muon or tau
     std::vector<reco::PFJetRef> oldJetRefsExclTauNoPTCut;
     for (reco::PFJetCollection::const_iterator iCorrectedJet = correctedOldJets.begin(); 
@@ -1936,7 +1986,8 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     if (((*iTau)->pt() > tauPTMin_) && 
 	((tauDecayMode_ == reco::PFTau::kNull) || ((*iTau)->decayMode() == tauDecayMode_)) && 
 	(fabs(tauOldJetRef->eta()) < 2.4) && (fabs(tau_vz - pv_vz) < 0.2) && 
-	(fabs(mu_vz - pv_vz) < 0.5)) {
+	(fabs(mu_vz - pv_vz) < 0.5)/* &&
+	noOtherBTaggedJets*/) {
 
       double b_discriminant = 999.;
       for (unsigned int i = 0; i != bTags.size(); ++i)
@@ -2057,6 +2108,27 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       /*plot the mu + tau invariant mass for the highest pT muon weighted by the statistical error 
 	on the hadronic tau pT weight for this event*/
       muHadMassReweightErrSq_->Fill(muHadMassForPlotting, tauHadPTWeightErr);
+
+      //TEMPORARY ANTI-LEPTON PLOTS
+      //WMuonRefs[WMuonRefs.size() - 1]
+      /*for (reco::GsfElectronRefVector::const_iterator iObj = electronsToVeto->begin(); iObj != electronsToVeto->end(); ++iObj)
+	{
+	  double deltaR_objWMuon = deltaR((**iObj),(*WMuonRefs[WMuonRefs.size() - 1]));
+	  muHadMassVsDRtrigMuonEle_->Fill(deltaR_objWMuon, muHadMass, PUWeight);
+	}
+
+      for (reco::MuonRefVector::const_iterator iObj = muonsToVeto->begin(); iObj != muonsToVeto->end(); ++iObj)
+	{
+	  double deltaR_objWMuon = deltaR((**iObj),(*WMuonRefs[WMuonRefs.size() - 1]));
+	  muHadMassVsDRtrigMuonMu_->Fill(deltaR_objWMuon, muHadMass, PUWeight);
+	}
+
+      for (reco::PFTauRefVector::const_iterator iObj = tausToVeto->begin(); iObj != tausToVeto->end(); ++iObj)
+	{
+	  double deltaR_objWMuon = deltaR((**iObj),(*WMuonRefs[WMuonRefs.size() - 1]));
+	  muHadMassVsDRtrigMuonTau_->Fill(deltaR_objWMuon, muHadMass, PUWeight);
+	  }*/
+      //TEMPORARY ANTI-LEPTON PLOTS
 
       //plot the mu + tau charge for the highest pT muon
       muHadCharge_->
@@ -3159,7 +3231,7 @@ void TauAnalyzer::beginJob()
     new TH1F("dRWMuSoftMuMuHadMassGe2", ";#DeltaR(W muon, soft muon);", 30, 0.0, 3.0);
   dRSoftMuTauHad_ = 
     new TH1F("dRSoftMuTauHad", ";#DeltaR(#tau_{#mu},#tau_{had});", 30, 0.0, 3.0);
-  //HPT_ = new TH1F("HPT", "", 200, 0.0, 1000.0);
+  HPT_ = new TH1F("HPT", "", 1000, 0.0, 1000.0);
   tauMuPT_ = new TH1F("tauMuPT", ";p_{T} (GeV);", 20, 0.0, 100.0);
   tauHadPT_ = new TH1F("tauHadPT", ";p_{T} (GeV);", tauHadPTBins_.size() - 1, &tauHadPTBins_[0]);
   tauHadPT1Prong_ = new TH1F("tauHadPT1Prong", ";p_{T} (GeV);", 
@@ -3311,6 +3383,14 @@ void TauAnalyzer::beginJob()
   muHad_t3t1VsDecayMode_ = new TH2F("muHad_t3t1VsDecayMode", 
 				    ";HPS #tau decay mode;#frac{#tau_{3}}{#tau_{1}}", 
 				    16, -1.5, 14.5, 500, 0.0, 2.0);
+  //TEMPORARY ANTI-LEPTON PLOTS//
+  //muHadMassVsDRtrigMuonEle_ = 
+  //new TH2F("muHadMassVsDRtrigMuonEle", ";#DeltaR(e, trigger #mu);m_{#mu+X} (GeV)", 50, 0., 5., 20, 0.0, 20.0);
+  //muHadMassVsDRtrigMuonMu_ = 
+  //new TH2F("muHadMassVsDRtrigMuonMu", ";#DeltaR(#mu, trigger #mu);m_{#mu+X} (GeV)", 50, 0., 5., 20, 0.0, 20.0);
+  //muHadMassVsDRtrigMuonTau_ = 
+  //new TH2F("muHadMassVsDRtrigMuonTau", ";#DeltaR(#tau, trigger #mu);m_{#mu+X} (GeV)", 50, 0., 5., 20, 0.0, 20.0);
+
   muHadMassVsNAddlJets_ = 
     new TH2F("muHadMassVsNAddlJets", ";N_{j};m_{#mu+X} (GeV)", 10, -0.5, 9.5, muHadMassBins_.size() - 1, &muHadMassBins_[0]);
   muHadMassVsCSVScore_ = new TH2F("muHadMassVsCSVScore", ";CSV score;m_{#mu+X} (GeV)", 25, 0.0, 
@@ -3492,7 +3572,7 @@ void TauAnalyzer::beginJob()
   dRWMuSoftGenMatchedMu_->Sumw2();
   dRWMuSoftMuMuHadMassGe2_->Sumw2();
   dRSoftMuTauHad_->Sumw2();
-  //HPT_->Sumw2();
+  HPT_->Sumw2();
   tauMuPT_->Sumw2();
   tauHadPT_->Sumw2();
   tauHadPT1Prong_->Sumw2();
@@ -3578,6 +3658,10 @@ void TauAnalyzer::beginJob()
   mWMuTauMuVsMWMuTauMuTauHad_->Sumw2();
   mWMuTauMuVsMWMuTauMuTauHadGenFSR_->Sumw2();
   muHadMassVsMWMuTauMuTauHad_->Sumw2();
+  //TEMPORARY ANTI-LEPTON PLOTS//
+  //muHadMassVsDRtrigMuonEle_->Sumw2();
+  //muHadMassVsDRtrigMuonMu_->Sumw2();
+  //muHadMassVsDRtrigMuonTau_->Sumw2();
   muHadMassVsNAddlJets_->Sumw2();
   muHadMassVsCSVScore_->Sumw2();
   muHadMassVsWMuMT_->Sumw2();
@@ -3661,7 +3745,7 @@ void TauAnalyzer::endJob()
   TCanvas dRWMuSoftGenMatchedMuCanvas("dRWMuSoftGenMatchedMuCanvas", "", 600, 600);
   TCanvas dRWMuSoftMuMuHadMassGe2Canvas("dRWMuSoftMuMuHadMassGe2Canvas", "", 600, 600);
   TCanvas dRSoftMuTauHadCanvas("dRSoftMuTauHadCanvas", "", 600, 600);
-  //TCanvas HPTCanvas("HPTCanvas", "", 600, 600);
+  TCanvas HPTCanvas("HPTCanvas", "", 600, 600);
   TCanvas tauMuPTCanvas("tauMuPTCanvas", "", 600, 600);
   TCanvas tauHadPTCanvas("tauHadPTCanvas", "", 600, 600);
   TCanvas tauHadPT1ProngCanvas("tauHadPT1ProngCanvas", "", 600, 600);
@@ -3767,6 +3851,10 @@ void TauAnalyzer::endJob()
   TCanvas 
     mWMuTauMuVsMWMuTauMuTauHadGenFSRCanvas("mWMuTauMuVsMWMuTauMuTauHadGenFSRCanvas", "", 600, 600);
   TCanvas muHadMassVsMWMuTauMuTauHadCanvas("muHadMassVsMWMuTauMuTauHadCanvas", "", 600, 600);
+  //TEMPORARY ANTI-LEPTON PLOTS//
+  //TCanvas muHadMassVsDRtrigMuonEleCanvas("muHadMassVsDRtrigMuonEleCanvas", "", 600, 600);
+  //TCanvas muHadMassVsDRtrigMuonMuCanvas("muHadMassVsDRtrigMuonMuCanvas", "", 600, 600);
+  //TCanvas muHadMassVsDRtrigMuonTauCanvas("muHadMassVsDRtrigMuonTauCanvas", "", 600, 600);
   TCanvas muHadMassVsNAddlJetsCanvas("muHadMassVsNAddlJetsCanvas", "", 600, 600);
   TCanvas muHadMassVsCSVScoreCanvas("muHadMassVsCSVScoreCanvas", "", 600, 600);
   TCanvas muHadMassVsWMuMTCanvas("muHadMassVsWMuMTCanvas", "", 600, 600);
@@ -3836,7 +3924,7 @@ void TauAnalyzer::endJob()
   Common::draw1DHistograms(dRWMuSoftGenMatchedMuCanvas, dRWMuSoftGenMatchedMu_);
   Common::draw1DHistograms(dRWMuSoftMuMuHadMassGe2Canvas, dRWMuSoftMuMuHadMassGe2_);
   Common::draw1DHistograms(dRSoftMuTauHadCanvas, dRSoftMuTauHad_);
-  //Common::draw1DHistograms(HPTCanvas, HPT_);
+  Common::draw1DHistograms(HPTCanvas, HPT_);
   Common::draw1DHistograms(tauMuPTCanvas, tauMuPT_);
   Common::draw1DHistograms(tauHadPTCanvas, tauHadPT_);
   Common::draw1DHistograms(tauHadPT1ProngCanvas, tauHadPT1Prong_);
@@ -3953,6 +4041,10 @@ void TauAnalyzer::endJob()
   Common::draw2DHistograms(dzTauMuVsdzTauHadCanvas, dzTauMuVsdzTauHad_);
   Common::draw2DHistograms(muHad_t3t1VsptmjCanvas, muHad_t3t1Vsptmj_);
   Common::draw2DHistograms(muHad_t3t1VsDecayModeCanvas, muHad_t3t1VsDecayMode_);
+  //TEMPORARY ANTI-LEPTON PLOTS//
+  //Common::draw2DHistograms(muHadMassVsDRtrigMuonEleCanvas, muHadMassVsDRtrigMuonEle_);
+  //Common::draw2DHistograms(muHadMassVsDRtrigMuonMuCanvas, muHadMassVsDRtrigMuonMu_);
+  //Common::draw2DHistograms(muHadMassVsDRtrigMuonTauCanvas, muHadMassVsDRtrigMuonTau_);
   Common::draw2DHistograms(muHadMassVsNAddlJetsCanvas, muHadMassVsNAddlJets_);
   Common::draw2DHistograms(muHadMassVsCSVScoreCanvas, muHadMassVsCSVScore_);
   Common::draw2DHistograms(muHadMassVsWMuMTCanvas, muHadMassVsWMuMT_);
@@ -4013,7 +4105,7 @@ void TauAnalyzer::endJob()
   dRWMuSoftGenMatchedMuCanvas.Write();
   dRWMuSoftMuMuHadMassGe2Canvas.Write();
   dRSoftMuTauHadCanvas.Write();
-  //HPTCanvas.Write();
+  HPTCanvas.Write();
   tauMuPTCanvas.Write();
   tauHadPTCanvas.Write();
   tauHadPT1ProngCanvas.Write();
@@ -4105,6 +4197,10 @@ void TauAnalyzer::endJob()
   mWMuTauMuVsMWMuTauMuTauHadCanvas.Write();
   mWMuTauMuVsMWMuTauMuTauHadGenFSRCanvas.Write();
   muHadMassVsMWMuTauMuTauHadCanvas.Write();
+  //TEMPORARY ANTI-LEPTON PLOTS//
+  //muHadMassVsDRtrigMuonEleCanvas.Write();
+  //muHadMassVsDRtrigMuonMuCanvas.Write();
+  //muHadMassVsDRtrigMuonTauCanvas.Write();
   muHadMassVsNAddlJetsCanvas.Write();
   muHadMassVsCSVScoreCanvas.Write();
   muHadMassVsWMuMTCanvas.Write();
@@ -5073,6 +5169,14 @@ void TauAnalyzer::reset(const bool doDelete)
   mWMuTauMuVsMWMuTauMuTauHadGenFSR_ = NULL;
   if (doDelete && (muHadMassVsMWMuTauMuTauHad_ != NULL)) delete muHadMassVsMWMuTauMuTauHad_;
   muHadMassVsMWMuTauMuTauHad_ = NULL;
+  //TEMPORARY ANTI-LEPTON PLOTS//
+  //if (doDelete && (muHadMassVsDRtrigMuonEle_ != NULL)) delete muHadMassVsDRtrigMuonEle_;
+  //muHadMassVsDRtrigMuonEle_ = NULL;
+  //if (doDelete && (muHadMassVsDRtrigMuonMu_ != NULL)) delete muHadMassVsDRtrigMuonMu_;
+  //muHadMassVsDRtrigMuonMu_ = NULL;
+  //if (doDelete && (muHadMassVsDRtrigMuonTau_ != NULL)) delete muHadMassVsDRtrigMuonTau_;
+  //muHadMassVsDRtrigMuonTau_ = NULL;
+
   if (doDelete && (muHadMassVsNAddlJets_ != NULL)) delete muHadMassVsNAddlJets_;
   muHadMassVsNAddlJets_ = NULL;
   if (doDelete && (muHadMassVsCSVScore_ != NULL)) delete muHadMassVsCSVScore_;

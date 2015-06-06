@@ -264,7 +264,7 @@ bool GenMatchedRecoObjectProducer<T>::filter(edm::Event& iEvent, const edm::Even
     nearestRecoObj = Common::nearestObject(visibleGenParticleRef, recoObjPtrs, nearestRecoObjKey);
 
     //if nearest reco object is within dR_ of the gen object... 
-    bool save = false;
+//     bool save = false;
     if ((nearestRecoObj != NULL) && (nearestRecoObjPTRank >= 0) && 
 	(reco::deltaR(*nearestRecoObj, *visibleGenParticleRef) < dR_)) {
       int matchedGenObjPTRank = (int)iGenObj->getPTRank();
@@ -273,9 +273,9 @@ bool GenMatchedRecoObjectProducer<T>::filter(edm::Event& iEvent, const edm::Even
 	max supported, ...*/
       if (makeAllCollections_) {
 
-	if ((useGenObjPTRank_ && /*debug*//*(matchedGenObjPTRank < nOutputColls_)*/true) || 
-	    (!useGenObjPTRank_ && 
-	     /*debug*//*(nearestRecoObjPTRank < (int)nOutputColls_)*/true)) save = true;
+// 	if ((useGenObjPTRank_ && /*debug*//*(matchedGenObjPTRank < nOutputColls_)*/true) || 
+// 	    (!useGenObjPTRank_ && 
+// 	     /*debug*//*(nearestRecoObjPTRank < (int)nOutputColls_)*/true)) save = true;
 
 	//debug
 	/*nearestRecoObjKey is the index into recoObjPtrs of the matched object
@@ -292,7 +292,7 @@ bool GenMatchedRecoObjectProducer<T>::filter(edm::Event& iEvent, const edm::Even
       else if ((pTRank_ == GenTauDecayID::ANY_PT_RANK) || 
 	       (useGenObjPTRank_ && (matchedGenObjPTRank == pTRank_)) || 
 	       (!useGenObjPTRank_ && (nearestRecoObjPTRank == pTRank_))) {
-	save = true;
+// 	save = true;
 	nearestRecoObjPTRank = 0; /*since only 1 output collection is produced in this case, the 
 				    index into genMatchedRecoObjs should be 0*/
 
