@@ -109,6 +109,9 @@ private:
   //muon PFRelIso cut
   double PFIsoMax_;
 
+  //trigger matching switch
+  bool doTriggerMatching_;
+
   //set of parameters for GenTauDecayID class
   edm::ParameterSet genTauDecayIDPSet_;
 
@@ -215,6 +218,7 @@ GenAnalyzer::GenAnalyzer(const edm::ParameterSet& iConfig):hltConfig_(),
 	   iConfig.getParameter<edm::InputTag>("muonTag") : edm::InputTag()),
   muonPFIsoPUSubtractionCoeff_(iConfig.getParameter<double>("muonPFIsoPUSubtractionCoeff")),
   PFIsoMax_(iConfig.getParameter<double>("PFIsoMax")),
+  doTriggerMatching_(iConfig.getParameter<bool>("doTriggerMatching")),
   genTauDecayIDPSet_(iConfig.getParameter<edm::ParameterSet>("genTauDecayIDPSet"))
 {
   //now do what ever initialization is needed
@@ -441,11 +445,11 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
       //is this a mu+X decay? //mu+mu
       //if (thisDecay.second == GenTauDecayID::MU)
-      if (((thisDecay.second == GenTauDecayID::MU))// && 
-	   //(sisterDecay.second == GenTauDecayID::HAD))// || 
+      if (((thisDecay.second == GenTauDecayID::MU)) && 
+	   (sisterDecay.second == GenTauDecayID::HAD))// || 
 	  //((thisDecay.second == GenTauDecayID::HAD) && 
 	  //(sisterDecay.second == GenTauDecayID::MU))
-	)
+	//)
 	{ // if this tau decayed to a mu
 	  
 	  //get ref to gen mu
@@ -500,7 +504,10 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 		    }
 		  }
 		} //firedHLT
-	      
+
+	      if(!doTriggerMatching_)
+		trigger_matched = true;
+
 	      double etaMax = 2.1;
 	      //double etaMax = 0.9;
 	      bool isTightMu = false;
