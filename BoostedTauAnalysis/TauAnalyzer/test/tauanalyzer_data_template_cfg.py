@@ -333,6 +333,27 @@ process.trigMuHadIsoTauSelector = cms.EDFilter(
     minNumObjsToPassFilter = cms.uint32(0)
     )
 
+#find regular PF taus in |eta| < 2.3 that pass
+#decay mode finding and isolation discriminator
+process.trigMuHadIsoUncleanedTauSelector = cms.EDFilter(
+    'CustomTauSepFromMuonSelector',
+    baseTauTag = cms.InputTag('hpsPFTauProducer', '', 'HLT'),
+    tauHadIsoTag = cms.InputTag(''),
+    tauDiscriminatorTags = cms.VInputTag(
+    cms.InputTag('hpsPFTauDiscriminationByDecayModeFinding', '', 'HLT'), 
+    cms.InputTag('hpsPFTauDiscriminationByMediumCombinedIsolationDBSumPtCorr', '', 'HLT')
+    ),
+    jetTag = cms.InputTag('ak5PFJets', '', 'HLT'),
+    muonRemovalDecisionTag = cms.InputTag(''),
+    overlapCandTag = cms.InputTag('trigMuHadIsoTauSelector'),
+    passDiscriminator = cms.bool(True),
+    pTMin = cms.double(10.0),
+    etaMax = cms.double(2.3),
+    isoMax = cms.double(-1.0),
+    dR = cms.double(0.5),
+    minNumObjsToPassFilter = cms.uint32(0)
+    )
+
 #produce AK5PFchs L1FastL2L3 corrected jets
 
 #b-tag filter
@@ -601,6 +622,8 @@ process.trigMuonTauFilter = cms.EDFilter(
     recoObjTag = cms.InputTag("trigMuHadIsoTauSelector"),
     delRMin = cms.double(0.4)
     )
+process.trigMuonDistantTauFilter = process.trigMuonTauFilter.clone()
+process.trigMuonDistantTauFilter.recoObjTag = cms.InputTag("trigMuHadIsoUncleanedTauSelector")
 
 #sequences
 process.beginSequence = cms.Sequence(process.genPartonSelector*process.genMuSelector)
@@ -616,7 +639,8 @@ process.baseIsoTauAnalysisSequence = cms.Sequence(
     process.electronSelector*
     process.trigMuonEFilter*
     process.trigMuonMuFilter*
-    process.trigMuonTauFilter
+    process.trigMuonTauFilter*
+    process.trigMuonDistantTauFilter
     )
 process.highMTIsoTauAnalysisSequence = cms.Sequence(
     process.baseIsoTauAnalysisSequence*
@@ -646,7 +670,8 @@ process.baseSignalIsoTauAnalysisSequence = cms.Sequence(
     process.electronSelector*
     process.trigMuonEFilter*
     process.trigMuonMuFilter*
-    process.trigMuonTauFilter
+    process.trigMuonTauFilter*
+    process.trigMuonDistantTauFilter
     )
 process.highMTSignalIsoTauAnalysisSequence = cms.Sequence(
     process.baseSignalIsoTauAnalysisSequence*
@@ -670,7 +695,8 @@ process.baseNonIsoTauAnalysisSequence = cms.Sequence(
     process.electronSelector*
     process.trigMuonEFilter*
     process.trigMuonMuFilter*
-    process.trigMuonTauFilter
+    process.trigMuonTauFilter*
+    process.trigMuonDistantTauFilter
     )
 process.highMTNonIsoTauAnalysisSequence = cms.Sequence(
     process.baseNonIsoTauAnalysisSequence*
@@ -694,7 +720,8 @@ process.baseTauAnalysisSequence = cms.Sequence(
     process.electronSelector*
     process.trigMuonEFilter*
     process.trigMuonMuFilter*
-    process.trigMuonTauFilter
+    process.trigMuonTauFilter*
+    process.trigMuonDistantTauFilter
     )
 process.highMTTauAnalysisSequence = cms.Sequence(
     process.baseTauAnalysisSequence*
