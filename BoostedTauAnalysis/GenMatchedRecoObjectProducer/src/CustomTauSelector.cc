@@ -241,13 +241,6 @@ bool CustomTauSelector<T>::filter(edm::Event& iEvent, const edm::EventSetup& iSe
 	if ((*pMuonRemovalDecisions)[(*iTau)->jetRef()]) {
 	  tauColl->push_back(*iTau);
 	  ++nPassingTaus;
-
-	  // 	//debug
-	  // 	std::cerr << "Selected tau pT: " << (*iTau)->pt() << " GeV\n";
-	  // 	std::cerr << "Selected tau eta: " << (*iTau)->eta() << std::endl;
-	  // 	std::cerr << "Selected tau phi: " << (*iTau)->phi() << std::endl;
-	  // 	std::cerr << "Selected tau ref key: " << iTau->key() << std::endl;
-	  // 	std::cerr << "Selected tau jet ref key: " << (*iTau)->jetRef().key() << std::endl;
 	}
       }
 

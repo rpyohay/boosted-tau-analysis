@@ -152,8 +152,9 @@ OSSFFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
     Common::sortByPT(removedMuonRefs);
     double chargeTauMuon = removedMuonRefs[removedMuonRefs.size() - 1]->charge();
     if ((passFilter_ && (chargeTauMuon*chargeWMuon > 0)) || //select same charge muons
-	(!passFilter_ && (chargeTauMuon*chargeWMuon <= 0))) //select opposite charge muons
+	(!passFilter_ && (chargeTauMuon*chargeWMuon <= 0))) { //select opposite charge muons
       SignSelector = true;
+    }
     
     ++iTau; 
   }

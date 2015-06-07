@@ -1,8 +1,9 @@
 //REGION A DATA 2D HISTOGRAMS ARE NOT BLINDED!!!  BEWARE!!!
 
 void formatSigPlots(const string& inputVersion, const string& outputVersion, 
-		    const bool compile, const string& uncTag, const string& a1Mass, 
-		    const string& MTBin, const bool doNoHPSIsoCut = false)
+		    const string& versionNarrow, const string& uncTag, const string& a1Mass, 
+		    const string& MTBin, const unsigned int firstBinToBlind, 
+		    const bool doNoHPSIsoCut = false)
 {
   //initial
   gROOT->Reset();
@@ -20,16 +21,9 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   string macroPath(CMSSWPathCPPString + "/src/BoostedTauAnalysis/TauAnalyzer/test/");
   gROOT->ProcessLine("#include <utility>");
   gSystem->Load((macroPath + "STLDictionary.so").c_str());
-  if (compile) {
-    gROOT->LoadMacro((macroPath + "Miscellaneous.C++").c_str());
-    gROOT->LoadMacro((macroPath + "Error.C++").c_str());
-    gROOT->LoadMacro((macroPath + "Plot.C++").c_str());
-  }
-  else {
-    gSystem->Load((macroPath + "Miscellaneous_C.so").c_str());
-    gSystem->Load((macroPath + "Error_C.so").c_str());
-    gSystem->Load((macroPath + "Plot_C.so").c_str());
-  }
+  gSystem->Load((macroPath + "Miscellaneous_C.so").c_str());
+  gSystem->Load((macroPath + "Error_C.so").c_str());
+  gSystem->Load((macroPath + "Plot_C.so").c_str());
 
   //ignore warnings
   gErrorIgnoreLevel = kError;
@@ -143,6 +137,7 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   canvasNames1D.push_back("tauHadPhotonEnergyFractionCanvas");
   canvasNames1D.push_back("dThetaPhotonOtherTauConstituentsCanvas");
   canvasNames1D.push_back("hardestCorrJetEtaCanvas");
+  canvasNames1D.push_back("WMuPTCanvas");
   vector<string> canvasNames2D;
   canvasNames2D.push_back("muHadMassVsDRSoftMuTauCanvas");
   canvasNames2D.push_back("tauHadIsoVsSoftMuPTCanvas");
@@ -182,6 +177,8 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   canvasNames2D.push_back("muHadMassVsWMuMTCanvas");
   canvasNames2D.push_back("tauHadJetEnergyFractionVsTauHadIsoCanvas");
   canvasNames2D.push_back("tauHadCleanedJetEnergyFractionVsTauHadIsoCanvas");
+  canvasNames2D.push_back("mu1ProngMassVsMu1Prong1Pi0MassCanvas");
+  canvasNames2D.push_back("dPhiTauMuMETVsMuHadMassCanvas");
   vector<string> graphNames1D;
   graphNames1D.push_back("hadTauAssociatedMuMultiplicity");
   graphNames1D.push_back("muHadMass");
@@ -287,6 +284,7 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   graphNames1D.push_back("tauHadPhotonEnergyFraction");
   graphNames1D.push_back("dThetaPhotonOtherTauConstituents");
   graphNames1D.push_back("hardestCorrJetEta");
+  graphNames1D.push_back("WMuPT");
   vector<string> graphNames2D;
   graphNames2D.push_back("muHadMassVsDRSoftMuTau");
   graphNames2D.push_back("tauHadIsoVsSoftMuPT");
@@ -326,11 +324,10 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   graphNames2D.push_back("muHadMassVsWMuMT");
   graphNames2D.push_back("tauHadJetEnergyFractionVsTauHadIso");
   graphNames2D.push_back("tauHadCleanedJetEnergyFractionVsTauHadIso");
+  graphNames2D.push_back("mu1ProngMassVsMu1Prong1Pi0Mass");
+  graphNames2D.push_back("dPhiTauMuMETVsMuHadMass");
   vector<Int_t> nullBlindLow(canvasNames1D.size(), 0);
   vector<Int_t> nullBlindHigh(canvasNames1D.size(), -2);
-  vector<Int_t> dataBlindLow(canvasNames1D.size(), 0);
-  for (unsigned int iPlot = 1; iPlot <= 11; ++iPlot) { dataBlindLow[iPlot] = 3; }
-  vector<Int_t> dataBlindHigh(canvasNames1D.size(), -1);
 
   //flag for pseudoscalar mass
   const bool ma9GeV = (a1Mass == "_a9");
@@ -342,7 +339,7 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   colorsSigBkg.push_back(kSpring - 1); //WH, data
   colorsSigBkg.push_back(kBlue); //ggH
   if (ma9GeV) {
-    colorsSigBkg.push_back(kRed); //ZH
+    colorsSigBkg.push_back(kSpring - 7); //ZH
     colorsSigBkg.push_back(kMagenta); //VBF
   }
   colorsSigBkg.push_back(kMagenta + 2); //WW
@@ -512,6 +509,7 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   //version tags
   const string outputVTag("_" + outputVersion);
   const string dataVTag("_" + inputVersion);
+  const string nonIsoWDataVTag("_" + inputVersion);
   const string Wh1SigVTag("_" + inputVersion);
   const string ggSigVTag("_" + inputVersion);
   const string ZHSigVTag("_" + inputVersion);
@@ -523,6 +521,7 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   const string WZVTag("_" + inputVersion);
   const string ZZVTag("_" + inputVersion);
   const string WWVTag("_" + inputVersion);
+  const string narrowBinsVTag("_" + versionNarrow);
 
   cout << "Begin hadding...\n";
 
@@ -592,24 +591,23 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   string ZHIsoEstHaddOutputFile(ZHIsoEstPrefix + "_hadd" + ZHEstSuffix);
   GetVBFZHEstimate(ZHIsoEstHaddOutputFile, Wh1IsoHaddOutputFile, Wh1Weight19p7InvFb, ZHWeightFromWH);
 
-
   //"hadd" ZH sample just to get the formatting of the 2D plots the same
+  string ZHSuffix(ZHSigVTag + fileExt);
+  string ZHIsoPrefix(analysisFilePath + "ZH/muHadIsoAnalysis" + MTBin + uncTag + "_ZH" + a1Mass);
+  string ZHIsoHaddOutputFile(ZHIsoPrefix + "_hadd" + ZHSuffix);
+  string ZHAllPrefix(analysisFilePath + "ZH/muHadAnalysis" + MTBin + uncTag + "_ZH" + a1Mass);
+  string ZHAllHaddOutputFile(ZHAllPrefix + "_hadd" + ZHSuffix);
+  vector<string> ZHIsoHaddInputFiles;
+  vector<string> ZHAllHaddInputFiles;
+  stringstream ZHIsoName;
+  ZHIsoName << ZHIsoPrefix << ZHSuffix;
+  ZHIsoHaddInputFiles.push_back(ZHIsoName.str());
+  stringstream ZHAllName;
+  ZHAllName << ZHAllPrefix << ZHSuffix;
+  ZHAllHaddInputFiles.push_back(ZHAllName.str());
   if (ma9GeV)
     {
       cout << "...ZH\n";
-      string ZHSuffix(ZHSigVTag + fileExt);
-      string ZHIsoPrefix(analysisFilePath + "ZH/muHadIsoAnalysis" + MTBin + uncTag + "_ZH" + a1Mass);
-      string ZHIsoHaddOutputFile(ZHIsoPrefix + "_hadd" + ZHSuffix);
-      string ZHAllPrefix(analysisFilePath + "ZH/muHadAnalysis" + MTBin + uncTag + "_ZH" + a1Mass);
-      string ZHAllHaddOutputFile(ZHAllPrefix + "_hadd" + ZHSuffix);
-      vector<string> ZHIsoHaddInputFiles;
-      vector<string> ZHAllHaddInputFiles;
-      stringstream ZHIsoName;
-      ZHIsoName << ZHIsoPrefix << ZHSuffix;
-      ZHIsoHaddInputFiles.push_back(ZHIsoName.str());
-      stringstream ZHAllName;
-      ZHAllName << ZHAllPrefix << ZHSuffix;
-      ZHAllHaddInputFiles.push_back(ZHAllName.str());
       haddCanvases(ZHIsoHaddOutputFile, ZHIsoHaddInputFiles, vector<float>(1, ZHWeight19p7InvFb), 
 		   canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
 		   nullBlindHigh);
@@ -617,27 +615,27 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
 	haddCanvases(ZHAllHaddOutputFile, ZHAllHaddInputFiles, vector<float>(1, ZHWeight19p7InvFb), 
 		     canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
 		     nullBlindHigh);
-		     }
+      }
     }
 
   //"hadd" VBF sample just to get the formatting of the 2D plots the same
+  string VBFSuffix(VBFSigVTag + fileExt);
+  string 
+    VBFIsoPrefix(analysisFilePath + "VBF/muHadIsoAnalysis" + MTBin + uncTag + "_VBF" + a1Mass);
+  string VBFIsoHaddOutputFile(VBFIsoPrefix + "_hadd" + VBFSuffix);
+  string VBFAllPrefix(analysisFilePath + "VBF/muHadAnalysis" + MTBin + uncTag + "_VBF" + a1Mass);
+  string VBFAllHaddOutputFile(VBFAllPrefix + "_hadd" + VBFSuffix);
+  vector<string> VBFIsoHaddInputFiles;
+  vector<string> VBFAllHaddInputFiles;
+  stringstream VBFIsoName;
+  VBFIsoName << VBFIsoPrefix << VBFSuffix;
+  VBFIsoHaddInputFiles.push_back(VBFIsoName.str());
+  stringstream VBFAllName;
+  VBFAllName << VBFAllPrefix << VBFSuffix;
+  VBFAllHaddInputFiles.push_back(VBFAllName.str());
   if (ma9GeV)
     {
       cout << "...VBF\n";
-      string VBFSuffix(VBFSigVTag + fileExt);
-      string 
-	VBFIsoPrefix(analysisFilePath + "VBF/muHadIsoAnalysis" + MTBin + uncTag + "_VBF" + a1Mass);
-      string VBFIsoHaddOutputFile(VBFIsoPrefix + "_hadd" + VBFSuffix);
-      string VBFAllPrefix(analysisFilePath + "VBF/muHadAnalysis" + MTBin + uncTag + "_VBF" + a1Mass);
-      string VBFAllHaddOutputFile(VBFAllPrefix + "_hadd" + VBFSuffix);
-      vector<string> VBFIsoHaddInputFiles;
-      vector<string> VBFAllHaddInputFiles;
-      stringstream VBFIsoName;
-      VBFIsoName << VBFIsoPrefix << VBFSuffix;
-      VBFIsoHaddInputFiles.push_back(VBFIsoName.str());
-      stringstream VBFAllName;
-      VBFAllName << VBFAllPrefix << VBFSuffix;
-      VBFAllHaddInputFiles.push_back(VBFAllName.str());
       haddCanvases(VBFIsoHaddOutputFile, VBFIsoHaddInputFiles, vector<float>(1, VBFWeight19p7InvFb), 
 		   canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
 		   nullBlindHigh);
@@ -645,7 +643,7 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
 	haddCanvases(VBFAllHaddOutputFile, VBFAllHaddInputFiles, vector<float>(1, VBFWeight19p7InvFb), 
 		     canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
 		     nullBlindHigh);
-		     }
+      }
     }
   
   cout << endl;
@@ -720,11 +718,20 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   string sigVsBkgOutputFileNoHPSIsoCutNorm1(analysisFilePath + "results/sigVsBkg_muHadAnalysis" + 
 					    MTBin + uncTag + a1Mass + tag1 + outputVTag + fileExt);
   vector<string> sigVsBkgInputFiles;
-  sigVsBkgInputFiles.push_back(Wh1IsoHaddOutputFile);
-  sigVsBkgInputFiles.push_back(ggIsoHaddOutputFile);
+  sigVsBkgInputFiles.push_back(Wh1IsoHaddOutputFile/*analysisFilePath + 
+						     "Wh1_Medium/muHadIsoAnalysis" + 
+						     MTBin + uncTag + "_Wh1" + a1Mass + 
+						     "_hadd_v194" + fileExt*/);
+  sigVsBkgInputFiles.push_back(ggIsoHaddOutputFile/*analysisFilePath + "gg/muHadIsoAnalysis" + 
+						    MTBin + uncTag + "_gg" + a1Mass + 
+						    "_hadd_v194" + fileExt*/);
   if (ma9GeV) {
-    sigVsBkgInputFiles.push_back(ZHIsoHaddOutputFile);
-    sigVsBkgInputFiles.push_back(VBFIsoHaddOutputFile);
+    sigVsBkgInputFiles.push_back(ZHIsoHaddOutputFile/*analysisFilePath + "ZH/muHadIsoAnalysis" + 
+						      MTBin + uncTag + "_ZH" + a1Mass + 
+						      "_hadd_v194" + fileExt*/);
+    sigVsBkgInputFiles.push_back(VBFIsoHaddOutputFile/*analysisFilePath + "VBF/muHadIsoAnalysis" + 
+						       MTBin + uncTag + "_VBF" + a1Mass + 
+						       "_hadd_v194" + fileExt*/);
   }
   sigVsBkgInputFiles.push_back(WWIsoHaddOutputFile);
   sigVsBkgInputFiles.push_back(ZZIsoHaddOutputFile);
@@ -833,16 +840,31 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   cout << "---\nMaking final plots\n";
 
   //make the final plot showing all background methods, signals, data, and errors
+  string resBkgOutputFile(analysisFilePath + "results/resBkg" + MTBin + tag19p7InvFb + 
+			  narrowBinsVTag + fileExt);
   string dataVsMCOutputFile(analysisFilePath + "results/dataVsMC_muHadNonIsoAnalysis" + MTBin + 
 			    tag19p7InvFb + outputVTag + fileExt);
+  const string 
+    HLTMu40eta2p1RegDInputFile(analysisFilePath + "nonIsoWDataHLTMu40eta2p1/analysis/" + 
+			       "nonIsoW_HLT_Mu40_eta2p1_muHadNonIsoAnalysis" + MTBin + 
+			       "_SingleMu" + nonIsoWDataVTag + fileExt);
+  string nonIsoWDataSuffix(nonIsoWDataVTag + fileExt);
+  string nonIsoWDataNonIsoPrefix(analysisFilePath + 
+				 "nonIsoWData/analysis/nonIsoW_muHadNonIsoAnalysis" + MTBin + 
+				 "_SingleMu");
+  string nonIsoWDataNonIsoHaddOutputFile(nonIsoWDataNonIsoPrefix + nonIsoWDataSuffix);
+  gStyle->SetErrorX(1);
   makeFinalPlot(pair<string, float>(sigVsBkgQCDFromDataOutputFile, 1.0), 
   		dataIsoHaddOutputFile, 
   		pair<string, float>(dataVsMCOutputFile, 1.0), 
-  		vector<string>(1, "muHadMass"), vector<string>(1, "m_{#mu+had} (GeV)"), 
-  		vector<int>(1, 1), vector<int>(1, 2), 
+  		pair<string, float>(resBkgOutputFile, 1.0), 
+		pair<string, float>(nonIsoWDataNonIsoHaddOutputFile/*HLTMu40eta2p1RegDInputFile*/, 
+				    1.0), 
+		vector<string>(1, "muHadMass"), vector<string>(1, "m_{#mu+had} (GeV)"), 
+  		vector<int>(1, 1), vector<int>(1, firstBinToBlind - 1), 
   		analysisFilePath + "results/final" + MTBin + uncTag + a1Mass + outputVTag + 
-		fileExt, "main 5", a1Mass == "_a9" ? true : false);
-  
+		fileExt, "main 5", ma9GeV);
+
   //MC closure plots
   vector<string> vars;
   vars.push_back("muHadMass");
@@ -863,7 +885,7 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   normRegionLowerBins.push_back(50);
   normRegionLowerBins.push_back(7);
   vector<int> normRegionUpperBins;
-  normRegionUpperBins.push_back(2);
+  normRegionUpperBins.push_back(firstBinToBlind - 1);
   normRegionUpperBins.push_back(3);
   normRegionUpperBins.push_back(46);
   normRegionUpperBins.push_back(50);

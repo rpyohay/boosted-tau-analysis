@@ -30,14 +30,9 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
-// #include "DataFormats/Candidate/interface/Candidate.h"
-// #include "DataFormats/METReco/interface/PFMETFwd.h"
-// #include "DataFormats/METReco/interface/PFMET.h"
 #include "DataFormats/MuonReco/interface/MuonFwd.h"
-// #include "DataFormats/MuonReco/interface/Muon.h"
 #include "BoostedTauAnalysis/Common/interface/Common.h"
 #include "DataFormats/TauReco/interface/PFTauFwd.h"
-// #include "DataFormats/TauReco/interface/PFTau.h"
 #include "DataFormats/JetReco/interface/PFJetCollection.h"
 #include "DataFormats/Common/interface/ValueMap.h"
 #include "DataFormats/BTauReco/interface/JetTag.h"
@@ -153,7 +148,9 @@ BVetoFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
       //CSV score for uncleaned tau parent jet is right, save the tau
       if (reco::PFJetRef(pOldJets, iBTagInfo).key() == ((*iTau)->jetRef()).key()) {
 	if ((passFilter_ && (bTags[iBTagInfo].second < CSVMax_)) || 
-	    (!passFilter_ && (bTags[iBTagInfo].second >= CSVMax_))) tauColl->push_back(*iTau);
+	    (!passFilter_ && (bTags[iBTagInfo].second >= CSVMax_))) {
+	  tauColl->push_back(*iTau);
+	}
       }
     }
     ++iTau;

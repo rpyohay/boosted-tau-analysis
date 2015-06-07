@@ -13,30 +13,36 @@ git init
 git pull git@github.com:rpyohay/boosted-tau-analysis
 
 For everyone else:
-git clone git@github.com:rpyohay/boosted-tau-analysis .
+git clone https://github.com/rpyohay/boosted-tau-analysis.git BoostedTauAnalysis
 
-cvs co -r CMSSW_5_3_11 DataFormats/HepMCCandidate
-cvs co -r CMSSW_5_3_11 DataFormats/MuonReco
-cvs co -r CMSSW_5_3_11 DataFormats/JetReco
-cvs co -r CMSSW_5_3_11 DataFormats/TauReco
+git clone https://github.com/yiiyama/Toolset.git
 git clone https://github.com/rpyohay/physics-tools.git PhysicsTools
-cvs co -r V08-03-19 PhysicsTools/Utilities
-cvs co RecoLuminosity/LumiDB
-cp ~friccita/public/HepMCCandidate/src/classes* DataFormats/HepMCCandidate/src
-cp ~friccita/public/MuonReco/src/classes* DataFormats/MuonReco/src
-cp ~friccita/JetReco/src/classes* DataFormats/JetReco/src
-cp ~yohay/public/CMSSW_5_3_11/src/DataFormats/TauReco/src/* DataFormats/TauReco/src
+git clone https://github.com/cms-sw/RecoLuminosity-LumiDB.git RecoLuminosity/LumiDB
+cd RecoLuminosity/LumiDB
+git checkout V04-02-10
 mkdir ~/Tau
 cd ~/Tau
 cmsrel CMSSW_5_3_11
 cd CMSSW_5_3_11/src
 cmsenv
+git cms-addpkg DataFormats/HepMCCandidate
+git cms-addpkg DataFormats/MuonReco
+git cms-addpkg DataFormats/JetReco
+git cms-addpkg DataFormats/TauReco
 git cms-addpkg RecoTauTag/RecoTau
 git cms-addpkg PhysicsTools/PatUtils
-cp -r PhysicsTools/PatUtils/ ~/CMSSW_5_3_11/src/PhysicsTools/
+git cms-addpkg PhysicsTools/Utilities
+cp -r DataFormats/ ~/CMSSW_5_3_11/src/
 cp -r RecoTauTag/ ~/CMSSW_5_3_11/src/
+cp -r PhysicsTools/PatUtils/ ~/CMSSW_5_3_11/src/PhysicsTools/
+cp -r PhysicsTools/Utilities/ ~/CMSSW_5_3_11/src/PhysicsTools/
 cd ~/CMSSW_5_3_11/src/
-scram b
+cp ~friccita/public/HepMCCandidate/src/classes* DataFormats/HepMCCandidate/src
+cp ~friccita/public/MuonReco/src/classes* DataFormats/MuonReco/src
+cp ~friccita/public/JetReco/src/classes* DataFormats/JetReco/src
+cp ~yohay/public/CMSSW_5_3_11/src/DataFormats/TauReco/src/* DataFormats/TauReco/src/
+cp -r ~yohay/public/CMSSW_5_3_11/src/RecoTauTag/Configuration RecoTauTag
+b -j16
 rm -rf ~/Tau
 
 3. Execute
@@ -85,11 +91,18 @@ mkdir -p /data1/`whoami`/SinglePhotonParkedData/analysis
 mkdir -p /data1/`whoami`/SinglePhotonParkedData/EDM_files
 mkdir -p /data1/`whoami`/results
 
-4. Execute
+4. Put the following lines in your rootlogon.C script:
+
+gSystem->Load("libRooFit.so");
+gSystem->Load("libRooFitCore.so");
+gSystem->SetIncludePath("-I/afs/cern.ch/cms/slc5_amd64_gcc462/lcg/roofit/5.32.00/include");
+
+5. Execute
 
 cd ~/CMSSW_5_3_11/src/BoostedTauAnalysis/TauAnalyzer/test
+cmsenv
 make -f STLDictionary_Makefile
-
+root -l -b -q compilePlottingCode.C
 
 
 
@@ -109,17 +122,20 @@ Running TauAnalyzer analysis jobs over data and MC
 2. Execute
 
 cd ~/CMSSW_5_3_11/src/BoostedTauAnalysis/TauAnalyzer/test
-./generateJobFiles.sh v<version_number>
-./submitAll.sh v<version_number>
+./generateJobFiles.sh v<version_number_1>
+./generateJobFiles.sh v<version_number_2> tauanalyzer_WNJetsToLNu_Wh1_narrowMassBins_template_cfg.py tauanalyzer_data_narrowMassBins_template_cfg.py
+./submitAll.sh v<version_number_1>
+./submitAll.sh v<version_number_2>
 
-to launch the batch jobs.  The STDOUT files created by the batch jobs will be written to ~/CMSSW_5_3_11/src/BoostedTauAnalysis/TauAnalyzer/test/v<version_number>/LSFJOB_XXXXXXXXX/STDOUT, where is XXXXXXXXX is the job number.  These files will tell you whether the jobs finished successfully or not.
+to launch the batch jobs.  The STDOUT files created by the batch jobs will be written to ~/CMSSW_5_3_11/src/BoostedTauAnalysis/TauAnalyzer/test/v<version_number>/LSFJOB_XXXXXXXXX/STDOUT, where is XXXXXXXXX is the job number.  These files will tell you whether the jobs finished successfully or not.  In what follows, <version_number_1> refers to a run of the analysis with standard mass binning, while <version_number_2> refers to a run of the analysis with 0.25-GeV bin widths (used for the J/psi fit).
 
 3. Once the batch jobs are finished, login to ucdavis.cern.ch and execute
 
 cd ~/CMSSW_5_3_11/src/BoostedTauAnalysis/TauAnalyzer/test
 cmsenv
-./copyAll.sh v<version_number>
-cd v<version_number>
+./copyAll.sh v<version_number_1>
+./copyAll.sh v<version_number_2>
+cd v<version_number_1>
 ./runggTauAnalyzerCfgs.sh
 ./runWh1TauAnalyzerCfgs.sh
 ./runZHTauAnalyzerCfgs.sh
@@ -135,33 +151,15 @@ Then execute
 
 cd ~/CMSSW_5_3_11/src/BoostedTauAnalysis/TauAnalyzer/test
 cmsenv
-root -l -b -q 'formatDataBkgPlots.C("v<input_version>", "v<output_version>", [true|false], "_lowMT")'
-root -l -b -q 'formatDataBkgPlots.C("v<input_version>", "v<output_version>", [true|false], "_highMT")'
-root -l -b -q 'formatSigPlots.C("v<input_version>", "v<output_version>", [true|false], "", "_a<a_mass>", "_lowMT")'
-root -l -b -q 'formatSigPlots.C("v<input_version>", "v<output_version>", [true|false], "", "_a<a_mass>", "_highMT")'
+./runStandardAnalysis.sh <version_number_2> <version_number_1>
 
-where
-
-<input_version> is the integer version number associated to the input files you want to analyze
-<output_version> is the version number that will be assigned to the output files you create (typically it's the same as the input version but there might be special cases where you'd like them to be different)
-"true" means recompile the code, "false" means do not recompile the code
-a_mass is the pseudoscalar mass
-"_lowMT"/"_highMT" refer to the MT bins (<=50 GeV / >50 GeV)
-
-If you want to also make plots where no HPS tau isolation cut is applied, do
-
-root -l -b -q 'formatDataBkgPlots.C("v<input_version>", "v<output_version>", [true|false], "_lowMT", true)'
-root -l -b -q 'formatDataBkgPlots.C("v<input_version>", "v<output_version>", [true|false], "_highMT", true)'
-root -l -b -q 'formatSigPlots.C("v<input_version>", "v<output_version>", [true|false], "", "_a<a_mass>", _lowMT", true)'
-root -l -b -q 'formatSigPlots.C("v<input_version>", "v<output_version>", [true|false], "", "_a<a_mass>", _highMT", true)'
-
-instead of the root command given above.
+If you want to also make plots where no HPS tau isolation cut is applied, edit the root commands in runStandardAnalysis.sh to put the flag "true" as the last argument to each function.
 
 To calculate the signal uncertainties, run
 
 cd ~/CMSSW_5_3_11/src/BoostedTauAnalysis/TauAnalyzer/test
 cmsenv
-./calculateBVetoUncertainties.sh v<version_number>
+./calculateBVetoUncertainties.sh v<version_number_1>
 
 They will be printed as text.
 
