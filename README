@@ -123,7 +123,7 @@ Running TauAnalyzer analysis jobs over data and MC
 
 cd ~/CMSSW_5_3_11/src/BoostedTauAnalysis/TauAnalyzer/test
 ./generateJobFiles.sh v<version_number_1>
-./generateJobFiles.sh v<version_number_2> tauanalyzer_WNJetsToLNu_Wh1_narrowMassBins_template_cfg.py tauanalyzer_data_narrowMassBins_template_cfg.py
+./generateJobFiles.sh v<version_number_2> tauanalyzer_WNJetsToLNu_Wh1_narrowMassBins_template_cfg.py tauanalyzer_data_narrowMassBins_template_cfg.py tauanalyzer_nonisodata_narrowMassBins_template_cfg.py
 ./submitAll.sh v<version_number_1>
 ./submitAll.sh v<version_number_2>
 

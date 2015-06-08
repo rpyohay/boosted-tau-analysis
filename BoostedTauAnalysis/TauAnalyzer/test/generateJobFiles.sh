@@ -1,8 +1,8 @@
 #!/bin/bash
 
-if [ $# -gt 3 ]
+if [ $# -gt 4 ]
     then
-    echo "Usage: ./generateJobFiles.sh <version> <MC template cfg> <data template cfg>"
+    echo "Usage: ./generateJobFiles.sh <version> <MC template cfg> <data template cfg> <non-isolated data template cfg>"
     exit 0
 fi
 
@@ -17,8 +17,11 @@ if [ -n "$3" ]
     then
     dataTemplateCfg=$3
 fi
-#nonisodataTemplateCfg="tauanalyzer_nonisodata_template_cfg.py"
-nonisodataTemplateCfg="tauanalyzer_nonisodata_narrowMassBins_template_cfg.py"
+nonisodataTemplateCfg="tauanalyzer_nonisodata_template_cfg.py"
+if [ -n "$4" ]
+    then
+    nonisodataTemplateCfg=$4
+fi
 
 ./generateDYJetsToLLTauAnalyzerCfgs.sh $version $MCTemplateCfg
 ./generateDataTauAnalyzerCfgs.sh $version $dataTemplateCfg
