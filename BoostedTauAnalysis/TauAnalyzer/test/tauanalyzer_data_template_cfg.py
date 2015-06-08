@@ -244,7 +244,9 @@ process.recoTauAK5PFJets08Region.src = cms.InputTag("CleanJetsTrig", "ak5PFJetsN
 process.recoTauAK5PFJets08Region.jetMuonMapTag = cms.InputTag("CleanJetsTrig", "", "MUHADANALYSIS")
 process.ak5PFJetsRecoTauPiZeros.jetSrc = cms.InputTag("CleanJetsTrig", "ak5PFJetsNoMu",
                                                       "MUHADANALYSIS")
-process.combinatoricRecoTaus.jetSrc = cms.InputTag("CleanJetsTrig", "ak5PFJetsNoMu", "MUHADANALYSIS")
+process.combinatoricRecoTaus.jetSrc = cms.InputTag(
+    "CleanJetsTrig", "ak5PFJetsNoMu", "MUHADANALYSIS"
+    )
 process.ak5PFJetTracksAssociatorAtVertex.jets = cms.InputTag("CleanJetsTrig", "ak5PFJetsNoMu",
                                                              "MUHADANALYSIS")
 process.ak5PFJetsLegacyHPSPiZeros.jetSrc = cms.InputTag("CleanJetsTrig", "ak5PFJetsNoMu",
@@ -636,13 +638,13 @@ process.baseSignalIsoTauAnalysisSequence = cms.Sequence(
     process.WIsoMuonSelector*
     process.tauMuonPTSelector*
     process.tauMuonSelector*
-    process.PFTau*
+    process.PFTau* #2 instances of PFTau sequence!  Fix someday!
     process.highestPTWMuonSelector*
     process.muHadIsoTauSelector*
     process.IsoBVetoFilter*
     process.TRIGGEROBJECTFILTER*
     OSSFFILTERISOprocess.SSSFFilterIso*
-    process.PFTau*
+    process.PFTau* #2 instances of PFTau sequence!  Fix someday!
     process.trigMuHadIsoTauSelector*
     process.electronSelector*
     process.trigMuonEFilter*
