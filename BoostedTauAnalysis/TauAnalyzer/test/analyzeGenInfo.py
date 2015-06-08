@@ -142,6 +142,11 @@ process.WIsoMuonSelector = cms.EDFilter('CustomMuonSelector',
                                         minNumObjsToPassFilter = cms.uint32(1)
                                         )
 
+#produce a collection with the highest pT W muon in the event
+process.highestPTWMuonSelector = cms.EDFilter('HighestPTMuonRefSelector',
+                                              objRefTag = cms.InputTag('WIsoMuonSelector')
+                                              )
+
 #search for a muon with pT > 5 GeV as in HZZ4l analysis and proceed if one can be found
 #this will produce a ref to the original muon collection
 process.tauMuonPTSelector = cms.EDFilter('MuonRefSelector',
@@ -191,19 +196,25 @@ process.genTauMuSelector = cms.EDFilter(
     makeAllCollections = cms.bool(False)
     )
 
-#clean the jets of soft muons, then rebuild the taus
-process.CleanJets.muonSrc = cms.InputTag('tauMuonSelector')
-process.CleanJets.jetSrc = cms.InputTag('ak5PFJets')
-process.CleanJets.PFCandSrc = cms.InputTag('particleFlow')
-process.CleanJets.cutOnGenMatches = cms.bool(False)
-process.CleanJets.outFileName = cms.string('NMSSMSignal_MuProperties_gg_a9_v7test.root')
-process.recoTauAK5PFJets08Region.src = cms.InputTag("CleanJets", "ak5PFJetsNoMu", "ANALYSIS")
-process.ak5PFJetsRecoTauPiZeros.jetSrc = cms.InputTag("CleanJets", "ak5PFJetsNoMu", "ANALYSIS")
-process.combinatoricRecoTaus.jetSrc = cms.InputTag("CleanJets", "ak5PFJetsNoMu", "ANALYSIS")
-process.ak5PFJetTracksAssociatorAtVertex.jets = cms.InputTag("CleanJets", "ak5PFJetsNoMu",
+#clean the jets of trigger muons, then rebuild the taus
+process.CleanJetsTrig = process.CleanJets.clone()
+process.CleanJetsTrig.muonSrc = cms.InputTag('highestPTWMuonSelector')
+process.CleanJetsTrig.PFCandSrc = cms.InputTag('particleFlow')
+process.CleanJetsTrig.cutOnGenMatches = cms.bool(False)
+process.CleanJetsTrig.outFileName = cms.string(
+    'CLEANJETSOUTFILE'
+    )
+process.recoTauAK5PFJets08Region.src = cms.InputTag("CleanJetsTrig", "ak5PFJetsNoMu",
+                                                    "ANALYSIS")
+process.recoTauAK5PFJets08Region.jetMuonMapTag = cms.InputTag("CleanJetsTrig", "", "ANALYSIS")
+process.ak5PFJetsRecoTauPiZeros.jetSrc = cms.InputTag("CleanJetsTrig", "ak5PFJetsNoMu",
+                                                      "ANALYSIS")
+process.combinatoricRecoTaus.jetSrc = cms.InputTag("CleanJetsTrig", "ak5PFJetsNoMu", "ANALYSIS")
+process.ak5PFJetTracksAssociatorAtVertex.jets = cms.InputTag("CleanJetsTrig", "ak5PFJetsNoMu",
                                                              "ANALYSIS")
-process.ak5PFJetsLegacyHPSPiZeros.jetSrc = cms.InputTag("CleanJets", "ak5PFJetsNoMu", "ANALYSIS")
-process.recoTauCommonSequence = cms.Sequence(process.CleanJets*
+process.ak5PFJetsLegacyHPSPiZeros.jetSrc = cms.InputTag("CleanJetsTrig", "ak5PFJetsNoMu",
+                                                        "ANALYSIS")
+process.recoTauCommonSequence = cms.Sequence(process.CleanJetsTrig*
                                              process.ak5PFJetTracksAssociatorAtVertex*
                                              process.recoTauAK5PFJets08Region*
                                              process.recoTauPileUpVertices*
@@ -211,26 +222,81 @@ process.recoTauCommonSequence = cms.Sequence(process.CleanJets*
                                              )
 process.PFTau = cms.Sequence(process.recoTauCommonSequence*process.recoTauClassicHPSSequence)
 
-#find taus in |eta| < 2.4 matched to muon-tagged cleaned jets
-#this will produce a ref to the cleaned tau collection
-process.muHadTauSelector = cms.EDFilter(
+
+#find taus in |eta| < 2.3 matched to the trigger muon-cleaned jets that pass
+#decay mode finding and isolation discriminator
+process.trigMuHadIsoTauSelector = cms.EDFilter(
     'CustomTauSepFromMuonSelector',
     baseTauTag = cms.InputTag('hpsPFTauProducer', '', 'ANALYSIS'),
-    tauHadIsoTag = cms.InputTag('hpsPFTauDiscriminationByRawCombinedIsolationDBSumPtCorr', '',
-                                'ANALYSIS'),
+    tauHadIsoTag = cms.InputTag(''),
     tauDiscriminatorTags = cms.VInputTag(
-    cms.InputTag('hpsPFTauDiscriminationByDecayModeFinding', '', 'ANALYSIS')
+    cms.InputTag('hpsPFTauDiscriminationByDecayModeFinding', '', 'ANALYSIS'), 
+    cms.InputTag('hpsPFTauDiscriminationByMediumCombinedIsolationDBSumPtCorr', '', 'ANALYSIS')
     ),
-    jetTag = cms.InputTag('CleanJets', 'ak5PFJetsNoMu', 'ANALYSIS'),
-    muonRemovalDecisionTag = cms.InputTag('CleanJets'),
-    overlapCandTag = cms.InputTag('WIsoMuonSelector'),
+    jetTag = cms.InputTag('CleanJetsTrig', 'ak5PFJetsNoMu', 'ANALYSIS'),
+    muonRemovalDecisionTag = cms.InputTag('CleanJetsTrig', '', 'ANALYSIS'),
+    overlapCandTag = cms.InputTag(''),
     passDiscriminator = cms.bool(True),
-    pTMin = cms.double(0.0),
-    etaMax = cms.double(2.4),
+    pTMin = cms.double(10.0),
+    etaMax = cms.double(2.3),
     isoMax = cms.double(-1.0),
     dR = cms.double(0.5),
+    minNumObjsToPassFilter = cms.uint32(0)
+    )
+
+#find taus in |eta| < 2.3 matched to the trigger muon-cleaned jets that pass
+#decay mode finding and isolation discriminator
+process.trigMuHadIsoUncleanedTauSelector = cms.EDFilter(
+    'CustomTauSepFromMuonSelector',
+    baseTauTag = cms.InputTag('hpsPFTauProducer', '', 'HLT'),
+    tauHadIsoTag = cms.InputTag(''),
+    tauDiscriminatorTags = cms.VInputTag(
+    cms.InputTag('hpsPFTauDiscriminationByDecayModeFinding', '', 'HLT'), 
+    cms.InputTag('hpsPFTauDiscriminationByMediumCombinedIsolationDBSumPtCorr', '', 'HLT')
+    ),
+    jetTag = cms.InputTag('ak5PFJets', '', 'HLT'),
+    muonRemovalDecisionTag = cms.InputTag(''),
+    overlapCandTag = cms.InputTag('trigMuHadIsoTauSelector'),
+    passDiscriminator = cms.bool(True),
+    pTMin = cms.double(10.0),
+    etaMax = cms.double(2.3),
+    isoMax = cms.double(-1.0),
+    dR = cms.double(0.5),
+    minNumObjsToPassFilter = cms.uint32(0)
+    )
+
+#trigger muon neighbouring lepton filters
+process.electronSelector = cms.EDFilter(
+    'CustomElectronSelector',
+    baseCandidateTag = cms.InputTag("particleFlow"),
+    pTMin = cms.double(7.0),
+    etaMax = cms.double(2.5),
     minNumObjsToPassFilter = cms.uint32(1)
     )
+process.trigMuonEFilter = cms.EDFilter(
+    'TriggerMuonElectronFilter',
+    muonTag = cms.InputTag("highestPTWMuonSelector"),
+    recoObjTag = cms.InputTag("electronSelector"),
+    delRMin = cms.double(0.4)
+#    delRMin = cms.double(0)
+    )
+process.trigMuonMuFilter = cms.EDFilter(
+    'TriggerMuonMuonFilter',
+    muonTag = cms.InputTag("highestPTWMuonSelector"),
+    recoObjTag = cms.InputTag("tauMuonSelector"),
+    delRMin = cms.double(0.4)
+#    delRMin = cms.double(0)
+    )
+process.trigMuonTauFilter = cms.EDFilter(
+    'TriggerMuonTauFilter',
+    muonTag = cms.InputTag("highestPTWMuonSelector"),
+    recoObjTag = cms.InputTag("trigMuHadIsoTauSelector"),
+    delRMin = cms.double(0.4)
+#    delRMin = cms.double(0)
+    )
+process.trigMuonDistantTauFilter = process.trigMuonTauFilter.clone()
+process.trigMuonDistantTauFilter.recoObjTag = cms.InputTag("trigMuHadIsoUncleanedTauSelector")
+
 
 readFiles = cms.untracked.vstring()
 process.source = cms.Source("PoolSource",
@@ -1627,7 +1693,8 @@ readFiles.extend([
 #analyze gen infor for Wh sample
 process.analyzeGenInfo = cms.EDAnalyzer(
     'GenAnalyzer',
-    outFileName = cms.string('ggHTriggerStudy/gg_WmuID_WmuIso_a9_gen_analysis_GenMatch_TriggerMatch_HLTPass_chP_muAll.root'),
+    outFileName = cms.string('ggHTriggerStudy/gg_WmuID_a9_gen_analysis_GenMatch_withFilters2_muHad.root'),
+#    outFileName = cms.string('ggHTriggerStudy/gg_WmuID_WmuIso_a9_gen_analysis_GenMatch_TriggerMatch_HLTPass_chP_muAll.root'),
 #    outFileName = cms.string('ggHTriggerStudy/gg_WmuID_WmuIso_a9_gen_analysis_GenMatch_muHad.root'),
 #    outFileName = cms.string('triggertest.root'),
     genParticleTag = cms.InputTag('genParticles'),
@@ -1636,8 +1703,9 @@ process.analyzeGenInfo = cms.EDAnalyzer(
     muonTag = cms.InputTag('muons'),
     genTauDecayIDPSet = commonGenTauDecayIDPSet,
     muonPFIsoPUSubtractionCoeff = cms.double(0.5),
-#    PFIsoMax = cms.double(-1.0),
-    PFIsoMax = cms.double(0.12),
+    PFIsoMax = cms.double(-1.0),
+#    PFIsoMax = cms.double(0.12),
+    doTriggerMatching = cms.bool(False),
     triggerEventTag = cms.untracked.InputTag("hltTriggerSummaryAOD", "", "HLT"),
     triggerResultsTag = cms.untracked.InputTag("TriggerResults", "", "HLT"),
     triggerDelRMatch = cms.untracked.double(0.1),
@@ -1664,11 +1732,20 @@ process.analyzeGenInfo = cms.EDAnalyzer(
     HLTSubFilters = cms.untracked.VInputTag("")
     )
 
-process.p = cms.Path(process.IsoMu24eta2p1Selector*
-#                     process.WMuonPTSelector*
-#                     process.WIsoMuonSelector*
+process.p = cms.Path(#process.IsoMu24eta2p1Selector*
+                     process.WMuonPTSelector*
+                     process.WIsoMuonSelector*
+                     process.highestPTWMuonSelector*
+                     process.tauMuonSelector*
+                     process.PFTau*
+                     process.trigMuHadIsoTauSelector*
+                     process.trigMuHadIsoUncleanedTauSelector*
+                     process.electronSelector*
+                     process.trigMuonEFilter*
+                     process.trigMuonMuFilter*
+                     process.trigMuonTauFilter*
+                     process.trigMuonDistantTauFilter*
 #                     process.tauMuonPTSelector*
-#                     process.tauMuonSelector*
 #                     process.PFTau*
 #                     process.muHadTauSelector*
                      process.analyzeGenInfo)

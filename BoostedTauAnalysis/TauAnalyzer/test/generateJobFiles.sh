@@ -17,11 +17,8 @@ if [ -n "$3" ]
     then
     dataTemplateCfg=$3
 fi
-nonisodataTemplateCfg="tauanalyzer_nonisodata_template_cfg.py"
-if [ -n "$3" ]
-    then
-    dataTemplateCfg=$3
-fi
+#nonisodataTemplateCfg="tauanalyzer_nonisodata_template_cfg.py"
+nonisodataTemplateCfg="tauanalyzer_nonisodata_narrowMassBins_template_cfg.py"
 
 ./generateDYJetsToLLTauAnalyzerCfgs.sh $version $MCTemplateCfg
 ./generateDataTauAnalyzerCfgs.sh $version $dataTemplateCfg
@@ -40,7 +37,7 @@ fi
 ./generateggTauAnalyzerCfg.sh $version $MCTemplateCfg
 ./generateZHTauAnalyzerCfg.sh $version $MCTemplateCfg
 ./generateVBFTauAnalyzerCfg.sh $version $MCTemplateCfg
-./generateNonIsoWDataTauAnalyzerCfgs.sh $version $dataTemplateCfg
+./generateNonIsoWDataTauAnalyzerCfgs.sh $version $nonisodataTemplateCfg
 #./generateSinglePhotonDataTauAnalyzerCfgs.sh $version $dataTemplateCfg
 #./generateNonIsoWQCDTauAnalyzerCfgs.sh $version $MCTemplateCfg
 #./generateNonIsoWQCDBTauAnalyzerCfgs.sh $version $MCTemplateCfg

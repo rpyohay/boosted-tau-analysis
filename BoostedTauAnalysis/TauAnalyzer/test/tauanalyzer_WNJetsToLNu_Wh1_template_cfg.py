@@ -600,21 +600,18 @@ process.trigMuonEFilter = cms.EDFilter(
     muonTag = cms.InputTag("highestPTWMuonSelector"),
     recoObjTag = cms.InputTag("electronSelector"),
     delRMin = cms.double(0.4)
-#    delRMin = cms.double(0)
     )
 process.trigMuonMuFilter = cms.EDFilter(
     'TriggerMuonMuonFilter',
     muonTag = cms.InputTag("highestPTWMuonSelector"),
     recoObjTag = cms.InputTag("tauMuonSelector"),
     delRMin = cms.double(0.4)
-#    delRMin = cms.double(0)
     )
 process.trigMuonTauFilter = cms.EDFilter(
     'TriggerMuonTauFilter',
     muonTag = cms.InputTag("highestPTWMuonSelector"),
     recoObjTag = cms.InputTag("trigMuHadIsoTauSelector"),
     delRMin = cms.double(0.4)
-#    delRMin = cms.double(0)
     )
 
 #sequences
