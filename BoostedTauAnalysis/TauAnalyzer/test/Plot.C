@@ -2797,7 +2797,9 @@ void arcQuest(const vector<string>& QCDVsMCInputFileNames, const string& isoData
   nonIsoDataMinusRegBQCD->SetLineColor(3);
   nonIsoDataMinusRegBQCD->SetMarkerColor(3);
   nonIsoDataMinusRegBQCD->Draw("pe");
-  cout << "percent deviation in final bin (QCD): " << nonIsoDataMinusRegBQCD->GetBinContent(5) << " +/- " << nonIsoDataMinusRegBQCD->GetBinError(5) << endl;
+  Double_t regBQCDerr = 0.0;
+  Double_t regBQCDintegral = nonIsoDataMinusRegBQCD->IntegralAndError(5, -1, regBQCDerr);
+  cout << "percent deviation in final bin (QCD): " << regBQCDintegral << " +/- " << regBQCDerr << endl;
   TH1F* nonIsoDataMinusRegBEWK = (TH1F*)nonIsoData->Clone();
   nonIsoDataMinusRegBEWK->Add(hists[1], -1.0);
   TH1F* nonIsoDataMinusRegBEWKDenom = denomErrorScale((TH1F*)nonIsoData->Clone());
@@ -2807,7 +2809,9 @@ void arcQuest(const vector<string>& QCDVsMCInputFileNames, const string& isoData
   nonIsoDataMinusRegBEWK->SetLineColor(4);
   nonIsoDataMinusRegBEWK->SetMarkerColor(4);
   nonIsoDataMinusRegBEWK->Draw("samepe");
-  cout << "percent deviation in final bin (EWK): " << nonIsoDataMinusRegBEWK->GetBinContent(5) << " +/- " << nonIsoDataMinusRegBEWK->GetBinError(5) << endl;
+  Double_t regBEWKerr = 0.0;
+  Double_t regBEWKintegral = nonIsoDataMinusRegBEWK->IntegralAndError(5, -1, regBEWKerr);
+  cout << "percent deviation in final bin (EWK): " << regBEWKintegral << " +/- " << regBEWKerr << endl;
 
   outCanvasAllQCDEWK.Write();
 
