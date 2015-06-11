@@ -784,6 +784,15 @@ void scaleAndAdd(const vector<string>& canvasNames, TFile* in, const vector<stri
     TCanvas* pCanvas;
     in->GetObject(iCanvasName->c_str(), pCanvas);
     T* pHist = (T*)pCanvas->GetPrimitive(graphNames[canvasIndex].c_str());
+
+    //include overflows in last bin
+    Int_t lastBin = pHist->GetNbinsX();
+    Double_t lastBinErr = pHist->GetBinError(lastBin);
+    Double_t overflowBinErr = pHist->GetBinError(lastBin + 1);
+    pHist->
+      SetBinContent(lastBin, pHist->GetBinContent(lastBin) + pHist->GetBinContent(lastBin + 1));
+    pHist->SetBinError(lastBin, sqrt(lastBinErr*lastBinErr + overflowBinErr*overflowBinErr));
+
     pHist->Scale(weight);
     if (fileIndex == 0) hists[canvasIndex] = pHist;
     else hists[canvasIndex]->Add(pHist);
