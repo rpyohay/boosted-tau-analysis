@@ -852,7 +852,7 @@ void formatBoostedResonanceDataBkgPlots(const string& inputVersion, const string
   //conservative estimate of the J/psi-->mumu or upsilon-->mumu/tautau background from region C
   //compute data-driven QCD estimate in signal (i.e. isolated W muon + isolated tau) region: 
   //region C - resonance estimate
-  const pair<Int_t, Int_t> normReg(1, firstBinToBlind - 1);
+  const pair<Int_t, Int_t> normReg(1, -1/*12*//*firstBinToBlind - 1*/);
   const string resBkgOutputFileNoRebin(analysisFilePath + "results/resBkg_noRebin" + MTBin + 
 				       tag19p7InvFb + outputVTag + fileExt);
   vector<Double_t> nominalBinEdges;
@@ -895,7 +895,7 @@ void formatBoostedResonanceDataBkgPlots(const string& inputVersion, const string
   const string theunit("m_{#mu+X} (GeV)");
   string inputFileNameB(nonIsoWDataIsoHaddOutputFile/*HLTMu40eta2p1RegCInputFile*/); // Region C
   vector<string> compRegCDataToRegDDataInputFiles;
-  compRegCDataToRegDDataInputFiles.push_back(outputFileNameB);
+  compRegCDataToRegDDataInputFiles.push_back(inputFileNameD);
   compRegCDataToRegDDataInputFiles.push_back(inputFileNameB);
   string compRegCDataToRegDDataOutputFile(analysisFilePath + "results/regCDataVsRegDData" + 
 					  MTBin + tag19p7InvFb + outputVTag + fileExt);

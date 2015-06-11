@@ -1074,7 +1074,7 @@ void formatDataBkgPlots(const string& inputVersion, const string& outputVersion,
 			       "_SingleMu" + nonIsoWDataVTag + fileExt);
 
   //compute data-driven QCD estimate in signal (i.e. isolated W muon + isolated tau) region
-  const pair<Int_t, Int_t> normReg(1, firstBinToBlind - 1);
+  const pair<Int_t, Int_t> normReg(1, 3/*firstBinToBlind - 1*/);
   const string resBkgOutputFile(analysisFilePath + "results/resBkg" + MTBin + tag19p7InvFb + 
 				narrowBinsVTag + fileExt);
   string outputFileNameA(analysisFilePath + "results/dataVsMC_RegionAQCDEstimate" + MTBin + 

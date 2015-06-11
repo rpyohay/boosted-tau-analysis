@@ -2987,7 +2987,7 @@ void addFinalPlot2(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
   sigColors.push_back(kBlue);
   sigColors.push_back(kSpring - 7);
   sigColors.push_back(kMagenta);
-  if (!ma9GeV) isoSig.erase(isoSig.begin() + 2, isoSig.begin() + 4);
+  //if (!ma9GeV) isoSig.erase(isoSig.begin() + 2, isoSig.begin() + 4);
   TLegend legendBkgMain5(0.6, 0.55, 0.9, 0.95);
   setLegendOptions(legendBkgMain5, "CMS 19.7 fb^{-1}");
   if (canvasIsoSigBkg != NULL) {

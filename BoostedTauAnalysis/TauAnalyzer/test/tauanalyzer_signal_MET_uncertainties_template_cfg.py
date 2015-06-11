@@ -77,7 +77,11 @@ process.load('HLTrigger/HLTfilters/hltHighLevel_cfi')
 #for mu-less jets
 #process.load("Configuration.StandardSequences.MagneticField_38T_cff")
 #process.load("Configuration.Geometry.GeometryRecoDB_cff")
+process.load("RecoTauTag.Configuration.RecoPFTauTag_cff")
+process.load("RecoTauTag.RecoTau.RecoTauPiZeroProducer_cfi")
+process.load('BoostedTauAnalysis/CleanJets/cleanjets_cfi')
 process.load('BoostedTauAnalysis/TauAnalyzer/tauanalyzer_cfi')
+process.load('JetMETCorrections.Type1MET.pfMETCorrections_cff')
 
 #for jet corrections
 process.load('JetMETCorrections.Configuration.JetCorrectionServices_cff')
