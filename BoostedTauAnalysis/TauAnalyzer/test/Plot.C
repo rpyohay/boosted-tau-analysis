@@ -792,6 +792,8 @@ void scaleAndAdd(const vector<string>& canvasNames, TFile* in, const vector<stri
     pHist->
       SetBinContent(lastBin, pHist->GetBinContent(lastBin) + pHist->GetBinContent(lastBin + 1));
     pHist->SetBinError(lastBin, sqrt(lastBinErr*lastBinErr + overflowBinErr*overflowBinErr));
+    pHist->SetBinContent(lastBin + 1, 0.0);
+    pHist->SetBinError(lastBin + 1, 0.0);
 
     pHist->Scale(weight);
     if (fileIndex == 0) hists[canvasIndex] = pHist;
@@ -1497,7 +1499,7 @@ void drawQCDRegionAHistograms(const string& outputFileA,
     cerr << weights.size() << endl;
     return;
   }
-  
+
   TFile outStream(outputFileA.c_str(), "RECREATE");
   TFile inputFileB(inputFileNameB.c_str(), "read");
   vector<TCanvas*> outputCanvases;
@@ -1577,7 +1579,6 @@ void drawQCDRegionAHistograms(const string& outputFileA,
   deleteObjects(legends);
   deleteObjects(stacks);
   deleteObjects(outputCanvases);
-
 } // end routine
 
 //replace muHadMass histogram in region A QCD-only file with the resonance-subtracted estimate
@@ -3205,7 +3206,7 @@ void addFinalPlot2(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
 	  JPsiBkgErr+=(hist->GetBinError(iBin)*hist->GetBinError(iBin));
 	}
       }
-      if (string(hist->GetName()) == "muHadMassDataControl") {
+      if ((string(hist->GetName()) == "muHadMassDataControl") && (iBin > 2/*8*/)) {
 	jetFakeBkgAroundJPsi+=hist->GetBinContent(iBin);
 	if (hist->GetBinContent(iBin) != 0.0) {
 	  jetFakeBkgAroundJPsiErr+=(hist->GetBinError(iBin)*hist->GetBinError(iBin));
