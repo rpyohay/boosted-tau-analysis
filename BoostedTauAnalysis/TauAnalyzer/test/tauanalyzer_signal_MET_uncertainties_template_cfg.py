@@ -75,8 +75,8 @@ process.GlobalTag.globaltag = cms.string('START53_V15::All')
 process.load('HLTrigger/HLTfilters/hltHighLevel_cfi')
 
 #for mu-less jets
-#process.load("Configuration.StandardSequences.MagneticField_38T_cff")
-#process.load("Configuration.Geometry.GeometryRecoDB_cff")
+process.load("Configuration.StandardSequences.MagneticField_38T_cff")
+process.load("Configuration.Geometry.GeometryRecoDB_cff")
 process.load("RecoTauTag.Configuration.RecoPFTauTag_cff")
 process.load("RecoTauTag.RecoTau.RecoTauPiZeroProducer_cfi")
 process.load('BoostedTauAnalysis/CleanJets/cleanjets_cfi')
@@ -85,6 +85,37 @@ process.load('JetMETCorrections.Type1MET.pfMETCorrections_cff')
 
 #for jet corrections
 process.load('JetMETCorrections.Configuration.JetCorrectionServices_cff')
+
+process.load("RecoBTag.Configuration.RecoBTag_cff")
+process.load("RecoJets.JetAssociationProducers.ak5JTA_cff")
+from RecoBTag.SoftLepton.softLepton_cff import *
+from RecoBTag.ImpactParameter.impactParameter_cff import *
+from RecoBTag.SecondaryVertex.secondaryVertex_cff import *
+from RecoBTau.JetTagComputer.combinedMVA_cff import *
+process.impactParameterTagInfos.jetTracks = cms.InputTag("ak5JetTracksAssociatorAtVertex")
+process.ak5JetTracksAssociatorAtVertex.jets = cms.InputTag("ak5PFJets")
+process.ak5JetTracksAssociatorAtVertex.tracks = cms.InputTag("generalTracks")
+process.btagging = cms.Sequence(
+    process.ak5JetTracksAssociatorAtVertex*
+    # impact parameters and IP-only algorithms
+    process.impactParameterTagInfos*
+    (process.trackCountingHighEffBJetTags +
+     process.trackCountingHighPurBJetTags +
+     process.jetProbabilityBJetTags +
+     process.jetBProbabilityBJetTags +
+     # SV tag infos depending on IP tag infos, and SV (+IP) based algos
+     process.secondaryVertexTagInfos*
+     (process.simpleSecondaryVertexHighEffBJetTags +
+      process.simpleSecondaryVertexHighPurBJetTags +
+      process.combinedSecondaryVertexBJetTags +
+      process.combinedSecondaryVertexMVABJetTags) +
+     process.ghostTrackVertexTagInfos*
+     process.ghostTrackBJetTags)##  +
+##     process.softPFMuonsTagInfos*
+##     process.softPFMuonBJetTags *
+##     process.softPFElectronsTagInfos*
+##     process.softPFElectronBJetTags
+    )
 
 #define a parameter set to be passed to all modules that utilize GenTauDecayID for signal taus
 commonGenTauDecayIDPSet = cms.PSet(momPDGID = cms.vint32(A_PDGID),

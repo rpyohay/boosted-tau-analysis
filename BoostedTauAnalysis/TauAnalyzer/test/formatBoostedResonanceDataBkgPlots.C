@@ -901,17 +901,17 @@ void formatBoostedResonanceDataBkgPlots(const string& inputVersion, const string
 					  MTBin + tag19p7InvFb + outputVTag + fileExt);
   QCDVsMCClosurePlots(compRegCDataToRegDDataInputFiles, variable, theunit, 
 		      pair<string, string>("Region D data", "Region C data"), 1, 
-		      firstBinToBlind - 1, 0.0, 3.75, compRegCDataToRegDDataOutputFile, "RECREATE");
+		      firstBinToBlind - 1, 0.0, 11.0, compRegCDataToRegDDataOutputFile, "RECREATE");
   QCDVsMCClosurePlots(compRegCDataToRegDDataInputFiles, "muHadMass1Prong", theunit, 
 		      pair<string, string>("Region D data", "Region C data"), 1, 
-		      firstBinToBlind - 1, 0.0, 3.75, compRegCDataToRegDDataOutputFile, "UPDATE");
+		      firstBinToBlind - 1, 0.0, 11.0, compRegCDataToRegDDataOutputFile, "UPDATE");
   QCDVsMCClosurePlots(compRegCDataToRegDDataInputFiles, "muHadMass1Prong1Pi0", theunit, 
 		      pair<string, string>("Region D data", "Region C data"), 1, 
-		      firstBinToBlind - 1, 0.0, 3.75, compRegCDataToRegDDataOutputFile, "UPDATE");
+		      firstBinToBlind - 1, 0.0, 11.0, compRegCDataToRegDDataOutputFile, "UPDATE");
   QCDVsMCClosurePlots(compRegCDataToRegDDataInputFiles, "muHadMass1Prong2Pi0", theunit, 
 		      pair<string, string>("Region D data", "Region C data"), 1, 
-		      firstBinToBlind - 1, 0.0, 3.75, compRegCDataToRegDDataOutputFile, "UPDATE");
+		      firstBinToBlind - 1, 0.0, 11.0, compRegCDataToRegDDataOutputFile, "UPDATE");
   QCDVsMCClosurePlots(compRegCDataToRegDDataInputFiles, "muHadMass3Prong", theunit, 
 		      pair<string, string>("Region D data", "Region C data"), 1, 
-		      firstBinToBlind - 1, 0.0, 3.75, compRegCDataToRegDDataOutputFile, "UPDATE");
+		      firstBinToBlind - 1, 0.0, 11.0, compRegCDataToRegDDataOutputFile, "UPDATE");
 }

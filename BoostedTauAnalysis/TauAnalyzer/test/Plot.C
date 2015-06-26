@@ -792,7 +792,8 @@ void scaleAndAdd(const vector<string>& canvasNames, TFile* in, const vector<stri
     pHist->
       SetBinContent(lastBin, pHist->GetBinContent(lastBin) + pHist->GetBinContent(lastBin + 1));
     pHist->SetBinError(lastBin, sqrt(lastBinErr*lastBinErr + overflowBinErr*overflowBinErr));
-
+    pHist->SetBinContent(lastBin + 1, 0.0);
+    pHist->SetBinError(lastBin + 1, 0.0);
     pHist->Scale(weight);
     if (fileIndex == 0) hists[canvasIndex] = pHist;
     else hists[canvasIndex]->Add(pHist);
@@ -971,6 +972,8 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 	  double errorRatio = ratio*sqrt(mGeq4GeVErrTerm + mLe2GeVErrTerm);
 	  cout << "(m < 2 GeV)/(m >= 4 GeV): " << setprecision(3) << ratio << " +/- ";
 	  cout << errorRatio << endl;
+	  if (!data)
+	    cout << "Total m integral for dz: " << pHist->Integral() << endl;
 	}
 	string histName(pHist->GetName());
 	if (histName == "jet_pt_etacut") pHist->GetXaxis()->SetTitle("p_{T} (GeV)");
@@ -3198,7 +3201,7 @@ void addFinalPlot2(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
 	}
       }
     }
-    for (Int_t iBin = 1; iBin <= 4/*16*/; ++iBin) {
+    for (Int_t iBin = 3; iBin <= 4/*16*/; ++iBin) {
       if (string(hist->GetName()) == "muHadMassResBkg") {
 	JPsiBkg+=hist->GetBinContent(iBin);
 	if (hist->GetBinContent(iBin) != 0.0) {

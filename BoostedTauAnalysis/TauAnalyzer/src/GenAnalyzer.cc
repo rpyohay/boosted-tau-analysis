@@ -337,12 +337,12 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
      index = 0;
    const trigger::Keys& KEYS(trgEvent->filterKeys(index));
    const size_type nK(KEYS.size());
-   std::cout << "nK = " << nK << std::endl;
+   //std::cout << "nK = " << nK << std::endl;
 
    //did this event fire the HLT?
    const edm::TriggerNames &trgNames = iEvent.triggerNames(*pTrgResults);
    const unsigned int trgIndex = trgNames.triggerIndex(myHLTFilter);
-   std::cout << "trgIndex = " << trgIndex << " and trgNames.size() = " << trgNames.size() << std::endl;
+   //std::cout << "trgIndex = " << trgIndex << " and trgNames.size() = " << trgNames.size() << std::endl;
    bool firedHLT = (trgIndex < trgNames.size()) && (pTrgResults->accept(trgIndex));
 
 
@@ -395,7 +395,7 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       //find sister
       iTau->findSister();
       const unsigned int iSister = iTau->getSisterIndex();
-
+      bool tooClose = false;
       //if sister wasn't already looped over...
       if (std::find(keysToIgnore.begin(), keysToIgnore.end(), iSister) == keysToIgnore.end()) {
 
@@ -403,14 +403,25 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	dRA1TauDaughters_->Fill(reco::deltaR(*reco::GenParticleRef(pGenParticles, tauKey), 
 					     *reco::GenParticleRef(pGenParticles, iSister)));
 	if (reco::deltaR(*reco::GenParticleRef(pGenParticles, tauKey), 
-			 *reco::GenParticleRef(pGenParticles, iSister)) > 0.3)
+			 *reco::GenParticleRef(pGenParticles, iSister)) < 0.05)
 	  {
+	    tooClose = true;
+	    std::cout << "Tau_mu and sister are very close!" << std::endl;
 	    std::cout << "dR(tau, sister) = " << reco::deltaR(*reco::GenParticleRef(pGenParticles, tauKey), 
-						 *reco::GenParticleRef(pGenParticles, iSister)) << std::endl;
+							      *reco::GenParticleRef(pGenParticles, iSister)) << std::endl;
 	    std::cout << "tau's decay type: " << iTau->tauDecayType(false, true).second << std::endl;
 	    std::cout << "sister tau's decay type: " << iTau->sisterDecayType(false,true).second << std::endl;
 	  }
-
+	/*if (reco::deltaR(*reco::GenParticleRef(pGenParticles, tauKey), 
+			 *reco::GenParticleRef(pGenParticles, iSister)) > 0.3)
+	  {
+	   
+	    std::cout << "dR(tau, sister) = " << reco::deltaR(*reco::GenParticleRef(pGenParticles, tauKey), 
+							      *reco::GenParticleRef(pGenParticles, iSister)) << std::endl;
+	    std::cout << "tau's decay type: " << iTau->tauDecayType(false, true).second << std::endl;
+	    std::cout << "sister tau's decay type: " << iTau->sisterDecayType(false,true).second << std::endl;
+	  } */
+	
 	//...save pair decay mode
 	aDecay.push_back(std::pair<GenTauDecayID::DecayType, 
 			 GenTauDecayID::DecayType>(iTau->tauDecayType(false, true).second, 
@@ -418,7 +429,7 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
 	//ignore this tau in the future
 	keysToIgnore.push_back(tauKey);
-      }
+	//}
       // get tau decay and tau sister decay
       std::pair<reco::PFTau::hadronicDecayMode, GenTauDecayID::DecayType> thisDecay = 
 	iTau->tauDecayType(false, true);
@@ -493,13 +504,13 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 		    
 		    const trigger::TriggerObject& TO = TOC[KEYS[ipart]];	
 		    
-		    std::cout << "dR(reco mu, TO) = " << deltaR(*(recoMuPtrs.at(muMatch)), TO) << std::endl;
+		    //std::cout << "dR(reco mu, TO) = " << deltaR(*(recoMuPtrs.at(muMatch)), TO) << std::endl;
 		    //save RECO objects matched to trigger objects
 		    if ((deltaR(*(recoMuPtrs.at(muMatch)), TO) < delRMatchingCut_)) {
-		      cout << "trigger-matched: true" << endl;
-		      cout << "TO pt = " << TO.pt() << endl;
-		      cout << "TO eta = " << TO.eta() << endl;
-		      cout << "TO phi = " << TO.phi() << endl;
+		      //cout << "trigger-matched: true" << endl;
+		      //cout << "TO pt = " << TO.pt() << endl;
+		      //cout << "TO eta = " << TO.eta() << endl;
+		      //cout << "TO phi = " << TO.phi() << endl;
 		      trigger_matched = true;
 		    }
 		  }
@@ -517,17 +528,22 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 							  PFIsoMax_, etaMax, true);
 	      double delPT_recogen = iTau->getVisibleTauP4().Pt() - (recoMuPtrs.at(muMatch))->pt();
 	      //if there was a match...
-	      if (/*(delR_recogen < 0.1)*/(fabs(delPT_recogen) < 0.5) && trigger_matched && isTightMu)
+	      if (/*(delR_recogen < 0.1)*/(fabs(delPT_recogen) < 0.5) /*&& trigger_matched */&& isTightMu)
 		{
 		  //if reco mu pT > 25 and |eta| < 2.1 ...
 		  if (((recoMuPtrs.at(muMatch))->pt() > 25.) && ((recoMuPtrs.at(muMatch))->eta() < etaMax))
 		    {
-
-		      cout << "kinematic properties of trigger-matched reco muon" << endl;
-		      cout << "reco muon pT = " << (recoMuPtrs.at(muMatch))->pt() << endl;
-		      cout << "reco muon eta = " << (recoMuPtrs.at(muMatch))->eta() << endl;
-		      cout << "reco muon phi = " << (recoMuPtrs.at(muMatch))->phi() << endl;
-		      cout << "reco muon PFRelIso = " << recoMuRelIso << endl;
+		      if (tooClose)
+			{
+			  cout << "kinematic properties of trigger-matched reco muon" << endl;
+			  cout << "reco muon pT = " << (recoMuPtrs.at(muMatch))->pt() << endl;
+			  cout << "reco muon eta = " << (recoMuPtrs.at(muMatch))->eta() << endl;
+			  cout << "reco muon phi = " << (recoMuPtrs.at(muMatch))->phi() << endl;
+			  cout << "reco muon PFRelIso = " << recoMuRelIso << endl;
+			  cout << "gen tau_mu pT - reco muon pT = " << delPT_recogen << endl; 
+			  cout << "gen tau_mu pT = "  << iTau->getVisibleTauP4().Pt() << endl;
+			  cout << "gen sister tau pT = " << iTau->getVisibleTauSisterP4().Pt() << endl;
+			}
 
 		      // - plot delR(gen tau_mu, gen tau_sister)
 		      dRA1TauDaughtersGenMatch_->Fill(reco::deltaR(*reco::GenParticleRef(pGenParticles, iTau->getTauIndex()), 
@@ -559,7 +575,8 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 		}
 	    }
 	} // if this tau decayed to a mu
-	
+	 
+      } // testing
     }
     catch (std::string& ex) { throw cms::Exception("GenAnalyzer") << ex; }
   }
