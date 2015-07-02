@@ -130,68 +130,147 @@ private:
   //histogram of dR between gen objects from a1 decay
   TH1F* dRA1TauDaughters_;
 
-  //histogram of dR between gen objects from a1 decay after gen match
-  TH1F* dRA1TauDaughtersGenMatch_;
-
-  //histogram of dpT between gen objects from a1 decay after gen match
-  TH1F* dpTA1TauRecoTauGenMatch_;
-
   //histogram of Higgs pT
   TH1F* HPT_;
 
   //histogram of mu+had mu pT
   TH1F* tauMuPT_;
 
-  //histogram of mu+had mu pT after gen match
-  TH1F* tauMuPTGenMatch_;
-
-  //histogram of mu+had mu's sister tau pT after gen match
-  TH1F* tauSisterPTGenMatch_;
-
-  //histogram of mu+had mu's sister tau decay mode after gen match
-  TH1F* tauSisterDecayModeGenMatch_;
-
-  //histogram of gen-matched reco mu eta
-  TH1F* recoMuEtaGenMatch_;
-
   //histogram of mu+had had pT
   TH1F* tauHadPT_;
-
-  //histogram of gen-matched reco mu PFRelIso
-  TH1F* recoMuPFRelIso_;
 
   //histogram of true no. in-time interactions
   TH1D* trueNInt_;
 
+  //histogram of mu+had mu's sister tau decay mode after gen match
+  TH1F* tauSisterDecayModeGenMatch_;
+
   //a2 tau pair decay type vs. a1 tau pair decay type
   TH2F* a2TauPairDecayVsA1TauPairDecay_;
-
-  //histogram of tau_mu pT vs dR(tau_mu, sister tau)
-  TH2F* tauMuPTVsdR_;
-
-  //histogram of tau_sister pT vs dR(tau_mu, sister tau)
-  TH2F* tauSisterPTVsdR_;
 
   //histogram of tau_sister pT vs decay mode after gen matching
   TH2F* tauSisterPTVsDecayMode_;
 
-  //histogram of gen-matched reco mu PFRelIso vs dR(tau_mu, sister tau)
-  TH2F* recoMuPFRelIsoVsdRA1TauDaughters_;
-
-  //histogram of gen-matched reco mu PFRelIso vs pT of sister tau
-  TH2F* recoMuPFRelIsoVsTauSisterPT_;
-
-  //histogram of gen-matched reco mu pT vs pT of sister tau
-  TH2F* recoMuPTVsTauSisterPT_;
-
-  //histogram of gen-matched gen tau_mu pT vs pT of sister tau
-  TH2F* tauMuPTVsTauSisterPT_;
-
-  //histogram of gen-matched reco mu PFRelIso vs reco mu pT
-  TH2F* recoMuPFRelIsoVsRecoMuPT_;
-
   //histogram of gen-matched reco mu PFRelIso vs decay mode of sister tau
   TH2F* recoMuPFRelIsoVsTauSisterDecayMode_;
+
+  //FOR TAU_MU+TAU_E
+
+  //histogram of dR between gen objects from a1 decay after gen match
+  TH1F* muE_dRA1TauDaughtersGenMatch_;
+
+  //histogram of dpT between gen objects from a1 decay after gen match
+  TH1F* muE_dpTA1TauRecoTauGenMatch_;
+
+  //histogram of mu+had mu pT after gen match
+  TH1F* muE_tauMuPTGenMatch_;
+
+  //histogram of mu+had mu's sister tau pT after gen match
+  TH1F* muE_tauSisterPTGenMatch_;
+
+
+  //histogram of gen-matched reco mu eta
+  TH1F* muE_recoMuEtaGenMatch_;
+
+  //histogram of gen-matched reco mu PFRelIso
+  TH1F* muE_recoMuPFRelIso_;
+
+  //histogram of tau_sister pT vs dR(tau_mu, sister tau)
+  TH2F* muE_tauSisterPTVsdR_;
+
+  //histogram of gen-matched reco mu PFRelIso vs dR(tau_mu, sister tau)
+  TH2F* muE_recoMuPFRelIsoVsdRA1TauDaughters_;
+
+  //histogram of gen-matched reco mu PFRelIso vs pT of sister tau
+  TH2F* muE_recoMuPFRelIsoVsTauSisterPT_;
+
+  //histogram of gen-matched reco mu pT vs pT of sister tau
+  TH2F* muE_recoMuPTVsTauSisterPT_;
+
+  //histogram of gen-matched gen tau_mu pT vs pT of sister tau
+  TH2F* muE_tauMuPTVsTauSisterPT_;
+
+  //histogram of gen-matched reco mu PFRelIso vs reco mu pT
+  TH2F* muE_recoMuPFRelIsoVsRecoMuPT_;
+
+  //FOR TAU_MU+TAU_MU
+
+  //histogram of dR between gen objects from a1 decay after gen match
+  TH1F* muMu_dRA1TauDaughtersGenMatch_;
+
+  //histogram of dpT between gen objects from a1 decay after gen match
+  TH1F* muMu_dpTA1TauRecoTauGenMatch_;
+
+  //histogram of mu+had mu pT after gen match
+  TH1F* muMu_tauMuPTGenMatch_;
+
+  //histogram of mu+had mu's sister tau pT after gen match
+  TH1F* muMu_tauSisterPTGenMatch_;
+
+  //histogram of gen-matched reco mu eta
+  TH1F* muMu_recoMuEtaGenMatch_;
+
+  //histogram of gen-matched reco mu PFRelIso
+  TH1F* muMu_recoMuPFRelIso_;
+
+  //histogram of tau_sister pT vs dR(tau_mu, sister tau)
+  TH2F* muMu_tauSisterPTVsdR_;
+
+  //histogram of gen-matched reco mu PFRelIso vs dR(tau_mu, sister tau)
+  TH2F* muMu_recoMuPFRelIsoVsdRA1TauDaughters_;
+
+  //histogram of gen-matched reco mu PFRelIso vs pT of sister tau
+  TH2F* muMu_recoMuPFRelIsoVsTauSisterPT_;
+
+  //histogram of gen-matched reco mu pT vs pT of sister tau
+  TH2F* muMu_recoMuPTVsTauSisterPT_;
+
+  //histogram of gen-matched gen tau_mu pT vs pT of sister tau
+  TH2F* muMu_tauMuPTVsTauSisterPT_;
+
+  //histogram of gen-matched reco mu PFRelIso vs reco mu pT
+  TH2F* muMu_recoMuPFRelIsoVsRecoMuPT_;
+
+  //FOR TAU_MU+TAU_HAD
+
+  //histogram of dR between gen objects from a1 decay after gen match
+  TH1F* muHad_dRA1TauDaughtersGenMatch_;
+
+  //histogram of dpT between gen objects from a1 decay after gen match
+  TH1F* muHad_dpTA1TauRecoTauGenMatch_;
+
+  //histogram of mu+had mu pT after gen match
+  TH1F* muHad_tauMuPTGenMatch_;
+
+  //histogram of mu+had mu's sister tau pT after gen match
+  TH1F* muHad_tauSisterPTGenMatch_;
+
+  //histogram of gen-matched reco mu eta
+  TH1F* muHad_recoMuEtaGenMatch_;
+
+  //histogram of gen-matched reco mu PFRelIso
+  TH1F* muHad_recoMuPFRelIso_;
+
+  //histogram of tau_sister pT vs dR(tau_mu, sister tau)
+  TH2F* muHad_tauSisterPTVsdR_;
+
+  //histogram of gen-matched reco mu PFRelIso vs dR(tau_mu, sister tau)
+  TH2F* muHad_recoMuPFRelIsoVsdRA1TauDaughters_;
+
+  //histogram of gen-matched reco mu PFRelIso vs pT of sister tau
+  TH2F* muHad_recoMuPFRelIsoVsTauSisterPT_;
+
+  //histogram of gen-matched reco mu pT vs pT of sister tau
+  TH2F* muHad_recoMuPTVsTauSisterPT_;
+
+  //histogram of gen-matched gen tau_mu pT vs pT of sister tau
+  TH2F* muHad_tauMuPTVsTauSisterPT_;
+
+  //histogram of gen-matched reco mu PFRelIso vs reco mu pT
+  TH2F* muHad_recoMuPFRelIsoVsRecoMuPT_;
+
+  //histogram of tau_mu pT vs dR(tau_mu, sister tau)
+  TH2F* tauMuPTVsdR_;
 
   //reco muon eta bins
   std::vector<double> recoMuEtaBins_;
@@ -456,11 +535,11 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
       //is this a mu+X decay? //mu+mu
       //if (thisDecay.second == GenTauDecayID::MU)
-      if (((thisDecay.second == GenTauDecayID::MU)) && 
-	   (sisterDecay.second == GenTauDecayID::HAD))// || 
+      if (((thisDecay.second == GenTauDecayID::MU))// && 
+	  //(sisterDecay.second == GenTauDecayID::MU))// || 
 	  //((thisDecay.second == GenTauDecayID::HAD) && 
 	  //(sisterDecay.second == GenTauDecayID::MU))
-	//)
+	)
 	{ // if this tau decayed to a mu
 	  
 	  //get ref to gen mu
@@ -528,7 +607,7 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 							  PFIsoMax_, etaMax, true);
 	      double delPT_recogen = iTau->getVisibleTauP4().Pt() - (recoMuPtrs.at(muMatch))->pt();
 	      //if there was a match...
-	      if (/*(delR_recogen < 0.1)*/(fabs(delPT_recogen) < 0.5) /*&& trigger_matched */&& isTightMu)
+	      if (/*(delR_recogen < 0.1)*/(fabs(delPT_recogen) < 0.5) && trigger_matched && isTightMu)
 		{
 		  //if reco mu pT > 25 and |eta| < 2.1 ...
 		  if (((recoMuPtrs.at(muMatch))->pt() > 25.) && ((recoMuPtrs.at(muMatch))->eta() < etaMax))
@@ -544,33 +623,84 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 			  cout << "gen tau_mu pT = "  << iTau->getVisibleTauP4().Pt() << endl;
 			  cout << "gen sister tau pT = " << iTau->getVisibleTauSisterP4().Pt() << endl;
 			}
-
-		      // - plot delR(gen tau_mu, gen tau_sister)
-		      dRA1TauDaughtersGenMatch_->Fill(reco::deltaR(*reco::GenParticleRef(pGenParticles, iTau->getTauIndex()), 
-								   *reco::GenParticleRef(pGenParticles, iTau->getSisterIndex())));
-		      // - plot dpT(gen tau_mu, gen reco_mu)
-		      dpTA1TauRecoTauGenMatch_->Fill(delPT_recogen);
 		      // - plot decay mode of sister
 		      tauSisterDecayModeGenMatch_->Fill(sisterDecay.second);
-		      // - plot pT of tau_mu
-		      
-		      tauMuPTGenMatch_->Fill(iTau->getVisibleTauP4().Pt());
-		      // - plot pT of sister
-		      tauSisterPTGenMatch_->Fill(iTau->getVisibleTauSisterP4().Pt());
-		      // - plot pT(gen tau_sister) vs decay mode of tau_sister
 		      tauSisterPTVsDecayMode_->Fill(sisterDecay.second, iTau->getVisibleTauSisterP4().Pt());
-		      recoMuEtaGenMatch_->Fill((recoMuPtrs.at(muMatch))->eta());
-		      tauSisterPTVsdR_->Fill(reco::deltaR(*reco::GenParticleRef(pGenParticles, iTau->getTauIndex()), 
-							  *reco::GenParticleRef(pGenParticles, iTau->getSisterIndex())), iTau->getVisibleTauSisterP4().Pt());
-		      // - plot PFRelIso vs pT of reco mu
-		      recoMuPFRelIso_->Fill(recoMuRelIso);
-		      recoMuPFRelIsoVsdRA1TauDaughters_->Fill(reco::deltaR(*reco::GenParticleRef(pGenParticles, iTau->getTauIndex()), 
-									   *reco::GenParticleRef(pGenParticles, iTau->getSisterIndex())), recoMuRelIso);
-		      recoMuPFRelIsoVsTauSisterPT_->Fill(iTau->getVisibleTauSisterP4().Pt(), recoMuRelIso);
-		      recoMuPFRelIsoVsRecoMuPT_->Fill((recoMuPtrs.at(muMatch))->pt(), recoMuRelIso);
 		      recoMuPFRelIsoVsTauSisterDecayMode_->Fill(sisterDecay.second, recoMuRelIso);
-		      recoMuPTVsTauSisterPT_->Fill(iTau->getVisibleTauSisterP4().Pt(),(recoMuPtrs.at(muMatch))->pt());
-		      tauMuPTVsTauSisterPT_->Fill(iTau->getVisibleTauSisterP4().Pt(),iTau->getVisibleTauP4().Pt());
+
+		      if ((sisterDecay.second == GenTauDecayID::E))
+			{
+			  // - plot delR(gen tau_mu, gen tau_sister)
+			  muE_dRA1TauDaughtersGenMatch_->Fill(reco::deltaR(*reco::GenParticleRef(pGenParticles, iTau->getTauIndex()), 
+								       *reco::GenParticleRef(pGenParticles, iTau->getSisterIndex())));
+			  // - plot dpT(gen tau_mu, gen reco_mu)
+			  muE_dpTA1TauRecoTauGenMatch_->Fill(delPT_recogen);
+			  // - plot pT of tau_mu
+			  
+			  muE_tauMuPTGenMatch_->Fill(iTau->getVisibleTauP4().Pt());
+			  // - plot pT of sister
+			  muE_tauSisterPTGenMatch_->Fill(iTau->getVisibleTauSisterP4().Pt());
+			  // - plot pT(gen tau_sister) vs decay mode of tau_sister
+			  muE_recoMuEtaGenMatch_->Fill((recoMuPtrs.at(muMatch))->eta());
+			  muE_tauSisterPTVsdR_->Fill(reco::deltaR(*reco::GenParticleRef(pGenParticles, iTau->getTauIndex()), 
+							      *reco::GenParticleRef(pGenParticles, iTau->getSisterIndex())), iTau->getVisibleTauSisterP4().Pt());
+			  // - plot PFRelIso vs pT of reco mu
+			  muE_recoMuPFRelIso_->Fill(recoMuRelIso);
+			  muE_recoMuPFRelIsoVsdRA1TauDaughters_->Fill(reco::deltaR(*reco::GenParticleRef(pGenParticles, iTau->getTauIndex()), 
+									       *reco::GenParticleRef(pGenParticles, iTau->getSisterIndex())), recoMuRelIso);
+			  muE_recoMuPFRelIsoVsTauSisterPT_->Fill(iTau->getVisibleTauSisterP4().Pt(), recoMuRelIso);
+			  muE_recoMuPFRelIsoVsRecoMuPT_->Fill((recoMuPtrs.at(muMatch))->pt(), recoMuRelIso);
+			  muE_recoMuPTVsTauSisterPT_->Fill(iTau->getVisibleTauSisterP4().Pt(),(recoMuPtrs.at(muMatch))->pt());
+			  muE_tauMuPTVsTauSisterPT_->Fill(iTau->getVisibleTauSisterP4().Pt(),iTau->getVisibleTauP4().Pt());
+			}
+		      else if ((sisterDecay.second == GenTauDecayID::MU))
+			{
+			  // - plot delR(gen tau_mu, gen tau_sister)
+			  muMu_dRA1TauDaughtersGenMatch_->Fill(reco::deltaR(*reco::GenParticleRef(pGenParticles, iTau->getTauIndex()), 
+								       *reco::GenParticleRef(pGenParticles, iTau->getSisterIndex())));
+			  // - plot dpT(gen tau_mu, gen reco_mu)
+			  muMu_dpTA1TauRecoTauGenMatch_->Fill(delPT_recogen);
+			  // - plot pT of tau_mu
+			  
+			  muMu_tauMuPTGenMatch_->Fill(iTau->getVisibleTauP4().Pt());
+			  // - plot pT of sister
+			  muMu_tauSisterPTGenMatch_->Fill(iTau->getVisibleTauSisterP4().Pt());
+			  muMu_recoMuEtaGenMatch_->Fill((recoMuPtrs.at(muMatch))->eta());
+			  muMu_tauSisterPTVsdR_->Fill(reco::deltaR(*reco::GenParticleRef(pGenParticles, iTau->getTauIndex()), 
+							      *reco::GenParticleRef(pGenParticles, iTau->getSisterIndex())), iTau->getVisibleTauSisterP4().Pt());
+			  // - plot PFRelIso vs pT of reco mu
+			  muMu_recoMuPFRelIso_->Fill(recoMuRelIso);
+			  muMu_recoMuPFRelIsoVsdRA1TauDaughters_->Fill(reco::deltaR(*reco::GenParticleRef(pGenParticles, iTau->getTauIndex()), 
+									       *reco::GenParticleRef(pGenParticles, iTau->getSisterIndex())), recoMuRelIso);
+			  muMu_recoMuPFRelIsoVsTauSisterPT_->Fill(iTau->getVisibleTauSisterP4().Pt(), recoMuRelIso);
+			  muMu_recoMuPFRelIsoVsRecoMuPT_->Fill((recoMuPtrs.at(muMatch))->pt(), recoMuRelIso);
+			  muMu_recoMuPTVsTauSisterPT_->Fill(iTau->getVisibleTauSisterP4().Pt(),(recoMuPtrs.at(muMatch))->pt());
+			  muMu_tauMuPTVsTauSisterPT_->Fill(iTau->getVisibleTauSisterP4().Pt(),iTau->getVisibleTauP4().Pt());
+			}
+		      else if ((sisterDecay.second == GenTauDecayID::HAD))
+			{
+			  // - plot delR(gen tau_mu, gen tau_sister)
+			  muHad_dRA1TauDaughtersGenMatch_->Fill(reco::deltaR(*reco::GenParticleRef(pGenParticles, iTau->getTauIndex()), 
+								       *reco::GenParticleRef(pGenParticles, iTau->getSisterIndex())));
+			  // - plot dpT(gen tau_mu, gen reco_mu)
+			  muHad_dpTA1TauRecoTauGenMatch_->Fill(delPT_recogen);
+			  // - plot pT of tau_mu
+			  
+			  muHad_tauMuPTGenMatch_->Fill(iTau->getVisibleTauP4().Pt());
+			  // - plot pT of sister
+			  muHad_tauSisterPTGenMatch_->Fill(iTau->getVisibleTauSisterP4().Pt());
+			  muHad_recoMuEtaGenMatch_->Fill((recoMuPtrs.at(muMatch))->eta());
+			  muHad_tauSisterPTVsdR_->Fill(reco::deltaR(*reco::GenParticleRef(pGenParticles, iTau->getTauIndex()), 
+							      *reco::GenParticleRef(pGenParticles, iTau->getSisterIndex())), iTau->getVisibleTauSisterP4().Pt());
+			  // - plot PFRelIso vs pT of reco mu
+			  muHad_recoMuPFRelIso_->Fill(recoMuRelIso);
+			  muHad_recoMuPFRelIsoVsdRA1TauDaughters_->Fill(reco::deltaR(*reco::GenParticleRef(pGenParticles, iTau->getTauIndex()), 
+									       *reco::GenParticleRef(pGenParticles, iTau->getSisterIndex())), recoMuRelIso);
+			  muHad_recoMuPFRelIsoVsTauSisterPT_->Fill(iTau->getVisibleTauSisterP4().Pt(), recoMuRelIso);
+			  muHad_recoMuPFRelIsoVsRecoMuPT_->Fill((recoMuPtrs.at(muMatch))->pt(), recoMuRelIso);
+			  muHad_recoMuPTVsTauSisterPT_->Fill(iTau->getVisibleTauSisterP4().Pt(),(recoMuPtrs.at(muMatch))->pt());
+			  muHad_tauMuPTVsTauSisterPT_->Fill(iTau->getVisibleTauSisterP4().Pt(),iTau->getVisibleTauP4().Pt());
+			}
 		    }
 		}
 	    }
@@ -634,31 +764,60 @@ void GenAnalyzer::beginJob()
 
   //book histograms
   dRA1TauDaughters_ = new TH1F("dRA1TauDaughters", "", 60, 0.0, 3.0);
-  dRA1TauDaughtersGenMatch_ = new TH1F("dRA1TauDaughtersGenMatch", "", 60, 0.0, 3.0);
-  dpTA1TauRecoTauGenMatch_ = new TH1F("dpTA1TauRecoTauGenMatch", "", 80, -2., 2.0);
   aMass_ = new TH1F("aMass", "", 100, 0.0, 25.0);
   HPT_ = new TH1F("HPT", "", 100, 0.0, 200.0);
   tauMuPT_ = new TH1F("tauMuPT", "", 50, 0.0, 100.0);
-  tauMuPTGenMatch_ = new TH1F("tauMuPTGenMatch", "", 50, 0.0, 100.0);
-  tauSisterPTGenMatch_ = new TH1F("tauSisterPTGenMatch", "", 50, 0.0, 100.0);
-  tauSisterDecayModeGenMatch_ = new TH1F("tauSisterDecayModeGenMatch", "",6, -0.5, 5.5);
-  //recoMuEtaGenMatch_ = new TH1F("recoMuEtaGenMatch", "", 23, -2.3, 2.3);
-  recoMuEtaGenMatch_ = new TH1F("recoMuEtaGenMatch", "", recoMuEtaBins_.size() - 1, &recoMuEtaBins_[0]);
-  tauHadPT_ = new TH1F("tauHadPT", "", 50, 0.0, 100.0);
-  recoMuPFRelIso_ = new TH1F("recoMuPFRelIso", "", 2000, 0.0, 40.0);
   trueNInt_ = new TH1D("trueNInt", "", 60, 0.0, 60.0);
+  tauHadPT_ = new TH1F("tauHadPT", "", 50, 0.0, 100.0);
+  tauSisterDecayModeGenMatch_ = new TH1F("tauSisterDecayModeGenMatch", "",6, -0.5, 5.5);
   a2TauPairDecayVsA1TauPairDecay_ = new TH2F("a2TauPairDecayVsA1TauPairDecay", 
 					     ";a_{1} di-tau decay;a_{2} di-tau decay", 
 					     6, -0.5, 5.5, 6, -0.5, 5.5);
   tauMuPTVsdR_ = new TH2F("tauMuPTVsdR", ";#DeltaR(#tau_{#mu},#tau_{sister});#tau_{#mu} p_{T} (GeV)", 60, 0., 3.0, 50, 0.0, 100.0);
-  tauSisterPTVsdR_ = new TH2F("tauSisterPTVsdR", ";#DeltaR(#tau_{#mu},#tau_{sister});#tau_{sister} p_{T} (GeV)", 60, 0., 3.0, 50, 0.0, 100.0);
   tauSisterPTVsDecayMode_ = new TH2F("tauSisterPTVsDecayMode", ";#tau_{sister} decay mode;#tau_{sister} p_{T} (GeV)", 6, -0.5, 5.5, 50, 0.0, 100.0);
-  recoMuPFRelIsoVsdRA1TauDaughters_ = new TH2F("recoMuPFRelIsoVsdRA1TauDaughters", ";#DeltaR;reco #mu PFRelIso", 60, 0., 3., 2000, 0.0, 40.0);
-  recoMuPFRelIsoVsTauSisterPT_ = new TH2F("recoMuPFRelIsoVsTauSisterPT", ";#tau_{sister} p_{T} (GeV);reco #mu PFRelIso", 50, 0., 100., 2000, 0.0, 40.0);
-  recoMuPTVsTauSisterPT_ = new TH2F("recoMuPTVsTauSisterPT", ";#tau_{sister} p_{T} (GeV);reco #mu p_{T} (GeV)", 50, 0., 100., 50, 0., 100.);
-  tauMuPTVsTauSisterPT_ = new TH2F("tauMuPTVsTauSisterPT", ";#tau_{sister} p_{T} (GeV);gen #tau_{#mu} p_{T} (GeV)", 50, 0., 100., 50, 0., 100.);
-  recoMuPFRelIsoVsRecoMuPT_ = new TH2F("recoMuPFRelIsoVsRecoMuPT", ";reco #mu p_{T} (GeV);reco #mu PFRelIso", 50, 0., 100., 2000, 0.0, 40.0);
   recoMuPFRelIsoVsTauSisterDecayMode_ = new TH2F("recoMuPFRelIsoVsTauSisterDecayMode", ";#tau_{sister} decay mode;reco #mu PFRelIso", 6, -0.5, 5.5, 2000, 0.0, 40.0);
+
+  //for tau_mu+tau_e
+  muE_dRA1TauDaughtersGenMatch_ = new TH1F("muE_dRA1TauDaughtersGenMatch", "", 60, 0.0, 3.0);
+  muE_dpTA1TauRecoTauGenMatch_ = new TH1F("muE_dpTA1TauRecoTauGenMatch", "", 80, -2., 2.0);
+  muE_tauMuPTGenMatch_ = new TH1F("muE_tauMuPTGenMatch", "", 50, 0.0, 100.0);
+  muE_tauSisterPTGenMatch_ = new TH1F("muE_tauSisterPTGenMatch", "", 50, 0.0, 100.0);
+  muE_recoMuEtaGenMatch_ = new TH1F("muE_recoMuEtaGenMatch", "", recoMuEtaBins_.size() - 1, &recoMuEtaBins_[0]);
+  muE_recoMuPFRelIso_ = new TH1F("muE_recoMuPFRelIso", "", 2000, 0.0, 40.0);
+  muE_tauSisterPTVsdR_ = new TH2F("muE_tauSisterPTVsdR", ";#DeltaR(#tau_{#mu},#tau_{sister});#tau_{sister} p_{T} (GeV)", 60, 0., 3.0, 50, 0.0, 100.0);
+  muE_recoMuPFRelIsoVsdRA1TauDaughters_ = new TH2F("muE_recoMuPFRelIsoVsdRA1TauDaughters", ";#DeltaR;reco #mu PFRelIso", 60, 0., 3., 2000, 0.0, 40.0);
+  muE_recoMuPFRelIsoVsTauSisterPT_ = new TH2F("muE_recoMuPFRelIsoVsTauSisterPT", ";#tau_{sister} p_{T} (GeV);reco #mu PFRelIso", 50, 0., 100., 2000, 0.0, 40.0);
+  muE_recoMuPTVsTauSisterPT_ = new TH2F("muE_recoMuPTVsTauSisterPT", ";#tau_{sister} p_{T} (GeV);reco #mu p_{T} (GeV)", 50, 0., 100., 50, 0., 100.);
+  muE_tauMuPTVsTauSisterPT_ = new TH2F("muE_tauMuPTVsTauSisterPT", ";#tau_{sister} p_{T} (GeV);gen #tau_{#mu} p_{T} (GeV)", 50, 0., 100., 50, 0., 100.);
+  muE_recoMuPFRelIsoVsRecoMuPT_ = new TH2F("muE_recoMuPFRelIsoVsRecoMuPT", ";reco #mu p_{T} (GeV);reco #mu PFRelIso", 50, 0., 100., 2000, 0.0, 40.0);
+
+  //for tau_mu+tau_mu
+  muMu_dRA1TauDaughtersGenMatch_ = new TH1F("muMu_dRA1TauDaughtersGenMatch", "", 60, 0.0, 3.0);
+  muMu_dpTA1TauRecoTauGenMatch_ = new TH1F("muMu_dpTA1TauRecoTauGenMatch", "", 80, -2., 2.0);
+  muMu_tauMuPTGenMatch_ = new TH1F("muMu_tauMuPTGenMatch", "", 50, 0.0, 100.0);
+  muMu_tauSisterPTGenMatch_ = new TH1F("muMu_tauSisterPTGenMatch", "", 50, 0.0, 100.0);
+  muMu_recoMuEtaGenMatch_ = new TH1F("muMu_recoMuEtaGenMatch", "", recoMuEtaBins_.size() - 1, &recoMuEtaBins_[0]);
+  muMu_recoMuPFRelIso_ = new TH1F("muMu_recoMuPFRelIso", "", 2000, 0.0, 40.0);
+  muMu_tauSisterPTVsdR_ = new TH2F("muMu_tauSisterPTVsdR", ";#DeltaR(#tau_{#mu},#tau_{sister});#tau_{sister} p_{T} (GeV)", 60, 0., 3.0, 50, 0.0, 100.0);
+  muMu_recoMuPFRelIsoVsdRA1TauDaughters_ = new TH2F("muMu_recoMuPFRelIsoVsdRA1TauDaughters", ";#DeltaR;reco #mu PFRelIso", 60, 0., 3., 2000, 0.0, 40.0);
+  muMu_recoMuPFRelIsoVsTauSisterPT_ = new TH2F("muMu_recoMuPFRelIsoVsTauSisterPT", ";#tau_{sister} p_{T} (GeV);reco #mu PFRelIso", 50, 0., 100., 2000, 0.0, 40.0);
+  muMu_recoMuPTVsTauSisterPT_ = new TH2F("muMu_recoMuPTVsTauSisterPT", ";#tau_{sister} p_{T} (GeV);reco #mu p_{T} (GeV)", 50, 0., 100., 50, 0., 100.);
+  muMu_tauMuPTVsTauSisterPT_ = new TH2F("muMu_tauMuPTVsTauSisterPT", ";#tau_{sister} p_{T} (GeV);gen #tau_{#mu} p_{T} (GeV)", 50, 0., 100., 50, 0., 100.);
+  muMu_recoMuPFRelIsoVsRecoMuPT_ = new TH2F("muMu_recoMuPFRelIsoVsRecoMuPT", ";reco #mu p_{T} (GeV);reco #mu PFRelIso", 50, 0., 100., 2000, 0.0, 40.0);
+
+  //for tau_mu+tau_had
+  muHad_dRA1TauDaughtersGenMatch_ = new TH1F("muHad_dRA1TauDaughtersGenMatch", "", 60, 0.0, 3.0);
+  muHad_dpTA1TauRecoTauGenMatch_ = new TH1F("muHad_dpTA1TauRecoTauGenMatch", "", 80, -2., 2.0);
+  muHad_tauMuPTGenMatch_ = new TH1F("muHad_tauMuPTGenMatch", "", 50, 0.0, 100.0);
+  muHad_tauSisterPTGenMatch_ = new TH1F("muHad_tauSisterPTGenMatch", "", 50, 0.0, 100.0);
+  muHad_recoMuEtaGenMatch_ = new TH1F("muHad_recoMuEtaGenMatch", "", recoMuEtaBins_.size() - 1, &recoMuEtaBins_[0]);
+  muHad_recoMuPFRelIso_ = new TH1F("muHad_recoMuPFRelIso", "", 2000, 0.0, 40.0);
+  muHad_tauSisterPTVsdR_ = new TH2F("muHad_tauSisterPTVsdR", ";#DeltaR(#tau_{#mu},#tau_{sister});#tau_{sister} p_{T} (GeV)", 60, 0., 3.0, 50, 0.0, 100.0);
+  muHad_recoMuPFRelIsoVsdRA1TauDaughters_ = new TH2F("muHad_recoMuPFRelIsoVsdRA1TauDaughters", ";#DeltaR;reco #mu PFRelIso", 60, 0., 3., 2000, 0.0, 40.0);
+  muHad_recoMuPFRelIsoVsTauSisterPT_ = new TH2F("muHad_recoMuPFRelIsoVsTauSisterPT", ";#tau_{sister} p_{T} (GeV);reco #mu PFRelIso", 50, 0., 100., 2000, 0.0, 40.0);
+  muHad_recoMuPTVsTauSisterPT_ = new TH2F("muHad_recoMuPTVsTauSisterPT", ";#tau_{sister} p_{T} (GeV);reco #mu p_{T} (GeV)", 50, 0., 100., 50, 0., 100.);
+  muHad_tauMuPTVsTauSisterPT_ = new TH2F("muHad_tauMuPTVsTauSisterPT", ";#tau_{sister} p_{T} (GeV);gen #tau_{#mu} p_{T} (GeV)", 50, 0., 100., 50, 0., 100.);
+  muHad_recoMuPFRelIsoVsRecoMuPT_ = new TH2F("muHad_recoMuPFRelIsoVsRecoMuPT", ";reco #mu p_{T} (GeV);reco #mu PFRelIso", 50, 0., 100., 2000, 0.0, 40.0);
 
   //set bin labels where appropriate
   a2TauPairDecayVsA1TauPairDecay_->GetXaxis()->SetBinLabel(1, "#tau_{#mu}#tau_{#mu}");
@@ -699,132 +858,276 @@ void GenAnalyzer::endJob()
   //make the canvases
   TCanvas dRA1TauDaughtersCanvas("dRA1TauDaughtersCanvas", "", 600, 600);
   Common::setCanvasOptions(dRA1TauDaughtersCanvas, 1, 0, 0);
-  TCanvas dRA1TauDaughtersGenMatchCanvas("dRA1TauDaughtersGenMatchCanvas", "", 600, 600);
-  Common::setCanvasOptions(dRA1TauDaughtersGenMatchCanvas, 1, 0, 0);
-  TCanvas dpTA1TauRecoTauGenMatchCanvas("dpTA1TauRecoTauGenMatchCanvas", "", 600, 600);
-  Common::setCanvasOptions(dpTA1TauRecoTauGenMatchCanvas, 1, 0, 0);
   TCanvas aMassCanvas("aMassCanvas", "", 600, 600);
   Common::setCanvasOptions(aMassCanvas, 1, 0, 0);
   TCanvas HPTCanvas("HPTCanvas", "", 600, 600);
   Common::setCanvasOptions(HPTCanvas, 1, 0, 0);
   TCanvas tauMuPTCanvas("tauMuPTCanvas", "", 600, 600);
   Common::setCanvasOptions(tauMuPTCanvas, 1, 0, 0);
-  TCanvas tauMuPTGenMatchCanvas("tauMuPTGenMatchCanvas", "", 600, 600);
-  Common::setCanvasOptions(tauMuPTGenMatchCanvas, 1, 0, 0);
-  TCanvas tauSisterPTGenMatchCanvas("tauSisterPTGenMatchCanvas", "", 600, 600);
-  Common::setCanvasOptions(tauSisterPTGenMatchCanvas, 1, 0, 0);
-  TCanvas tauSisterDecayModeGenMatchCanvas("tauSisterDecayModeGenMatchCanvas", "", 600, 600);
-  Common::setCanvasOptions(tauSisterDecayModeGenMatchCanvas, 1, 0, 0);
-  TCanvas recoMuEtaGenMatchCanvas("recoMuEtaGenMatchCanvas", "", 600, 600);
-  Common::setCanvasOptions(recoMuEtaGenMatchCanvas, 1, 0, 0);
   TCanvas tauHadPTCanvas("tauHadPTCanvas", "", 600, 600);
   Common::setCanvasOptions(tauHadPTCanvas, 1, 0, 0);
-  TCanvas recoMuPFRelIsoCanvas("recoMuPFRelIsoCanvas", "", 600, 600);
-  Common::setCanvasOptions(recoMuPFRelIsoCanvas, 1, 0, 0);
   TCanvas trueNIntCanvas("trueNIntCanvas", "", 600, 600);
   Common::setCanvasOptions(trueNIntCanvas, 1, 0, 0);
+  TCanvas tauSisterDecayModeGenMatchCanvas("tauSisterDecayModeGenMatchCanvas", "", 600, 600);
+  Common::setCanvasOptions(tauSisterDecayModeGenMatchCanvas, 1, 0, 0);
   TCanvas a2TauPairDecayVsA1TauPairDecayCanvas("a2TauPairDecayVsA1TauPairDecayCanvas", "", 
 					       600, 600);
   TCanvas tauMuPTVsdRCanvas("tauMuPTVsdRCanvas","", 600, 600);
-  TCanvas tauSisterPTVsdRCanvas("tauSisterPTVsdRCanvas","", 600, 600);
   TCanvas tauSisterPTVsDecayModeCanvas("tauSisterPTVsDecayModeCanvas", "", 600, 600);
-  TCanvas recoMuPFRelIsoVsdRA1TauDaughtersCanvas("recoMuPFRelIsoVsdRA1TauDaughtersCanvas", "", 600, 600);
-  TCanvas recoMuPFRelIsoVsTauSisterPTCanvas("recoMuPFRelIsoVsTauSisterPTCanvas", "", 600, 600);
-  TCanvas recoMuPTVsTauSisterPTCanvas("recoMuPTVsTauSisterPTCanvas", "", 600, 600);
-  TCanvas tauMuPTVsTauSisterPTCanvas("tauMuPTVsTauSisterPTCanvas", "", 600, 600);
-  TCanvas recoMuPFRelIsoVsRecoMuPTCanvas("recoMuPFRelIsoVsRecoMuPTCanvas", "", 600, 600);
   TCanvas recoMuPFRelIsoVsTauSisterDecayModeCanvas("recoMuPFRelIsoVsTauSisterDecayModeCanvas", "", 600, 600);
+
+  //for tau_mu+tau_e
+  TCanvas muE_dRA1TauDaughtersGenMatchCanvas("muE_dRA1TauDaughtersGenMatchCanvas", "", 600, 600);
+  Common::setCanvasOptions(muE_dRA1TauDaughtersGenMatchCanvas, 1, 0, 0);
+  TCanvas muE_dpTA1TauRecoTauGenMatchCanvas("muE_dpTA1TauRecoTauGenMatchCanvas", "", 600, 600);
+  Common::setCanvasOptions(muE_dpTA1TauRecoTauGenMatchCanvas, 1, 0, 0);
+  TCanvas muE_tauMuPTGenMatchCanvas("muE_tauMuPTGenMatchCanvas", "", 600, 600);
+  Common::setCanvasOptions(muE_tauMuPTGenMatchCanvas, 1, 0, 0);
+  TCanvas muE_tauSisterPTGenMatchCanvas("muE_tauSisterPTGenMatchCanvas", "", 600, 600);
+  Common::setCanvasOptions(muE_tauSisterPTGenMatchCanvas, 1, 0, 0);
+  TCanvas muE_recoMuEtaGenMatchCanvas("muE_recoMuEtaGenMatchCanvas", "", 600, 600);
+  Common::setCanvasOptions(muE_recoMuEtaGenMatchCanvas, 1, 0, 0);
+  TCanvas muE_recoMuPFRelIsoCanvas("muE_recoMuPFRelIsoCanvas", "", 600, 600);
+  Common::setCanvasOptions(muE_recoMuPFRelIsoCanvas, 1, 0, 0);
+  TCanvas muE_tauSisterPTVsdRCanvas("muE_tauSisterPTVsdRCanvas","", 600, 600);
+  TCanvas muE_recoMuPFRelIsoVsdRA1TauDaughtersCanvas("muE_recoMuPFRelIsoVsdRA1TauDaughtersCanvas", "", 600, 600);
+  TCanvas muE_recoMuPFRelIsoVsTauSisterPTCanvas("muE_recoMuPFRelIsoVsTauSisterPTCanvas", "", 600, 600);
+  TCanvas muE_recoMuPTVsTauSisterPTCanvas("muE_recoMuPTVsTauSisterPTCanvas", "", 600, 600);
+  TCanvas muE_tauMuPTVsTauSisterPTCanvas("muE_tauMuPTVsTauSisterPTCanvas", "", 600, 600);
+  TCanvas muE_recoMuPFRelIsoVsRecoMuPTCanvas("muE_recoMuPFRelIsoVsRecoMuPTCanvas", "", 600, 600);
+
+  //for tau_mu+tau_mu
+  TCanvas muMu_dRA1TauDaughtersGenMatchCanvas("muMu_dRA1TauDaughtersGenMatchCanvas", "", 600, 600);
+  Common::setCanvasOptions(muMu_dRA1TauDaughtersGenMatchCanvas, 1, 0, 0);
+  TCanvas muMu_dpTA1TauRecoTauGenMatchCanvas("muMu_dpTA1TauRecoTauGenMatchCanvas", "", 600, 600);
+  Common::setCanvasOptions(muMu_dpTA1TauRecoTauGenMatchCanvas, 1, 0, 0);
+  TCanvas muMu_tauMuPTGenMatchCanvas("muMu_tauMuPTGenMatchCanvas", "", 600, 600);
+  Common::setCanvasOptions(muMu_tauMuPTGenMatchCanvas, 1, 0, 0);
+  TCanvas muMu_tauSisterPTGenMatchCanvas("muMu_tauSisterPTGenMatchCanvas", "", 600, 600);
+  Common::setCanvasOptions(muMu_tauSisterPTGenMatchCanvas, 1, 0, 0);
+  TCanvas muMu_recoMuEtaGenMatchCanvas("muMu_recoMuEtaGenMatchCanvas", "", 600, 600);
+  Common::setCanvasOptions(muMu_recoMuEtaGenMatchCanvas, 1, 0, 0);
+  TCanvas muMu_recoMuPFRelIsoCanvas("muMu_recoMuPFRelIsoCanvas", "", 600, 600);
+  Common::setCanvasOptions(muMu_recoMuPFRelIsoCanvas, 1, 0, 0);
+  TCanvas muMu_tauSisterPTVsdRCanvas("muMu_tauSisterPTVsdRCanvas","", 600, 600);
+  TCanvas muMu_recoMuPFRelIsoVsdRA1TauDaughtersCanvas("muMu_recoMuPFRelIsoVsdRA1TauDaughtersCanvas", "", 600, 600);
+  TCanvas muMu_recoMuPFRelIsoVsTauSisterPTCanvas("muMu_recoMuPFRelIsoVsTauSisterPTCanvas", "", 600, 600);
+  TCanvas muMu_recoMuPTVsTauSisterPTCanvas("muMu_recoMuPTVsTauSisterPTCanvas", "", 600, 600);
+  TCanvas muMu_tauMuPTVsTauSisterPTCanvas("muMu_tauMuPTVsTauSisterPTCanvas", "", 600, 600);
+  TCanvas muMu_recoMuPFRelIsoVsRecoMuPTCanvas("muMu_recoMuPFRelIsoVsRecoMuPTCanvas", "", 600, 600);
+
+  //for tau_mu+tau_e
+  TCanvas muHad_dRA1TauDaughtersGenMatchCanvas("muHad_dRA1TauDaughtersGenMatchCanvas", "", 600, 600);
+  Common::setCanvasOptions(muHad_dRA1TauDaughtersGenMatchCanvas, 1, 0, 0);
+  TCanvas muHad_dpTA1TauRecoTauGenMatchCanvas("muHad_dpTA1TauRecoTauGenMatchCanvas", "", 600, 600);
+  Common::setCanvasOptions(muHad_dpTA1TauRecoTauGenMatchCanvas, 1, 0, 0);
+  TCanvas muHad_tauMuPTGenMatchCanvas("muHad_tauMuPTGenMatchCanvas", "", 600, 600);
+  Common::setCanvasOptions(muHad_tauMuPTGenMatchCanvas, 1, 0, 0);
+  TCanvas muHad_tauSisterPTGenMatchCanvas("muHad_tauSisterPTGenMatchCanvas", "", 600, 600);
+  Common::setCanvasOptions(muHad_tauSisterPTGenMatchCanvas, 1, 0, 0);
+  TCanvas muHad_recoMuEtaGenMatchCanvas("muHad_recoMuEtaGenMatchCanvas", "", 600, 600);
+  Common::setCanvasOptions(muHad_recoMuEtaGenMatchCanvas, 1, 0, 0);
+  TCanvas muHad_recoMuPFRelIsoCanvas("muHad_recoMuPFRelIsoCanvas", "", 600, 600);
+  Common::setCanvasOptions(muHad_recoMuPFRelIsoCanvas, 1, 0, 0);
+  TCanvas muHad_tauSisterPTVsdRCanvas("muHad_tauSisterPTVsdRCanvas","", 600, 600);
+  TCanvas muHad_recoMuPFRelIsoVsdRA1TauDaughtersCanvas("muHad_recoMuPFRelIsoVsdRA1TauDaughtersCanvas", "", 600, 600);
+  TCanvas muHad_recoMuPFRelIsoVsTauSisterPTCanvas("muHad_recoMuPFRelIsoVsTauSisterPTCanvas", "", 600, 600);
+  TCanvas muHad_recoMuPTVsTauSisterPTCanvas("muHad_recoMuPTVsTauSisterPTCanvas", "", 600, 600);
+  TCanvas muHad_tauMuPTVsTauSisterPTCanvas("muHad_tauMuPTVsTauSisterPTCanvas", "", 600, 600);
+  TCanvas muHad_recoMuPFRelIsoVsRecoMuPTCanvas("muHad_recoMuPFRelIsoVsRecoMuPTCanvas", "", 600, 600);
+
   //format the plots
   Common::setHistogramOptions(dRA1TauDaughters_, kBlack, 0.7, 20, 1.0, "#DeltaR", "", 0.05);
   dRA1TauDaughters_->SetLineWidth(2);
-  Common::setHistogramOptions(dRA1TauDaughtersGenMatch_, kBlack, 0.7, 20, 1.0, "#DeltaR", "", 0.05);
-  dRA1TauDaughtersGenMatch_->SetLineWidth(2);
-  Common::setHistogramOptions(dpTA1TauRecoTauGenMatch_, kBlack, 0.7, 20, 1.0, "#Delta p_{T} (GeV)", "", 0.05);
-  dpTA1TauRecoTauGenMatch_->SetLineWidth(2);
   Common::setHistogramOptions(aMass_, kBlack, 0.7, 20, 1.0, "m_{a} (GeV)", "", 0.05);
   aMass_->SetLineWidth(2);
   Common::setHistogramOptions(HPT_, kBlack, 0.7, 20, 1.0, "Higgs pT (GeV)", "", 0.05);
   HPT_->SetLineWidth(2);
   Common::setHistogramOptions(tauMuPT_, kBlack, 0.7, 20, 1.0, "tau_{mu} pT (GeV)", "", 0.05);
   tauMuPT_->SetLineWidth(2);
-  Common::setHistogramOptions(tauMuPTGenMatch_, kBlack, 0.7, 20, 1.0, "tau_{mu} pT (GeV)", "", 0.05);
-  tauMuPTGenMatch_->SetLineWidth(2);
-  Common::setHistogramOptions(tauSisterPTGenMatch_, kBlack, 0.7, 20, 1.0, "tau_{sister} pT (GeV)", "", 0.05);
-  tauSisterPTGenMatch_->SetLineWidth(2);
-  Common::setHistogramOptions(tauSisterDecayModeGenMatch_, kBlack, 0.7, 20, 1.0, "tau_{sister} decay mode", "", 0.05);
-  tauSisterDecayModeGenMatch_->SetLineWidth(2);
-  //tauSisterDecayModeGenMatch_->Scale(1./tauSisterDecayModeGenMatch_->Integral());
-  Common::setHistogramOptions(recoMuEtaGenMatch_, kBlack, 0.7, 20, 1.0, "reco #mu #eta", "", 0.05);
-  recoMuEtaGenMatch_->SetLineWidth(2);
   Common::setHistogramOptions(tauHadPT_, kBlack, 0.7, 20, 1.0, "tau_{had} pT (GeV)", "", 0.05);
   tauHadPT_->SetLineWidth(2);
-  Common::setHistogramOptions(recoMuPFRelIso_, kBlack, 0.7, 20, 1.0, "reco #mu PFRelIso", "", 0.05);
-  recoMuPFRelIso_->SetLineWidth(2);
   Common::setHistogramOptions(trueNInt_, kBlack, 0.7, 20, 1.0, "No. interactions", "", 0.05);
   trueNInt_->SetLineWidth(2);
+  Common::setHistogramOptions(tauSisterDecayModeGenMatch_, kBlack, 0.7, 20, 1.0, "tau_{sister} decay mode", "", 0.05);
+  tauSisterDecayModeGenMatch_->SetLineWidth(2);
+
+  //muE
+  Common::setHistogramOptions(muE_dRA1TauDaughtersGenMatch_, kBlack, 0.7, 20, 1.0, "#DeltaR", "", 0.05);
+  muE_dRA1TauDaughtersGenMatch_->SetLineWidth(2);
+  Common::setHistogramOptions(muE_dpTA1TauRecoTauGenMatch_, kBlack, 0.7, 20, 1.0, "#Delta p_{T} (GeV)", "", 0.05);
+  muE_dpTA1TauRecoTauGenMatch_->SetLineWidth(2);
+  Common::setHistogramOptions(muE_tauMuPTGenMatch_, kBlack, 0.7, 20, 1.0, "tau_{mu} pT (GeV)", "", 0.05);
+  muE_tauMuPTGenMatch_->SetLineWidth(2);
+  Common::setHistogramOptions(muE_tauSisterPTGenMatch_, kBlack, 0.7, 20, 1.0, "tau_{sister} pT (GeV)", "", 0.05);
+  muE_tauSisterPTGenMatch_->SetLineWidth(2);
+  Common::setHistogramOptions(muE_recoMuEtaGenMatch_, kBlack, 0.7, 20, 1.0, "reco #mu #eta", "", 0.05);
+  muE_recoMuEtaGenMatch_->SetLineWidth(2);
+  Common::setHistogramOptions(muE_recoMuPFRelIso_, kBlack, 0.7, 20, 1.0, "reco #mu PFRelIso", "", 0.05);
+  muE_recoMuPFRelIso_->SetLineWidth(2);
+
+  //muMu
+  Common::setHistogramOptions(muMu_dRA1TauDaughtersGenMatch_, kBlack, 0.7, 20, 1.0, "#DeltaR", "", 0.05);
+  muMu_dRA1TauDaughtersGenMatch_->SetLineWidth(2);
+  Common::setHistogramOptions(muMu_dpTA1TauRecoTauGenMatch_, kBlack, 0.7, 20, 1.0, "#Delta p_{T} (GeV)", "", 0.05);
+  muMu_dpTA1TauRecoTauGenMatch_->SetLineWidth(2);
+  Common::setHistogramOptions(muMu_tauMuPTGenMatch_, kBlack, 0.7, 20, 1.0, "tau_{mu} pT (GeV)", "", 0.05);
+  muMu_tauMuPTGenMatch_->SetLineWidth(2);
+  Common::setHistogramOptions(muMu_tauSisterPTGenMatch_, kBlack, 0.7, 20, 1.0, "tau_{sister} pT (GeV)", "", 0.05);
+  muMu_tauSisterPTGenMatch_->SetLineWidth(2);
+  Common::setHistogramOptions(muMu_recoMuEtaGenMatch_, kBlack, 0.7, 20, 1.0, "reco #mu #eta", "", 0.05);
+  muMu_recoMuEtaGenMatch_->SetLineWidth(2);
+  Common::setHistogramOptions(muMu_recoMuPFRelIso_, kBlack, 0.7, 20, 1.0, "reco #mu PFRelIso", "", 0.05);
+  muMu_recoMuPFRelIso_->SetLineWidth(2);
+
+  //muHad
+  Common::setHistogramOptions(muHad_dRA1TauDaughtersGenMatch_, kBlack, 0.7, 20, 1.0, "#DeltaR", "", 0.05);
+  muHad_dRA1TauDaughtersGenMatch_->SetLineWidth(2);
+  Common::setHistogramOptions(muHad_dpTA1TauRecoTauGenMatch_, kBlack, 0.7, 20, 1.0, "#Delta p_{T} (GeV)", "", 0.05);
+  muHad_dpTA1TauRecoTauGenMatch_->SetLineWidth(2);
+  Common::setHistogramOptions(muHad_tauMuPTGenMatch_, kBlack, 0.7, 20, 1.0, "tau_{mu} pT (GeV)", "", 0.05);
+  muHad_tauMuPTGenMatch_->SetLineWidth(2);
+  Common::setHistogramOptions(muHad_tauSisterPTGenMatch_, kBlack, 0.7, 20, 1.0, "tau_{sister} pT (GeV)", "", 0.05);
+  muHad_tauSisterPTGenMatch_->SetLineWidth(2);
+  Common::setHistogramOptions(muHad_recoMuEtaGenMatch_, kBlack, 0.7, 20, 1.0, "reco #mu #eta", "", 0.05);
+  muHad_recoMuEtaGenMatch_->SetLineWidth(2);
+  Common::setHistogramOptions(muHad_recoMuPFRelIso_, kBlack, 0.7, 20, 1.0, "reco #mu PFRelIso", "", 0.05);
+  muHad_recoMuPFRelIso_->SetLineWidth(2);
 
   //draw plots
   dRA1TauDaughtersCanvas.cd();
   dRA1TauDaughters_->Draw();
-  dRA1TauDaughtersGenMatchCanvas.cd();
-  dRA1TauDaughtersGenMatch_->Draw();
-  dpTA1TauRecoTauGenMatchCanvas.cd();
-  dpTA1TauRecoTauGenMatch_->Draw();
   aMassCanvas.cd();
   aMass_->Draw();
   HPTCanvas.cd();
   HPT_->Draw();
   tauMuPTCanvas.cd();
   tauMuPT_->Draw();
-  tauMuPTGenMatchCanvas.cd();
-  tauMuPTGenMatch_->Draw();
-  tauSisterPTGenMatchCanvas.cd();
-  tauSisterPTGenMatch_->Draw();
-  tauSisterDecayModeGenMatchCanvas.cd();
-  tauSisterDecayModeGenMatch_->Draw();
-  recoMuEtaGenMatchCanvas.cd();
-  recoMuEtaGenMatch_->Draw();
   tauHadPTCanvas.cd();
   tauHadPT_->Draw();
-  recoMuPFRelIsoCanvas.cd();
-  recoMuPFRelIso_->Draw();
   trueNIntCanvas.cd();
   trueNInt_->Draw();
+  tauSisterDecayModeGenMatchCanvas.cd();
+  tauSisterDecayModeGenMatch_->Draw();
+  //muE
+  muE_dRA1TauDaughtersGenMatchCanvas.cd();
+  muE_dRA1TauDaughtersGenMatch_->Draw();
+  muE_dpTA1TauRecoTauGenMatchCanvas.cd();
+  muE_dpTA1TauRecoTauGenMatch_->Draw();
+  muE_tauMuPTGenMatchCanvas.cd();
+  muE_tauMuPTGenMatch_->Draw();
+  muE_tauSisterPTGenMatchCanvas.cd();
+  muE_tauSisterPTGenMatch_->Draw();
+  muE_recoMuEtaGenMatchCanvas.cd();
+  muE_recoMuEtaGenMatch_->Draw();
+  muE_recoMuPFRelIsoCanvas.cd();
+  muE_recoMuPFRelIso_->Draw();
+  //muMu
+  muMu_dRA1TauDaughtersGenMatchCanvas.cd();
+  muMu_dRA1TauDaughtersGenMatch_->Draw();
+  muMu_dpTA1TauRecoTauGenMatchCanvas.cd();
+  muMu_dpTA1TauRecoTauGenMatch_->Draw();
+  muMu_tauMuPTGenMatchCanvas.cd();
+  muMu_tauMuPTGenMatch_->Draw();
+  muMu_tauSisterPTGenMatchCanvas.cd();
+  muMu_tauSisterPTGenMatch_->Draw();
+  muMu_recoMuEtaGenMatchCanvas.cd();
+  muMu_recoMuEtaGenMatch_->Draw();
+  muMu_recoMuPFRelIsoCanvas.cd();
+  muMu_recoMuPFRelIso_->Draw();
+  //muHad
+  muHad_dRA1TauDaughtersGenMatchCanvas.cd();
+  muHad_dRA1TauDaughtersGenMatch_->Draw();
+  muHad_dpTA1TauRecoTauGenMatchCanvas.cd();
+  muHad_dpTA1TauRecoTauGenMatch_->Draw();
+  muHad_tauMuPTGenMatchCanvas.cd();
+  muHad_tauMuPTGenMatch_->Draw();
+  muHad_tauSisterPTGenMatchCanvas.cd();
+  muHad_tauSisterPTGenMatch_->Draw();
+  muHad_recoMuEtaGenMatchCanvas.cd();
+  muHad_recoMuEtaGenMatch_->Draw();
+  muHad_recoMuPFRelIsoCanvas.cd();
+  muHad_recoMuPFRelIso_->Draw();
+
   Common::draw2DHistograms(a2TauPairDecayVsA1TauPairDecayCanvas, a2TauPairDecayVsA1TauPairDecay_);
   Common::draw2DHistograms(tauMuPTVsdRCanvas, tauMuPTVsdR_);
-  Common::draw2DHistograms(tauSisterPTVsdRCanvas, tauSisterPTVsdR_);
   Common::draw2DHistograms(tauSisterPTVsDecayModeCanvas, tauSisterPTVsDecayMode_);
-  Common::draw2DHistograms(recoMuPFRelIsoVsdRA1TauDaughtersCanvas, recoMuPFRelIsoVsdRA1TauDaughters_);
-  Common::draw2DHistograms(recoMuPFRelIsoVsTauSisterPTCanvas, recoMuPFRelIsoVsTauSisterPT_);
-  Common::draw2DHistograms(recoMuPTVsTauSisterPTCanvas, recoMuPTVsTauSisterPT_);
-  Common::draw2DHistograms(tauMuPTVsTauSisterPTCanvas, tauMuPTVsTauSisterPT_);
-  Common::draw2DHistograms(recoMuPFRelIsoVsRecoMuPTCanvas, recoMuPFRelIsoVsRecoMuPT_);
   Common::draw2DHistograms(recoMuPFRelIsoVsTauSisterDecayModeCanvas, recoMuPFRelIsoVsTauSisterDecayMode_);
+  //muE
+  Common::draw2DHistograms(muE_tauSisterPTVsdRCanvas, muE_tauSisterPTVsdR_);
+  Common::draw2DHistograms(muE_recoMuPFRelIsoVsdRA1TauDaughtersCanvas, muE_recoMuPFRelIsoVsdRA1TauDaughters_);
+  Common::draw2DHistograms(muE_recoMuPFRelIsoVsTauSisterPTCanvas, muE_recoMuPFRelIsoVsTauSisterPT_);
+  Common::draw2DHistograms(muE_recoMuPTVsTauSisterPTCanvas, muE_recoMuPTVsTauSisterPT_);
+  Common::draw2DHistograms(muE_tauMuPTVsTauSisterPTCanvas, muE_tauMuPTVsTauSisterPT_);
+  Common::draw2DHistograms(muE_recoMuPFRelIsoVsRecoMuPTCanvas, muE_recoMuPFRelIsoVsRecoMuPT_);
+  //muMu
+  Common::draw2DHistograms(muMu_tauSisterPTVsdRCanvas, muMu_tauSisterPTVsdR_);
+  Common::draw2DHistograms(muMu_recoMuPFRelIsoVsdRA1TauDaughtersCanvas, muMu_recoMuPFRelIsoVsdRA1TauDaughters_);
+  Common::draw2DHistograms(muMu_recoMuPFRelIsoVsTauSisterPTCanvas, muMu_recoMuPFRelIsoVsTauSisterPT_);
+  Common::draw2DHistograms(muMu_recoMuPTVsTauSisterPTCanvas, muMu_recoMuPTVsTauSisterPT_);
+  Common::draw2DHistograms(muMu_tauMuPTVsTauSisterPTCanvas, muMu_tauMuPTVsTauSisterPT_);
+  Common::draw2DHistograms(muMu_recoMuPFRelIsoVsRecoMuPTCanvas, muMu_recoMuPFRelIsoVsRecoMuPT_);
+  //muHad
+  Common::draw2DHistograms(muHad_tauSisterPTVsdRCanvas, muHad_tauSisterPTVsdR_);
+  Common::draw2DHistograms(muHad_recoMuPFRelIsoVsdRA1TauDaughtersCanvas, muHad_recoMuPFRelIsoVsdRA1TauDaughters_);
+  Common::draw2DHistograms(muHad_recoMuPFRelIsoVsTauSisterPTCanvas, muHad_recoMuPFRelIsoVsTauSisterPT_);
+  Common::draw2DHistograms(muHad_recoMuPTVsTauSisterPTCanvas, muHad_recoMuPTVsTauSisterPT_);
+  Common::draw2DHistograms(muHad_tauMuPTVsTauSisterPTCanvas, muHad_tauMuPTVsTauSisterPT_);
+  Common::draw2DHistograms(muHad_recoMuPFRelIsoVsRecoMuPTCanvas, muHad_recoMuPFRelIsoVsRecoMuPT_);
+
+
   //write output file
   out_->cd();
   dRA1TauDaughtersCanvas.Write();
-  dRA1TauDaughtersGenMatchCanvas.Write();
-  dpTA1TauRecoTauGenMatchCanvas.Write();
   aMassCanvas.Write();
   HPTCanvas.Write();
   tauMuPTCanvas.Write();
-  tauMuPTGenMatchCanvas.Write();
-  tauSisterPTGenMatchCanvas.Write();
-  tauSisterDecayModeGenMatchCanvas.Write();
-  recoMuEtaGenMatchCanvas.Write();
   tauHadPTCanvas.Write();
-  recoMuPFRelIsoCanvas.Write();
   trueNIntCanvas.Write();
+  tauSisterDecayModeGenMatchCanvas.Write();
   a2TauPairDecayVsA1TauPairDecayCanvas.Write();
   tauMuPTVsdRCanvas.Write();
-  tauSisterPTVsdRCanvas.Write();
   tauSisterPTVsDecayModeCanvas.Write();
-  recoMuPFRelIsoVsdRA1TauDaughtersCanvas.Write();
-  recoMuPFRelIsoVsTauSisterPTCanvas.Write();
-  recoMuPTVsTauSisterPTCanvas.Write();
-  tauMuPTVsTauSisterPTCanvas.Write();
-  recoMuPFRelIsoVsRecoMuPTCanvas.Write();
   recoMuPFRelIsoVsTauSisterDecayModeCanvas.Write();
+  //muE
+  muE_dRA1TauDaughtersGenMatchCanvas.Write();
+  muE_dpTA1TauRecoTauGenMatchCanvas.Write();
+  muE_tauMuPTGenMatchCanvas.Write();
+  muE_tauSisterPTGenMatchCanvas.Write();
+  muE_recoMuEtaGenMatchCanvas.Write();
+  muE_recoMuPFRelIsoCanvas.Write();
+  muE_tauSisterPTVsdRCanvas.Write();
+  muE_recoMuPFRelIsoVsdRA1TauDaughtersCanvas.Write();
+  muE_recoMuPFRelIsoVsTauSisterPTCanvas.Write();
+  muE_recoMuPTVsTauSisterPTCanvas.Write();
+  muE_tauMuPTVsTauSisterPTCanvas.Write();
+  muE_recoMuPFRelIsoVsRecoMuPTCanvas.Write();
+  //muMu
+  muMu_dRA1TauDaughtersGenMatchCanvas.Write();
+  muMu_dpTA1TauRecoTauGenMatchCanvas.Write();
+  muMu_tauMuPTGenMatchCanvas.Write();
+  muMu_tauSisterPTGenMatchCanvas.Write();
+  muMu_recoMuEtaGenMatchCanvas.Write();
+  muMu_recoMuPFRelIsoCanvas.Write();
+  muMu_tauSisterPTVsdRCanvas.Write();
+  muMu_recoMuPFRelIsoVsdRA1TauDaughtersCanvas.Write();
+  muMu_recoMuPFRelIsoVsTauSisterPTCanvas.Write();
+  muMu_recoMuPTVsTauSisterPTCanvas.Write();
+  muMu_tauMuPTVsTauSisterPTCanvas.Write();
+  muMu_recoMuPFRelIsoVsRecoMuPTCanvas.Write();
+  //muHad
+  muHad_dRA1TauDaughtersGenMatchCanvas.Write();
+  muHad_dpTA1TauRecoTauGenMatchCanvas.Write();
+  muHad_tauMuPTGenMatchCanvas.Write();
+  muHad_tauSisterPTGenMatchCanvas.Write();
+  muHad_recoMuEtaGenMatchCanvas.Write();
+  muHad_recoMuPFRelIsoCanvas.Write();
+  muHad_tauSisterPTVsdRCanvas.Write();
+  muHad_recoMuPFRelIsoVsdRA1TauDaughtersCanvas.Write();
+  muHad_recoMuPFRelIsoVsTauSisterPTCanvas.Write();
+  muHad_recoMuPTVsTauSisterPTCanvas.Write();
+  muHad_tauMuPTVsTauSisterPTCanvas.Write();
+  muHad_recoMuPFRelIsoVsRecoMuPTCanvas.Write();
   out_->Write();
   out_->Close();
 }
@@ -879,14 +1182,12 @@ void GenAnalyzer::reset(const bool doDelete)
   HPT_ = NULL;
   if ((doDelete) && (tauMuPT_ != NULL)) delete tauMuPT_;
   tauMuPT_ = NULL;
-  if ((doDelete) && (recoMuEtaGenMatch_ != NULL)) delete recoMuEtaGenMatch_;
-  recoMuEtaGenMatch_ = NULL;
   if ((doDelete) && (tauHadPT_ != NULL)) delete tauHadPT_;
   tauHadPT_ = NULL;
-  if ((doDelete) && (recoMuPFRelIso_ != NULL)) delete recoMuPFRelIso_;
-  recoMuPFRelIso_ = NULL;
-  if ((doDelete) && (trueNInt_ != NULL)) delete trueNInt_;
-  trueNInt_ = NULL;
+  if (doDelete && (tauSisterPTVsDecayMode_ != NULL)) {
+    delete tauSisterPTVsDecayMode_;
+  }
+  tauSisterPTVsDecayMode_ = NULL;
   if (doDelete && (a2TauPairDecayVsA1TauPairDecay_ != NULL)) {
     delete a2TauPairDecayVsA1TauPairDecay_;
   }
@@ -895,39 +1196,101 @@ void GenAnalyzer::reset(const bool doDelete)
     delete tauMuPTVsdR_;
   }
   tauMuPTVsdR_ = NULL;
-  if (doDelete && (tauSisterPTVsdR_ != NULL)) {
-    delete tauSisterPTVsdR_;
-  }
-  tauSisterPTVsdR_ = NULL;
-  if (doDelete && (tauSisterPTVsDecayMode_ != NULL)) {
-    delete tauSisterPTVsDecayMode_;
-  }
-  tauSisterPTVsDecayMode_ = NULL;
-  if (doDelete && (recoMuPFRelIsoVsdRA1TauDaughters_ != NULL)) {
-    delete recoMuPFRelIsoVsdRA1TauDaughters_;
-  }
-  recoMuPFRelIsoVsdRA1TauDaughters_ = NULL;
-  if (doDelete && (recoMuPFRelIsoVsTauSisterPT_ != NULL)) {
-    delete recoMuPFRelIsoVsTauSisterPT_;
-  }
-  recoMuPFRelIsoVsTauSisterPT_ = NULL;
-  if (doDelete && (recoMuPTVsTauSisterPT_ != NULL)) {
-    delete recoMuPTVsTauSisterPT_;
-  }
-  recoMuPTVsTauSisterPT_ = NULL;
-  if (doDelete && (tauMuPTVsTauSisterPT_ != NULL)) {
-    delete tauMuPTVsTauSisterPT_;
-  }
-  tauMuPTVsTauSisterPT_ = NULL;
-  if (doDelete && (recoMuPFRelIsoVsRecoMuPT_ != NULL)) {
-    delete recoMuPFRelIsoVsRecoMuPT_;
-  }
-  recoMuPFRelIsoVsRecoMuPT_ = NULL;
+  if ((doDelete) && (trueNInt_ != NULL)) delete trueNInt_;
+  trueNInt_ = NULL;
   if (doDelete && (recoMuPFRelIsoVsTauSisterDecayMode_ != NULL)) {
     delete recoMuPFRelIsoVsTauSisterDecayMode_;
   }
   recoMuPFRelIsoVsTauSisterDecayMode_ = NULL;
-}
 
+  //muE
+  if ((doDelete) && (muE_recoMuEtaGenMatch_ != NULL)) delete muE_recoMuEtaGenMatch_;
+  muE_recoMuEtaGenMatch_ = NULL;
+  if ((doDelete) && (muE_recoMuPFRelIso_ != NULL)) delete muE_recoMuPFRelIso_;
+  muE_recoMuPFRelIso_ = NULL;
+  if (doDelete && (muE_tauSisterPTVsdR_ != NULL)) {
+    delete muE_tauSisterPTVsdR_;
+  }
+  muE_tauSisterPTVsdR_ = NULL;
+  if (doDelete && (muE_recoMuPFRelIsoVsdRA1TauDaughters_ != NULL)) {
+    delete muE_recoMuPFRelIsoVsdRA1TauDaughters_;
+  }
+  muE_recoMuPFRelIsoVsdRA1TauDaughters_ = NULL;
+  if (doDelete && (muE_recoMuPFRelIsoVsTauSisterPT_ != NULL)) {
+    delete muE_recoMuPFRelIsoVsTauSisterPT_;
+  }
+  muE_recoMuPFRelIsoVsTauSisterPT_ = NULL;
+  if (doDelete && (muE_recoMuPTVsTauSisterPT_ != NULL)) {
+    delete muE_recoMuPTVsTauSisterPT_;
+  }
+  muE_recoMuPTVsTauSisterPT_ = NULL;
+  if (doDelete && (muE_tauMuPTVsTauSisterPT_ != NULL)) {
+    delete muE_tauMuPTVsTauSisterPT_;
+  }
+  muE_tauMuPTVsTauSisterPT_ = NULL;
+  if (doDelete && (muE_recoMuPFRelIsoVsRecoMuPT_ != NULL)) {
+    delete muE_recoMuPFRelIsoVsRecoMuPT_;
+  }
+  muE_recoMuPFRelIsoVsRecoMuPT_ = NULL;
+  //muMu
+  if ((doDelete) && (muMu_recoMuEtaGenMatch_ != NULL)) delete muMu_recoMuEtaGenMatch_;
+  muMu_recoMuEtaGenMatch_ = NULL;
+  if ((doDelete) && (muMu_recoMuPFRelIso_ != NULL)) delete muMu_recoMuPFRelIso_;
+  muMu_recoMuPFRelIso_ = NULL;
+  if (doDelete && (muMu_tauSisterPTVsdR_ != NULL)) {
+    delete muMu_tauSisterPTVsdR_;
+  }
+  muMu_tauSisterPTVsdR_ = NULL;
+  if (doDelete && (muMu_recoMuPFRelIsoVsdRA1TauDaughters_ != NULL)) {
+    delete muMu_recoMuPFRelIsoVsdRA1TauDaughters_;
+  }
+  muMu_recoMuPFRelIsoVsdRA1TauDaughters_ = NULL;
+  if (doDelete && (muMu_recoMuPFRelIsoVsTauSisterPT_ != NULL)) {
+    delete muMu_recoMuPFRelIsoVsTauSisterPT_;
+  }
+  muMu_recoMuPFRelIsoVsTauSisterPT_ = NULL;
+  if (doDelete && (muMu_recoMuPTVsTauSisterPT_ != NULL)) {
+    delete muMu_recoMuPTVsTauSisterPT_;
+  }
+  muMu_recoMuPTVsTauSisterPT_ = NULL;
+  if (doDelete && (muMu_tauMuPTVsTauSisterPT_ != NULL)) {
+    delete muMu_tauMuPTVsTauSisterPT_;
+  }
+  muMu_tauMuPTVsTauSisterPT_ = NULL;
+  if (doDelete && (muMu_recoMuPFRelIsoVsRecoMuPT_ != NULL)) {
+    delete muMu_recoMuPFRelIsoVsRecoMuPT_;
+  }
+  muMu_recoMuPFRelIsoVsRecoMuPT_ = NULL;
+
+  //muHad
+  if ((doDelete) && (muHad_recoMuEtaGenMatch_ != NULL)) delete muHad_recoMuEtaGenMatch_;
+  muHad_recoMuEtaGenMatch_ = NULL;
+  if ((doDelete) && (muHad_recoMuPFRelIso_ != NULL)) delete muHad_recoMuPFRelIso_;
+  muHad_recoMuPFRelIso_ = NULL;
+  if (doDelete && (muHad_tauSisterPTVsdR_ != NULL)) {
+    delete muHad_tauSisterPTVsdR_;
+  }
+  muHad_tauSisterPTVsdR_ = NULL;
+  if (doDelete && (muHad_recoMuPFRelIsoVsdRA1TauDaughters_ != NULL)) {
+    delete muHad_recoMuPFRelIsoVsdRA1TauDaughters_;
+  }
+  muHad_recoMuPFRelIsoVsdRA1TauDaughters_ = NULL;
+  if (doDelete && (muHad_recoMuPFRelIsoVsTauSisterPT_ != NULL)) {
+    delete muHad_recoMuPFRelIsoVsTauSisterPT_;
+  }
+  muHad_recoMuPFRelIsoVsTauSisterPT_ = NULL;
+  if (doDelete && (muHad_recoMuPTVsTauSisterPT_ != NULL)) {
+    delete muHad_recoMuPTVsTauSisterPT_;
+  }
+  muHad_recoMuPTVsTauSisterPT_ = NULL;
+  if (doDelete && (muHad_tauMuPTVsTauSisterPT_ != NULL)) {
+    delete muHad_tauMuPTVsTauSisterPT_;
+  }
+  muHad_tauMuPTVsTauSisterPT_ = NULL;
+  if (doDelete && (muHad_recoMuPFRelIsoVsRecoMuPT_ != NULL)) {
+    delete muHad_recoMuPFRelIsoVsRecoMuPT_;
+  }
+  muHad_recoMuPFRelIsoVsRecoMuPT_ = NULL;
+}
 //define this as a plug-in
 DEFINE_FWK_MODULE(GenAnalyzer);
