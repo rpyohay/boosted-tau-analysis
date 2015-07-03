@@ -508,7 +508,7 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
 	//ignore this tau in the future
 	keysToIgnore.push_back(tauKey);
-	//}
+	}
       // get tau decay and tau sister decay
       std::pair<reco::PFTau::hadronicDecayMode, GenTauDecayID::DecayType> thisDecay = 
 	iTau->tauDecayType(false, true);
@@ -706,7 +706,7 @@ void GenAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	    }
 	} // if this tau decayed to a mu
 	 
-      } // testing
+     // } // testing
     }
     catch (std::string& ex) { throw cms::Exception("GenAnalyzer") << ex; }
   }
