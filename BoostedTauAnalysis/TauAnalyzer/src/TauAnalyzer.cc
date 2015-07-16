@@ -1703,24 +1703,6 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     const reco::PFJetRef& tauOldJetRef = (*pOldNewJetMap)[tauJetRef];
     const reco::PFJet correctedTauJet = correctedJets[tauOldJetRef.key()];
     const reco::MuonRefVector& removedMuons = (*pMuonJetMap)[tauJetRef];
-
-    bool noOtherBTaggedJets = true;
-    //loop again over btags to veto corrected old jets that pass CSVM
-    for (unsigned int i = 0; i != bTags.size(); ++i)
-      { // loop over btags
-	PFJetRef myBJetRef(pOldJets,i);
-	for (std::vector<reco::PFJetRef>::const_iterator iJet = correctedOldJetRefs.begin(); 
-	     iJet != correctedOldJetRefs.end(); ++iJet)
-	  { // loop over corrected old jets not matched to W_mu, tau_mu, or tau_had
-
-	    if (myBJetRef.key() == iJet->key()) // if a b-tagged jet is found
-	      {
-		if (((*iJet)->pt() > 30.) && (bTags[i].second > 0.679)) // if jet pT > 30 and csv_ > CSVM
-		  noOtherBTaggedJets = false;
-	      }
-	  } // loop over corrected old jets not matched to W_mu, tau_mu, or tau_had
-
-      } // loop over btags
     
     //make a collection of corrected old jets in |eta| < 2.4 not overlapping the W muon or tau
     std::vector<reco::PFJetRef> oldJetRefsExclTauNoPTCut;
@@ -1732,6 +1714,24 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       }
     }
     Common::sortByPT(oldJetRefsExclTauNoPTCut);
+
+    bool noOtherBTaggedJets = true;
+    //loop again over btags to veto corrected old jets that pass CSVM
+    for (unsigned int i = 0; i != bTags.size(); ++i)
+      { // loop over btags
+	PFJetRef myBJetRef(pOldJets,i);
+	for (std::vector<reco::PFJetRef>::const_iterator iJet = oldJetRefsExclTauNoPTCut.begin(); 
+	     iJet != oldJetRefsExclTauNoPTCut.end(); ++iJet)
+	  { // loop over corrected old jets not matched to W_mu, tau_mu, or tau_had
+
+	    if (myBJetRef.key() == iJet->key()) // if a b-tagged jet is found
+	      {
+		if (((*iJet)->pt() > 30.) && (bTags[i].second > 0.679)) // if jet pT > 30 and csv_ > CSVM
+		  noOtherBTaggedJets = false;
+	      }
+	  } // loop over corrected old jets not matched to W_mu, tau_mu, or tau_had
+
+      } // loop over btags
 
     // //get weight based on hadronic tau pT
     // bool foundBin = false;

@@ -99,7 +99,8 @@ from RecoBTag.ImpactParameter.impactParameter_cff import *
 from RecoBTag.SecondaryVertex.secondaryVertex_cff import *
 from RecoBTau.JetTagComputer.combinedMVA_cff import *
 process.impactParameterTagInfos.jetTracks = cms.InputTag("ak5JetTracksAssociatorAtVertex")
-process.ak5JetTracksAssociatorAtVertex.jets = cms.InputTag("ak5PFJets")
+#process.ak5JetTracksAssociatorAtVertex.jets = cms.InputTag("ak5PFJets")
+process.ak5JetTracksAssociatorAtVertex.jets = cms.InputTag('CleanJets', 'ak5PFJetsNoMu', 'SKIM')
 process.ak5JetTracksAssociatorAtVertex.tracks = cms.InputTag("generalTracks")
 process.btagging = cms.Sequence(
     process.ak5JetTracksAssociatorAtVertex*
@@ -341,10 +342,12 @@ process.trigMuHadIsoTauSelector = cms.EDFilter(
 process.IsoBVetoFilter = cms.EDFilter(
     'BVetoFilter',
     tauTag = cms.InputTag('muHadIsoTauSelector'),
-    oldJetTag = cms.InputTag('ak5PFJets'),
+#    oldJetTag = cms.InputTag('ak5PFJets'),
+    oldJetTag = cms.InputTag('CleanJets', 'ak5PFJetsNoMu', 'SKIM'),
     jetMuonMapTag = cms.InputTag('CleanJets', '', 'SKIM'),
-    bTagInfoTag = cms.InputTag('combinedSecondaryVertexBJetTags'),
+    bTagInfoTag = cms.InputTag('combinedSecondaryVertexBJetTags', '', 'MUHADANALYSIS'),
     CSVMax = cms.double(0.679),
+#    CSVMax = cms.double(10.),
     passFilter = cms.bool(True),
     minNumObjsToPassFilter = cms.uint32(1)
     )
@@ -429,6 +432,7 @@ process.highMTMuHadIsoTauAnalyzer = cms.EDAnalyzer(
     zCut = cms.double(0.1),
     RcutFactor = cms.double(0.5),
     CSVMax = cms.double(0.679),
+#    CSVMax = cms.double(10.),
     MC = cms.bool(False),
     higgsReweight = cms.bool(False),
     reweight = cms.bool(False),
@@ -610,6 +614,7 @@ process.beginSequence = cms.Sequence(process.genPartonSelector*process.genMuSele
 process.baseIsoTauAnalysisSequence = cms.Sequence(
     process.highestPTWMuonSelector*
     process.muHadIsoTauSelector*
+    process.btagging*
     process.IsoBVetoFilter*
     process.corrJetDistinctIsoTauSelector*
     process.TRIGGEROBJECTFILTER*
@@ -641,6 +646,7 @@ process.baseSignalIsoTauAnalysisSequence = cms.Sequence(
     process.PFTau* #2 instances of PFTau sequence!  Fix someday!
     process.highestPTWMuonSelector*
     process.muHadIsoTauSelector*
+    process.btagging*
     process.IsoBVetoFilter*
     process.TRIGGEROBJECTFILTER*
     OSSFFILTERISOprocess.SSSFFilterIso*
@@ -664,6 +670,7 @@ process.lowMTSignalIsoTauAnalysisSequence = cms.Sequence(
 process.baseNonIsoTauAnalysisSequence = cms.Sequence(
     process.highestPTWMuonSelector*
     process.muHadNonIsoTauSelector*
+    process.btagging*
     process.NonIsoBVetoFilter*
     process.corrJetDistinctNonIsoTauSelector*
     process.TRIGGEROBJECTFILTER*
@@ -688,6 +695,7 @@ process.lowMTNonIsoTauAnalysisSequence = cms.Sequence(
 process.baseTauAnalysisSequence = cms.Sequence(
     process.highestPTWMuonSelector*
     process.muHadTauSelector*
+    process.btagging*
     process.AllBVetoFilter*
     process.corrJetDistinctTauSelector*
     process.TRIGGEROBJECTFILTER*
