@@ -66,6 +66,7 @@ void formatBoostedResonanceDataBkgPlots(const string& inputVersion, const string
   canvasNames1D.push_back("diJetWMuHTCanvas");
   canvasNames1D.push_back("jetTauJetWMuHTCanvas");
   canvasNames1D.push_back("dRSoftMuTauHadCanvas");
+  canvasNames1D.push_back("HPTCanvas");
   canvasNames1D.push_back("tauMuPTCanvas");
   canvasNames1D.push_back("tauHadPTCanvas");
   canvasNames1D.push_back("tauHadPT1ProngCanvas");
@@ -212,6 +213,7 @@ void formatBoostedResonanceDataBkgPlots(const string& inputVersion, const string
   graphNames1D.push_back("diJetWMuHT");
   graphNames1D.push_back("jetTauJetWMuHT");
   graphNames1D.push_back("dRSoftMuTauHad");
+  graphNames1D.push_back("HPT");
   graphNames1D.push_back("tauMuPT");
   graphNames1D.push_back("tauHadPT");
   graphNames1D.push_back("tauHadPT1Prong");
@@ -852,16 +854,16 @@ void formatBoostedResonanceDataBkgPlots(const string& inputVersion, const string
   //conservative estimate of the J/psi-->mumu or upsilon-->mumu/tautau background from region C
   //compute data-driven QCD estimate in signal (i.e. isolated W muon + isolated tau) region: 
   //region C - resonance estimate
-  const pair<Int_t, Int_t> normReg(1, firstBinToBlind - 1);
+  const pair<Int_t, Int_t> normReg(1, 12);
   const string resBkgOutputFileNoRebin(analysisFilePath + "results/resBkg_noRebin" + MTBin + 
 				       tag19p7InvFb + outputVTag + fileExt);
   vector<Double_t> nominalBinEdges;
   cout << "\nEstimate boosted resonance background with narrow bins\n---\n";
   estimateBoostedResonanceBackground(resBkgOutputFileNoRebin, dataVsMCOutputDiff, /*first, no 
 										    rebinning*/
-				     nonIsoWDataIsoHaddOutputFile, nonIsoWDataNonIsoHaddOutputFile, 
-				     normReg, HLTPath, MTBin, nominalBinEdges.size() - 1, 
-				     nominalBinEdges);
+				     nonIsoWDataIsoHaddOutputFile, 
+				     nonIsoWDataNonIsoHaddOutputFile, normReg, HLTPath, MTBin, 
+				     nominalBinEdges.size() - 1, nominalBinEdges);
   nominalBinEdges.push_back(0.0);
   nominalBinEdges.push_back(1.0);
   nominalBinEdges.push_back(2.0);
@@ -872,15 +874,15 @@ void formatBoostedResonanceDataBkgPlots(const string& inputVersion, const string
 				outputVTag + fileExt);
   cout << "\nEstimate boosted resonance background and rebin to match nominal binning\n---\n";
   estimateBoostedResonanceBackground(resBkgOutputFile, dataVsMCOutputDiff, //rebin
-				     nonIsoWDataIsoHaddOutputFile, nonIsoWDataNonIsoHaddOutputFile, 
-				     normReg, HLTPath, MTBin, nominalBinEdges.size() - 1, 
-				     nominalBinEdges);
+				     nonIsoWDataIsoHaddOutputFile, 
+				     nonIsoWDataNonIsoHaddOutputFile, normReg, HLTPath, MTBin, 
+				     nominalBinEdges.size() - 1, nominalBinEdges);
 
   //compute data-driven QCD estimate in control (i.e. isolated W muon + non-isolated tau) region
   string outputFileNameB(analysisFilePath + "results/dataVsMC_RegionBQCDEstimate" + MTBin + 
 			 dataVTag + fileExt);
   string inputFileNameC(dataVsMCOutputDiff); // Region B
-  string inputFileNameD(nonIsoWDataNonIsoHaddOutputFile/*HLTMu40eta2p1RegDInputFile*/); // Region D
+  string inputFileNameD(nonIsoWDataNonIsoHaddOutputFile); // Region D
   const pair<Double_t, Double_t> SFAndErrTotInt = 
     normFactorAndError(pair<string, string>(inputFileNameC, "muHadMass"), 
 		       pair<string, string>(inputFileNameD, "muHadMass"), 
@@ -893,25 +895,25 @@ void formatBoostedResonanceDataBkgPlots(const string& inputVersion, const string
   //compare region C data to region D data
   const string variable("muHadMass");
   const string theunit("m_{#mu+X} (GeV)");
-  string inputFileNameB(nonIsoWDataIsoHaddOutputFile/*HLTMu40eta2p1RegCInputFile*/); // Region C
+  string inputFileNameB(nonIsoWDataIsoHaddOutputFile); // Region C
   vector<string> compRegCDataToRegDDataInputFiles;
   compRegCDataToRegDDataInputFiles.push_back(outputFileNameB);
   compRegCDataToRegDDataInputFiles.push_back(inputFileNameB);
   string compRegCDataToRegDDataOutputFile(analysisFilePath + "results/regCDataVsRegDData" + 
 					  MTBin + tag19p7InvFb + outputVTag + fileExt);
   QCDVsMCClosurePlots(compRegCDataToRegDDataInputFiles, variable, theunit, 
-		      pair<string, string>("Region D data", "Region C data"), 1, 
-		      firstBinToBlind - 1, 0.0, 3.75, compRegCDataToRegDDataOutputFile, "RECREATE");
+		      pair<string, string>("Region D data", "Region C data"), 1, 12, 0.0, 3.75, 
+		      compRegCDataToRegDDataOutputFile, "RECREATE");
   QCDVsMCClosurePlots(compRegCDataToRegDDataInputFiles, "muHadMass1Prong", theunit, 
-		      pair<string, string>("Region D data", "Region C data"), 1, 
-		      firstBinToBlind - 1, 0.0, 3.75, compRegCDataToRegDDataOutputFile, "UPDATE");
+		      pair<string, string>("Region D data", "Region C data"), 1, 12, 0.0, 3.75, 
+		      compRegCDataToRegDDataOutputFile, "UPDATE");
   QCDVsMCClosurePlots(compRegCDataToRegDDataInputFiles, "muHadMass1Prong1Pi0", theunit, 
-		      pair<string, string>("Region D data", "Region C data"), 1, 
-		      firstBinToBlind - 1, 0.0, 3.75, compRegCDataToRegDDataOutputFile, "UPDATE");
+		      pair<string, string>("Region D data", "Region C data"), 1, 12, 0.0, 3.75, 
+		      compRegCDataToRegDDataOutputFile, "UPDATE");
   QCDVsMCClosurePlots(compRegCDataToRegDDataInputFiles, "muHadMass1Prong2Pi0", theunit, 
-		      pair<string, string>("Region D data", "Region C data"), 1, 
-		      firstBinToBlind - 1, 0.0, 3.75, compRegCDataToRegDDataOutputFile, "UPDATE");
+		      pair<string, string>("Region D data", "Region C data"), 1, 12, 0.0, 3.75, 
+		      compRegCDataToRegDDataOutputFile, "UPDATE");
   QCDVsMCClosurePlots(compRegCDataToRegDDataInputFiles, "muHadMass3Prong", theunit, 
-		      pair<string, string>("Region D data", "Region C data"), 1, 
-		      firstBinToBlind - 1, 0.0, 3.75, compRegCDataToRegDDataOutputFile, "UPDATE");
+		      pair<string, string>("Region D data", "Region C data"), 1, 12, 0.0, 3.75, 
+		      compRegCDataToRegDDataOutputFile, "UPDATE");
 }
