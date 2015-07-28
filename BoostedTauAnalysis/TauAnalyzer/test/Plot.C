@@ -882,6 +882,59 @@ void deleteStreams(vector<TFile*>& streams)
   }
 }
 
+/*create a histogram of (data - bkg.)/sqrt(jetFakeStatErr^2 + resBkgStatErr^2)
+  for all cases, use the nominal error as the denominator*/
+TH1F* makeDataBkgAgreementHist(const TH1F* data, const TH1F* bkg)
+{
+  if ((data->GetNbinsX() + 2) != (bkg->GetNbinsX() + 2)) {
+    cerr << "Error: size mismatch.\n";
+    return NULL;
+  }
+  TH1F* ratioHist = (TH1F*)data->Clone();
+  ratioHist->Add(bkg, -1.0);
+  for (Int_t iBin = 0; iBin <= (bkg->GetNbinsX() + 1); ++iBin) {
+    Double_t dataBkgStatErr = ratioHist->GetBinError(iBin);
+    Double_t bkgStatErr = bkg->GetBinError(iBin);
+    Double_t binContent = bkgStatErr == 0.0 ? 0.0 : (ratioHist->GetBinContent(iBin)/bkgStatErr);
+    ratioHist->SetBinContent(iBin, binContent);
+    ratioHist->SetBinError(iBin, dataBkgStatErr/bkgStatErr);
+  }
+  ratioHist->GetYaxis()->SetTitle("#frac{Data - Bkg.}{Bkg. stat. error}");
+  ratioHist->GetYaxis()->SetRangeUser(-3.0, 3.0);
+  return ratioHist;
+}
+
+/*create a histogram of (data - bkg.)/
+  sqrt(jetFakeStatErr^2 + resBkgStatErr^2 + jetFakeSystErr^2)*/
+TH1F* makeDataBkgAgreementHist(const TH1F* data, const TH1F* nomBkg, const TH1F* allQCDBkg, 
+			       const TH1F* allEWBkg)
+{
+  if (((data->GetNbinsX()) != (nomBkg->GetNbinsX())) || 
+      ((nomBkg->GetNbinsX()) != (allQCDBkg->GetNbinsX())) || 
+      ((allQCDBkg->GetNbinsX()) != (allEWBkg->GetNbinsX()))) {
+    cerr << "Error: size mismatch.\n";
+    return NULL;
+  }
+  TH1F* ratioHist = (TH1F*)data->Clone();
+  ratioHist->Add(nomBkg, -1.0);
+  for (Int_t iBin = 0; iBin <= (nomBkg->GetNbinsX() + 1); ++iBin) {
+    Double_t dataNomBkgStatErr = ratioHist->GetBinError(iBin);
+    Double_t nomBkgStatErr = nomBkg->GetBinError(iBin);
+    Double_t nomBkgVal = nomBkg->GetBinContent(iBin);
+    Double_t allQCDBkgSystErr2 = allQCDBkg->GetBinContent(iBin) - nomBkgVal;
+    allQCDBkgSystErr2*=allQCDBkgSystErr2;
+    Double_t allEWBkgSystErr2 = allEWBkg->GetBinContent(iBin) - nomBkgVal;
+    allEWBkgSystErr2*=allEWBkgSystErr2;
+    Double_t totBkgErr = sqrt(nomBkgStatErr*nomBkgStatErr + allQCDBkgSystErr2 + allEWBkgSystErr2);
+    Double_t binContent = totBkgErr == 0.0 ? 0.0 : (ratioHist->GetBinContent(iBin)/totBkgErr);
+    ratioHist->SetBinContent(iBin, binContent);
+    ratioHist->SetBinError(iBin, dataNomBkgStatErr/nomBkgStatErr); //meaningless
+  }
+  ratioHist->GetYaxis()->SetTitle("#frac{Data - Bkg.}{Bkg. error (excl. resonances)}");
+  ratioHist->GetYaxis()->SetRangeUser(-3.0, 3.0);
+  return ratioHist;
+}
+
 //merge efficiency graphs from different files into one canvas
 void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName, 
 					   const vector<string>& inputFiles, 
@@ -1110,18 +1163,33 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 	cout << sqrt(MCQCDNormToSigRatioErr2) << endl;
       }
       TH1F* dataHist = (TH1F*)hists[canvasIndex][0]->Clone();
-      TH1F* denomHist = denomErrorScale((TH1F*)stackSumHist->Clone()); 
-      stackSumHist->Add(dataHist, -1.0);
-     //stackSumHist->Divide(dataHist);
-      stackSumHist->Divide(denomHist);
-      setHistogramOptions(stackSumHist, kBlack, 0.7, 20, 1.0, 
-			  stackSumHist->GetXaxis()->GetTitle(), 
-			  //"#frac{N_{MC} - N_{data}}{N_{data}}");
-			  "#frac{N_{MC} - N_{data}}{sqrt(N_{MC}^2 + #sigma_{MC}^2}");
-      stackSumHist->GetYaxis()->SetRangeUser(-1.0, 1.0);
+
+      // New: calculate pull //
+      TH1F* pullHist = makeDataBkgAgreementHist(dataHist, stackSumHist);
+
+      // Old data-MC agreement histogram //
+     //  TH1F* denomHist = denomErrorScale((TH1F*)stackSumHist->Clone()); 
+     //  stackSumHist->Add(dataHist, -1.0);
+     // //stackSumHist->Divide(dataHist);
+     //  stackSumHist->Divide(denomHist);
+     //  setHistogramOptions(stackSumHist, kBlack, 0.7, 20, 1.0, 
+     // 			  stackSumHist->GetXaxis()->GetTitle(), 
+     // 			  //"#frac{N_{MC} - N_{data}}{N_{data}}");
+     // 			  "#frac{N_{MC} - N_{data}}{sqrt(N_{MC}^2 + #sigma_{MC}^2}");
+     //  stackSumHist->GetYaxis()->SetRangeUser(-1.0, 1.0);
+
       if (dataMC) {
 	outputCanvases[canvasIndex]->cd(dataMC ? 2 : 0);
-	stackSumHist->Draw("e");
+
+	// New: draw pull //
+	pullHist->GetYaxis()->SetTitle("#frac{Data - MC}{MC stat. error}");
+	pullHist->SetLineColor(kBlack);
+	pullHist->SetFillColor(kAzure);
+	pullHist->SetFillStyle(1001);
+	pullHist->Draw("HIST");
+
+	// Old data-MC agreement histogram //
+	// stackSumHist->Draw("e");
       }
     }
     outputCanvases[canvasIndex]->cd(dataMC ? 1 : 0);
@@ -1874,10 +1942,10 @@ void QCDVsMCClosurePlots(const vector<string>& QCDVsMCInputFileNames, const stri
   hists[1]->GetXaxis()->SetTitle(units.c_str());
 
   TH1F* ratioHist = (TH1F*)hists[0]->Clone();
-  ratioHist->Add(hists[1],-1.);
+//   ratioHist->Add(hists[1],-1.);
   ratioHist->Divide(hists[1]);
-  ratioHist->GetYaxis()->SetTitle("Fractional difference");
-  ratioHist->GetYaxis()->SetRangeUser(-2.0,2.0);
+  ratioHist->GetYaxis()->SetTitle(/*"Fractional difference"*/"Ratio");
+  ratioHist->GetYaxis()->SetRangeUser(/*-2.0,2.0*/0.0, 2.0);
   ratioHist->SetLineColor(1);
   ratioHist->SetMarkerColor(1);
 
@@ -1906,7 +1974,6 @@ void QCDVsMCClosurePlots(const vector<string>& QCDVsMCInputFileNames, const stri
   outCanvas.cd(2);
   ratioHist->Draw();
   ratioHist->GetXaxis()->SetRangeUser(xMin, xMax);
-
   outCanvas.Write();
   outStream.Write();
   outStream.Close();
@@ -1974,10 +2041,10 @@ void compareTotalMCBToA(const vector<string>& QCDVsMCInputFileNames1,
   hists[1]->GetXaxis()->SetTitle(units.c_str());
 
   TH1F* ratioHist = (TH1F*)hists[0]->Clone();
-  ratioHist->Add(hists[1],-1.);
+//   ratioHist->Add(hists[1],-1.);
   ratioHist->Divide(hists[1]);
-  ratioHist->GetYaxis()->SetTitle("#frac{B-A}{A}");
-  ratioHist->GetYaxis()->SetRangeUser(-2.0,2.0);
+  ratioHist->GetYaxis()->SetTitle(/*"#frac{B-A}{A}"*/"Reg. B / Reg. A");
+  ratioHist->GetYaxis()->SetRangeUser(/*-2.0,2.0*/0.0, 2.0);
   ratioHist->SetLineColor(1);
 
   TLegend *leg = new TLegend(0.35, 0.55, 0.75, 0.75, "");
@@ -2800,9 +2867,10 @@ void arcQuest(const vector<string>& QCDVsMCInputFileNames, const string& isoData
   outCanvasAllQCDEWK.cd(2);
   TH1F* nonIsoDataMinusRegBQCD = (TH1F*)nonIsoData->Clone();
   nonIsoDataMinusRegBQCD->Add(hists[0], -1.0);
-  TH1F* nonIsoDataMinusRegBQCDDenom = denomErrorScale((TH1F*)nonIsoData->Clone());
-  nonIsoDataMinusRegBQCD->Divide(nonIsoDataMinusRegBQCDDenom);
-  nonIsoDataMinusRegBQCD->GetYaxis()->SetTitle("#frac{Data(B) - Exp(B)}{sqrt(Data(B)^2 + #sigma_{DataB}^2)}");
+//   TH1F* nonIsoDataMinusRegBQCDDenom = denomErrorScale((TH1F*)nonIsoData->Clone());
+  nonIsoDataMinusRegBQCD->Divide(/*nonIsoDataMinusRegBQCDDenom*/nonIsoData);
+  nonIsoDataMinusRegBQCD->GetYaxis()->
+    SetTitle(/*"#frac{Data(B) - Exp(B)}{sqrt(Data(B)^2 + #sigma_{DataB}^2)}"*/"Syst. error envelope");
   nonIsoDataMinusRegBQCD->GetYaxis()->SetRangeUser(-1.0, 1.0);
   nonIsoDataMinusRegBQCD->SetLineColor(3);
   nonIsoDataMinusRegBQCD->SetMarkerColor(3);
@@ -2812,9 +2880,10 @@ void arcQuest(const vector<string>& QCDVsMCInputFileNames, const string& isoData
   cout << "percent deviation in final bin (QCD): " << regBQCDintegral << " +/- " << regBQCDerr << endl;
   TH1F* nonIsoDataMinusRegBEWK = (TH1F*)nonIsoData->Clone();
   nonIsoDataMinusRegBEWK->Add(hists[1], -1.0);
-  TH1F* nonIsoDataMinusRegBEWKDenom = denomErrorScale((TH1F*)nonIsoData->Clone());
-  nonIsoDataMinusRegBEWK->Divide(nonIsoDataMinusRegBEWKDenom);
-  nonIsoDataMinusRegBEWK->GetYaxis()->SetTitle("#frac{Data(B) - Exp(B)}{sqrt(Data(B)^2 + #sigma_{DataB}^2)}");
+//   TH1F* nonIsoDataMinusRegBEWKDenom = denomErrorScale((TH1F*)nonIsoData->Clone());
+  nonIsoDataMinusRegBEWK->Divide(/*nonIsoDataMinusRegBEWKDenom*/nonIsoData);
+  nonIsoDataMinusRegBEWK->GetYaxis()->
+    SetTitle(/*"#frac{Data(B) - Exp(B)}{sqrt(Data(B)^2 + #sigma_{DataB}^2)}"*/"Syst. error envelope");
   nonIsoDataMinusRegBEWK->GetYaxis()->SetRangeUser(-1.0, 1.0);
   nonIsoDataMinusRegBEWK->SetLineColor(4);
   nonIsoDataMinusRegBEWK->SetMarkerColor(4);
@@ -2871,28 +2940,6 @@ void GetVBFZHEstimate(const string& vbfOutputFileName, const string& isoggHFileN
 
 } // end VBFEstimateFromGGH
 
-/*create a histogram of (data - bkg.)/sqrt(jetFakeStatErr^2 + resBkgStatErr^2)
-  for all cases, use the nominal error as the denominator*/
-TH1F* makeDataBkgAgreementHist(const TH1F* data, const TH1F* bkg)
-{
-  if ((data->GetNbinsX() + 2) != (bkg->GetNbinsX() + 2)) {
-    cerr << "Error: size mismatch.\n";
-    return NULL;
-  }
-  TH1F* ratioHist = (TH1F*)data->Clone();
-  ratioHist->Add(bkg, -1.0);
-  for (Int_t iBin = 0; iBin <= (bkg->GetNbinsX() + 1); ++iBin) {
-    Double_t dataBkgStatErr = ratioHist->GetBinError(iBin);
-    Double_t bkgStatErr = bkg->GetBinError(iBin);
-    Double_t binContent = bkgStatErr == 0.0 ? 0.0 : (ratioHist->GetBinContent(iBin)/bkgStatErr);
-    ratioHist->SetBinContent(iBin, binContent);
-    ratioHist->SetBinError(iBin, dataBkgStatErr/bkgStatErr);
-  }
-  ratioHist->GetYaxis()->SetTitle("#frac{Data - Bkg.}{Bkg. stat. error}");
-  ratioHist->GetYaxis()->SetRangeUser(-3.0, 3.0);
-  return ratioHist;
-}
-
 //normalize plot and propagate statistical error from normalization term
 //don't use getIntegralAndError because they don't work for MC stacks
 void normalizeHistogram(const TH1F* histToNormalizeTo, TH1F* histToNormalize, 
@@ -2947,7 +2994,7 @@ void normalizeHistogram(const TH1F* histToNormalizeTo, TH1F* histToNormalize,
   }
 }
 
-//make and format pull histogram
+//make and format pull histogram for bkg. stat. error only
 TH1F* makeAndFormatPullHistogram(TH1F* data, TH1F* resBkgTemplate, TH1F* jetFakeBkgTemplate, 
 				 const Color_t fillColor, Option_t* drawOpt)
 {
@@ -2958,6 +3005,33 @@ TH1F* makeAndFormatPullHistogram(TH1F* data, TH1F* resBkgTemplate, TH1F* jetFake
   cout << jetFakeBkgSigRegErr << endl;
   totBkgHist->Add((TH1F*)resBkgTemplate->Clone());
   TH1F* pull = makeDataBkgAgreementHist(data, totBkgHist);
+
+//   //debug
+//   for (Int_t iBin = 9; iBin <= pull->GetNbinsX(); ++iBin) { pull->SetBinContent(iBin, 0.0); }
+
+  pull->SetLineColor(kBlack);
+  pull->SetFillColor(fillColor);
+  pull->SetFillStyle(1001);
+  pull->Draw(drawOpt);
+  return pull;
+}
+
+//make and format pull histogram for bkg. stat. + syst. error
+TH1F* makeAndFormatPullHistogram(TH1F* data, TH1F* resBkgTemplate, TH1F* jetFakeBkgTemplate, 
+				 const TH1F* allQCDBkgTemplate, const TH1F* allEWBkgTemplate, 
+				 const Color_t fillColor, Option_t* drawOpt)
+{
+  TH1F* totBkgHist = (TH1F*)jetFakeBkgTemplate->Clone();
+  Double_t jetFakeBkgSigRegErr;
+  Double_t jetFakeBkgSigReg = totBkgHist->IntegralAndError(5/*17*/, -1, jetFakeBkgSigRegErr);
+  cout << "Jet fake bkg.: " << setprecision(3) << jetFakeBkgSigReg << " +/- ";
+  cout << jetFakeBkgSigRegErr << endl;
+  totBkgHist->Add((TH1F*)resBkgTemplate->Clone());
+  TH1F* pull = makeDataBkgAgreementHist(data, totBkgHist, allQCDBkgTemplate, allEWBkgTemplate);
+
+//   //debug
+//   for (Int_t iBin = 9; iBin <= pull->GetNbinsX(); ++iBin) { pull->SetBinContent(iBin, 0.0); }
+
   pull->SetLineColor(kBlack);
   pull->SetFillColor(fillColor);
   pull->SetFillStyle(1001);
@@ -2997,7 +3071,6 @@ void addFinalPlot2(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
   sigColors.push_back(kBlue);
   sigColors.push_back(kSpring - 7);
   sigColors.push_back(kMagenta);
-  if (!ma9GeV) isoSig.erase(isoSig.begin() + 2, isoSig.begin() + 4);
   TLegend legendBkgMain5(0.6, 0.55, 0.9, 0.95);
   setLegendOptions(legendBkgMain5, "CMS 19.7 fb^{-1}");
   if (canvasIsoSigBkg != NULL) {
@@ -3101,7 +3174,7 @@ void addFinalPlot2(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
     return;
   }
 
-  //normalize region B MC to region A data (can copy the below into a fn. and repeat here)
+  //normalize region B MC to region A data
   normalizeHistogram(const_cast<const TH1F*>(isoData), nonIsoMCHist, 
 		     normRegionLowerBin, normRegionUpperBin);
 
@@ -3280,6 +3353,8 @@ void addFinalPlot2(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
     correlation is ignored*/
   cout << "Nominal -- ";
   makeAndFormatPullHistogram(isoData, resBkg, nonIsoData, kAzure, "HIST");
+//   makeAndFormatPullHistogram(isoData, resBkg, nonIsoData, nonIsoWNonIsoData, nonIsoMCHist, kAzure, 
+// 			     "HIST");
 
   //high-MT bin only
   if (resBkgRegCkFixed != NULL) {
