@@ -81,7 +81,8 @@ void formatEfficiencyPlots(const bool compile)
 
   //map of inputs to 2D efficiency histograms
   map<pair<string, string>, pair<string, string> > effHistMap2D;
-  effHistMap2D[pair<string, string>("numeratorPTAbsEta", "denominatorPTAbsEta")] = make_pair(unitPT, unitAbsEta);
+  effHistMap2D[pair<string, string>("numeratorPTAbsEta", "denominatorPTAbsEta")] = 
+    make_pair(unitPT, unitAbsEta);
 
   //map of inputs to 1D histograms
   map<string, string> hist1DMap;
@@ -100,22 +101,22 @@ void formatEfficiencyPlots(const bool compile)
   hist1DMapTau["numeratorEta"] = unitEtaTau;
   hist1DMapTau["denominatorEta"] = unitEtaTau;
 
-//   //make individual efficiency plots for signal
-   vector<string> effInputFiles;
-   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/HPSTauEff.root");
-   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/HPSTauPTEff.root");
-   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/HPSTauPTEtaEff.root");
-   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/HPSTauPTEtaDMFEff.root");
-   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/HPSTauPTEtaDMFIsoEff.root");
+  //make individual efficiency plots for signal
+  vector<string> effInputFiles;
+//   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/HPSTauEff.root");
+//   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/HPSTauPTEff.root");
+//   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/HPSTauPTEtaEff.root");
+//   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/HPSTauPTEtaDMFEff.root");
+//   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/HPSTauPTEtaDMFIsoEff.root");
 //   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/softMuEtaEff.root");
 //   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/softMuPTEff.root");
-   for (vector<string>::const_iterator iFile = effInputFiles.begin(); iFile != effInputFiles.end(); 
-        ++iFile) {
-     const unsigned int strLen = iFile->find(".root");
-     const string outputFileName(iFile->substr(0, strLen) + "_final.root");
-     double tempWeight = 1.;
-     plotNice(*iFile, effHistMap1DTau, effHistMap2D, binLabelMap, hist1DMapTau, outputFileName, "noPDF", tempWeight);
-   }
+//   for (vector<string>::const_iterator iFile = effInputFiles.begin(); iFile != effInputFiles.end(); 
+//        ++iFile) {
+//     const unsigned int strLen = iFile->find(".root");
+//     const string outputFileName(iFile->substr(0, strLen) + "_final.root");
+//     double tempWeight = 1.;
+//     plotNice(*iFile, effHistMap1DTau, effHistMap2D, binLabelMap, hist1DMapTau, outputFileName, "noPDF", tempWeight);
+//   }
 
 //   //make HLT efficiency plots for signal
 //   vector<string> effInputFiles;
@@ -169,6 +170,8 @@ void formatEfficiencyPlots(const bool compile)
   //put trigger efficiency and pT distribution on same plot
 //   effInputFiles.push_back("/afs/cern.ch/user/y/yohay/CMSSW_5_3_3_Git/src/BoostedTauAnalysis/GenMatchedRecoObjectProducer/test/genA1TauRecoMuonEtaHLTEff.root");
 //   effInputFiles.push_back("/afs/cern.ch/user/y/yohay/CMSSW_5_3_3_Git/src/BoostedTauAnalysis/GenMatchedRecoObjectProducer/test/genWRecoMuonEtaHLTEff.root");
+//   effInputFiles.push_back("ggHWMuHLTEff.root");
+//   effInputFiles.push_back("WHWMuHLTEff.root");
 //   for (vector<string>::const_iterator iFile = effInputFiles.begin(); iFile != effInputFiles.end(); 
 //        ++iFile) {
 //     const unsigned int strLen = iFile->find(".root");
@@ -176,7 +179,9 @@ void formatEfficiencyPlots(const bool compile)
 //     // float weight = 1.95295217378794; //Pythia WH cross section scaled by SM ggH:WH ratio
 //     float weight = 3.79619; //SM ggH cross section
 //     // if ((iFile - effInputFiles.begin()) == 1) weight = 0.0709988; //Pythia WH cross section
-//     if ((iFile - effInputFiles.begin()) == 1) weight = 0.138806; //SM WH cross section * BR(W-->leptons)
-//     plotNice(*iFile, effHistMap1D, effHistMap2D, binLabelMap, hist1DMap, outputFileName, "noPDF", weight);
+//     if ((iFile - effInputFiles.begin()) == 1) weight = 0.138806; /*SM WH cross section * 
+// 								   BR(W-->leptons)*/
+//     plotNice(*iFile, effHistMap1D, effHistMap2D, binLabelMap, hist1DMap, outputFileName, "noPDF", 
+// 	     weight);
 //   }
 }
