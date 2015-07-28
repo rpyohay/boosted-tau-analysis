@@ -184,7 +184,7 @@ process.WIsoMuonSelector = cms.EDFilter('CustomMuonSelector',
                                         muonTag = cms.InputTag('WMuonPTSelector'),
                                         vtxTag = cms.InputTag('offlinePrimaryVertices'),
                                         muonID = cms.string('tight'),
-                                        PFIsoMax = cms.double(0.2),
+                                        PFIsoMax = cms.double(0.12),
                                         detectorIsoMax = cms.double(-1.0),
                                         PUSubtractionCoeff = cms.double(0.5),
                                         usePFIso = cms.bool(True),
@@ -273,7 +273,9 @@ process.recoTauAK5PFJets08Region.src = cms.InputTag("CleanJetsTrig", "ak5PFJetsN
 process.recoTauAK5PFJets08Region.jetMuonMapTag = cms.InputTag("CleanJetsTrig", "", "MUHADANALYSIS")
 process.ak5PFJetsRecoTauPiZeros.jetSrc = cms.InputTag("CleanJetsTrig", "ak5PFJetsNoMu",
                                                       "MUHADANALYSIS")
-process.combinatoricRecoTaus.jetSrc = cms.InputTag("CleanJetsTrig", "ak5PFJetsNoMu", "MUHADANALYSIS")
+process.combinatoricRecoTaus.jetSrc = cms.InputTag(
+    "CleanJetsTrig", "ak5PFJetsNoMu", "MUHADANALYSIS"
+    )
 process.ak5PFJetTracksAssociatorAtVertex.jets = cms.InputTag("CleanJetsTrig", "ak5PFJetsNoMu",
                                                              "MUHADANALYSIS")
 process.ak5PFJetsLegacyHPSPiZeros.jetSrc = cms.InputTag("CleanJetsTrig", "ak5PFJetsNoMu",
@@ -324,14 +326,14 @@ process.muHadIsoTauSelector = cms.EDFilter(
     minNumObjsToPassFilter = cms.uint32(1)
     )
 
-#find taus in |eta| < 2.4 matched to muon-tagged cleaned jets that pass decay mode finding
+#find taus in |eta| < 2.3 matched to muon-tagged cleaned jets that pass decay mode finding
 #this will produce a ref to the cleaned tau collection
 process.muHadTauSelector = process.muHadIsoTauSelector.clone()
 process.muHadTauSelector.tauDiscriminatorTags = cms.VInputTag(
     cms.InputTag('hpsPFTauDiscriminationByDecayModeFinding', '', 'SKIM')
     )
 
-#find taus in |eta| < 2.4 matched to muon-tagged cleaned jets that fail the isolation
+#find taus in |eta| < 2.3 matched to muon-tagged cleaned jets that fail the isolation
 #discriminator
 #this will produce a ref to the cleaned tau collection
 process.muHadNonIsoTauSelector = process.muHadIsoTauSelector.clone()
@@ -361,7 +363,6 @@ process.trigMuHadIsoTauSelector = cms.EDFilter(
     dR = cms.double(0.5),
     minNumObjsToPassFilter = cms.uint32(0)
     )
-
 
 #produce AK5PFchs L1FastL2L3 corrected jets
 
@@ -609,21 +610,18 @@ process.trigMuonEFilter = cms.EDFilter(
     muonTag = cms.InputTag("highestPTWMuonSelector"),
     recoObjTag = cms.InputTag("electronSelector"),
     delRMin = cms.double(0.4)
-#    delRMin = cms.double(0)
     )
 process.trigMuonMuFilter = cms.EDFilter(
     'TriggerMuonMuonFilter',
     muonTag = cms.InputTag("highestPTWMuonSelector"),
     recoObjTag = cms.InputTag("tauMuonSelector"),
     delRMin = cms.double(0.4)
-#    delRMin = cms.double(0)
     )
 process.trigMuonTauFilter = cms.EDFilter(
     'TriggerMuonTauFilter',
     muonTag = cms.InputTag("highestPTWMuonSelector"),
     recoObjTag = cms.InputTag("trigMuHadIsoTauSelector"),
     delRMin = cms.double(0.4)
-#    delRMin = cms.double(0)
     )
 
 #sequences
@@ -666,13 +664,13 @@ process.baseSignalIsoTauAnalysisSequence = cms.Sequence(
     process.WIsoMuonSelector*
     process.tauMuonPTSelector*
     process.tauMuonSelector*
-    process.PFTau*
+    process.PFTau* #2 instances of PFTau sequence!  Fix someday!
     process.muHadIsoTauSelector*
     process.IsoBVetoFilter*
     process.muonTriggerObjectFilter*
     process.OSSFFilterIso*
     process.SSSFFilterIso*
-    process.PFTau*
+    process.PFTau* #2 instances of PFTau sequence!  Fix someday!
     process.trigMuHadIsoTauSelector*
     process.electronSelector*
     process.trigMuonEFilter*
