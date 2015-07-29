@@ -413,6 +413,7 @@ process.highMTMuHadIsoTauAnalyzer = cms.EDAnalyzer(
     MC = cms.bool(False),
     higgsReweight = cms.bool(False),
     reweight = cms.bool(False),
+    isHighMT = cms.bool(True),
     bTagScaleShift = cms.string("mean"),
     sample = cms.string(""),
     muHadMassBins = cms.vdouble(0.0, 0.25, 0.5, 0.75, 
@@ -475,6 +476,7 @@ process.highMTMuHadTauAnalyzer.tauTag = cms.InputTag('AllBVetoFilter', '', 'MUHA
 process.highMTMuHadTauAnalyzer.corrJetTag = cms.InputTag('corrJetDistinctTauSelector')
 process.lowMTMuHadTauAnalyzer = process.highMTMuHadTauAnalyzer.clone()
 process.lowMTMuHadTauAnalyzer.outFileName = cms.string('LOWMTALLTAUANALYZEROUTFILE')
+process.lowMTMuHadIsoTauAnalyzer.isHighMT = cms.bool(False)
 
 #output
 process.output = cms.OutputModule(

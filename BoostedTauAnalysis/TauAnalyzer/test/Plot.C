@@ -643,6 +643,7 @@ void plotNice(const string& inputFileName, const map<string, pair<string, string
     in.Close();
     return;
   }
+  cout << "Processing file: " << inputFileName.c_str() << endl;
 
   //make efficiency plots
   plotEfficiency(in, out, effHistMap1D, binLabelMap, savePath);

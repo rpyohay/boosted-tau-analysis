@@ -852,7 +852,7 @@ void formatBoostedResonanceDataBkgPlots(const string& inputVersion, const string
   //conservative estimate of the J/psi-->mumu or upsilon-->mumu/tautau background from region C
   //compute data-driven QCD estimate in signal (i.e. isolated W muon + isolated tau) region: 
   //region C - resonance estimate
-  const pair<Int_t, Int_t> normReg(1, -1/*12*//*firstBinToBlind - 1*/);
+  const pair<Int_t, Int_t> normReg(1, 12/*firstBinToBlind - 1*/);
   const string resBkgOutputFileNoRebin(analysisFilePath + "results/resBkg_noRebin" + MTBin + 
 				       tag19p7InvFb + outputVTag + fileExt);
   vector<Double_t> nominalBinEdges;

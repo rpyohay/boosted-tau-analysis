@@ -153,7 +153,7 @@ private:
   //plot histogram of HT for user's choice of input candidates
   void plotHT(const std::vector<reco::Candidate*>&, TH1F*, const double);
 
-  //get data/MC mistag scale factor (central value or +/-1sigma
+  //get data/MC mistag scale factor (central value or +/-1sigma)
   TF1* GetSFLight(TString meanminmax, TString tagger, TString TaggerStrength, Float_t Etamin, 
 		  Float_t Etamax, TString DataPeriod);
 
@@ -168,6 +168,10 @@ private:
   //get data/MC mistag scale factor + 1sigma
   TF1* GetSFlmax(TString tagger, TString TaggerStrength, float Etamin, float Etamax, 
 		 TString DataPeriod);
+
+  //get data/MC mistag scale factor (central value or +/-1sigma), b-jet SF
+  double GetSFb(TString meanminmax, TString tagger, TString TaggerStrength, Float_t Etamin, 
+		Float_t Etamax, TString DataPeriod, double ptEval);
 
   double getHiggsPTWeight(double genHiggsPt, TH1* histogram_weight);
 
@@ -281,8 +285,11 @@ private:
   //Higgs pT reweight flag
   bool higgsReweight_;
 
-  //reweight flag
+  //reweight flag (for b-veto efficiency reweighting)
   bool reweight_;
+
+  //low or high MT bin flag (for b-veto efficiency reweighting)
+  bool isHighMT_;
 
   //b tag scale shift ("mean" ==> nominal, "min" ==> nominal - 1sigma, "max" ==> nominal + 1sigma)
   std::string bTagScaleShift_;
@@ -859,6 +866,7 @@ TauAnalyzer::TauAnalyzer(const edm::ParameterSet& iConfig):
   MC_(iConfig.getParameter<bool>("MC")),
   higgsReweight_(iConfig.getParameter<bool>("higgsReweight")),
   reweight_(iConfig.getParameter<bool>("reweight")),
+  isHighMT_(iConfig.getParameter<bool>("isHighMT")),
   bTagScaleShift_(iConfig.getParameter<std::string>("bTagScaleShift")),
   sample_(iConfig.getParameter<std::string>("sample")),
   muHadMassBins_(iConfig.getParameter<std::vector<double> >("muHadMassBins")),
@@ -1752,18 +1760,24 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       //get eta bin
       Float_t absEtaMin = -1.0;
       Float_t absEtaMax = -1.0;
-      if ((fabs(correctedTauJet.eta()) >= 0.0) && (fabs(correctedTauJet.eta()) < 0.8)) {
+
+      //for light jets
+      if ((fabs(/*correctedTauJet*/tauJetRef->eta()) >= 0.0) && (fabs(/*correctedTauJet*/tauJetRef->eta()) < 0.8)) {
 	absEtaMin = 0.0;
 	absEtaMax = 0.8;
       }
-      else if ((fabs(correctedTauJet.eta()) >= 0.8) && (fabs(correctedTauJet.eta()) < 1.6)) {
+      else if ((fabs(/*correctedTauJet*/tauJetRef->eta()) >= 0.8) && (fabs(/*correctedTauJet*/tauJetRef->eta()) < 1.6)) {
 	absEtaMin = 0.8;
 	absEtaMax = 1.6;
       }
-      else if /*(*/(fabs(correctedTauJet.eta()) >= 1.6)/* && (fabs(correctedTauJet.eta()) < 2.4))*/ { //hack RPY 23-May-14 for cases where the tau |eta| is less than 2.4 but the parent jet is slightly more
+      else if /*(*/(fabs(/*correctedTauJet*/tauJetRef->eta()) >= 1.6)/* && (fabs(correctedTauJet.eta()) < 2.4))*/ { //hack RPY 23-May-14 for cases where the tau |eta| is less than 2.4 but the parent jet is slightly more
 	absEtaMin = 1.6;
-	absEtaMax = 2.4;
+      	absEtaMax = 2.4;
       }
+      
+      //for b jets
+      //absEtaMin = 0.0;
+      //absEtaMax = 2.4;
 
       /*get mistag scale factor as a function of jet pT for appropriate eta bin and uncertainty 
 	scenario
@@ -1785,18 +1799,18 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       Float_t mistagEff = 1.0;
       if (mistagEffVsPTAndEta_ != NULL) {
 	while ((pTBin == 0) && (iPTBin < mistagEffVsPTAndEta_->GetNbinsX())) {
-	  if ((correctedTauJet.pt() >= 
+	  if ((/*correctedTauJet*/tauJetRef->pt() >= 
 	       mistagEffVsPTAndEta_->GetXaxis()->GetBinLowEdge(iPTBin)) && 
-	      (correctedTauJet.pt() < 
+	      (/*correctedTauJet*/tauJetRef->pt() < 
 	       mistagEffVsPTAndEta_->GetXaxis()->GetBinLowEdge(iPTBin + 1))) {
 	    pTBin = iPTBin;
 	  }
 	  ++iPTBin;
 	}
 	while ((etaBin == 0) && (iEtaBin < mistagEffVsPTAndEta_->GetNbinsY())) {
-	  if ((fabs(correctedTauJet.eta()) >= 
+	  if ((fabs(/*correctedTauJet*/tauJetRef->eta()) >= 
 	       mistagEffVsPTAndEta_->GetYaxis()->GetBinLowEdge(iEtaBin)) && 
-	      (fabs(correctedTauJet.eta()) < 
+	      (fabs(/*correctedTauJet*/tauJetRef->eta()) < 
 	       mistagEffVsPTAndEta_->GetYaxis()->GetBinLowEdge(iEtaBin + 1))) {
 	    etaBin = iEtaBin;
 	  }
@@ -1805,33 +1819,58 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	mistagEff = mistagEffVsPTAndEta_->GetBinContent(pTBin, etaBin);
       }
 
+      double SFb = 0.;
+      double SFbNominal = 0.;
+      if ((absEtaMin != -1.0) && (absEtaMax != -1.0)) {
+	double jetPT = /*correctedTauJet*/tauJetRef->pt();
+	//SFb = GetSFb(bTagScaleShift_, "CSV","M",absEtaMin, absEtaMax, "ABCD", jetPT);
+	//SFbNominal = GetSFb("mean", "CSV","M",absEtaMin, absEtaMax, "ABCD", jetPT);
+	//cout << "SFb = " << SFb << " and SFbNominal = " << SFbNominal << endl;
+      }
+      
       /*calculate mistag veto data/MC scale factor following 
 	https://hypernews.cern.ch/HyperNews/CMS/get/btag/1084/1.html*/
+
+      //b jet scale factor for systematics
+      /*if ((SFb != 0.) && (SFbNominal != 0.))
+	{
+	  Double_t diff = SFbNominal - SFb;
+	  //for b-jet weighting
+	  if (mistagEff != 1.0) {
+	    tauHadPTWeight = 
+	      (1.0 - (SFb - diff)*mistagEff)/(1.0 - mistagEff);
+	  }
+	  else tauHadPTWeight = SFb - diff;
+	}*/
+
+      //light jet scale factor for yield calculation
       if ((SFlight != NULL) && (SFlightNominal != NULL)) {
-	double jetPT = correctedTauJet.pt();
+	double jetPT = /*correctedTauJet*/tauJetRef->pt();
 	Double_t diff = 0.0;
-	if ((fabs(correctedTauJet.eta()) >= 1.6) && (fabs(correctedTauJet.eta()) < 2.4)) {
+	if ((fabs(/*correctedTauJet*/tauJetRef->eta()) >= 1.6) && (fabs(/*correctedTauJet*/tauJetRef->eta()) < 2.4)) {
 	  if (jetPT > 850.0/*GeV*/) {
 	    jetPT = 850.0/*GeV*/;
 	    diff = 
-	      SFlightNominal->Eval(correctedTauJet.pt()) - SFlight->Eval(correctedTauJet.pt());
+	      SFlightNominal->Eval(jetPT) - SFlight->Eval(jetPT);
 	  }
 	}
 	else if (jetPT > 1000.0/*GeV*/) {
 	  jetPT = 1000.0/*GeV*/;
 	  diff = 
-	    SFlightNominal->Eval(correctedTauJet.pt()) - SFlight->Eval(correctedTauJet.pt());
+	    SFlightNominal->Eval(jetPT) - SFlight->Eval(jetPT);
 	}
 	if (jetPT < 20.0/*GeV*/) {
 	  jetPT = 20.0/*GeV*/;
 	  diff = 
-	    SFlightNominal->Eval(correctedTauJet.pt()) - SFlight->Eval(correctedTauJet.pt());
+	    SFlightNominal->Eval(jetPT) - SFlight->Eval(jetPT);
 	}
+	//cout << "SFlight = " << SFlight->Eval(jetPT) << " and SFlightNominal = " << SFlightNominal->Eval(jetPT) << endl;
+
 	if (mistagEff != 1.0) {
 	  tauHadPTWeight = 
-	    (1.0 - (SFlight->Eval(correctedTauJet.pt()) - diff)*mistagEff)/(1.0 - mistagEff);
+	    (1.0 - (SFlight->Eval(jetPT) - diff)*mistagEff)/(1.0 - mistagEff);
 	}
-	else tauHadPTWeight = SFlight->Eval(correctedTauJet.pt()) - diff;
+	else tauHadPTWeight = SFlight->Eval(jetPT) - diff;
       }
       else {
 	std::stringstream err;
@@ -4268,388 +4307,928 @@ void TauAnalyzer::fillMistagEffPlot()
   mistagEffVsPTAndEta_ = 
     new TH2F("mistagEffVsPTAndEta", ";p_{T} (GeV);|#eta|", 10, pTBins, 3, 0.0, 2.4);
   if (sample_ == "Wh1_a5") {
-    mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.2);
-    mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.166667);
-    mistagEffVsPTAndEta_->SetBinContent(3, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.166667);
-    mistagEffVsPTAndEta_->SetBinContent(4, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(4, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.5);
-    mistagEffVsPTAndEta_->SetBinContent(5, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(5, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(6, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(6, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(6, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(7, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(7, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(8, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(8, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    if (isHighMT_) {
+      mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.155556);
+      mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.166667);
+      mistagEffVsPTAndEta_->SetBinContent(3, 3, 0.188406);
+      mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.184211);
+      mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.153153);
+      mistagEffVsPTAndEta_->SetBinContent(4, 3, 0.160714);
+      mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.128205);
+      mistagEffVsPTAndEta_->SetBinContent(5, 2, 0.153846);
+      mistagEffVsPTAndEta_->SetBinContent(5, 3, 0.129032);
+      mistagEffVsPTAndEta_->SetBinContent(6, 1, 0.234043);
+      mistagEffVsPTAndEta_->SetBinContent(6, 2, 0.230769);
+      mistagEffVsPTAndEta_->SetBinContent(6, 3, 0.166667);
+      mistagEffVsPTAndEta_->SetBinContent(7, 1, 0.157895);
+      mistagEffVsPTAndEta_->SetBinContent(7, 2, 0.222222);
+      mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 1, 0.230769);
+      mistagEffVsPTAndEta_->SetBinContent(8, 2, 0.222222);
+      mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    }
+    else {
+      mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.174603);
+      mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.2125);
+      mistagEffVsPTAndEta_->SetBinContent(3, 3, 0.0571429);
+      mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.0869565);
+      mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.230769);
+      mistagEffVsPTAndEta_->SetBinContent(4, 3, 0.0555556);
+      mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.263158);
+      mistagEffVsPTAndEta_->SetBinContent(5, 2, 0.171429);
+      mistagEffVsPTAndEta_->SetBinContent(5, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(6, 1, 0.227273);
+      mistagEffVsPTAndEta_->SetBinContent(6, 2, 0.0833333);
+      mistagEffVsPTAndEta_->SetBinContent(6, 3, 0.2);
+      mistagEffVsPTAndEta_->SetBinContent(7, 1, 0.1);
+      mistagEffVsPTAndEta_->SetBinContent(7, 2, 0.1);
+      mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 1, 0.0833333);
+      mistagEffVsPTAndEta_->SetBinContent(8, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    }
   }
   else if (sample_ == "Wh1_a7") {
-    mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.133333);
-    mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.181818);
-    mistagEffVsPTAndEta_->SetBinContent(3, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(4, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(4, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(4, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.4);
-    mistagEffVsPTAndEta_->SetBinContent(5, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(5, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(6, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(6, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(6, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(7, 1, 1);
-    mistagEffVsPTAndEta_->SetBinContent(7, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(8, 1, 1);
-    mistagEffVsPTAndEta_->SetBinContent(8, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
+    if (isHighMT_) {
+      mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.166667);
+      mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.139535);
+      mistagEffVsPTAndEta_->SetBinContent(3, 3, 0.138462);
+      mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.162791);
+      mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.0666667);
+      mistagEffVsPTAndEta_->SetBinContent(4, 3, 0.106383);
+      mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.0818182);
+      mistagEffVsPTAndEta_->SetBinContent(5, 2, 0.1);
+      mistagEffVsPTAndEta_->SetBinContent(5, 3, 0.0869565);
+      mistagEffVsPTAndEta_->SetBinContent(6, 1, 0.184211);
+      mistagEffVsPTAndEta_->SetBinContent(6, 2, 0.0384615);
+      mistagEffVsPTAndEta_->SetBinContent(6, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 1, 0.178571);
+      mistagEffVsPTAndEta_->SetBinContent(7, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 3, 0.2);
+      mistagEffVsPTAndEta_->SetBinContent(8, 1, 0.166667);
+      mistagEffVsPTAndEta_->SetBinContent(8, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    }
+    else {
+      mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.129032);
+      mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.142857);
+      mistagEffVsPTAndEta_->SetBinContent(3, 3, 0.217391);
+      mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.15625);
+      mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.185185);
+      mistagEffVsPTAndEta_->SetBinContent(4, 3, 0.214286);
+      mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.0681818);
+      mistagEffVsPTAndEta_->SetBinContent(5, 2, 0.0263158);
+      mistagEffVsPTAndEta_->SetBinContent(5, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(6, 1, 0.166667);
+      mistagEffVsPTAndEta_->SetBinContent(6, 2, 0.0833333);
+      mistagEffVsPTAndEta_->SetBinContent(6, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 1, 0.111111);
+      mistagEffVsPTAndEta_->SetBinContent(7, 2, 0.25);
+      mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 1, 0.222222);
+      mistagEffVsPTAndEta_->SetBinContent(8, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 3, 0.5);
+      mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 2, 1);
+      mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    }
   }
   else if (sample_ == "Wh1_a9") {
-    mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.148148);
-    mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.0555556);
-    mistagEffVsPTAndEta_->SetBinContent(3, 3, 0.125);
-    mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.153846);
-    mistagEffVsPTAndEta_->SetBinContent(4, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(4, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.2);
-    mistagEffVsPTAndEta_->SetBinContent(5, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(5, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(6, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(6, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(6, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(7, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(7, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(8, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(8, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    if (isHighMT_) {
+      mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.108527);
+      mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.130435);
+      mistagEffVsPTAndEta_->SetBinContent(3, 3, 0.155556);
+      mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.131313);
+      mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.127273);
+      mistagEffVsPTAndEta_->SetBinContent(4, 3, 0.222222);
+      mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.0909091);
+      mistagEffVsPTAndEta_->SetBinContent(5, 2, 0.0615385);
+      mistagEffVsPTAndEta_->SetBinContent(5, 3, 0.0606061);
+      mistagEffVsPTAndEta_->SetBinContent(6, 1, 0.125);
+      mistagEffVsPTAndEta_->SetBinContent(6, 2, 0.111111);
+      mistagEffVsPTAndEta_->SetBinContent(6, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 2, 0.0769231);
+      mistagEffVsPTAndEta_->SetBinContent(7, 3, 0.666667);
+      mistagEffVsPTAndEta_->SetBinContent(8, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 2, 0.111111);
+      mistagEffVsPTAndEta_->SetBinContent(8, 3, 0.25);
+      mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    }
+    else {
+      mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.1875);
+      mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.114286);
+      mistagEffVsPTAndEta_->SetBinContent(3, 3, 0.153846);
+      mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.105263);
+      mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.0909091);
+      mistagEffVsPTAndEta_->SetBinContent(4, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.12);
+      mistagEffVsPTAndEta_->SetBinContent(5, 2, 0.0909091);
+      mistagEffVsPTAndEta_->SetBinContent(5, 3, 0.0909091);
+      mistagEffVsPTAndEta_->SetBinContent(6, 1, 0.0588235);
+      mistagEffVsPTAndEta_->SetBinContent(6, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(6, 3, 0.5);
+      mistagEffVsPTAndEta_->SetBinContent(7, 1, 0.375);
+      mistagEffVsPTAndEta_->SetBinContent(7, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 1, 0.142857);
+      mistagEffVsPTAndEta_->SetBinContent(8, 2, 0.333333);
+      mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    }
   }
   else if (sample_ == "Wh1_a11") {
-    mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.0769231);
-    mistagEffVsPTAndEta_->SetBinContent(3, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(3, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(4, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.272727);
-    mistagEffVsPTAndEta_->SetBinContent(4, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.2);
-    mistagEffVsPTAndEta_->SetBinContent(5, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(5, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(6, 1, 1);
-    mistagEffVsPTAndEta_->SetBinContent(6, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(6, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(7, 1, 1);
-    mistagEffVsPTAndEta_->SetBinContent(7, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(8, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(8, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    if (isHighMT_) {
+      mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.125984);
+      mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.126316);
+      mistagEffVsPTAndEta_->SetBinContent(3, 3, 0.148148);
+      mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.157895);
+      mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.142857);
+      mistagEffVsPTAndEta_->SetBinContent(4, 3, 0.166667);
+      mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.10101);
+      mistagEffVsPTAndEta_->SetBinContent(5, 2, 0.14);
+      mistagEffVsPTAndEta_->SetBinContent(5, 3, 0.173913);
+      mistagEffVsPTAndEta_->SetBinContent(6, 1, 0.12);
+      mistagEffVsPTAndEta_->SetBinContent(6, 2, 0.0952381);
+      mistagEffVsPTAndEta_->SetBinContent(6, 3, 0.333333);
+      mistagEffVsPTAndEta_->SetBinContent(7, 1, 0.0625);
+      mistagEffVsPTAndEta_->SetBinContent(7, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 1, 0.230769);
+      mistagEffVsPTAndEta_->SetBinContent(8, 2, 0.166667);
+      mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    }
+    else {
+      mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.0344828);
+      mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.133333);
+      mistagEffVsPTAndEta_->SetBinContent(3, 3, 0.2);
+      mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.103448);
+      mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.2);
+      mistagEffVsPTAndEta_->SetBinContent(4, 3, 0.0909091);
+      mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.0606061);
+      mistagEffVsPTAndEta_->SetBinContent(5, 2, 0.125);
+      mistagEffVsPTAndEta_->SetBinContent(5, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(6, 1, 0.111111);
+      mistagEffVsPTAndEta_->SetBinContent(6, 2, 0.4);
+      mistagEffVsPTAndEta_->SetBinContent(6, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 3, 0.2);
+      mistagEffVsPTAndEta_->SetBinContent(8, 1, 0.3);
+      mistagEffVsPTAndEta_->SetBinContent(8, 2, 0.333333);
+      mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    }
   }
   else if (sample_ == "Wh1_a13") {
-    mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.166667);
-    mistagEffVsPTAndEta_->SetBinContent(3, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(3, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(4, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(4, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(4, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(5, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(5, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(5, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(6, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(6, 2, 0.5);
-    mistagEffVsPTAndEta_->SetBinContent(6, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(7, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(7, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(8, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(8, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    if (isHighMT_) {
+      mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.171429);
+      mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.114754);
+      mistagEffVsPTAndEta_->SetBinContent(3, 3, 0.0344828);
+      mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.169492);
+      mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.145455);
+      mistagEffVsPTAndEta_->SetBinContent(4, 3, 0.0909091);
+      mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.119403);
+      mistagEffVsPTAndEta_->SetBinContent(5, 2, 0.0793651);
+      mistagEffVsPTAndEta_->SetBinContent(5, 3, 0.125);
+      mistagEffVsPTAndEta_->SetBinContent(6, 1, 0.0882353);
+      mistagEffVsPTAndEta_->SetBinContent(6, 2, 0.0434783);
+      mistagEffVsPTAndEta_->SetBinContent(6, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 1, 0.0666667);
+      mistagEffVsPTAndEta_->SetBinContent(7, 2, 0.0833333);
+      mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 1, 0.214286);
+      mistagEffVsPTAndEta_->SetBinContent(8, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 3, 0.333333);
+      mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 2, 0.666667);
+      mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    }
+    else {
+      mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.0555556);
+      mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.222222);
+      mistagEffVsPTAndEta_->SetBinContent(3, 3, 0.1);
+      mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.142857);
+      mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.176471);
+      mistagEffVsPTAndEta_->SetBinContent(4, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.0909091);
+      mistagEffVsPTAndEta_->SetBinContent(5, 2, 0.142857);
+      mistagEffVsPTAndEta_->SetBinContent(5, 3, 0.0909091);
+      mistagEffVsPTAndEta_->SetBinContent(6, 1, 0.222222);
+      mistagEffVsPTAndEta_->SetBinContent(6, 2, 0.111111);
+      mistagEffVsPTAndEta_->SetBinContent(6, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 1, 0.181818);
+      mistagEffVsPTAndEta_->SetBinContent(7, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 3, 0.333333);
+      mistagEffVsPTAndEta_->SetBinContent(8, 1, 0.2);
+      mistagEffVsPTAndEta_->SetBinContent(8, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    }
   }
   else if (sample_ == "Wh1_a15") {
-    mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.142857);
-    mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.25);
-    mistagEffVsPTAndEta_->SetBinContent(3, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(4, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(4, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(4, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(5, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(5, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(5, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(6, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(6, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(6, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(7, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(7, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(8, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(8, 2, 1);
-    mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    if (isHighMT_) {
+      mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.108108);
+      mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.0967742);
+      mistagEffVsPTAndEta_->SetBinContent(3, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.152174);
+      mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.133333);
+      mistagEffVsPTAndEta_->SetBinContent(4, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.122449);
+      mistagEffVsPTAndEta_->SetBinContent(5, 2, 0.116279);
+      mistagEffVsPTAndEta_->SetBinContent(5, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(6, 1, 0.130435);
+      mistagEffVsPTAndEta_->SetBinContent(6, 2, 0.125);
+      mistagEffVsPTAndEta_->SetBinContent(6, 3, 0.142857);
+      mistagEffVsPTAndEta_->SetBinContent(7, 1, 0.153846);
+      mistagEffVsPTAndEta_->SetBinContent(7, 2, 0.333333);
+      mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 1, 0.15);
+      mistagEffVsPTAndEta_->SetBinContent(8, 2, 0.4);
+      mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 1, 1);
+      mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    }
+    else {
+      mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.0909091);
+      mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.181818);
+      mistagEffVsPTAndEta_->SetBinContent(3, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.142857);
+      mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.1);
+      mistagEffVsPTAndEta_->SetBinContent(4, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.176471);
+      mistagEffVsPTAndEta_->SetBinContent(5, 2, 0.0588235);
+      mistagEffVsPTAndEta_->SetBinContent(5, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(6, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(6, 2, 0.133333);
+      mistagEffVsPTAndEta_->SetBinContent(6, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 1, 0.25);
+      mistagEffVsPTAndEta_->SetBinContent(7, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 2, 0.5);
+      mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    }
   }
   else if (sample_ == "gg_a5") {
-    mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.133333);
-    mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.117284);
-    mistagEffVsPTAndEta_->SetBinContent(3, 3, 0.173913);
-    mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.149123);
-    mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.144144);
-    mistagEffVsPTAndEta_->SetBinContent(4, 3, 0.125);
-    mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.119658);
-    mistagEffVsPTAndEta_->SetBinContent(5, 2, 0.123077);
-    mistagEffVsPTAndEta_->SetBinContent(5, 3, 0.129032);
-    mistagEffVsPTAndEta_->SetBinContent(6, 1, 0.234043);
-    mistagEffVsPTAndEta_->SetBinContent(6, 2, 0.192308);
-    mistagEffVsPTAndEta_->SetBinContent(6, 3, 0.25);
-    mistagEffVsPTAndEta_->SetBinContent(7, 1, 0.157895);
-    mistagEffVsPTAndEta_->SetBinContent(7, 2, 0.222222);
-    mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(8, 1, 0.230769);
-    mistagEffVsPTAndEta_->SetBinContent(8, 2, 0.111111);
-    mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    if (isHighMT_) {
+      mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.2);
+      mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.166667);
+      mistagEffVsPTAndEta_->SetBinContent(3, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.166667);
+      mistagEffVsPTAndEta_->SetBinContent(4, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(4, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.5);
+      mistagEffVsPTAndEta_->SetBinContent(5, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(5, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(6, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(6, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(6, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    }
+    else {
+      mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.0895522);
+      mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.106383);
+      mistagEffVsPTAndEta_->SetBinContent(3, 3, 0.166667);
+      mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.206897);
+      mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.125);
+      mistagEffVsPTAndEta_->SetBinContent(4, 3, 0.375);
+      mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.04);
+      mistagEffVsPTAndEta_->SetBinContent(5, 2, 0.0909091);
+      mistagEffVsPTAndEta_->SetBinContent(5, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(6, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(6, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(6, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    }
   }
   else if (sample_ == "gg_a7") {
-    mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.116667);
-    mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.100775);
-    mistagEffVsPTAndEta_->SetBinContent(3, 3, 0.107692);
-    mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.139535);
-    mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.0777778);
-    mistagEffVsPTAndEta_->SetBinContent(4, 3, 0.0851064);
-    mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.0727273);
-    mistagEffVsPTAndEta_->SetBinContent(5, 2, 0.111111);
-    mistagEffVsPTAndEta_->SetBinContent(5, 3, 0.0869565);
-    mistagEffVsPTAndEta_->SetBinContent(6, 1, 0.210526);
-    mistagEffVsPTAndEta_->SetBinContent(6, 2, 0.0769231);
-    mistagEffVsPTAndEta_->SetBinContent(6, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(7, 1, 0.178571);
-    mistagEffVsPTAndEta_->SetBinContent(7, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(7, 3, 0.2);
-    mistagEffVsPTAndEta_->SetBinContent(8, 1, 0.166667);
-    mistagEffVsPTAndEta_->SetBinContent(8, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    if (isHighMT_) {
+      mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.133333);
+      mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.272727);
+      mistagEffVsPTAndEta_->SetBinContent(3, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(4, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(4, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(4, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.4);
+      mistagEffVsPTAndEta_->SetBinContent(5, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(5, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(6, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(6, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(6, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 1, 1);
+      mistagEffVsPTAndEta_->SetBinContent(7, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 1, 1);
+      mistagEffVsPTAndEta_->SetBinContent(8, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    }
+    else {
+      mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.125);
+      mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.0806452);
+      mistagEffVsPTAndEta_->SetBinContent(3, 3, 0.151515);
+      mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.137931);
+      mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.0909091);
+      mistagEffVsPTAndEta_->SetBinContent(4, 3, 0.0833333);
+      mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.047619);
+      mistagEffVsPTAndEta_->SetBinContent(5, 2, 0.181818);
+      mistagEffVsPTAndEta_->SetBinContent(5, 3, 0.2);
+      mistagEffVsPTAndEta_->SetBinContent(6, 1, 0.5);
+      mistagEffVsPTAndEta_->SetBinContent(6, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(6, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    }
   }
   else if (sample_ == "gg_a9") {
-    mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.0697674);
-    mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.0869565);
-    mistagEffVsPTAndEta_->SetBinContent(3, 3, 0.155556);
-    mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.10101);
-    mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.109091);
-    mistagEffVsPTAndEta_->SetBinContent(4, 3, 0.166667);
-    mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.0818182);
-    mistagEffVsPTAndEta_->SetBinContent(5, 2, 0.0769231);
-    mistagEffVsPTAndEta_->SetBinContent(5, 3, 0.0606061);
-    mistagEffVsPTAndEta_->SetBinContent(6, 1, 0.0625);
-    mistagEffVsPTAndEta_->SetBinContent(6, 2, 0.111111);
-    mistagEffVsPTAndEta_->SetBinContent(6, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(7, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(7, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(7, 3, 0.333333);
-    mistagEffVsPTAndEta_->SetBinContent(8, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(8, 2, 0.111111);
-    mistagEffVsPTAndEta_->SetBinContent(8, 3, 0.25);
-    mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(9, 2, 0.5);
-    mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    if (isHighMT_) {
+      mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.148148);
+      mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.111111);
+      mistagEffVsPTAndEta_->SetBinContent(3, 3, 0.125);
+      mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.153846);
+      mistagEffVsPTAndEta_->SetBinContent(4, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(4, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.2);
+      mistagEffVsPTAndEta_->SetBinContent(5, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(5, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(6, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(6, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(6, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 1, 1);
+      mistagEffVsPTAndEta_->SetBinContent(7, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    }
+    else {
+      mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.111111);
+      mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.0701754);
+      mistagEffVsPTAndEta_->SetBinContent(3, 3, 0.12);
+      mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.117647);
+      mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.153846);
+      mistagEffVsPTAndEta_->SetBinContent(4, 3, 0.2);
+      mistagEffVsPTAndEta_->SetBinContent(5, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(5, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(5, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(6, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(6, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(6, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 1, 0.666667);
+      mistagEffVsPTAndEta_->SetBinContent(7, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    }
   }
   else if (sample_ == "gg_a11") {
-    mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.102362);
-    mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.105263);
-    mistagEffVsPTAndEta_->SetBinContent(3, 3, 0.185185);
-    mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.175439);
-    mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.142857);
-    mistagEffVsPTAndEta_->SetBinContent(4, 3, 0.138889);
-    mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.10101);
-    mistagEffVsPTAndEta_->SetBinContent(5, 2, 0.14);
-    mistagEffVsPTAndEta_->SetBinContent(5, 3, 0.173913);
-    mistagEffVsPTAndEta_->SetBinContent(6, 1, 0.12);
-    mistagEffVsPTAndEta_->SetBinContent(6, 2, 0.047619);
-    mistagEffVsPTAndEta_->SetBinContent(6, 3, 0.333333);
-    mistagEffVsPTAndEta_->SetBinContent(7, 1, 0.0625);
-    mistagEffVsPTAndEta_->SetBinContent(7, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(8, 1, 0.230769);
-    mistagEffVsPTAndEta_->SetBinContent(8, 2, 0.166667);
-    mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    if (isHighMT_) {
+      mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.0769231);
+      mistagEffVsPTAndEta_->SetBinContent(3, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(3, 3, 0.5);
+      mistagEffVsPTAndEta_->SetBinContent(4, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.272727);
+      mistagEffVsPTAndEta_->SetBinContent(4, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.2);
+      mistagEffVsPTAndEta_->SetBinContent(5, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(5, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(6, 1, 1);
+      mistagEffVsPTAndEta_->SetBinContent(6, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(6, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 1, 1);
+      mistagEffVsPTAndEta_->SetBinContent(7, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    }
+    else {
+      mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.117647);
+      mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.16129);
+      mistagEffVsPTAndEta_->SetBinContent(3, 3, 0.2);
+      mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.0555556);
+      mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.0666667);
+      mistagEffVsPTAndEta_->SetBinContent(4, 3, 0.25);
+      mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.173913);
+      mistagEffVsPTAndEta_->SetBinContent(5, 2, 0.142857);
+      mistagEffVsPTAndEta_->SetBinContent(5, 3, 0.5);
+      mistagEffVsPTAndEta_->SetBinContent(6, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(6, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(6, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    }
   }
   else if (sample_ == "gg_a13") {
-    mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.114286);
-    mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.114754);
-    mistagEffVsPTAndEta_->SetBinContent(3, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.169492);
-    mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.109091);
-    mistagEffVsPTAndEta_->SetBinContent(4, 3, 0.0454545);
-    mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.119403);
-    mistagEffVsPTAndEta_->SetBinContent(5, 2, 0.0793651);
-    mistagEffVsPTAndEta_->SetBinContent(5, 3, 0.0625);
-    mistagEffVsPTAndEta_->SetBinContent(6, 1, 0.0588235);
-    mistagEffVsPTAndEta_->SetBinContent(6, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(6, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(7, 1, 0.133333);
-    mistagEffVsPTAndEta_->SetBinContent(7, 2, 0.0833333);
-    mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(8, 1, 0.142857);
-    mistagEffVsPTAndEta_->SetBinContent(8, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(8, 3, 0.333333);
-    mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(9, 2, 0.333333);
-    mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    if (isHighMT_) {
+      mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.166667);
+      mistagEffVsPTAndEta_->SetBinContent(3, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(3, 3, 0.5);
+      mistagEffVsPTAndEta_->SetBinContent(4, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(4, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(4, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(5, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(5, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(5, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(6, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(6, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(6, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    }
+    else {
+      mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.0740741);
+      mistagEffVsPTAndEta_->SetBinContent(3, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(3, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.190476);
+      mistagEffVsPTAndEta_->SetBinContent(4, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(4, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.0833333);
+      mistagEffVsPTAndEta_->SetBinContent(5, 2, 0.111111);
+      mistagEffVsPTAndEta_->SetBinContent(5, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(6, 1, 0.444444);
+      mistagEffVsPTAndEta_->SetBinContent(6, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(6, 3, 0.5);
+      mistagEffVsPTAndEta_->SetBinContent(7, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    }
   }
   else if (sample_ == "gg_a15") {
-    mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.0540541);
-    mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.0645161);
-    mistagEffVsPTAndEta_->SetBinContent(3, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.108696);
-    mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.166667);
-    mistagEffVsPTAndEta_->SetBinContent(4, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.0816327);
-    mistagEffVsPTAndEta_->SetBinContent(5, 2, 0.116279);
-    mistagEffVsPTAndEta_->SetBinContent(5, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(6, 1, 0.130435);
-    mistagEffVsPTAndEta_->SetBinContent(6, 2, 0.125);
-    mistagEffVsPTAndEta_->SetBinContent(6, 3, 0.142857);
-    mistagEffVsPTAndEta_->SetBinContent(7, 1, 0.153846);
-    mistagEffVsPTAndEta_->SetBinContent(7, 2, 0.333333);
-    mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(8, 1, 0.1);
-    mistagEffVsPTAndEta_->SetBinContent(8, 2, 0.2);
-    mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(9, 1, 1);
-    mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
-    mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
-    mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
-    mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    if (isHighMT_) {
+      mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.142857);
+      mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.5);
+      mistagEffVsPTAndEta_->SetBinContent(3, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(4, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(4, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(4, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.333333);
+      mistagEffVsPTAndEta_->SetBinContent(5, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(5, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(6, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(6, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(6, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 2, 1);
+      mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    }
+    else {
+      mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.142857);
+      mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.333333);
+      mistagEffVsPTAndEta_->SetBinContent(3, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.222222);
+      mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.333333);
+      mistagEffVsPTAndEta_->SetBinContent(4, 3, 0.5);
+      mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.166667);
+      mistagEffVsPTAndEta_->SetBinContent(5, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(5, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(6, 1, 0.3);
+      mistagEffVsPTAndEta_->SetBinContent(6, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(6, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 2, 1);
+      mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    }
+  }
+  else if (sample_ == "VBF_a9") {
+    if (isHighMT_) {
+      mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.134615);
+      mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.153846);
+      mistagEffVsPTAndEta_->SetBinContent(3, 3, 0.25);
+      mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.15);
+      mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.0833333);
+      mistagEffVsPTAndEta_->SetBinContent(4, 3, 0.5);
+      mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.136364);
+      mistagEffVsPTAndEta_->SetBinContent(5, 2, 0.0833333);
+      mistagEffVsPTAndEta_->SetBinContent(5, 3, 0.5);
+      mistagEffVsPTAndEta_->SetBinContent(6, 1, 0.125);
+      mistagEffVsPTAndEta_->SetBinContent(6, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(6, 3, 0.5);
+      mistagEffVsPTAndEta_->SetBinContent(7, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    }
+    else {
+      mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.131579);
+      mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.138889);
+      mistagEffVsPTAndEta_->SetBinContent(3, 3, 0.153846);
+      mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.126984);
+      mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.0784314);
+      mistagEffVsPTAndEta_->SetBinContent(4, 3, 0.142857);
+      mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.103448);
+      mistagEffVsPTAndEta_->SetBinContent(5, 2, 0.15625);
+      mistagEffVsPTAndEta_->SetBinContent(5, 3, 0.142857);
+      mistagEffVsPTAndEta_->SetBinContent(6, 1, 0.0714286);
+      mistagEffVsPTAndEta_->SetBinContent(6, 2, 0.0666667);
+      mistagEffVsPTAndEta_->SetBinContent(6, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 1, 0.285714);
+      mistagEffVsPTAndEta_->SetBinContent(7, 2, 0.2);
+      mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 1, 0.142857);
+      mistagEffVsPTAndEta_->SetBinContent(8, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    }
+  }
+  else if (sample_ == "ZH_a9") {
+    if (isHighMT_) {
+      mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.165829);
+      mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.162338);
+      mistagEffVsPTAndEta_->SetBinContent(3, 3, 0.152778);
+      mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.177778);
+      mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.147368);
+      mistagEffVsPTAndEta_->SetBinContent(4, 3, 0.113636);
+      mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.136054);
+      mistagEffVsPTAndEta_->SetBinContent(5, 2, 0.113402);
+      mistagEffVsPTAndEta_->SetBinContent(5, 3, 0.1);
+      mistagEffVsPTAndEta_->SetBinContent(6, 1, 0.1125);
+      mistagEffVsPTAndEta_->SetBinContent(6, 2, 0.170213);
+      mistagEffVsPTAndEta_->SetBinContent(6, 3, 0.08);
+      mistagEffVsPTAndEta_->SetBinContent(7, 1, 0.212121);
+      mistagEffVsPTAndEta_->SetBinContent(7, 2, 0.0909091);
+      mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 1, 0.157895);
+      mistagEffVsPTAndEta_->SetBinContent(8, 2, 0.0666667);
+      mistagEffVsPTAndEta_->SetBinContent(8, 3, 0.333333);
+      mistagEffVsPTAndEta_->SetBinContent(9, 1, 0.4);
+      mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    }
+    else {
+      mistagEffVsPTAndEta_->SetBinContent(1, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(1, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(2, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(3, 1, 0.156863);
+      mistagEffVsPTAndEta_->SetBinContent(3, 2, 0.119048);
+      mistagEffVsPTAndEta_->SetBinContent(3, 3, 0.15);
+      mistagEffVsPTAndEta_->SetBinContent(4, 1, 0.114286);
+      mistagEffVsPTAndEta_->SetBinContent(4, 2, 0.0625);
+      mistagEffVsPTAndEta_->SetBinContent(4, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(5, 1, 0.1875);
+      mistagEffVsPTAndEta_->SetBinContent(5, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(5, 3, 0.0526316);
+      mistagEffVsPTAndEta_->SetBinContent(6, 1, 0.0909091);
+      mistagEffVsPTAndEta_->SetBinContent(6, 2, 0.142857);
+      mistagEffVsPTAndEta_->SetBinContent(6, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(7, 1, 0.0833333);
+      mistagEffVsPTAndEta_->SetBinContent(7, 2, 0.142857);
+      mistagEffVsPTAndEta_->SetBinContent(7, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 1, 0.2);
+      mistagEffVsPTAndEta_->SetBinContent(8, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(8, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(9, 3, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 1, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 2, 0);
+      mistagEffVsPTAndEta_->SetBinContent(10, 3, 0);
+    }
   }
 }
 
@@ -4708,6 +5287,88 @@ void TauAnalyzer::drawMultiplePTHistograms(TCanvas& canvas,
 
 void TauAnalyzer::plotHT(const std::vector<reco::Candidate*>& cands, TH1F* hist, 
 			 const double weight) { hist->Fill(HT(cands), weight); }
+
+double TauAnalyzer::GetSFb(TString meanminmax, TString tagger, TString TaggerStrength, 
+			   Float_t Etamin, Float_t Etamax, TString DataPeriod, double ptEval)
+{
+  TF1 *tmpSFb = NULL;
+  TString Atagger = tagger+TaggerStrength;
+  TString sEtamin = Form("%1.1f",Etamin);
+  TString sEtamax = Form("%1.1f",Etamax);
+
+  Double_t ptmax = 800.;
+  Double_t ptmin = 20.;
+  float ptMinArray[] = {20, 30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500, 600};
+  float ptMaxArray[] = {30, 40, 50, 60, 70, 80,100, 120, 160, 210, 260, 320, 400, 500, 600, 800};
+
+  // Insert function def below here =====================================
+
+  if( Atagger == "CSVM" && sEtamin == "0.0" && sEtamax == "2.4")
+    {
+      double SFb_error[] = {0.0415707, 0.0204209, 0.0223227, 0.0206655, 0.0199325, 0.0174121, 0.0202332, 0.0182446, 0.0159777, 0.0218531, 0.0204688, 0.0265191, 0.0313175, 0.0415417, 0.0740446, 0.0596716 };
+      /*if ((sizeof(SFb_error) != sizeof(ptMinArray)) || (sizeof(SFb_error) != sizeof(ptMaxArray)))
+	{
+	  cout << sizeof(SFb_error) << " " << sizeof(ptMinArray) << " " << sizeof(ptMaxArray) << endl;
+	  cout << "Error in size of SFb error array!" << endl;
+	  return 0;
+	  }*/
+      if( meanminmax == "mean" )
+	{
+	  tmpSFb = new TF1("SFb","(0.938887+(0.00017124*x))+(-2.76366e-07*(x*x))", 20.,ptmax);
+	  if (ptEval > ptmax)
+	    return tmpSFb->Eval(ptmax);
+	  else if (ptEval < ptmin)
+	    return tmpSFb->Eval(ptmin);
+	  else
+	    return tmpSFb->Eval(ptEval);
+	}
+      if( meanminmax == "min" )
+	{
+	  tmpSFb = new TF1("SFbMin","(0.938887+(0.00017124*x))+(-2.76366e-07*(x*x))", 20.,ptmax);
+	  unsigned int bErrorBin;
+	  for (unsigned int i = 0; i < 16; ++i)
+	    {
+	      if ((ptEval >= ptMinArray[i]) && (ptEval < ptMaxArray[i]))
+		{
+		  bErrorBin = i;
+		  break;
+		}
+	    }
+	  if (ptEval > ptmax)
+	      return (tmpSFb->Eval(ptmax) - 2.*SFb_error[15]);
+	  else if (ptEval < ptmin)
+	    return (tmpSFb->Eval(ptmin) - 2.*SFb_error[0]);
+	  else
+	    return (tmpSFb->Eval(ptEval) - SFb_error[bErrorBin]);
+	}
+      if( meanminmax == "max" )
+	{
+	  tmpSFb = new TF1("SFbMax","(0.938887+(0.00017124*x))+(-2.76366e-07*(x*x))", 20.,ptmax);
+	  unsigned int bErrorBin;
+	  for (unsigned int i = 0; i < 16; ++i)
+	    {
+	      if ((ptEval >= ptMinArray[i]) && (ptEval < ptMaxArray[i]))
+		{
+		  bErrorBin = i;
+		  break;
+		}
+	    }
+	  if (ptEval > ptmax)
+	      return (tmpSFb->Eval(ptmax) + 2.*SFb_error[15]);
+	  else if (ptEval < ptmin)
+	    return (tmpSFb->Eval(ptmin) + 2.*SFb_error[0]);
+	  else
+	    return (tmpSFb->Eval(ptEval) + SFb_error[bErrorBin]);
+	}
+      else
+	return 0;
+    }
+  else
+    {
+      if( tmpSFb == NULL ) cout << "NULL pointer returned... Function seems not to exist" << endl;
+      throw cms::Exception("TauAnalyzer") << "SFb error!\n";
+    }
+}
 
 TF1* TauAnalyzer::GetSFLight(TString meanminmax, TString tagger, TString TaggerStrength, 
 			     Float_t Etamin, Float_t Etamax, TString DataPeriod)
@@ -4771,7 +5432,7 @@ TF1* TauAnalyzer::GetSFLight(TString meanminmax, TString tagger, TString TaggerS
       if( meanminmax == "mean" ) tmpSFl = new TF1("SFlight","((1.05625+(0.000487231*x))+(-2.22792e-06*(x*x)))+(1.70262e-09*(x*(x*x)))", 20.,ptmax);
       if( meanminmax == "min" ) tmpSFl = new TF1("SFlightMin","((0.956736+(0.000280197*x))+(-1.42739e-06*(x*x)))+(1.0085e-09*(x*(x*x)))", 20.,ptmax);
       if( meanminmax == "max" ) tmpSFl = new TF1("SFlightMax","((1.15575+(0.000693344*x))+(-3.02661e-06*(x*x)))+(2.39752e-09*(x*(x*x)))", 20.,ptmax);
-    }
+      }
   if( Atagger == "CSVT" && sEtamin == "0.0" && sEtamax == "2.4")
     {
       if( meanminmax == "mean" ) tmpSFl = new TF1("SFlight","((1.00462+(0.00325971*x))+(-7.79184e-06*(x*x)))+(5.22506e-09*(x*(x*x)))", 20.,ptmax);

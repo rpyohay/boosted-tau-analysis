@@ -467,6 +467,7 @@ process.highMTMuHadIsoTauAnalyzer = cms.EDAnalyzer(
     MC = cms.bool(True),
     higgsReweight = cms.bool(HIGGSREW),
     reweight = cms.bool(REWEIGHT),
+    isHighMT = cms.bool(True),
     bTagScaleShift = cms.string("mean"),
     sample = cms.string("SAMPLE"),
     muHadMassBins = cms.vdouble(0.0, 1.0, 2.0, 3.0, 4.0, 11.0),
@@ -498,6 +499,7 @@ process.highMTMuHadIsoTauAnalyzer = cms.EDAnalyzer(
     )
 process.lowMTMuHadIsoTauAnalyzer = process.highMTMuHadIsoTauAnalyzer.clone()
 process.lowMTMuHadIsoTauAnalyzer.outFileName = cms.string('LOWMTISOTAUANALYZEROUTFILE')
+process.lowMTMuHadIsoTauAnalyzer.isHighMT = cms.bool(False)
 
 #analyze non-isolated taus
 process.highMTMuHadNonIsoTauAnalyzer = process.highMTMuHadIsoTauAnalyzer.clone()
