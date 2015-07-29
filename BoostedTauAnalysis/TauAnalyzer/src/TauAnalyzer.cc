@@ -1410,7 +1410,6 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   //iEvent.getByLabel(tauTriggerVetoTag_, tausToVeto);
   //TEMPORARY ANTI-LEPTON PLOTS//
 
-
 //   //debug
 //   for (reco::PFTauRefVector::const_iterator iTau = pTaus->begin(); iTau != pTaus->end(); 
 //        ++iTau) {
@@ -1429,7 +1428,7 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   //get PU weight
   double PUWeight = 1.0;
   double HiggsPTWeight = 1.0;
-  double ggHToVBFWeight = 1.0;
+//   double ggHToVBFWeight = 1.0;
   float trueNInt = -1;
   if (MC_ && ((PUScenario_ == "S7") || (PUScenario_ == "S10"))) {
     std::vector<PileupSummaryInfo>::const_iterator iPU = pPU->begin();
@@ -1723,23 +1722,22 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     }
     Common::sortByPT(oldJetRefsExclTauNoPTCut);
 
-    bool noOtherBTaggedJets = true;
-    //loop again over btags to veto corrected old jets that pass CSVM
-    for (unsigned int i = 0; i != bTags.size(); ++i)
-      { // loop over btags
-	PFJetRef myBJetRef(pOldJets,i);
-	for (std::vector<reco::PFJetRef>::const_iterator iJet = oldJetRefsExclTauNoPTCut.begin(); 
-	     iJet != oldJetRefsExclTauNoPTCut.end(); ++iJet)
-	  { // loop over corrected old jets not matched to W_mu, tau_mu, or tau_had
+//     bool noOtherBTaggedJets = true;
+//     //loop again over btags to veto corrected old jets that pass CSVM
+//     for (unsigned int i = 0; i != bTags.size(); ++i)
+//       { // loop over btags
+// 	PFJetRef myBJetRef(pOldJets,i);
+// 	for (std::vector<reco::PFJetRef>::const_iterator iJet = correctedOldJetRefs.begin(); 
+// 	     iJet != correctedOldJetRefs.end(); ++iJet)
+// 	  { // loop over corrected old jets not matched to W_mu, tau_mu, or tau_had
+// 	    if (myBJetRef.key() == iJet->key()) // if a b-tagged jet is found
+// 	      {
+// 		if (((*iJet)->pt() > 30.) && (bTags[i].second > 0.679)) // if jet pT > 30 and csv_ > CSVM
+// 		  noOtherBTaggedJets = false;
+// 	      }
+// 	  } // loop over corrected old jets not matched to W_mu, tau_mu, or tau_had
 
-	    if (myBJetRef.key() == iJet->key()) // if a b-tagged jet is found
-	      {
-		if (((*iJet)->pt() > 30.) && (bTags[i].second > 0.679)) // if jet pT > 30 and csv_ > CSVM
-		  noOtherBTaggedJets = false;
-	      }
-	  } // loop over corrected old jets not matched to W_mu, tau_mu, or tau_had
-
-      } // loop over btags
+//       } // loop over btags
 
     // //get weight based on hadronic tau pT
     // bool foundBin = false;
@@ -1996,7 +1994,7 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     double tau_px = (*iTau)->p4().px();
     double tau_py = (*iTau)->p4().py();
     double tau_pz = (*iTau)->p4().pz();
-    
+
     //get coordinates of primary vertex
 //     double pv_vx = primaryVertex->x();
 //     double pv_vy = primaryVertex->y();

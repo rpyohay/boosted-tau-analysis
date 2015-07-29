@@ -177,7 +177,7 @@ process.WIsoMuonSelector = cms.EDFilter('CustomMuonSelector',
                                         muonTag = cms.InputTag('WMuonPTSelector'),
                                         vtxTag = cms.InputTag('offlinePrimaryVertices'),
                                         muonID = cms.string('tight'),
-                                        PFIsoMax = cms.double(0.2),
+                                        PFIsoMax = cms.double(0.12),
                                         detectorIsoMax = cms.double(-1.0),
                                         PUSubtractionCoeff = cms.double(0.5),
                                         usePFIso = cms.bool(True),
@@ -271,7 +271,7 @@ process.originalDownShiftedTauProducer = cms.EDProducer(
     keyTag = cms.InputTag('tauShiftProducer', 'hpsTausDownShifted', 'SKIM')
     )
 
-#find taus in |eta| < 2.4 matched to muon-tagged cleaned jets that pass the isolation
+#find taus in |eta| < 2.3 matched to muon-tagged cleaned jets that pass the isolation
 #discriminator
 #this will produce a ref to the cleaned tau collection
 process.muHadIsoTauSelector = cms.EDFilter(
@@ -295,14 +295,14 @@ process.muHadIsoTauSelector = cms.EDFilter(
     minNumObjsToPassFilter = cms.uint32(1)
     )
 
-#find taus in |eta| < 2.4 matched to muon-tagged cleaned jets that pass decay mode finding
+#find taus in |eta| < 2.3 matched to muon-tagged cleaned jets that pass decay mode finding
 #this will produce a ref to the cleaned tau collection
 process.muHadTauSelector = process.muHadIsoTauSelector.clone()
 process.muHadTauSelector.tauDiscriminatorTags = cms.VInputTag(
     cms.InputTag('hpsPFTauDiscriminationByDecayModeFinding', '', 'SKIM')
     )
 
-#find taus in |eta| < 2.4 matched to muon-tagged cleaned jets that fail the isolation
+#find taus in |eta| < 2.3 matched to muon-tagged cleaned jets that fail the isolation
 #discriminator
 #this will produce a ref to the cleaned tau collection
 process.muHadNonIsoTauSelector = process.muHadIsoTauSelector.clone()
@@ -311,7 +311,6 @@ process.muHadNonIsoTauSelector.tauDiscriminatorTags = cms.VInputTag(
     )
 process.muHadNonIsoTauSelector.passDiscriminator = cms.bool(False)
 process.muHadNonIsoTauSelector.isoMax = cms.double(5.0) #GeV
-
 
 #produce AK5PFchs L1FastL2L3 corrected jets
 

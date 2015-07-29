@@ -718,20 +718,11 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   string sigVsBkgOutputFileNoHPSIsoCutNorm1(analysisFilePath + "results/sigVsBkg_muHadAnalysis" + 
 					    MTBin + uncTag + a1Mass + tag1 + outputVTag + fileExt);
   vector<string> sigVsBkgInputFiles;
-  sigVsBkgInputFiles.push_back(Wh1IsoHaddOutputFile/*analysisFilePath + 
-						     "Wh1_Medium/muHadIsoAnalysis" + 
-						     MTBin + uncTag + "_Wh1" + a1Mass + 
-						     "_hadd_v194" + fileExt*/);
-  sigVsBkgInputFiles.push_back(ggIsoHaddOutputFile/*analysisFilePath + "gg/muHadIsoAnalysis" + 
-						    MTBin + uncTag + "_gg" + a1Mass + 
-						    "_hadd_v194" + fileExt*/);
+  sigVsBkgInputFiles.push_back(Wh1IsoHaddOutputFile);
+  sigVsBkgInputFiles.push_back(ggIsoHaddOutputFile);
   if (ma9GeV) {
-    sigVsBkgInputFiles.push_back(ZHIsoHaddOutputFile/*analysisFilePath + "ZH/muHadIsoAnalysis" + 
-						      MTBin + uncTag + "_ZH" + a1Mass + 
-						      "_hadd_v194" + fileExt*/);
-    sigVsBkgInputFiles.push_back(VBFIsoHaddOutputFile/*analysisFilePath + "VBF/muHadIsoAnalysis" + 
-						       MTBin + uncTag + "_VBF" + a1Mass + 
-						       "_hadd_v194" + fileExt*/);
+    sigVsBkgInputFiles.push_back(ZHIsoHaddOutputFile);
+    sigVsBkgInputFiles.push_back(VBFIsoHaddOutputFile);
   }
   sigVsBkgInputFiles.push_back(WWIsoHaddOutputFile);
   sigVsBkgInputFiles.push_back(ZZIsoHaddOutputFile);
@@ -858,8 +849,7 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   		dataIsoHaddOutputFile, 
   		pair<string, float>(dataVsMCOutputFile, 1.0), 
   		pair<string, float>(resBkgOutputFile, 1.0), 
-		pair<string, float>(nonIsoWDataNonIsoHaddOutputFile/*HLTMu40eta2p1RegDInputFile*/, 
-				    1.0), 
+		pair<string, float>(nonIsoWDataNonIsoHaddOutputFile, 1.0), 
 		vector<string>(1, "muHadMass"), vector<string>(1, "m_{#mu+had} (GeV)"), 
   		vector<int>(1, 1), vector<int>(1, firstBinToBlind - 1), 
   		analysisFilePath + "results/final" + MTBin + uncTag + a1Mass + outputVTag + 

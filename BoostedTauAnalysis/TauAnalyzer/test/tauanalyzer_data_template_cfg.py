@@ -278,7 +278,7 @@ process.originalDownShiftedTauProducer = cms.EDProducer(
 #discriminator
 #this will produce a ref to the cleaned tau collection
 process.muHadIsoTauSelector = cms.EDFilter(
-    'CustomTauSepFromMuonSelector',
+    'CUSTOMTAUSELECTOR',
     tauTag = cms.InputTag('muHadTauSelector', '', 'SKIM'),
     baseTauTag = cms.InputTag('hpsPFTauProducer', '', 'SKIM'),
     tauHadIsoTag = cms.InputTag('hpsPFTauDiscriminationByRawCombinedIsolationDBSumPtCorr', '',

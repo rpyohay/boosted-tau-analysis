@@ -117,7 +117,7 @@ root -l -b -q compilePlottingCode.C
 
 Running TauAnalyzer analysis jobs over data and MC
 
-1. Login to lxplus5.cern.ch
+1. Login to lxplus.cern.ch
 
 2. Execute
 

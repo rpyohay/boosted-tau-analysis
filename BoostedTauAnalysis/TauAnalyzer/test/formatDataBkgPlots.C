@@ -1074,14 +1074,14 @@ void formatDataBkgPlots(const string& inputVersion, const string& outputVersion,
 			       "_SingleMu" + nonIsoWDataVTag + fileExt);
 
   //compute data-driven QCD estimate in signal (i.e. isolated W muon + isolated tau) region
-  const pair<Int_t, Int_t> normReg(1, 3/*firstBinToBlind - 1*/);
+  const pair<Int_t, Int_t> normReg(1, 3);
   const string resBkgOutputFile(analysisFilePath + "results/resBkg" + MTBin + tag19p7InvFb + 
 				narrowBinsVTag + fileExt);
   string outputFileNameA(analysisFilePath + "results/dataVsMC_RegionAQCDEstimate" + MTBin + 
 			 dataVTag + fileExt);
-  string inputFileNameB(nonIsoWDataIsoHaddOutputFile/*HLTMu40eta2p1RegCInputFile*/); // Region C
+  string inputFileNameB(nonIsoWDataIsoHaddOutputFile); // Region C
   string inputFileNameC(dataVsMCOutputDiff); // Region B
-  string inputFileNameD(nonIsoWDataNonIsoHaddOutputFile/*HLTMu40eta2p1RegDInputFile*/); // Region D
+  string inputFileNameD(nonIsoWDataNonIsoHaddOutputFile); // Region D
   const pair<Double_t, Double_t> SFAndErrNormOnly = 
     normFactorAndError(pair<string, string>(inputFileNameC, "muHadMass"), 
 		       pair<string, string>(inputFileNameD, "muHadMass"), normReg);
@@ -1132,8 +1132,8 @@ void formatDataBkgPlots(const string& inputVersion, const string& outputVersion,
   string RegionBQCDVsMCOutputFile(analysisFilePath + "results/QCDVsMC_RegionB" + MTBin + 
 				  tag19p7InvFb + outputVTag + fileExt);
   QCDVsMCClosurePlots(RegionBQCDVsMCInputFiles, variable, theunit, 
-		      pair<string, string>("QCD (data-driven)", "EWK+TOP+DY (MC)"), 1, 
-		      firstBinToBlind - 1, 0.0, 11.0, RegionBQCDVsMCOutputFile, "RECREATE");
+		      pair<string, string>("QCD (data-driven)", "EWK+TOP+DY (MC)"), 1, 3, 0.0, 
+		      11.0, RegionBQCDVsMCOutputFile, "RECREATE");
 
   //compare data-driven QCD to total MC in signal region
   vector<string>RegionAQCDVsMCInputFiles;
@@ -1148,15 +1148,15 @@ void formatDataBkgPlots(const string& inputVersion, const string& outputVersion,
   string RegionAQCDVsMCOutputFile(analysisFilePath + "results/QCDVsMC_RegionA" + MTBin + 
 				  tag19p7InvFb + outputVTag + fileExt);
   QCDVsMCClosurePlots(RegionAQCDVsMCInputFiles, variable, theunit, 
-		      pair<string, string>("QCD (data-driven)", "EWK+TOP+DY (MC)"), 1, 
-		      firstBinToBlind - 1, 0.0, 11.0, RegionAQCDVsMCOutputFile, "RECREATE");
+		      pair<string, string>("QCD (data-driven)", "EWK+TOP+DY (MC)"), 1, 3, 0.0, 
+		      11.0, RegionAQCDVsMCOutputFile, "RECREATE");
 
   //compare region B MC+QCD to region A MC+QCD
   cout << "\nCompare region B MC+ddQCD to regionA MC+ddQCD \n\n";
   string RegionBVsAMCComparisonOutputFile(analysisFilePath + "results/QCDMC_RegionBVsA" + MTBin +
 					  tag19p7InvFb + outputVTag + fileExt);
-  compareTotalMCBToA(RegionBQCDVsMCInputFiles, RegionAQCDVsMCInputFiles, variable, theunit, 1, 
-		     firstBinToBlind - 1, RegionBVsAMCComparisonOutputFile);
+  compareTotalMCBToA(RegionBQCDVsMCInputFiles, RegionAQCDVsMCInputFiles, variable, theunit, 1, 3, 
+		     RegionBVsAMCComparisonOutputFile);
 
   //compare region B data - MC to region D data
   vector<string> compRegBDataMinusMCToRegDDataInputFiles;
@@ -1166,8 +1166,8 @@ void formatDataBkgPlots(const string& inputVersion, const string& outputVersion,
 						 "results/regBDataMinusMCVsRegDData" + MTBin + 
 						 tag19p7InvFb + outputVTag + fileExt);
   QCDVsMCClosurePlots(compRegBDataMinusMCToRegDDataInputFiles, variable, theunit, 
-		      pair<string, string>("Region D data", "Region B data - MC"), 1, firstBinToBlind - 1, 
-		      0.0, 11.0, compRegBDataMinusMCToRegDDataOutputFile, "RECREATE");
+		      pair<string, string>("Region D data", "Region B data - MC"), 1, 3, 0.0, 
+		      11.0, compRegBDataMinusMCToRegDDataOutputFile, "RECREATE");
 
   //compare region C data to region D data
   vector<string> compRegCDataToRegDDataInputFiles;
@@ -1176,19 +1176,19 @@ void formatDataBkgPlots(const string& inputVersion, const string& outputVersion,
   string compRegCDataToRegDDataOutputFile(analysisFilePath + "results/regCDataVsRegDData" + 
 					  MTBin + tag19p7InvFb + outputVTag + fileExt);
   QCDVsMCClosurePlots(compRegCDataToRegDDataInputFiles, variable, theunit, 
-		      pair<string, string>("Region D data", "Region C data"), 1, firstBinToBlind - 1, 0.0, 11.0, 
+		      pair<string, string>("Region D data", "Region C data"), 1, 3, 0.0, 11.0, 
 		      compRegCDataToRegDDataOutputFile, "RECREATE");
   QCDVsMCClosurePlots(compRegCDataToRegDDataInputFiles, "muHadMass1Prong", theunit, 
-		      pair<string, string>("Region D data", "Region C data"), 1, firstBinToBlind - 1, 0.0, 11.0, 
+		      pair<string, string>("Region D data", "Region C data"), 1, 3, 0.0, 11.0, 
 		      compRegCDataToRegDDataOutputFile, "UPDATE");
   QCDVsMCClosurePlots(compRegCDataToRegDDataInputFiles, "muHadMass1Prong1Pi0", theunit, 
-		      pair<string, string>("Region D data", "Region C data"), 1, firstBinToBlind - 1, 0.0, 11.0, 
+		      pair<string, string>("Region D data", "Region C data"), 1, 3, 0.0, 11.0, 
 		      compRegCDataToRegDDataOutputFile, "UPDATE");
   QCDVsMCClosurePlots(compRegCDataToRegDDataInputFiles, "muHadMass1Prong2Pi0", theunit, 
-		      pair<string, string>("Region D data", "Region C data"), 1, firstBinToBlind - 1, 0.0, 11.0, 
+		      pair<string, string>("Region D data", "Region C data"), 1, 3, 0.0, 11.0, 
 		      compRegCDataToRegDDataOutputFile, "UPDATE");
   QCDVsMCClosurePlots(compRegCDataToRegDDataInputFiles, "muHadMass3Prong", theunit, 
-		      pair<string, string>("Region D data", "Region C data"), 1, firstBinToBlind - 1, 0.0, 11.0, 
+		      pair<string, string>("Region D data", "Region C data"), 1, 3, 0.0, 11.0, 
 		      compRegCDataToRegDDataOutputFile, "UPDATE");
 
   //compare region C data to region B data - MC
@@ -1199,20 +1199,20 @@ void formatDataBkgPlots(const string& inputVersion, const string& outputVersion,
 						 "results/regCDataVsRegBDataMinusMC" + MTBin + 
 						 tag19p7InvFb + outputVTag + fileExt);
   QCDVsMCClosurePlots(compRegCDataToRegBDataMinusMCInputFiles, variable, theunit, 
-		      pair<string, string>("Region B data - MC", "Region C data"), 1, firstBinToBlind - 1, 
-		      0.0, 11.0, compRegCDataToRegBDataMinusMCOutputFile, "RECREATE");
+		      pair<string, string>("Region B data - MC", "Region C data"), 1, 3, 0.0, 
+		      11.0, compRegCDataToRegBDataMinusMCOutputFile, "RECREATE");
   QCDVsMCClosurePlots(compRegCDataToRegBDataMinusMCInputFiles, "muHadMass1Prong", theunit, 
-		      pair<string, string>("Region B data - MC", "Region C data"), 1, firstBinToBlind - 1, 
-		      0.0, 11.0, compRegCDataToRegBDataMinusMCOutputFile, "UPDATE");
+		      pair<string, string>("Region B data - MC", "Region C data"), 1, 3, 0.0, 
+		      11.0, compRegCDataToRegBDataMinusMCOutputFile, "UPDATE");
   QCDVsMCClosurePlots(compRegCDataToRegBDataMinusMCInputFiles, "muHadMass1Prong1Pi0", theunit, 
-		      pair<string, string>("Region B data - MC", "Region C data"), 1, firstBinToBlind - 1, 
-		      0.0, 11.0, compRegCDataToRegBDataMinusMCOutputFile, "UPDATE");
+		      pair<string, string>("Region B data - MC", "Region C data"), 1, 3, 0.0, 
+		      11.0, compRegCDataToRegBDataMinusMCOutputFile, "UPDATE");
   QCDVsMCClosurePlots(compRegCDataToRegBDataMinusMCInputFiles, "muHadMass1Prong2Pi0", theunit, 
-		      pair<string, string>("Region B data - MC", "Region C data"), 1, firstBinToBlind - 1, 
-		      0.0, 11.0, compRegCDataToRegBDataMinusMCOutputFile, "UPDATE");
+		      pair<string, string>("Region B data - MC", "Region C data"), 1, 3, 0.0, 
+		      11.0, compRegCDataToRegBDataMinusMCOutputFile, "UPDATE");
   QCDVsMCClosurePlots(compRegCDataToRegBDataMinusMCInputFiles, "muHadMass3Prong", theunit, 
-		      pair<string, string>("Region B data - MC", "Region C data"), 1, firstBinToBlind - 1, 
-		      0.0, 11.0, compRegCDataToRegBDataMinusMCOutputFile, "UPDATE");
+		      pair<string, string>("Region B data - MC", "Region C data"), 1, 3, 0.0, 
+		      11.0, compRegCDataToRegBDataMinusMCOutputFile, "UPDATE");
 
   //compare region C data to region B data
   vector<string> compRegCDataToRegBDataInputFiles;
@@ -1221,8 +1221,8 @@ void formatDataBkgPlots(const string& inputVersion, const string& outputVersion,
   string compRegCDataToRegBDataOutputFile(analysisFilePath + "results/regCDataVsRegBData" + 
 					  MTBin + tag19p7InvFb + outputVTag + fileExt);
   QCDVsMCClosurePlots(compRegCDataToRegBDataInputFiles, variable, theunit, 
-		      pair<string, string>("Region B data", "Region C data"), 1, firstBinToBlind - 1, 
-		      0.0, 11.0, compRegCDataToRegBDataOutputFile, "RECREATE");
+		      pair<string, string>("Region B data", "Region C data"), 1, 3, 0.0, 11.0, 
+		      compRegCDataToRegBDataOutputFile, "RECREATE");
 
   cout << "\nBegin region A vs. region B plots, sample by sample...\n\n";
   
@@ -1230,8 +1230,8 @@ void formatDataBkgPlots(const string& inputVersion, const string& outputVersion,
   //1. the shape of data-driven QCD from region B
   //2. the shape of MC EWK from region B
   cout << "\nCalculate bkg uncertainty with all-QCD and all-EWK assumptions \n\n";
-  string allQCDEWKAssumptionOutputFile(analysisFilePath + "results/allQCDorEWK_bkgUncertainty" + MTBin +
-					  tag19p7InvFb + outputVTag + fileExt);
+  string allQCDEWKAssumptionOutputFile(analysisFilePath + "results/allQCDorEWK_bkgUncertainty" + 
+				       MTBin + tag19p7InvFb + outputVTag + fileExt);
   arcQuest(RegionBQCDVsMCInputFiles, dataIsoHaddOutputFile, 
 	   dataNonIsoHaddOutputFile,
 	   variable, theunit, 1, 2,
