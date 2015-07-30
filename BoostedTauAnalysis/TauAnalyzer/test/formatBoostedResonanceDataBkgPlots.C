@@ -897,7 +897,7 @@ void formatBoostedResonanceDataBkgPlots(const string& inputVersion, const string
   const string theunit("m_{#mu+X} (GeV)");
   string inputFileNameB(nonIsoWDataIsoHaddOutputFile); // Region C
   vector<string> compRegCDataToRegDDataInputFiles;
-  compRegCDataToRegDDataInputFiles.push_back(outputFileNameB);
+  compRegCDataToRegDDataInputFiles.push_back(inputFileNameD);
   compRegCDataToRegDDataInputFiles.push_back(inputFileNameB);
   string compRegCDataToRegDDataOutputFile(analysisFilePath + "results/regCDataVsRegDData" + 
 					  MTBin + tag19p7InvFb + outputVTag + fileExt);

@@ -171,7 +171,7 @@ process.tauMuonSelector = cms.EDFilter('CustomMuonSelector',
                                        usePFIso = cms.bool(True),
                                        passIso = cms.bool(True),
                                        etaMax = cms.double(2.4),
-                                       minNumObjsToPassFilter = cms.uint32(1)
+                                       minNumObjsToPassFilter = cms.uint32(0)
                                        )
 
 
@@ -233,6 +233,8 @@ process.trigMuHadIsoTauSelector = cms.EDFilter(
     cms.InputTag('hpsPFTauDiscriminationByDecayModeFinding', '', 'ANALYSIS'), 
     cms.InputTag('hpsPFTauDiscriminationByMediumCombinedIsolationDBSumPtCorr', '', 'ANALYSIS')
     ),
+#    cms.InputTag('hpsPFTauDiscriminationByLooseCombinedIsolationDBSumPtCorr', '', 'ANALYSIS')
+#    ),
     jetTag = cms.InputTag('CleanJetsTrig', 'ak5PFJetsNoMu', 'ANALYSIS'),
     muonRemovalDecisionTag = cms.InputTag('CleanJetsTrig', '', 'ANALYSIS'),
     overlapCandTag = cms.InputTag(''),
@@ -253,6 +255,7 @@ process.trigMuHadIsoUncleanedTauSelector = cms.EDFilter(
     tauDiscriminatorTags = cms.VInputTag(
     cms.InputTag('hpsPFTauDiscriminationByDecayModeFinding', '', 'HLT'), 
     cms.InputTag('hpsPFTauDiscriminationByMediumCombinedIsolationDBSumPtCorr', '', 'HLT')
+#    cms.InputTag('hpsPFTauDiscriminationByLooseCombinedIsolationDBSumPtCorr', '', 'HLT')
     ),
     jetTag = cms.InputTag('ak5PFJets', '', 'HLT'),
     muonRemovalDecisionTag = cms.InputTag(''),
@@ -1693,7 +1696,7 @@ readFiles.extend([
 #analyze gen infor for Wh sample
 process.analyzeGenInfo = cms.EDAnalyzer(
     'GenAnalyzer',
-    outFileName = cms.string('ggHTriggerStudy/gg_WmuID_a9_gen_analysis_GenMatch_withFilters2_muHad.root'),
+    outFileName = cms.string('ggHTriggerStudy/gg_WmuID_WmuIso_a9_gen_analysis_GenMatch_withLooseFilters_muAll.root'),
 #    outFileName = cms.string('ggHTriggerStudy/gg_WmuID_WmuIso_a9_gen_analysis_GenMatch_TriggerMatch_HLTPass_chP_muAll.root'),
 #    outFileName = cms.string('ggHTriggerStudy/gg_WmuID_WmuIso_a9_gen_analysis_GenMatch_muHad.root'),
 #    outFileName = cms.string('triggertest.root'),
@@ -1703,8 +1706,8 @@ process.analyzeGenInfo = cms.EDAnalyzer(
     muonTag = cms.InputTag('muons'),
     genTauDecayIDPSet = commonGenTauDecayIDPSet,
     muonPFIsoPUSubtractionCoeff = cms.double(0.5),
-    PFIsoMax = cms.double(-1.0),
-#    PFIsoMax = cms.double(0.12),
+#    PFIsoMax = cms.double(-1.0),
+    PFIsoMax = cms.double(0.12),
     doTriggerMatching = cms.bool(False),
     triggerEventTag = cms.untracked.InputTag("hltTriggerSummaryAOD", "", "HLT"),
     triggerResultsTag = cms.untracked.InputTag("TriggerResults", "", "HLT"),
@@ -1736,6 +1739,7 @@ process.p = cms.Path(#process.IsoMu24eta2p1Selector*
                      process.WMuonPTSelector*
                      process.WIsoMuonSelector*
                      process.highestPTWMuonSelector*
+                     process.tauMuonPTSelector*
                      process.tauMuonSelector*
                      process.PFTau*
                      process.trigMuHadIsoTauSelector*
@@ -1745,8 +1749,5 @@ process.p = cms.Path(#process.IsoMu24eta2p1Selector*
                      process.trigMuonMuFilter*
                      process.trigMuonTauFilter*
                      process.trigMuonDistantTauFilter*
-#                     process.tauMuonPTSelector*
-#                     process.PFTau*
-#                     process.muHadTauSelector*
                      process.analyzeGenInfo)
 #process.p = cms.Path(process.analyzeGenInfo)

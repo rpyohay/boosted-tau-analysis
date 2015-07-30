@@ -28,17 +28,20 @@ for iRegion in "Iso" "NonIso" ""
   TriggerObjectFilterLine=1
   MTFilterLine=1
   signFilterLine=1
+  trigTauFilterLine=1
   region=A
   if [ -z $iRegion ]
       then
       TriggerObjectFilterLine=5
       MTFilterLine=3
       signFilterLine=5
+      trigTauFilterLine=5
       region="A + B (e.g. no isolation cut)"
   elif [ $iRegion = "NonIso" ]
       then
       TriggerObjectFilterLine=3
       MTFilterLine=2
+      trigTauFilterLine=3
       region=B
   fi
 
@@ -48,6 +51,7 @@ for iRegion in "Iso" "NonIso" ""
   nTrgMatchedTot=( 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 )
   nSameSgnMuTot=( 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 )
   nOppSgnTauTot=( 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 )
+  nTrigLepFilterTot=( 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 )
   nHighMTTot=( 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 )
   nLowMTTot=( 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 )
 
@@ -55,7 +59,6 @@ for iRegion in "Iso" "NonIso" ""
   for iJob in `ls -alh ${version} | grep LSFJOB | awk '{ print $9 }'`
     do
     file=${version}/${iJob}/STDOUT
-
     #get the name of the sample
     sample=`grep Initiating $file | sed -e "s%.*root.*user/[a-z]*/\(.*\)/data_no_selection.*%\1%" | head -n 1`
 
@@ -65,6 +68,7 @@ for iRegion in "Iso" "NonIso" ""
     nTrgMatched=`grep TriggerObjectFilter $file | head -n $TriggerObjectFilterLine | tail -n 1 | awk '{ print $5 }'`
     nSameSgnMu=`grep "OSSFFilter${iRegion}" $file | head -n $signFilterLine | tail -n 1 | awk '{ print $5 }'`
     nOppSgnTau=`grep "SSSFFilter${iRegion}" $file | head -n $signFilterLine | tail -n 1 | awk '{ print $5 }'`
+    nTrigTauFilter=`grep "trigMuonTauFilter" $file | head -n $trigTauFilterLine | tail -n 1 | awk '{ print $5 }'`
     nHighMT=`grep "highMTFilter" $file | head -n $MTFilterLine | tail -n 1 | awk '{ print $5 }'`
     nLowMT=`grep "lowMTFilter" $file | head -n $MTFilterLine | tail -n 1 | awk '{ print $5 }'`
 
@@ -91,6 +95,7 @@ for iRegion in "Iso" "NonIso" ""
     nTrgMatchedTot[${iSample}]=`expr ${nTrgMatchedTot[${iSample}]} + $nTrgMatched`
     nSameSgnMuTot[${iSample}]=`expr ${nSameSgnMuTot[${iSample}]} + $nSameSgnMu`
     nOppSgnTauTot[${iSample}]=`expr ${nOppSgnTauTot[${iSample}]} + $nOppSgnTau`
+    nTrigLepFilterTot[${iSample}]=`expr ${nTrigLepFilterTot[${iSample}]} + $nTrigTauFilter`
     nHighMTTot[${iSample}]=`expr ${nHighMTTot[${iSample}]} + $nHighMT`
     nLowMTTot[${iSample}]=`expr ${nLowMTTot[${iSample}]} + $nLowMT`
   done
@@ -108,6 +113,7 @@ for iRegion in "Iso" "NonIso" ""
 	echo "HLT matching: ${nTrgMatchedTot[${iSample}]}"
 	echo "W muon, soft muon same sign: ${nSameSgnMuTot[${iSample}]}"
 	echo "Soft muon, tau opposite sign: ${nOppSgnTauTot[${iSample}]}"
+	echo "Lepton filter: ${nTrigLepFilterTot[${iSample}]}"
 	echo "High MT: ${nHighMTTot[${iSample}]}"
 	echo "Low MT: ${nLowMTTot[${iSample}]}"
 	echo ""

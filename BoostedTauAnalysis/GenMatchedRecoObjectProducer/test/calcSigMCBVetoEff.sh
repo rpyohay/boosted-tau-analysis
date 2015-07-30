@@ -1,8 +1,8 @@
 #!/bin/bash
 
-if [ $# -ne 4 ]
+if [ $# -ne 6 ]
     then
-    echo "Usage: ./calcSigMCBVetoEff.sh <in_version_WH> <in_version_ggH> <out_version> <template cfg>"
+    echo "Usage: ./calcSigMCBVetoEff.sh <in_version_WH> <in_version_ggH> <in_version_ZH> <in_version_VBF> <out_version> <template cfg>"
     exit 0
 fi
 
@@ -11,8 +11,10 @@ fi
 #version
 inVersionWH=$1
 inVersionggH=$2
-outVersion=$3
-templateCfg=$4
+inVersionZH=$3
+inVersionVBF=$4
+outVersion=$5
+templateCfg=$6
 dir=$outVersion
 
 #a1 mass
@@ -22,7 +24,7 @@ iBeg=0
 iEndJob=`expr $nJobs - 1`
 
 #input file directories
-dirs=( "Wh1_Medium" "gg" )
+dirs=( "Wh1_Medium" "gg" "ZH" "VBF" )
 nSamples=${#dirs[@]}
 iEndSample=`expr $nSamples - 1`
 
@@ -49,6 +51,20 @@ for iSample in `seq $iBeg $iEndSample`
 	then
 	sample="Wh1"
 	inVersion=$inVersionWH
+    fi
+    if [ ${sample} = "ZH" ]
+	then
+	inVersion=$inVersionZH	
+    fi
+    if [ ${sample} = "VBF" ]
+	then
+	inVersion=$inVersionVBF	
+    fi
+    if [[ ${sample} = "ZH" &&  ${a1Mass[${iJob}]} != "9" ]]; then
+	continue
+    fi
+    if [[ ${sample} = "VBF" &&  ${a1Mass[${iJob}]} != "9" ]]; then
+	continue
     fi
     sample="${sample}_a${a1Mass[${iJob}]}"
     sed -e "s%DIR%${dirs[${iSample}]}%" -e "s%MASS%${a1Mass[${iJob}]}%" -e "s%VERSION%${inVersion}%" -e "s%SAMPLE%${sample}%" ../${templateCfg} > calcSigMCBVetoEff_${sample}.py
