@@ -3274,7 +3274,7 @@ void addFinalPlot2(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
 	}
       }
     }
-    for (Int_t iBin = 3; iBin <= 4/*16*/; ++iBin) {
+    for (Int_t iBin = 1; iBin <= 4/*16*/; ++iBin) {
       if (string(hist->GetName()) == "muHadMassResBkg") {
 	JPsiBkg+=hist->GetBinContent(iBin);
 	if (hist->GetBinContent(iBin) != 0.0) {
