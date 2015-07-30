@@ -101,6 +101,24 @@ void formatEfficiencyPlots(const bool compile)
   hist1DMapTau["numeratorEta"] = unitEtaTau;
   hist1DMapTau["denominatorEta"] = unitEtaTau;
 
+<<<<<<< HEAD
+//   //make individual efficiency plots for signal
+  //vector<string> effInputFiles;
+  //effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/HPSTauEff.root");
+  //effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/HPSTauPTEff.root");
+  //effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/HPSTauPTEtaEff.root");
+  //effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/HPSTauPTEtaDMFEff.root");
+  //effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/HPSTauPTEtaDMFIsoEff.root");
+//   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/softMuEtaEff.root");
+//   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/softMuPTEff.root");
+  // for (vector<string>::const_iterator iFile = effInputFiles.begin(); iFile != effInputFiles.end(); 
+  //      ++iFile) {
+  //   const unsigned int strLen = iFile->find(".root");
+  //   const string outputFileName(iFile->substr(0, strLen) + "_final.root");
+  //   double tempWeight = 1.;
+  //   plotNice(*iFile, effHistMap1DTau, effHistMap2D, binLabelMap, hist1DMapTau, outputFileName, "noPDF", tempWeight);
+  // }
+=======
   //make individual efficiency plots for signal
   vector<string> effInputFiles;
 //   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/HPSTauEff.root");
@@ -117,6 +135,7 @@ void formatEfficiencyPlots(const bool compile)
 //     double tempWeight = 1.;
 //     plotNice(*iFile, effHistMap1DTau, effHistMap2D, binLabelMap, hist1DMapTau, outputFileName, "noPDF", tempWeight);
 //   }
+>>>>>>> upstream/master
 
 //   //make HLT efficiency plots for signal
 //   vector<string> effInputFiles;
@@ -147,25 +166,43 @@ void formatEfficiencyPlots(const bool compile)
 //   }
 
   //make signal b veto efficiency plots
-   //  vector<string> effInputFiles;
-//   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v1/b_veto_eff_gg_a5.root");
-//   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v1/b_veto_eff_gg_a7.root");
-//   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v1/b_veto_eff_gg_a9.root");
-//   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v1/b_veto_eff_gg_a11.root");
-//   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v1/b_veto_eff_gg_a13.root");
-//   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v1/b_veto_eff_gg_a15.root");
-//   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v1/b_veto_eff_Wh1_a5.root");
-//   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v1/b_veto_eff_Wh1_a7.root");
-//   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v1/b_veto_eff_Wh1_a9.root");
-//   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v1/b_veto_eff_Wh1_a11.root");
-//   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v1/b_veto_eff_Wh1_a13.root");
-//   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v1/b_veto_eff_Wh1_a15.root");
-//  for (vector<string>::const_iterator iFile = effInputFiles.begin(); iFile != effInputFiles.end(); 
-//       ++iFile) {
-//    const unsigned int strLen = iFile->find(".root");
-//    const string outputFileName(iFile->substr(0, strLen) + "_final.root");
-//    plotNice(*iFile, effHistMap1D, effHistMap2D, binLabelMap, hist1DMap, outputFileName, "noPDF", 1.0);
-//  }
+  vector<string> effInputFiles;
+  //low MT files
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v2/b_veto_eff_lowMT_gg_a5.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v2/b_veto_eff_lowMT_gg_a7.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v2/b_veto_eff_lowMT_gg_a9.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v2/b_veto_eff_lowMT_gg_a11.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v2/b_veto_eff_lowMT_gg_a13.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v2/b_veto_eff_lowMT_gg_a15.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v2/b_veto_eff_lowMT_Wh1_a5.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v2/b_veto_eff_lowMT_Wh1_a7.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v2/b_veto_eff_lowMT_Wh1_a9.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v2/b_veto_eff_lowMT_Wh1_a11.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v2/b_veto_eff_lowMT_Wh1_a13.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v2/b_veto_eff_lowMT_Wh1_a15.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v2/b_veto_eff_lowMT_ZH_a9.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v2/b_veto_eff_lowMT_VBF_a9.root");
+  //high MT files
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v2/b_veto_eff_highMT_gg_a5.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v2/b_veto_eff_highMT_gg_a7.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v2/b_veto_eff_highMT_gg_a9.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v2/b_veto_eff_highMT_gg_a11.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v2/b_veto_eff_highMT_gg_a13.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v2/b_veto_eff_highMT_gg_a15.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v2/b_veto_eff_highMT_Wh1_a5.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v2/b_veto_eff_highMT_Wh1_a7.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v2/b_veto_eff_highMT_Wh1_a9.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v2/b_veto_eff_highMT_Wh1_a11.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v2/b_veto_eff_highMT_Wh1_a13.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v2/b_veto_eff_highMT_Wh1_a15.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v2/b_veto_eff_highMT_ZH_a9.root");
+  effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/v2/b_veto_eff_highMT_VBF_a9.root");
+  for (vector<string>::const_iterator iFile = effInputFiles.begin(); iFile != effInputFiles.end(); 
+       ++iFile) {
+    const unsigned int strLen = iFile->find(".root");
+    const string outputFileName(iFile->substr(0, strLen) + "_final.root");
+    plotNice(*iFile, effHistMap1D, effHistMap2D, binLabelMap, hist1DMap, outputFileName, "noPDF", 1.0);
+  }
 
   //put trigger efficiency and pT distribution on same plot
 //   effInputFiles.push_back("/afs/cern.ch/user/y/yohay/CMSSW_5_3_3_Git/src/BoostedTauAnalysis/GenMatchedRecoObjectProducer/test/genA1TauRecoMuonEtaHLTEff.root");
