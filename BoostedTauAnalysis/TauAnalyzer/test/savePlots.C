@@ -41,10 +41,10 @@ void savePlots(const string& outputVersion, const string& a1Mass, const string& 
   //for error bands
   gStyle->SetErrorX(0.5);
 
-  const string FranTestDir("/myNMSSMAnalysis/CMSSW_5_3_11/src/BoostedTauAnalysis/TauAnalyzer/test/plotsToSave");
+//   const string FranTestDir("/myNMSSMAnalysis/CMSSW_5_3_11/src/BoostedTauAnalysis/TauAnalyzer/test/plotsToSave/");
   //save directory
-  const string saveDir("/afs/cern.ch/user/" + userDir + "/" + user + FranTestDir +
-		       /*"/AN-13-254/notes/AN-13-254/trunk/figures/"*/"/");
+  const string saveDir("/afs/cern.ch/user/" + userDir + "/" + user + 
+		       "/AN-13-254/notes/AN-13-254/trunk/figures/"/*FranTestDir*/);
 
   // //HLT path
   // string HLTPath("_IsoMu24_eta2p1");
