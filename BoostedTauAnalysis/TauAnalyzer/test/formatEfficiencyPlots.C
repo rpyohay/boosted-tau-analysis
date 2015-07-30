@@ -101,26 +101,8 @@ void formatEfficiencyPlots(const bool compile)
   hist1DMapTau["numeratorEta"] = unitEtaTau;
   hist1DMapTau["denominatorEta"] = unitEtaTau;
 
-<<<<<<< HEAD
-//   //make individual efficiency plots for signal
-  //vector<string> effInputFiles;
-  //effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/HPSTauEff.root");
-  //effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/HPSTauPTEff.root");
-  //effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/HPSTauPTEtaEff.root");
-  //effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/HPSTauPTEtaDMFEff.root");
-  //effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/HPSTauPTEtaDMFIsoEff.root");
-//   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/softMuEtaEff.root");
-//   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/softMuPTEff.root");
-  // for (vector<string>::const_iterator iFile = effInputFiles.begin(); iFile != effInputFiles.end(); 
-  //      ++iFile) {
-  //   const unsigned int strLen = iFile->find(".root");
-  //   const string outputFileName(iFile->substr(0, strLen) + "_final.root");
-  //   double tempWeight = 1.;
-  //   plotNice(*iFile, effHistMap1DTau, effHistMap2D, binLabelMap, hist1DMapTau, outputFileName, "noPDF", tempWeight);
-  // }
-=======
   //make individual efficiency plots for signal
-  vector<string> effInputFiles;
+//   vector<string> effInputFiles;
 //   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/HPSTauEff.root");
 //   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/HPSTauPTEff.root");
 //   effInputFiles.push_back("../../GenMatchedRecoObjectProducer/test/HPSTauPTEtaEff.root");
@@ -135,7 +117,6 @@ void formatEfficiencyPlots(const bool compile)
 //     double tempWeight = 1.;
 //     plotNice(*iFile, effHistMap1DTau, effHistMap2D, binLabelMap, hist1DMapTau, outputFileName, "noPDF", tempWeight);
 //   }
->>>>>>> upstream/master
 
 //   //make HLT efficiency plots for signal
 //   vector<string> effInputFiles;
