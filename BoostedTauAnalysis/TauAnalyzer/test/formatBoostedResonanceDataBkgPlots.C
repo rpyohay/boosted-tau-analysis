@@ -902,18 +902,18 @@ void formatBoostedResonanceDataBkgPlots(const string& inputVersion, const string
   string compRegCDataToRegDDataOutputFile(analysisFilePath + "results/regCDataVsRegDData" + 
 					  MTBin + tag19p7InvFb + outputVTag + fileExt);
   QCDVsMCClosurePlots(compRegCDataToRegDDataInputFiles, variable, theunit, 
-		      pair<string, string>("Region D data", "Region C data"), 1, 12, 0.0, 11.0, 
+		      pair<string, string>("Region D data", "Region C data"), 1, 12, 0.0, 3.75, 
 		      compRegCDataToRegDDataOutputFile, "RECREATE");
   QCDVsMCClosurePlots(compRegCDataToRegDDataInputFiles, "muHadMass1Prong", theunit, 
-		      pair<string, string>("Region D data", "Region C data"), 1, 12, 0.0, 11.0, 
+		      pair<string, string>("Region D data", "Region C data"), 1, 12, 0.0, 3.75, 
 		      compRegCDataToRegDDataOutputFile, "UPDATE");
   QCDVsMCClosurePlots(compRegCDataToRegDDataInputFiles, "muHadMass1Prong1Pi0", theunit, 
-		      pair<string, string>("Region D data", "Region C data"), 1, 12, 0.0, 11.0, 
+		      pair<string, string>("Region D data", "Region C data"), 1, 12, 0.0, 3.75, 
 		      compRegCDataToRegDDataOutputFile, "UPDATE");
   QCDVsMCClosurePlots(compRegCDataToRegDDataInputFiles, "muHadMass1Prong2Pi0", theunit, 
-		      pair<string, string>("Region D data", "Region C data"), 1, 12, 0.0, 11.0, 
+		      pair<string, string>("Region D data", "Region C data"), 1, 12, 0.0, 3.75, 
 		      compRegCDataToRegDDataOutputFile, "UPDATE");
   QCDVsMCClosurePlots(compRegCDataToRegDDataInputFiles, "muHadMass3Prong", theunit, 
-		      pair<string, string>("Region D data", "Region C data"), 1, 12, 0.0, 11.0, 
+		      pair<string, string>("Region D data", "Region C data"), 1, 12, 0.0, 3.75, 
 		      compRegCDataToRegDDataOutputFile, "UPDATE");
 }
