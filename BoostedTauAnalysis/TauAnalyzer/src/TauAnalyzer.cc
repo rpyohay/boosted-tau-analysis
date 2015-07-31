@@ -1817,14 +1817,14 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	mistagEff = mistagEffVsPTAndEta_->GetBinContent(pTBin, etaBin);
       }
 
-      double SFb = 0.;
-      double SFbNominal = 0.;
-      if ((absEtaMin != -1.0) && (absEtaMax != -1.0)) {
-	double jetPT = /*correctedTauJet*/tauJetRef->pt();
-	//SFb = GetSFb(bTagScaleShift_, "CSV","M",absEtaMin, absEtaMax, "ABCD", jetPT);
-	//SFbNominal = GetSFb("mean", "CSV","M",absEtaMin, absEtaMax, "ABCD", jetPT);
-	//cout << "SFb = " << SFb << " and SFbNominal = " << SFbNominal << endl;
-      }
+//       double SFb = 0.;
+//       double SFbNominal = 0.;
+//       if ((absEtaMin != -1.0) && (absEtaMax != -1.0)) {
+// 	double jetPT = /*correctedTauJet*/tauJetRef->pt();
+// 	SFb = GetSFb(bTagScaleShift_, "CSV","M",absEtaMin, absEtaMax, "ABCD", jetPT);
+// 	SFbNominal = GetSFb("mean", "CSV","M",absEtaMin, absEtaMax, "ABCD", jetPT);
+// 	cout << "SFb = " << SFb << " and SFbNominal = " << SFbNominal << endl;
+//       }
       
       /*calculate mistag veto data/MC scale factor following 
 	https://hypernews.cern.ch/HyperNews/CMS/get/btag/1084/1.html*/
