@@ -925,7 +925,11 @@ TH1F* makeDataBkgAgreementHist(const TH1F* data, const TH1F* nomBkg, const TH1F*
     allQCDBkgSystErr2*=allQCDBkgSystErr2;
     Double_t allEWBkgSystErr2 = allEWBkg->GetBinContent(iBin) - nomBkgVal;
     allEWBkgSystErr2*=allEWBkgSystErr2;
-    Double_t totBkgErr = sqrt(nomBkgStatErr*nomBkgStatErr + allQCDBkgSystErr2 + allEWBkgSystErr2);
+    Double_t totBkgErr = 0.0;
+    if (allQCDBkgSystErr2 > allEWBkgSystErr2) {
+      totBkgErr = sqrt(nomBkgStatErr*nomBkgStatErr + allQCDBkgSystErr2);
+    }
+    else totBkgErr = sqrt(nomBkgStatErr*nomBkgStatErr + allEWBkgSystErr2);
     Double_t binContent = totBkgErr == 0.0 ? 0.0 : (ratioHist->GetBinContent(iBin)/totBkgErr);
     ratioHist->SetBinContent(iBin, binContent);
     ratioHist->SetBinError(iBin, dataNomBkgStatErr/nomBkgStatErr); //meaningless
@@ -3354,55 +3358,55 @@ void addFinalPlot2(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
     resonance backgrounds, but they are far outweighed by the statistical errors so the 
     correlation is ignored*/
   cout << "Nominal -- ";
-  makeAndFormatPullHistogram(isoData, resBkg, nonIsoData, kAzure, "HIST");
-//   makeAndFormatPullHistogram(isoData, resBkg, nonIsoData, nonIsoWNonIsoData, nonIsoMCHist, kAzure, 
-// 			     "HIST");
+//   makeAndFormatPullHistogram(isoData, resBkg, nonIsoData, kAzure, "HIST");
+  makeAndFormatPullHistogram(isoData, resBkg, nonIsoData, nonIsoWNonIsoData, nonIsoMCHist, kAzure, 
+			     "HIST");
 
-  //high-MT bin only
-  if (resBkgRegCkFixed != NULL) {
+//   //high-MT bin only
+//   if (resBkgRegCkFixed != NULL) {
 
-    //pull(reg. C sideband, reg. B MC)
-    cout << "J/psi bkg. shape from reg. C, jet fake bkg. shape from reg. B MC -- ";
-    makeAndFormatPullHistogram(isoData, resBkgRegCkFixed, nonIsoMCHist, kAzure - 1, 
-			       "HISTSAME");
+//     //pull(reg. C sideband, reg. B MC)
+//     cout << "J/psi bkg. shape from reg. C, jet fake bkg. shape from reg. B MC -- ";
+//     makeAndFormatPullHistogram(isoData, resBkgRegCkFixed, nonIsoMCHist, kAzure - 1, 
+// 			       "HISTSAME");
 
-    //pull(reg. C sideband, nom.)
-    cout << "J/psi bkg. shape from reg. C, nominal jet fake bkg. shape -- ";
-    makeAndFormatPullHistogram(isoData, resBkgRegCkFixed, nonIsoData, kAzure - 2, 
-			       "HISTSAME");
+//     //pull(reg. C sideband, nom.)
+//     cout << "J/psi bkg. shape from reg. C, nominal jet fake bkg. shape -- ";
+//     makeAndFormatPullHistogram(isoData, resBkgRegCkFixed, nonIsoData, kAzure - 2, 
+// 			       "HISTSAME");
 
-    //pull(reg. C sideband, reg. D data)
-    cout << "J/psi bkg. shape from reg. C, jet fake bkg. shape from reg. D MC -- ";
-    makeAndFormatPullHistogram(isoData, resBkgRegCkFixed, nonIsoWNonIsoData, kAzure - 3, 
-			       "HISTSAME");
-  }
+//     //pull(reg. C sideband, reg. D data)
+//     cout << "J/psi bkg. shape from reg. C, jet fake bkg. shape from reg. D MC -- ";
+//     makeAndFormatPullHistogram(isoData, resBkgRegCkFixed, nonIsoWNonIsoData, kAzure - 3, 
+// 			       "HISTSAME");
+//   }
 
-  //pull(nom, reg. B MC)
-  cout << "Nominal J/psi bkg. shape, jet fake bkg. shape from reg. B MC -- ";
-  makeAndFormatPullHistogram(isoData, resBkg, nonIsoMCHist, kAzure - 4, "HISTSAME");
+//   //pull(nom, reg. B MC)
+//   cout << "Nominal J/psi bkg. shape, jet fake bkg. shape from reg. B MC -- ";
+//   makeAndFormatPullHistogram(isoData, resBkg, nonIsoMCHist, kAzure - 4, "HISTSAME");
 
-  //pull(nom, reg. D data)
-  cout << "Nominal J/psi bkg. shape, jet fake bkg. shape from reg. D data -- ";
-  makeAndFormatPullHistogram(isoData, resBkg, nonIsoWNonIsoData, kAzure - 5, "HISTSAME");
+//   //pull(nom, reg. D data)
+//   cout << "Nominal J/psi bkg. shape, jet fake bkg. shape from reg. D data -- ";
+//   makeAndFormatPullHistogram(isoData, resBkg, nonIsoWNonIsoData, kAzure - 5, "HISTSAME");
 
-  //high-MT bin only
-  if (resBkgRegDkFixed != NULL) {
+//   //high-MT bin only
+//   if (resBkgRegDkFixed != NULL) {
 
-    //pull(reg. D, reg. B MC)
-    cout << "J/psi bkg. shape from reg. D, jet fake bkg. shape from reg. B MC -- ";
-    makeAndFormatPullHistogram(isoData, resBkgRegDkFixed, nonIsoMCHist, kAzure - 6, 
-			       "HISTSAME");
+//     //pull(reg. D, reg. B MC)
+//     cout << "J/psi bkg. shape from reg. D, jet fake bkg. shape from reg. B MC -- ";
+//     makeAndFormatPullHistogram(isoData, resBkgRegDkFixed, nonIsoMCHist, kAzure - 6, 
+// 			       "HISTSAME");
 
-    //pull(reg. D, nom.)
-    cout << "J/psi bkg. shape from reg. D, nominal jet fake bkg. shape -- ";
-    makeAndFormatPullHistogram(isoData, resBkgRegDkFixed, nonIsoData, kAzure - 7, 
-			       "HISTSAME");
+//     //pull(reg. D, nom.)
+//     cout << "J/psi bkg. shape from reg. D, nominal jet fake bkg. shape -- ";
+//     makeAndFormatPullHistogram(isoData, resBkgRegDkFixed, nonIsoData, kAzure - 7, 
+// 			       "HISTSAME");
 
-    //pull(reg. D, reg. D data)
-    cout << "J/psi bkg. shape from reg. D, jet fake bkg. shape from reg. D data -- ";
-    makeAndFormatPullHistogram(isoData, resBkgRegDkFixed, nonIsoWNonIsoData, kAzure - 8, 
-			       "HISTSAME");
-  }
+//     //pull(reg. D, reg. D data)
+//     cout << "J/psi bkg. shape from reg. D, jet fake bkg. shape from reg. D data -- ";
+//     makeAndFormatPullHistogram(isoData, resBkgRegDkFixed, nonIsoWNonIsoData, kAzure - 8, 
+// 			       "HISTSAME");
+//   }
 
   //write the canvas to file
   outCanvas.Write();
