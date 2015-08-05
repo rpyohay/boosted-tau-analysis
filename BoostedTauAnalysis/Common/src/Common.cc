@@ -330,6 +330,28 @@ Common::getSoftRecoMuons(const edm::Handle<reco::MuonRefVector>& pMuons,
   return softMuons;
 }
 
+std::vector<reco::MuonRef>
+Common::getSoftRecoMuonsFromPV(const edm::Handle<reco::MuonCollection>& pMuons, 
+			       const reco::Vertex* pPV, const double etaMax)
+{
+  std::vector<reco::MuonRef> softMuons;
+  for (reco::MuonCollection::const_iterator iMuon = pMuons->begin(); iMuon != pMuons->end(); 
+       ++iMuon) {
+    const reco::TrackRef innerTrack = iMuon->innerTrack();
+    const reco::Vertex::Point PVPos = pPV->position();
+    if (muon::isGoodMuon(*iMuon, muon::TMOneStationTight) && 
+	(iMuon->track()->hitPattern().trackerLayersWithMeasurement() > 5) && 
+	(innerTrack->hitPattern().pixelLayersWithMeasurement() > 1) && 
+	(innerTrack->normalizedChi2() < 1.8) && 
+	(fabs(innerTrack->dxy(PVPos)) < 3.0) && 
+	(fabs(innerTrack->dz(PVPos)) < 0.5) && 
+	((etaMax == -1.0) || (fabs(iMuon->eta()) < etaMax))) {
+      softMuons.push_back(reco::MuonRef(pMuons, iMuon - pMuons->begin()));
+    }
+  }
+  return softMuons;
+}
+
 std::vector<reco::PFTauRef> 
 Common::getRecoTaus(const edm::Handle<reco::PFTauCollection>& pTaus, 
 		    const std::vector<edm::Handle<reco::PFTauDiscriminator> >& pTauDiscriminators, 
