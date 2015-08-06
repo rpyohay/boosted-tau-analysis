@@ -817,6 +817,10 @@ private:
 
   //maximum mu+had mass
   double maxMuHadMass_;
+
+  unsigned int nNot3Mu_;
+  unsigned int n3Mu_;
+  unsigned int nTot_;
 };
 
 
@@ -1991,11 +1995,11 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     reco::PFCandidateRefVector::const_iterator iTauSigCand = tauSigCands.begin();
     while ((iTauSigCand != tauSigCands.end()) && !threeMu1) {
 
-      // //debug
-      // std::cerr << "Tau signal candidate #" << iTauSigCand - tauSigCands.begin() << ":\n";
-      // std::cerr << "pT = " << (*iTauSigCand)->pt() << " GeV\n";
-      // std::cerr << "eta = " << (*iTauSigCand)->eta() << std::endl;
-      // std::cerr << "phi = " << (*iTauSigCand)->phi() << std::endl << std::endl;
+//       //debug
+//       std::cerr << "Tau signal candidate #" << iTauSigCand - tauSigCands.begin() << ":\n";
+//       std::cerr << "pT = " << (*iTauSigCand)->pt() << " GeV\n";
+//       std::cerr << "eta = " << (*iTauSigCand)->eta() << std::endl;
+//       std::cerr << "phi = " << (*iTauSigCand)->phi() << std::endl << std::endl;
 
       //get the tau signal candidate track if it exists
       reco::TrackRef tauSigCandTrackRef((*iTauSigCand)->trackRef());
@@ -2040,30 +2044,18 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	    //   std::cerr << "DYT track eta = " << iMu->dytTrack()->eta() << std::endl;
 	    //   std::cerr << "DYT track phi = " << iMu->dytTrack()->phi() << std::endl;
 	    // }
-	    // if (iMu->muonBestTrack().isNonnull()) {
-	    //   std::cerr << "Best track pT = " << iMu->muonBestTrack()->pt() << " GeV\n";
-	    //   std::cerr << "Best track eta = " << iMu->muonBestTrack()->eta() << std::endl;
-	    //   std::cerr << "Best track phi = " << iMu->muonBestTrack()->phi() << std::endl;
-	    // }
-	    // std::cerr << std::endl;
+// 	    if (iMu->muonBestTrack().isNonnull()) {
+// 	      std::cerr << "Best track pT = " << iMu->muonBestTrack()->pt() << " GeV\n";
+// 	      std::cerr << "Best track eta = " << iMu->muonBestTrack()->eta() << std::endl;
+// 	      std::cerr << "Best track phi = " << iMu->muonBestTrack()->phi() << std::endl;
+// 	    }
+// 	    std::cerr << std::endl;
 
-	    //get track refs for all types of muon tracks
-	    if ((iMu->track().isNonnull() && 
-		 (tauSigCandTrackRef.key() == iMu->track().key())) || 
-		(iMu->standAloneMuon().isNonnull() && 
-		 (tauSigCandTrackRef.key() == iMu->standAloneMuon().key())) || 
-		(iMu->combinedMuon().isNonnull() && 
-		 (tauSigCandTrackRef.key() == iMu->combinedMuon().key())) || 
-		(iMu->tpfmsTrack().isNonnull() && 
-		 (tauSigCandTrackRef.key() == iMu->tpfmsTrack().key())) || 
-		(iMu->pickyTrack().isNonnull() && 
-		 (tauSigCandTrackRef.key() == iMu->pickyTrack().key())) || 
-		(iMu->dytTrack().isNonnull() && 
-		 (tauSigCandTrackRef.key() == iMu->dytTrack().key())) || 
-		(iMu->muonBestTrack().isNonnull() && 
-		 (tauSigCandTrackRef.key() == iMu->muonBestTrack().key()))) {
+	    //get best muon track ref
+	    if (iMu->muonBestTrack().isNonnull() && 
+		(tauSigCandTrackRef.key() == iMu->muonBestTrack().key())) {
 	      threeMu1 = true;
-	      // std::cerr << "Found a 3-muon event\n\n";
+// 	      std::cerr << "Found a 3-muon event\n\n";
 	    }
 	  }
 	  ++iMu;
@@ -2163,6 +2155,8 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	(fabs(mu_vz - pv_vz) < 0.5)/* &&
 	noOtherBTaggedJets*/) {
 
+      ++nTot_;
+
       double b_discriminant = 999.;
       for (unsigned int i = 0; i != bTags.size(); ++i)
 	{ // loop over btags
@@ -2246,7 +2240,10 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       hadTauAssociatedMuMultiplicity_->Fill(removedMuons.size(), PUWeight);
 
       //plot the mu + tau invariant mass for the highest pT muon
-      muHadMass_->Fill(muHadMassForPlotting, PUWeight*tauHadPTWeight*HiggsPTWeight);
+      if (!threeMu1) {
+	++nNot3Mu_;
+	muHadMass_->Fill(muHadMassForPlotting, PUWeight*tauHadPTWeight*HiggsPTWeight);
+      }
 
      //plot the mu + tau invariant mass for the highest pT muon
       //if (muHadMass >= 4.)
@@ -2278,6 +2275,7 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
       //plot the mu+tau invariant mass for 3-muon events
       if (threeMu1) {
+	++n3Mu_;
 	muHadMass3MuShareTrack_->Fill(muHadMassForPlotting, PUWeight*tauHadPTWeight*HiggsPTWeight);
       }
       if (threeMu2) {
@@ -3900,6 +3898,10 @@ void TauAnalyzer::beginJob()
 
   //maximum mu+had mass
   maxMuHadMass_ = 0.0;
+
+  nNot3Mu_ = 0.0;
+  n3Mu_ = 0.0;
+  nTot_ = 0.0;
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
@@ -4449,6 +4451,10 @@ void TauAnalyzer::endJob()
   //print maximum hadronic tau PT and mu+had mass
   cout << "Maximum HPS tau pT: " << maxTauHadPT_ << " GeV\n";
   cout << "Maximum mu+had mass: " << maxMuHadMass_ << " GeV\n\n";
+
+  std::cerr << "nNot3Mu = " << nNot3Mu_ << std::endl;
+  std::cerr << "n3Mu = " << n3Mu_ << std::endl;
+  std::cerr << "nTot = " << nTot_ << std::endl;
 }
 
 // ------------ method called when starting to processes a run  ------------
