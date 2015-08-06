@@ -93,7 +93,7 @@ from RecoBTag.ImpactParameter.impactParameter_cff import *
 from RecoBTag.SecondaryVertex.secondaryVertex_cff import *
 from RecoBTau.JetTagComputer.combinedMVA_cff import *
 process.impactParameterTagInfos.jetTracks = cms.InputTag("ak5JetTracksAssociatorAtVertex")
-process.ak5JetTracksAssociatorAtVertex.jets = cms.InputTag("ak5PFJets")
+process.ak5JetTracksAssociatorAtVertex.jets = cms.InputTag('CleanJets', 'ak5PFJetsNoMu', 'SKIM')
 process.ak5JetTracksAssociatorAtVertex.tracks = cms.InputTag("generalTracks")
 process.btagging = cms.Sequence(
     process.ak5JetTracksAssociatorAtVertex*
@@ -273,7 +273,7 @@ process.IsoBVetoFilter = cms.EDFilter(
     tauTag = cms.InputTag('muHadIsoTauSelector'),
     oldJetTag = cms.InputTag('ak5PFJets'),
     jetMuonMapTag = cms.InputTag('CleanJets', '', 'SKIM'),
-    bTagInfoTag = cms.InputTag('combinedSecondaryVertexBJetTags'),
+    bTagInfoTag = cms.InputTag('combinedSecondaryVertexBJetTags', '', 'MUHADANALYSIS'),
     CSVMax = cms.double(0.679),
     passFilter = cms.bool(True),
     minNumObjsToPassFilter = cms.uint32(1)
@@ -349,7 +349,7 @@ process.highMTMuHadIsoTauAnalyzer = cms.EDAnalyzer(
     vtxTag = cms.InputTag('offlinePrimaryVertices'),
     allGenParticleTag = cms.InputTag('genParticles'),
     corrJetTag = cms.InputTag('corrJetDistinctIsoTauSelector'),
-    bJetTag = cms.InputTag('combinedSecondaryVertexBJetTags'),
+    bJetTag = cms.InputTag('combinedSecondaryVertexBJetTags', '', 'MUHADANALYSIS'),
     dR = cms.double(0.3),
     tauPTMin = cms.double(20.0), #GeV
     tauDecayMode = cms.int32(TAU_ALL_HAD),
@@ -362,6 +362,7 @@ process.highMTMuHadIsoTauAnalyzer = cms.EDAnalyzer(
     MC = cms.bool(True),
     higgsReweight = cms.bool(HIGGSREW),
     reweight = cms.bool(True),
+    isHighMT = cms.bool(True),
     bTagScaleShift = cms.string("mean"),
     sample = cms.string("SAMPLE"),
     muHadMassBins = cms.vdouble(0.0, 1.0, 2.0, 3.0, 4.0, 11.0),
@@ -395,6 +396,7 @@ process.lowMTMuHadIsoTauAnalyzer = process.highMTMuHadIsoTauAnalyzer.clone()
 process.lowMTMuHadIsoTauAnalyzer.outFileName = cms.string(
     'PREFIX_lowMT_central_SAMPLE_VERSION.root'
     )
+process.lowMTMuHadIsoTauAnalyzer.isHighMT = cms.bool(False)
 
 #analyze isolated taus, e/g scale shifted
 process.highMTEGScaleDownMuHadIsoTauAnalyzer = cms.EDAnalyzer(
@@ -422,7 +424,7 @@ process.highMTEGScaleDownMuHadIsoTauAnalyzer = cms.EDAnalyzer(
     vtxTag = cms.InputTag('offlinePrimaryVertices'),
     allGenParticleTag = cms.InputTag('genParticles'),
     corrJetTag = cms.InputTag('corrJetDistinctIsoTauSelector'),
-    bJetTag = cms.InputTag('combinedSecondaryVertexBJetTags'),
+    bJetTag = cms.InputTag('combinedSecondaryVertexBJetTags', '', 'MUHADANALYSIS'),
     dR = cms.double(0.3),
     tauPTMin = cms.double(20.0), #GeV
     tauDecayMode = cms.int32(TAU_ALL_HAD),
@@ -435,6 +437,7 @@ process.highMTEGScaleDownMuHadIsoTauAnalyzer = cms.EDAnalyzer(
     MC = cms.bool(True),
     higgsReweight = cms.bool(HIGGSREW),
     reweight = cms.bool(True),
+    isHighMT = cms.bool(True),
     bTagScaleShift = cms.string("mean"),
     sample = cms.string("SAMPLE"),
     muHadMassBins = cms.vdouble(0.0, 1.0, 2.0, 3.0, 4.0, 11.0),
@@ -468,6 +471,7 @@ process.lowMTEGScaleDownMuHadIsoTauAnalyzer = process.highMTEGScaleDownMuHadIsoT
 process.lowMTEGScaleDownMuHadIsoTauAnalyzer.outFileName = cms.string(
     'PREFIX_lowMT_minus1SigmaEGScale_SAMPLE_VERSION.root'
     )
+process.lowMTEGScaleDownMuHadIsoTauAnalyzer.isHighMT = cms.bool(False)
 process.highMTEGScaleUpMuHadIsoTauAnalyzer = process.highMTEGScaleDownMuHadIsoTauAnalyzer.clone()
 process.highMTEGScaleUpMuHadIsoTauAnalyzer.outFileName = cms.string(
     'PREFIX_highMT_plus1SigmaEGScale_SAMPLE_VERSION.root'
@@ -479,6 +483,7 @@ process.lowMTEGScaleUpMuHadIsoTauAnalyzer = process.highMTEGScaleUpMuHadIsoTauAn
 process.lowMTEGScaleUpMuHadIsoTauAnalyzer.outFileName = cms.string(
     'PREFIX_lowMT_plus1SigmaEGScale_SAMPLE_VERSION.root'
     )
+process.lowMTEGScaleUpMuHadIsoTauAnalyzer.isHighMT = cms.bool(False)
 
 #analyze isolated taus, JER shifted
 process.highMTJERDownMuHadIsoTauAnalyzer = process.highMTEGScaleDownMuHadIsoTauAnalyzer.clone()
@@ -492,6 +497,7 @@ process.lowMTJERDownMuHadIsoTauAnalyzer = process.highMTJERDownMuHadIsoTauAnalyz
 process.lowMTJERDownMuHadIsoTauAnalyzer.outFileName = cms.string(
     'PREFIX_lowMT_minus1SigmaJER_SAMPLE_VERSION.root'
     )
+process.lowMTJERDownMuHadIsoTauAnalyzer.isHighMT = cms.bool(False)
 process.highMTJERUpMuHadIsoTauAnalyzer = process.highMTEGScaleDownMuHadIsoTauAnalyzer.clone()
 process.highMTJERUpMuHadIsoTauAnalyzer.outFileName = cms.string(
     'PREFIX_highMT_plus1SigmaJER_SAMPLE_VERSION.root'
@@ -503,6 +509,7 @@ process.lowMTJERUpMuHadIsoTauAnalyzer = process.highMTJERUpMuHadIsoTauAnalyzer.c
 process.lowMTJERUpMuHadIsoTauAnalyzer.outFileName = cms.string(
     'PREFIX_lowMT_plus1SigmaJER_SAMPLE_VERSION.root'
     )
+process.lowMTJERUpMuHadIsoTauAnalyzer.isHighMT = cms.bool(False)
 
 #analyze isolated taus, JES shifted
 process.highMTJESDownMuHadIsoTauAnalyzer = process.highMTEGScaleDownMuHadIsoTauAnalyzer.clone()
@@ -516,6 +523,7 @@ process.lowMTJESDownMuHadIsoTauAnalyzer = process.highMTJESDownMuHadIsoTauAnalyz
 process.lowMTJESDownMuHadIsoTauAnalyzer.outFileName = cms.string(
     'PREFIX_lowMT_minus1SigmaJES_SAMPLE_VERSION.root'
     )
+process.lowMTJESDownMuHadIsoTauAnalyzer.isHighMT = cms.bool(False)
 process.highMTJESUpMuHadIsoTauAnalyzer = process.highMTEGScaleDownMuHadIsoTauAnalyzer.clone()
 process.highMTJESUpMuHadIsoTauAnalyzer.outFileName = cms.string(
     'PREFIX_highMT_plus1SigmaJES_SAMPLE_VERSION.root'
@@ -527,6 +535,7 @@ process.lowMTJESUpMuHadIsoTauAnalyzer = process.highMTJESUpMuHadIsoTauAnalyzer.c
 process.lowMTJESUpMuHadIsoTauAnalyzer.outFileName = cms.string(
     'PREFIX_lowMT_plus1SigmaJES_SAMPLE_VERSION.root'
     )
+process.lowMTJESUpMuHadIsoTauAnalyzer.isHighMT = cms.bool(False)
 
 #analyze isolated taus, muon energy scale shifted
 process.highMTMuEnergyScaleDownMuHadIsoTauAnalyzer = process.highMTEGScaleDownMuHadIsoTauAnalyzer.clone()
@@ -540,6 +549,7 @@ process.lowMTMuEnergyScaleDownMuHadIsoTauAnalyzer = process.highMTMuEnergyScaleD
 process.lowMTMuEnergyScaleDownMuHadIsoTauAnalyzer.outFileName = cms.string(
     'PREFIX_lowMT_minus1SigmaMuEnergyScale_SAMPLE_VERSION.root'
     )
+process.lowMTMuEnergyScaleDownMuHadIsoTauAnalyzer.isHighMT = cms.bool(False)
 process.highMTMuEnergyScaleUpMuHadIsoTauAnalyzer = process.highMTEGScaleDownMuHadIsoTauAnalyzer.clone()
 process.highMTMuEnergyScaleUpMuHadIsoTauAnalyzer.outFileName = cms.string(
     'PREFIX_highMT_plus1SigmaMuEnergyScale_SAMPLE_VERSION.root'
@@ -551,6 +561,7 @@ process.lowMTMuEnergyScaleUpMuHadIsoTauAnalyzer = process.highMTMuEnergyScaleUpM
 process.lowMTMuEnergyScaleUpMuHadIsoTauAnalyzer.outFileName = cms.string(
     'PREFIX_lowMT_plus1SigmaMuEnergyScale_SAMPLE_VERSION.root'
     )
+process.lowMTMuEnergyScaleUpMuHadIsoTauAnalyzer.isHighMT = cms.bool(False)
 
 #analyze isolated taus, tau energy scale shifted
 process.highMTTauEnergyScaleDownMuHadIsoTauAnalyzer = process.highMTEGScaleDownMuHadIsoTauAnalyzer.clone()
@@ -564,6 +575,7 @@ process.lowMTTauEnergyScaleDownMuHadIsoTauAnalyzer = process.highMTTauEnergyScal
 process.lowMTTauEnergyScaleDownMuHadIsoTauAnalyzer.outFileName = cms.string(
     'PREFIX_lowMT_minus1SigmaTauEnergyScale_SAMPLE_VERSION.root'
     )
+process.lowMTTauEnergyScaleDownMuHadIsoTauAnalyzer.isHighMT = cms.bool(False)
 process.highMTTauEnergyScaleUpMuHadIsoTauAnalyzer = process.highMTEGScaleDownMuHadIsoTauAnalyzer.clone()
 process.highMTTauEnergyScaleUpMuHadIsoTauAnalyzer.outFileName = cms.string(
     'PREFIX_highMT_plus1SigmaTauEnergyScale_SAMPLE_VERSION.root'
@@ -575,6 +587,7 @@ process.lowMTTauEnergyScaleUpMuHadIsoTauAnalyzer = process.highMTTauEnergyScaleU
 process.lowMTTauEnergyScaleUpMuHadIsoTauAnalyzer.outFileName = cms.string(
     'PREFIX_lowMT_plus1SigmaTauEnergyScale_SAMPLE_VERSION.root'
     )
+process.lowMTTauEnergyScaleUpMuHadIsoTauAnalyzer.isHighMT = cms.bool(False)
 
 #analyze isolated taus, unclustered energy scale shifted
 process.highMTUnclusteredEnergyScaleDownMuHadIsoTauAnalyzer = process.highMTEGScaleDownMuHadIsoTauAnalyzer.clone()
@@ -588,6 +601,7 @@ process.lowMTUnclusteredEnergyScaleDownMuHadIsoTauAnalyzer = process.highMTUnclu
 process.lowMTUnclusteredEnergyScaleDownMuHadIsoTauAnalyzer.outFileName = cms.string(
     'PREFIX_lowMT_minus1SigmaUnclusteredEnergyScale_SAMPLE_VERSION.root'
     )
+process.lowMTUnclusteredEnergyScaleDownMuHadIsoTauAnalyzer.isHighMT = cms.bool(False)
 
 process.highMTUnclusteredEnergyScaleUpMuHadIsoTauAnalyzer = process.highMTEGScaleDownMuHadIsoTauAnalyzer.clone()
 process.highMTUnclusteredEnergyScaleUpMuHadIsoTauAnalyzer.outFileName = cms.string(
@@ -600,6 +614,7 @@ process.lowMTUnclusteredEnergyScaleUpMuHadIsoTauAnalyzer = process.highMTUnclust
 process.lowMTUnclusteredEnergyScaleUpMuHadIsoTauAnalyzer.outFileName = cms.string(
     'PREFIX_lowMT_plus1SigmaUnclusteredEnergyScale_SAMPLE_VERSION.root'
     )
+process.lowMTUnclusteredEnergyScaleUpMuHadIsoTauAnalyzer.isHighMT = cms.bool(False)
 
 #analyze isolated taus, b veto scale shifted
 process.highMTBVetoScaleDownMuHadIsoTauAnalyzer = process.highMTEGScaleDownMuHadIsoTauAnalyzer.clone()
@@ -615,6 +630,8 @@ process.lowMTBVetoScaleDownMuHadIsoTauAnalyzer = process.highMTBVetoScaleDownMuH
 process.lowMTBVetoScaleDownMuHadIsoTauAnalyzer.outFileName = cms.string(
     'PREFIX_lowMT_minus1SigmaBVetoScale_SAMPLE_VERSION.root'
     )
+process.lowMTBVetoScaleDownMuHadIsoTauAnalyzer.isHighMT = cms.bool(False)
+
 process.highMTBVetoScaleUpMuHadIsoTauAnalyzer = process.highMTBVetoScaleDownMuHadIsoTauAnalyzer.clone()
 process.highMTBVetoScaleUpMuHadIsoTauAnalyzer.outFileName = cms.string(
     'PREFIX_highMT_plus1SigmaBVetoScale_SAMPLE_VERSION.root'
@@ -624,6 +641,7 @@ process.lowMTBVetoScaleUpMuHadIsoTauAnalyzer = process.highMTBVetoScaleUpMuHadIs
 process.lowMTBVetoScaleUpMuHadIsoTauAnalyzer.outFileName = cms.string(
     'PREFIX_lowMT_plus1SigmaBVetoScale_SAMPLE_VERSION.root'
     )
+process.lowMTBVetoScaleUpMuHadIsoTauAnalyzer.isHighMT = cms.bool(False)
 
 #output
 process.output = cms.OutputModule(
@@ -778,6 +796,7 @@ process.begin = cms.Path(
     )
 process.baseIsoTauAnalysisSequence = cms.Sequence(
     process.muHadIsoTauSelector*
+    process.btagging*
     process.IsoBVetoFilter*
     process.corrJetDistinctIsoTauSelector*
     process.muonTriggerObjectFilter*
