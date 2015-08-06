@@ -1160,7 +1160,7 @@ void formatDataBkgPlots(const string& inputVersion, const string& outputVersion,
 
   //compare region B data - MC to region D data
   vector<string> compRegBDataMinusMCToRegDDataInputFiles;
-  compRegBDataMinusMCToRegDDataInputFiles.push_back(outputFileNameB);
+  compRegBDataMinusMCToRegDDataInputFiles.push_back(nonIsoWDataNonIsoHaddOutputFile);
   compRegBDataMinusMCToRegDDataInputFiles.push_back(dataVsMCOutputDiff);
   string compRegBDataMinusMCToRegDDataOutputFile(analysisFilePath + 
 						 "results/regBDataMinusMCVsRegDData" + MTBin + 
@@ -1171,7 +1171,7 @@ void formatDataBkgPlots(const string& inputVersion, const string& outputVersion,
 
   //compare region C data to region D data
   vector<string> compRegCDataToRegDDataInputFiles;
-  compRegCDataToRegDDataInputFiles.push_back(outputFileNameB);
+  compRegCDataToRegDDataInputFiles.push_back(nonIsoWDataNonIsoHaddOutputFile);
   compRegCDataToRegDDataInputFiles.push_back(inputFileNameB);
   string compRegCDataToRegDDataOutputFile(analysisFilePath + "results/regCDataVsRegDData" + 
 					  MTBin + tag19p7InvFb + outputVTag + fileExt);
