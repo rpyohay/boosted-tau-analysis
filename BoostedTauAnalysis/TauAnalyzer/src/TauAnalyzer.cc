@@ -2052,7 +2052,7 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 // 	    std::cerr << std::endl;
 
 	    //get best muon track ref
-	    if (iMu->muonBestTrack().isNonnull() && 
+	    if (iMu->isPFMuon() && iMu->muonBestTrack().isNonnull() && 
 		(tauSigCandTrackRef.key() == iMu->muonBestTrack().key())) {
 	      threeMu1 = true;
 // 	      std::cerr << "Found a 3-muon event\n\n";
