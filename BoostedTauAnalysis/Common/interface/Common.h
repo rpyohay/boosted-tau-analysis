@@ -183,6 +183,12 @@ class Common {
 						     const edm::Handle<reco::MuonCollection>&, 
 						     const reco::Vertex*, const double);
 
+  /*fill STL container with muons passing the 2012 soft selection and |eta| along with dz < 0.5 cm
+    (cf. https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId)*/
+  static std::vector<reco::MuonRef> 
+    getSoftRecoMuonsFromPV(const edm::Handle<reco::MuonCollection>&, const reco::Vertex*, 
+			   const double);
+
   //fill STL container with taus passing specified discriminators in specified eta range
   static std::vector<reco::PFTauRef>
     getRecoTaus(const edm::Handle<reco::PFTauCollection>&,

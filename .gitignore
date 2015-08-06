@@ -45,3 +45,12 @@ iso*root
 GluGlu_*/
 *speed_test*
 BoostedTauAnalysis/GenMatchedRecoObjectProducer/test/*.root
+*NMinus1*
+*Mu40*
+*WMuHLTEff*.root
+*noBVeto*
+*jet_requirement*
+*noMTFilter*
+*no*SSFVeto*
+*tauMuMT*
+testRegionCAndDFits.C

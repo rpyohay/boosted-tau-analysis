@@ -360,6 +360,13 @@ private:
   //histogram of mu+had mass for 3-prong taus
   TH1F* muHadMass3Prong_;
 
+  //histograms of mu+had mass for 3-muon events
+  TH1F* muHadMass3MuShareTrack_;
+  TH1F* muHadMass3MuSoftMu_;
+  TH1F* muHadMass3MuSoftMu5GeV_;
+  TH1F* muHadMass3MuSoftMu15GeV_;
+  TH1F* muHadMass3MuSoftMu20GeV_;
+
   /*histogram of mu+had mass weighted by the stat. error on hadronic tau pT weights (i.e. each 
     event is filled with a weight of sigma_w, where sigma_w is the stat. error on the hadronic tau 
     pT weight for that event)*/
@@ -810,6 +817,10 @@ private:
 
   //maximum mu+had mass
   double maxMuHadMass_;
+
+  unsigned int nNot3Mu_;
+  unsigned int n3Mu_;
+  unsigned int nTot_;
 };
 
 
@@ -1817,14 +1828,14 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	mistagEff = mistagEffVsPTAndEta_->GetBinContent(pTBin, etaBin);
       }
 
-      double SFb = 0.;
-      double SFbNominal = 0.;
-      if ((absEtaMin != -1.0) && (absEtaMax != -1.0)) {
-	double jetPT = /*correctedTauJet*/tauJetRef->pt();
-	//SFb = GetSFb(bTagScaleShift_, "CSV","M",absEtaMin, absEtaMax, "ABCD", jetPT);
-	//SFbNominal = GetSFb("mean", "CSV","M",absEtaMin, absEtaMax, "ABCD", jetPT);
-	//cout << "SFb = " << SFb << " and SFbNominal = " << SFbNominal << endl;
-      }
+//       double SFb = 0.;
+//       double SFbNominal = 0.;
+//       if ((absEtaMin != -1.0) && (absEtaMax != -1.0)) {
+// 	double jetPT = /*correctedTauJet*/tauJetRef->pt();
+// 	SFb = GetSFb(bTagScaleShift_, "CSV","M",absEtaMin, absEtaMax, "ABCD", jetPT);
+// 	SFbNominal = GetSFb("mean", "CSV","M",absEtaMin, absEtaMax, "ABCD", jetPT);
+// 	cout << "SFb = " << SFb << " and SFbNominal = " << SFbNominal << endl;
+//       }
       
       /*calculate mistag veto data/MC scale factor following 
 	https://hypernews.cern.ch/HyperNews/CMS/get/btag/1084/1.html*/
@@ -1975,6 +1986,124 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       }
     }
 
+    /* Method 1: look for a track shared between a muon and a tau signal candidate */
+
+    bool threeMu1 = false;
+
+    //loop over tau signal candidates
+    const reco::PFCandidateRefVector& tauSigCands((*iTau)->signalPFCands());
+    reco::PFCandidateRefVector::const_iterator iTauSigCand = tauSigCands.begin();
+    while ((iTauSigCand != tauSigCands.end()) && !threeMu1) {
+
+//       //debug
+//       std::cerr << "Tau signal candidate #" << iTauSigCand - tauSigCands.begin() << ":\n";
+//       std::cerr << "pT = " << (*iTauSigCand)->pt() << " GeV\n";
+//       std::cerr << "eta = " << (*iTauSigCand)->eta() << std::endl;
+//       std::cerr << "phi = " << (*iTauSigCand)->phi() << std::endl << std::endl;
+
+      //get the tau signal candidate track if it exists
+      reco::TrackRef tauSigCandTrackRef((*iTauSigCand)->trackRef());
+      if (tauSigCandTrackRef.isNonnull()) {
+
+	//loop over muons not overlapping the W or tau muons
+	reco::MuonCollection::const_iterator iMu = pAllMuons->begin();
+	while ((iMu != pAllMuons->end()) && (!threeMu1)) {
+	  const unsigned int muKey = iMu - pAllMuons->begin();
+	  if ((muKey != removedMuonRefs[removedMuonRefs.size() - 1].key()) && 
+	      (muKey != WMuonRefs[WMuonRefs.size() - 1].key())) {
+
+	    // //debug
+	    // std::cerr << "Muon #" << iMu - pAllMuons->begin() << ":\n";
+	    // if (iMu->track().isNonnull()) {
+	    //   std::cerr << "Tracker track pT = " << iMu->track()->pt() << " GeV\n";
+	    //   std::cerr << "Tracker track eta = " << iMu->track()->eta() << std::endl;
+	    //   std::cerr << "Tracker track phi = " << iMu->track()->phi() << std::endl;
+	    // }
+	    // if (iMu->standAloneMuon().isNonnull()) {
+	    //   std::cerr << "Muon track pT = " << iMu->standAloneMuon()->pt() << " GeV\n";
+	    //   std::cerr << "Muon track eta = " << iMu->standAloneMuon()->eta() << std::endl;
+	    //   std::cerr << "Muon track phi = " << iMu->standAloneMuon()->phi() << std::endl;
+	    // }
+	    // if (iMu->combinedMuon().isNonnull()) {
+	    //   std::cerr << "Combined track pT = " << iMu->combinedMuon()->pt() << " GeV\n";
+	    //   std::cerr << "Combined track eta = " << iMu->combinedMuon()->eta() << std::endl;
+	    //   std::cerr << "Combined track phi = " << iMu->combinedMuon()->phi() << std::endl;
+	    // }
+	    // if (iMu->tpfmsTrack().isNonnull()) {
+	    //   std::cerr << "TPFMS track pT = " << iMu->tpfmsTrack()->pt() << " GeV\n";
+	    //   std::cerr << "TPFMS track eta = " << iMu->tpfmsTrack()->eta() << std::endl;
+	    //   std::cerr << "TPFMS track phi = " << iMu->tpfmsTrack()->phi() << std::endl;
+	    // }
+	    // if (iMu->pickyTrack().isNonnull()) {
+	    //   std::cerr << "Picky track pT = " << iMu->pickyTrack()->pt() << " GeV\n";
+	    //   std::cerr << "Picky track eta = " << iMu->pickyTrack()->eta() << std::endl;
+	    //   std::cerr << "Picky track phi = " << iMu->pickyTrack()->phi() << std::endl;
+	    // }
+	    // if (iMu->dytTrack().isNonnull()) {
+	    //   std::cerr << "DYT track pT = " << iMu->dytTrack()->pt() << " GeV\n";
+	    //   std::cerr << "DYT track eta = " << iMu->dytTrack()->eta() << std::endl;
+	    //   std::cerr << "DYT track phi = " << iMu->dytTrack()->phi() << std::endl;
+	    // }
+// 	    if (iMu->muonBestTrack().isNonnull()) {
+// 	      std::cerr << "Best track pT = " << iMu->muonBestTrack()->pt() << " GeV\n";
+// 	      std::cerr << "Best track eta = " << iMu->muonBestTrack()->eta() << std::endl;
+// 	      std::cerr << "Best track phi = " << iMu->muonBestTrack()->phi() << std::endl;
+// 	    }
+// 	    std::cerr << std::endl;
+
+	    //get best muon track ref
+	    if (iMu->muonBestTrack().isNonnull() && 
+		(tauSigCandTrackRef.key() == iMu->muonBestTrack().key())) {
+	      threeMu1 = true;
+// 	      std::cerr << "Found a 3-muon event\n\n";
+	    }
+	  }
+	  ++iMu;
+	}
+      }
+      ++iTauSigCand;
+    }
+
+    /* Method 2: look for soft muons overlapping the tau that are not the tau or W muon
+       Method 3: look for soft muons with pT > 5 GeV overlapping the tau that are not the tau or W 
+       muon
+       Method 4: look for soft muons with pT > 15 GeV overlapping the tau that are not the tau or W 
+       muon
+       Method 5: look for soft muons with pT > 20 GeV overlapping the tau that are not the tau or W 
+       muon */
+
+    bool threeMu2 = false;
+    bool threeMu3 = false;
+    bool threeMu4 = false;
+    bool threeMu5 = false;
+    std::vector<reco::MuonRef> softMuons = 
+      Common::getSoftRecoMuonsFromPV(pAllMuons, primaryVertex, 2.3);
+
+    //loop over soft muons not overlapping the W or tau muons
+    std::vector<reco::MuonRef>::const_iterator iSoftMu = softMuons.begin();
+    while ((iSoftMu != softMuons.end()) && (!threeMu2 || !threeMu3 || !threeMu4 || !threeMu5)) {
+      const unsigned int muKey = iSoftMu->key();
+      if ((muKey != removedMuonRefs[removedMuonRefs.size() - 1].key()) && 
+	  (muKey != WMuonRefs[WMuonRefs.size() - 1].key()) && 
+
+	  //require the soft muon to overlap the tau in 0.5
+	  (reco::deltaR(**iTau, **iSoftMu) < 0.5)) {
+
+	threeMu2 = true;
+	const double muPT = (*iSoftMu)->pt();
+	if (muPT >= 5.0/*GeV*/) {
+	  threeMu3 = true;
+	  if (muPT >= 15.0/*GeV*/) {
+	    threeMu4 = true;
+	    if (muPT >= 20.0/*GeV*/) {
+	      threeMu5 = true;
+	    }
+	  }
+	}
+      }
+      ++iSoftMu;
+    }
+
     // get coordinates of W_mu vertex
 //     double WMu_vx = WMuonRefs[WMuonRefs.size() - 1]->vertex().x();
 //     double WMu_vy = WMuonRefs[WMuonRefs.size() - 1]->vertex().y();
@@ -2025,6 +2154,8 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	(fabs(tauOldJetRef->eta()) < 2.4) && (fabs(tau_vz - pv_vz) < 0.2) && 
 	(fabs(mu_vz - pv_vz) < 0.5)/* &&
 	noOtherBTaggedJets*/) {
+
+      ++nTot_;
 
       double b_discriminant = 999.;
       for (unsigned int i = 0; i != bTags.size(); ++i)
@@ -2109,7 +2240,10 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       hadTauAssociatedMuMultiplicity_->Fill(removedMuons.size(), PUWeight);
 
       //plot the mu + tau invariant mass for the highest pT muon
-      muHadMass_->Fill(muHadMassForPlotting, PUWeight*tauHadPTWeight*HiggsPTWeight);
+      if (!threeMu1) {
+	++nNot3Mu_;
+	muHadMass_->Fill(muHadMassForPlotting, PUWeight*tauHadPTWeight*HiggsPTWeight);
+      }
 
      //plot the mu + tau invariant mass for the highest pT muon
       //if (muHadMass >= 4.)
@@ -2137,6 +2271,24 @@ void TauAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       //plot the mu + 3-prong tau invariant mass for the highest pT muon
       if ((*iTau)->decayMode() == reco::PFTau::kThreeProng0PiZero) {
 	muHadMass3Prong_->Fill(muHadMassForPlotting, PUWeight*tauHadPTWeight*HiggsPTWeight);
+      }
+
+      //plot the mu+tau invariant mass for 3-muon events
+      if (threeMu1) {
+	++n3Mu_;
+	muHadMass3MuShareTrack_->Fill(muHadMassForPlotting, PUWeight*tauHadPTWeight*HiggsPTWeight);
+      }
+      if (threeMu2) {
+	muHadMass3MuSoftMu_->Fill(muHadMassForPlotting, PUWeight*tauHadPTWeight*HiggsPTWeight);
+      }
+      if (threeMu3) {
+	muHadMass3MuSoftMu5GeV_->Fill(muHadMassForPlotting, PUWeight*tauHadPTWeight*HiggsPTWeight);
+      }
+      if (threeMu4) {
+	muHadMass3MuSoftMu15GeV_->Fill(muHadMassForPlotting, PUWeight*tauHadPTWeight*HiggsPTWeight);
+      }
+      if (threeMu5) {
+	muHadMass3MuSoftMu20GeV_->Fill(muHadMassForPlotting, PUWeight*tauHadPTWeight*HiggsPTWeight);
       }
 
       //track maximum mu+had mass
@@ -3232,6 +3384,16 @@ void TauAnalyzer::beginJob()
 				  muHadMassBins_.size() - 1, &muHadMassBins_[0]);
   muHadMass3Prong_ = new TH1F("muHadMass3Prong", ";m_{#mu+X} (GeV);", 
 			      muHadMassBins_.size() - 1, &muHadMassBins_[0]);
+  muHadMass3MuShareTrack_ = new TH1F("muHadMass3MuShareTrack", ";m_{#mu+X} (GeV);", 
+				     muHadMassBins_.size() - 1, &muHadMassBins_[0]);
+  muHadMass3MuSoftMu_ = new TH1F("muHadMass3MuSoftMu", ";m_{#mu+X} (GeV);", 
+				 muHadMassBins_.size() - 1, &muHadMassBins_[0]);
+  muHadMass3MuSoftMu5GeV_ = new TH1F("muHadMass3MuSoftMu5GeV", ";m_{#mu+X} (GeV);", 
+				     muHadMassBins_.size() - 1, &muHadMassBins_[0]);
+  muHadMass3MuSoftMu15GeV_ = new TH1F("muHadMass3MuSoftMu15GeV", ";m_{#mu+X} (GeV);", 
+				      muHadMassBins_.size() - 1, &muHadMassBins_[0]);
+  muHadMass3MuSoftMu20GeV_ = new TH1F("muHadMass3MuSoftMu20GeV", ";m_{#mu+X} (GeV);", 
+				      muHadMassBins_.size() - 1, &muHadMassBins_[0]);
   muHadMassReweightErrSq_ = new TH1F("muHadMassReweightErrSq", ";m_{#mu+X} (GeV);", 
 				     muHadMassBins_.size() - 1, &muHadMassBins_[0]);
   muHadCharge_ = new TH1F("muHadCharge", ";q_{#mu} + q_{had};", 5, -2.5, 2.5);
@@ -3579,6 +3741,11 @@ void TauAnalyzer::beginJob()
   muHadMass1Prong1Pi0_->Sumw2();
   muHadMass1Prong2Pi0_->Sumw2();
   muHadMass3Prong_->Sumw2();
+  muHadMass3MuShareTrack_->Sumw2();
+  muHadMass3MuSoftMu_->Sumw2();
+  muHadMass3MuSoftMu5GeV_->Sumw2();
+  muHadMass3MuSoftMu15GeV_->Sumw2();
+  muHadMass3MuSoftMu20GeV_->Sumw2();
   muHadMassReweightErrSq_->Sumw2();
   muHadCharge_->Sumw2();
   muHadDdxy_->Sumw2();
@@ -3731,6 +3898,10 @@ void TauAnalyzer::beginJob()
 
   //maximum mu+had mass
   maxMuHadMass_ = 0.0;
+
+  nNot3Mu_ = 0.0;
+  n3Mu_ = 0.0;
+  nTot_ = 0.0;
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
@@ -3752,6 +3923,11 @@ void TauAnalyzer::endJob()
   TCanvas muHadMass1Prong1Pi0Canvas("muHadMass1Prong1Pi0Canvas", "", 600, 600);
   TCanvas muHadMass1Prong2Pi0Canvas("muHadMass1Prong2Pi0Canvas", "", 600, 600);
   TCanvas muHadMass3ProngCanvas("muHadMass3ProngCanvas", "", 600, 600);
+  TCanvas muHadMass3MuShareTrackCanvas("muHadMass3MuShareTrackCanvas", "", 600, 600);
+  TCanvas muHadMass3MuSoftMuCanvas("muHadMass3MuSoftMuCanvas", "", 600, 600);
+  TCanvas muHadMass3MuSoftMu5GeVCanvas("muHadMass3MuSoftMu5GeVCanvas", "", 600, 600);
+  TCanvas muHadMass3MuSoftMu15GeVCanvas("muHadMass3MuSoftMu15GeVCanvas", "", 600, 600);
+  TCanvas muHadMass3MuSoftMu20GeVCanvas("muHadMass3MuSoftMu20GeVCanvas", "", 600, 600);
   TCanvas muHadMassReweightErrSqCanvas("muHadMassReweightErrSqCanvas", "", 600, 600);
   TCanvas muHadChargeCanvas("muHadChargeCanvas", "", 600, 600);
   TCanvas muHadDdxyCanvas("muHadDdxyCanvas", "", 600, 600);
@@ -3931,6 +4107,11 @@ void TauAnalyzer::endJob()
   Common::draw1DHistograms(muHadMass1Prong1Pi0Canvas, muHadMass1Prong1Pi0_);
   Common::draw1DHistograms(muHadMass1Prong2Pi0Canvas, muHadMass1Prong2Pi0_);
   Common::draw1DHistograms(muHadMass3ProngCanvas, muHadMass3Prong_);
+  Common::draw1DHistograms(muHadMass3MuShareTrackCanvas, muHadMass3MuShareTrack_);
+  Common::draw1DHistograms(muHadMass3MuSoftMuCanvas, muHadMass3MuSoftMu_);
+  Common::draw1DHistograms(muHadMass3MuSoftMu5GeVCanvas, muHadMass3MuSoftMu5GeV_);
+  Common::draw1DHistograms(muHadMass3MuSoftMu15GeVCanvas, muHadMass3MuSoftMu15GeV_);
+  Common::draw1DHistograms(muHadMass3MuSoftMu20GeVCanvas, muHadMass3MuSoftMu20GeV_);
   Common::draw1DHistograms(muHadMassReweightErrSqCanvas, muHadMassReweightErrSq_);
   Common::draw1DHistograms(muHadChargeCanvas, muHadCharge_);
   Common::draw1DHistograms(muHadDdxyCanvas, muHadDdxy_);
@@ -4112,6 +4293,11 @@ void TauAnalyzer::endJob()
   muHadMass1Prong1Pi0Canvas.Write();
   muHadMass1Prong2Pi0Canvas.Write();
   muHadMass3ProngCanvas.Write();
+  muHadMass3MuShareTrackCanvas.Write();
+  muHadMass3MuSoftMuCanvas.Write();
+  muHadMass3MuSoftMu5GeVCanvas.Write();
+  muHadMass3MuSoftMu15GeVCanvas.Write();
+  muHadMass3MuSoftMu20GeVCanvas.Write();
   muHadMassReweightErrSqCanvas.Write();
   muHadChargeCanvas.Write();
   muHadDdxyCanvas.Write();
@@ -4265,6 +4451,10 @@ void TauAnalyzer::endJob()
   //print maximum hadronic tau PT and mu+had mass
   cout << "Maximum HPS tau pT: " << maxTauHadPT_ << " GeV\n";
   cout << "Maximum mu+had mass: " << maxMuHadMass_ << " GeV\n\n";
+
+  std::cerr << "nNot3Mu = " << nNot3Mu_ << std::endl;
+  std::cerr << "n3Mu = " << n3Mu_ << std::endl;
+  std::cerr << "nTot = " << nTot_ << std::endl;
 }
 
 // ------------ method called when starting to processes a run  ------------
@@ -5646,6 +5836,16 @@ void TauAnalyzer::reset(const bool doDelete)
   muHadMass1Prong2Pi0_ = NULL;
   if (doDelete && (muHadMass3Prong_ != NULL)) delete muHadMass3Prong_;
   muHadMass3Prong_ = NULL;
+  if (doDelete && (muHadMass3MuShareTrack_ != NULL)) delete muHadMass3MuShareTrack_;
+  muHadMass3MuShareTrack_ = NULL;
+  if (doDelete && (muHadMass3MuSoftMu_ != NULL)) delete muHadMass3MuSoftMu_;
+  muHadMass3MuSoftMu_ = NULL;
+  if (doDelete && (muHadMass3MuSoftMu5GeV_ != NULL)) delete muHadMass3MuSoftMu5GeV_;
+  muHadMass3MuSoftMu5GeV_ = NULL;
+  if (doDelete && (muHadMass3MuSoftMu15GeV_ != NULL)) delete muHadMass3MuSoftMu15GeV_;
+  muHadMass3MuSoftMu15GeV_ = NULL;
+  if (doDelete && (muHadMass3MuSoftMu20GeV_ != NULL)) delete muHadMass3MuSoftMu20GeV_;
+  muHadMass3MuSoftMu20GeV_ = NULL;
   if (doDelete && (muHadMassReweightErrSq_ != NULL)) delete muHadMassReweightErrSq_;
   muHadMassReweightErrSq_ = NULL;
   if (doDelete && (muHadCharge_ != NULL)) delete muHadCharge_;
