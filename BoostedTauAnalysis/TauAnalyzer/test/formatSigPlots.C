@@ -1,9 +1,8 @@
 //REGION A DATA 2D HISTOGRAMS ARE NOT BLINDED!!!  BEWARE!!!
 
 void formatSigPlots(const string& inputVersion, const string& outputVersion, 
-		    const string& versionNarrow, const string& uncTag, const string& a1Mass, 
-		    const string& MTBin, const unsigned int firstBinToBlind, 
-		    const bool doNoHPSIsoCut = false)
+		    const string& uncTag, const string& a1Mass, const string& MTBin, 
+		    const unsigned int firstBinToBlind, const bool doNoHPSIsoCut = false)
 {
   //initial
   gROOT->Reset();
@@ -531,7 +530,6 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   const string WZVTag("_" + inputVersion);
   const string ZZVTag("_" + inputVersion);
   const string WWVTag("_" + inputVersion);
-  const string narrowBinsVTag("_" + versionNarrow);
 
   cout << "Begin hadding...\n";
 
@@ -541,6 +539,7 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   string Wh1IsoPrefix(analysisFilePath + "Wh1_Medium/muHadIsoAnalysis" + MTBin + uncTag + "_Wh1" + 
 		      a1Mass);
   string Wh1IsoHaddOutputFile(Wh1IsoPrefix + "_hadd" + Wh1Suffix);
+  string Wh1IsoCombinedHaddOutputFile(Wh1IsoPrefix + "_hadd_combined" + Wh1Suffix);
   string Wh1AllPrefix(analysisFilePath + "Wh1_Medium/muHadAnalysis" + MTBin + uncTag + "_Wh1" + 
 		      a1Mass);
   string Wh1AllHaddOutputFile(Wh1AllPrefix + "_hadd" + Wh1Suffix);
@@ -555,6 +554,7 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   haddCanvases(Wh1IsoHaddOutputFile, Wh1IsoHaddInputFiles, 
 	       vector<float>(1, Wh1Weight19p7InvFb), canvasNames1D, graphNames1D, 
 	       canvasNames2D, graphNames2D, nullBlindLow, nullBlindHigh);
+  copyAddOverwrite(Wh1IsoHaddOutputFile, Wh1IsoCombinedHaddOutputFile);
   if (doNoHPSIsoCut) {
     haddCanvases(Wh1AllHaddOutputFile, Wh1AllHaddInputFiles, 
 		 vector<float>(1, Wh1Weight19p7InvFb), canvasNames1D, graphNames1D, 
@@ -566,6 +566,7 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   string ggSuffix(ggSigVTag + fileExt);
   string ggIsoPrefix(analysisFilePath + "gg/muHadIsoAnalysis" + MTBin + uncTag + "_gg" + a1Mass);
   string ggIsoHaddOutputFile(ggIsoPrefix + "_hadd" + ggSuffix);
+  string ggIsoCombinedHaddOutputFile(ggIsoPrefix + "_hadd_combined" + ggSuffix);
   string ggAllPrefix(analysisFilePath + "gg/muHadAnalysis" + MTBin + uncTag + "_gg" + a1Mass);
   string ggAllHaddOutputFile(ggAllPrefix + "_hadd" + ggSuffix);
   vector<string> ggIsoHaddInputFiles;
@@ -579,6 +580,7 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   haddCanvases(ggIsoHaddOutputFile, ggIsoHaddInputFiles, vector<float>(1, ggWeight19p7InvFb),
   	       canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow,
   	       nullBlindHigh);
+  copyAddOverwrite(ggIsoHaddOutputFile, ggIsoCombinedHaddOutputFile);
   if (doNoHPSIsoCut) {
     haddCanvases(ggAllHaddOutputFile, ggAllHaddInputFiles, vector<float>(1, ggWeight19p7InvFb), 
   		 canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
@@ -591,7 +593,7 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   string 
     VBFIsoEstPrefix(analysisFilePath + "VBF/muHadIsoAnalysis" + MTBin + uncTag + "_VBFEst" + a1Mass);
   string VBFIsoEstHaddOutputFile(VBFIsoEstPrefix + "_hadd" + VBFEstSuffix);
-  GetVBFZHEstimate(VBFIsoEstHaddOutputFile, ggIsoHaddOutputFile, ggWeight19p7InvFb, VBFWeightFromggH);
+  GetVBFZHEstimate(VBFIsoEstHaddOutputFile, ggIsoCombinedHaddOutputFile, ggWeight19p7InvFb, VBFWeightFromggH);
 
   //get ZH estimates from hadded WH sample
    cout << "...ZH estimates from WH\n";
@@ -599,12 +601,13 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   string 
     ZHIsoEstPrefix(analysisFilePath + "ZH/muHadIsoAnalysis" + MTBin + uncTag + "_ZHEst" + a1Mass);
   string ZHIsoEstHaddOutputFile(ZHIsoEstPrefix + "_hadd" + ZHEstSuffix);
-  GetVBFZHEstimate(ZHIsoEstHaddOutputFile, Wh1IsoHaddOutputFile, Wh1Weight19p7InvFb, ZHWeightFromWH);
+  GetVBFZHEstimate(ZHIsoEstHaddOutputFile, Wh1IsoCombinedHaddOutputFile, Wh1Weight19p7InvFb, ZHWeightFromWH);
 
   //"hadd" ZH sample just to get the formatting of the 2D plots the same
   string ZHSuffix(ZHSigVTag + fileExt);
   string ZHIsoPrefix(analysisFilePath + "ZH/muHadIsoAnalysis" + MTBin + uncTag + "_ZH" + a1Mass);
   string ZHIsoHaddOutputFile(ZHIsoPrefix + "_hadd" + ZHSuffix);
+  string ZHIsoCombinedHaddOutputFile(ZHIsoPrefix + "_hadd_combined" + ZHSuffix);
   string ZHAllPrefix(analysisFilePath + "ZH/muHadAnalysis" + MTBin + uncTag + "_ZH" + a1Mass);
   string ZHAllHaddOutputFile(ZHAllPrefix + "_hadd" + ZHSuffix);
   vector<string> ZHIsoHaddInputFiles;
@@ -621,6 +624,7 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
       haddCanvases(ZHIsoHaddOutputFile, ZHIsoHaddInputFiles, vector<float>(1, ZHWeight19p7InvFb), 
 		   canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
 		   nullBlindHigh);
+      copyAddOverwrite(ZHIsoHaddOutputFile, ZHIsoCombinedHaddOutputFile);
       if (doNoHPSIsoCut) {
 	haddCanvases(ZHAllHaddOutputFile, ZHAllHaddInputFiles, vector<float>(1, ZHWeight19p7InvFb), 
 		     canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
@@ -633,6 +637,7 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   string 
     VBFIsoPrefix(analysisFilePath + "VBF/muHadIsoAnalysis" + MTBin + uncTag + "_VBF" + a1Mass);
   string VBFIsoHaddOutputFile(VBFIsoPrefix + "_hadd" + VBFSuffix);
+  string VBFIsoCombinedHaddOutputFile(VBFIsoPrefix + "_hadd_combined" + VBFSuffix);
   string VBFAllPrefix(analysisFilePath + "VBF/muHadAnalysis" + MTBin + uncTag + "_VBF" + a1Mass);
   string VBFAllHaddOutputFile(VBFAllPrefix + "_hadd" + VBFSuffix);
   vector<string> VBFIsoHaddInputFiles;
@@ -649,6 +654,7 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
       haddCanvases(VBFIsoHaddOutputFile, VBFIsoHaddInputFiles, vector<float>(1, VBFWeight19p7InvFb), 
 		   canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
 		   nullBlindHigh);
+      copyAddOverwrite(VBFIsoHaddOutputFile, VBFIsoCombinedHaddOutputFile);
       if (doNoHPSIsoCut) {
 	haddCanvases(VBFAllHaddOutputFile, VBFAllHaddInputFiles, vector<float>(1, VBFWeight19p7InvFb), 
 		     canvasNames1D, graphNames1D, canvasNames2D, graphNames2D, nullBlindLow, 
@@ -662,12 +668,14 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   string dataSuffix(dataVTag + fileExt);
   string dataIsoPrefix(analysisFilePath + "data/analysis/muHadIsoAnalysis" + MTBin + "_SingleMu");
   string dataIsoHaddOutputFile(dataIsoPrefix + dataSuffix); //BLINDED!!!
+  string dataIsoCombinedHaddOutputFile(dataIsoPrefix + "_combined" + dataSuffix); //BLINDED!!!
 
   //DY region A files
   string DYJetsToLLSuffix(DYJetsToLLVTag + fileExt);
   string DYJetsToLLIsoPrefix(analysisFilePath + "DYJetsToLL/analysis/muHadIsoAnalysis" + MTBin + 
 			     "_DYJetsToLL");
   string DYJetsToLLIsoHaddOutputFile(DYJetsToLLIsoPrefix + DYJetsToLLSuffix);
+  string DYJetsToLLIsoCombinedHaddOutputFile(DYJetsToLLIsoPrefix + "_combined" + DYJetsToLLSuffix);
   string DYJetsToLLAllPrefix(analysisFilePath + "DYJetsToLL/analysis/muHadAnalysis" + MTBin + 
 			     "_DYJetsToLL");
   string DYJetsToLLAllHaddOutputFile(DYJetsToLLAllPrefix + DYJetsToLLSuffix);
@@ -677,6 +685,7 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   string TTJetsIsoPrefix(analysisFilePath + "TTJets/analysis/muHadIsoAnalysis" + MTBin + 
 			 "_TTJets");
   string TTJetsIsoHaddOutputFile(TTJetsIsoPrefix + "_hadd" + TTJetsSuffix);
+  string TTJetsIsoCombinedHaddOutputFile(TTJetsIsoPrefix + "_combined" + TTJetsSuffix);
   string TTJetsAllPrefix(analysisFilePath + "TTJets/analysis/muHadAnalysis" + MTBin + "_TTJets");
   string TTJetsAllHaddOutputFile(TTJetsAllPrefix + "_hadd" + TTJetsSuffix);
 
@@ -684,6 +693,7 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   string TSuffix(TVTag + fileExt);
   string TIsoPrefix(analysisFilePath + "SingleTop/analysis/muHadIsoAnalysis" + MTBin + "_T");
   string TIsoHaddOutputFile(TIsoPrefix + TSuffix);
+  string TIsoCombinedHaddOutputFile(TIsoPrefix + "_combined" + TSuffix);
   string TAllPrefix(analysisFilePath + "SingleTop/analysis/muHadAnalysis" + MTBin + "_T");
   string TAllHaddOutputFile(TAllPrefix + TSuffix);
 
@@ -692,6 +702,7 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   string WNJetsToLNuIsoPrefix(analysisFilePath + "WNJetsToLNu/analysis/muHadIsoAnalysis" + MTBin + 
 			      "_W");
   string WNJetsToLNuIsoHaddOutputFile(WNJetsToLNuIsoPrefix + "N" + WNJetsToLNuSuffix);
+  string WNJetsToLNuIsoCombinedHaddOutputFile(WNJetsToLNuIsoPrefix + "_combined" + WNJetsToLNuSuffix);
   string WNJetsToLNuAllTauPrefix(analysisFilePath + "WNJetsToLNu/analysis/muHadAnalysis" + MTBin + 
 				 "_W");
   string WNJetsToLNuAllTauHaddOutputFile(WNJetsToLNuAllTauPrefix + "N" + WNJetsToLNuSuffix);
@@ -700,6 +711,7 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   string WZSuffix(WZVTag + fileExt);
   string WZIsoPrefix(analysisFilePath + "WZ/analysis/muHadIsoAnalysis" + MTBin + "_WZ");
   string WZIsoHaddOutputFile(WZIsoPrefix + "_hadd" + WZSuffix);
+  string WZIsoCombinedHaddOutputFile(WZIsoPrefix + "_combined" + WZSuffix);
   string WZAllPrefix(analysisFilePath + "WZ/analysis/muHadAnalysis" + MTBin + "_WZ");
   string WZAllHaddOutputFile(WZAllPrefix + "_hadd" + WZSuffix);
 
@@ -707,6 +719,7 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   string ZZSuffix(ZZVTag + fileExt);
   string ZZIsoPrefix(analysisFilePath + "ZZ/analysis/muHadIsoAnalysis" + MTBin + "_ZZ");
   string ZZIsoHaddOutputFile(ZZIsoPrefix + "_hadd" + ZZSuffix);
+  string ZZIsoCombinedHaddOutputFile(ZZIsoPrefix + "_combined" + ZZSuffix);
   string ZZAllPrefix(analysisFilePath + "ZZ/analysis/muHadAnalysis" + MTBin + "_ZZ");
   string ZZAllHaddOutputFile(ZZAllPrefix + "_hadd" + ZZSuffix);
 
@@ -714,10 +727,11 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   string WWSuffix(WWVTag + fileExt);
   string WWIsoPrefix(analysisFilePath + "WW/analysis/muHadIsoAnalysis" + MTBin + "_WW");
   string WWIsoHaddOutputFile(WWIsoPrefix + "_hadd" + WWSuffix);
+  string WWIsoCombinedHaddOutputFile(WWIsoPrefix + "_combined" + WWSuffix);
   string WWAllPrefix(analysisFilePath + "WW/analysis/muHadAnalysis" + MTBin + "_WW");
   string WWAllHaddOutputFile(WWAllPrefix + "_hadd" + WWSuffix);
 
-  //compare MC signal to background
+  //compare MC signal to background, 3-muon and non-3-muon mu+had mass plots separate
   string sigVsBkgOutputFile(analysisFilePath + "results/sigVsBkg_muHadIsoAnalysis" + MTBin + 
 			    uncTag + a1Mass + tag19p7InvFb + outputVTag + fileExt);
   string sigVsBkgOutputFile1(analysisFilePath + "results/sigVsBkg_muHadIsoAnalysis" + MTBin + 
@@ -755,40 +769,27 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   sigVsBkgNoHPSIsoCutInputFiles.push_back(TAllHaddOutputFile);
   sigVsBkgNoHPSIsoCutInputFiles.push_back(TTJetsAllHaddOutputFile);
   sigVsBkgNoHPSIsoCutInputFiles.push_back(DYJetsToLLAllHaddOutputFile);
-  cout << "Plot signal vs. background normalized to data luminosity\n---\n";
+  cout << "Plot signal vs. background for 3-muon and non-3-muon mu+had mass plots separately normalized to data luminosity\n---\n";
   if (uncTag == "") {
     drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgOutputFile, sigVsBkgInputFiles, 
 					  canvasNames1D, graphNames1D, legendHeaders19p7InvFb, 
 					  colorsSigBkg, styles, legendEntriesSigBkg, 
 					  weightsSigBkg, setLogY, drawStack, sigBkg);
-    cout << "\nPlot signal vs. background normalized to 1\n---\n";
+    cout << "\nPlot signal vs. background for 3-muon and non-3-muon mu+had mass plots separately normalized to 1\n---\n";
     drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgOutputFile1, sigVsBkgInputFiles, 
 					  canvasNames1D, graphNames1D, legendHeaders1, 
 					  colorsSigBkg, styles, legendEntriesSigBkg, weights1, 
 					  setLinY, drawSame, sigBkg);
   }
-  else {
-    drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgOutputFile, sigVsBkgInputFiles, 
-					  vector<string>(1, "muHadMassCanvas"), 
-					  vector<string>(1, "muHadMass"), legendHeaders19p7InvFb, 
-					  colorsSigBkg, styles, legendEntriesSigBkg, 
-					  weightsSigBkg, setLogY, drawStack, sigBkg);
-    cout << "\nPlot signal vs. background normalized to 1\n---\n";
-    drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgOutputFile1, sigVsBkgInputFiles, 
-					  vector<string>(1, "muHadMassCanvas"), 
-					  vector<string>(1, "muHadMass"), legendHeaders1, 
-					  colorsSigBkg, styles, legendEntriesSigBkg, weights1, 
-					  setLinY, drawSame, sigBkg);
-  }
   if (doNoHPSIsoCut) {
-    cout << "\nPlot signal vs. background normalized to data luminosity, ";
+    cout << "\nPlot signal vs. background for 3-muon and non-3-muon mu+had mass plots separately normalized to data luminosity, ";
     cout << "no cut on tau isolation\n---\n";
     drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgOutputFileNoHPSIsoCut, 
 					  sigVsBkgNoHPSIsoCutInputFiles, canvasNames1D, 
 					  graphNames1D, legendHeaders19p7InvFb, colorsSigBkg, 
 					  styles, legendEntriesSigBkg, weightsSigBkg, setLogY, 
 					  drawStack, sigBkg);
-    cout << "\nPlot signal vs. background normalized to 1, no cut on tau isolation\n---\n";
+    cout << "\nPlot signal vs. background for 3-muon and non-3-muon mu+had mass plots separately normalized to 1, no cut on tau isolation\n---\n";
     drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgOutputFileNoHPSIsoCutNorm1, 
 					  sigVsBkgNoHPSIsoCutInputFiles, canvasNames1D, 
 					  graphNames1D, legendHeaders1, colorsSigBkg, styles, 
@@ -796,17 +797,62 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
 					  sigBkg);
   }
 
+  //compare MC signal to background, 3-muon and non-3-muon mu+had mass plots combined
+  string sigVsBkgCombinedOutputFile(analysisFilePath + "results/sigVsBkg_muHadIsoAnalysis_combined" + MTBin + 
+				    uncTag + a1Mass + tag19p7InvFb + outputVTag + fileExt);
+  string sigVsBkgCombinedOutputFile1(analysisFilePath + "results/sigVsBkg_muHadIsoAnalysis_combined" + MTBin + 
+				     tag1 + uncTag + a1Mass + outputVTag + fileExt);
+  vector<string> sigVsBkgCombinedInputFiles;
+  sigVsBkgCombinedInputFiles.push_back(Wh1IsoCombinedHaddOutputFile);
+  sigVsBkgCombinedInputFiles.push_back(ggIsoCombinedHaddOutputFile);
+  if (ma9GeV) {
+    sigVsBkgCombinedInputFiles.push_back(ZHIsoCombinedHaddOutputFile);
+    sigVsBkgCombinedInputFiles.push_back(VBFIsoCombinedHaddOutputFile);
+  }
+  sigVsBkgCombinedInputFiles.push_back(WWIsoCombinedHaddOutputFile);
+  sigVsBkgCombinedInputFiles.push_back(ZZIsoCombinedHaddOutputFile);
+  sigVsBkgCombinedInputFiles.push_back(WZIsoCombinedHaddOutputFile);
+  sigVsBkgCombinedInputFiles.push_back(WNJetsToLNuIsoCombinedHaddOutputFile);
+  sigVsBkgCombinedInputFiles.push_back(TIsoCombinedHaddOutputFile);
+  sigVsBkgCombinedInputFiles.push_back(TTJetsIsoCombinedHaddOutputFile);
+  sigVsBkgCombinedInputFiles.push_back(DYJetsToLLIsoCombinedHaddOutputFile);
+  cout << "Plot signal vs. background for 3-muon and non-3-muon mu+had mass plots combined normalized to data luminosity\n---\n";
+  if (uncTag == "") {
+    drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgCombinedOutputFile, sigVsBkgCombinedInputFiles, 
+					  canvasNames1D, graphNames1D, legendHeaders19p7InvFb, 
+					  colorsSigBkg, styles, legendEntriesSigBkg, 
+					  weightsSigBkg, setLogY, drawStack, sigBkg);
+    cout << "\nPlot signal vs. background for 3-muon and non-3-muon mu+had mass plots combined normalized to 1\n---\n";
+    drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgCombinedOutputFile1, sigVsBkgCombinedInputFiles, 
+					  canvasNames1D, graphNames1D, legendHeaders1, 
+					  colorsSigBkg, styles, legendEntriesSigBkg, weights1, 
+					  setLinY, drawSame, sigBkg);
+  }
+  else {
+    drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgCombinedOutputFile, sigVsBkgCombinedInputFiles, 
+					  vector<string>(1, "muHadMassCanvas"), 
+					  vector<string>(1, "muHadMass"), legendHeaders19p7InvFb, 
+					  colorsSigBkg, styles, legendEntriesSigBkg, 
+					  weightsSigBkg, setLogY, drawStack, sigBkg);
+    cout << "\nPlot signal vs. background for 3-muon and non-3-muon mu+had mass plots combined normalized to 1\n---\n";
+    drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgCombinedOutputFile1, sigVsBkgCombinedInputFiles, 
+					  vector<string>(1, "muHadMassCanvas"), 
+					  vector<string>(1, "muHadMass"), legendHeaders1, 
+					  colorsSigBkg, styles, legendEntriesSigBkg, weights1, 
+					  setLinY, drawSame, sigBkg);
+  }
+
   //compare MC signal + data-driven QCD to background
-  string outputFileNameA(analysisFilePath + "results/dataVsMC_RegionAQCDEstimate" + MTBin + 
-			 dataVTag + fileExt);
+  string outputFileNameATotQCD(analysisFilePath + "results/dataVsMC_RegionATotQCDEstimate" + 
+			       MTBin + dataVTag + fileExt);
   string sigVsBkgQCDFromDataOutputFile(analysisFilePath + 
 				       "results/sigVsBkgQCDFromData_muHadIsoAnalysis" + MTBin + 
 				       uncTag + a1Mass + tag19p7InvFb + outputVTag + fileExt);
   string sigVsBkgQCDFromDataOutputFile1(analysisFilePath + 
 					"results/sigVsBkgQCDFromData_muHadIsoAnalysis" + MTBin + 
 					uncTag + a1Mass + tag1 + outputVTag + fileExt);
-  vector<string> sigVsBkgQCDFromDataInputFiles(sigVsBkgInputFiles);
-  sigVsBkgQCDFromDataInputFiles.push_back(outputFileNameA);
+  vector<string> sigVsBkgQCDFromDataInputFiles(sigVsBkgCombinedInputFiles);
+  sigVsBkgQCDFromDataInputFiles.push_back(outputFileNameATotQCD);
   cout << "\nPlot signal vs. background with data-driven QCD estimate ";
   cout << "normalized to data luminosity\n---\n";
   if (uncTag == "") {
@@ -841,14 +887,8 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   cout << "---\nMaking final plots\n";
 
   //make the final plot showing all background methods, signals, data, and errors
-  string resBkgOutputFile(analysisFilePath + "results/resBkg" + MTBin + tag19p7InvFb + 
-			  narrowBinsVTag + fileExt);
   string dataVsMCOutputFile(analysisFilePath + "results/dataVsMC_muHadNonIsoAnalysis" + MTBin + 
 			    tag19p7InvFb + outputVTag + fileExt);
-  const string 
-    HLTMu40eta2p1RegDInputFile(analysisFilePath + "nonIsoWDataHLTMu40eta2p1/analysis/" + 
-			       "nonIsoW_HLT_Mu40_eta2p1_muHadNonIsoAnalysis" + MTBin + 
-			       "_SingleMu" + nonIsoWDataVTag + fileExt);
   string nonIsoWDataSuffix(nonIsoWDataVTag + fileExt);
   string nonIsoWDataNonIsoPrefix(analysisFilePath + 
 				 "nonIsoWData/analysis/nonIsoW_muHadNonIsoAnalysis" + MTBin + 
@@ -856,9 +896,9 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   string nonIsoWDataNonIsoHaddOutputFile(nonIsoWDataNonIsoPrefix + nonIsoWDataSuffix);
   gStyle->SetErrorX(1);
   makeFinalPlot(pair<string, float>(sigVsBkgQCDFromDataOutputFile, 1.0), 
-  		dataIsoHaddOutputFile, 
+  		dataIsoCombinedHaddOutputFile, 
   		pair<string, float>(dataVsMCOutputFile, 1.0), 
-  		pair<string, float>(resBkgOutputFile, 1.0), 
+  		pair<string, float>(dataIsoHaddOutputFile, 1.0), 
 		pair<string, float>(nonIsoWDataNonIsoHaddOutputFile, 1.0), 
 		vector<string>(1, "muHadMass"), vector<string>(1, "m_{#mu+had} (GeV)"), 
   		vector<int>(1, 1), vector<int>(1, firstBinToBlind - 1), 

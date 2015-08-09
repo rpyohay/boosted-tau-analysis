@@ -795,6 +795,7 @@ void scaleAndAdd(const vector<string>& canvasNames, TFile* in, const vector<stri
     pHist->SetBinError(lastBin, sqrt(lastBinErr*lastBinErr + overflowBinErr*overflowBinErr));
     pHist->SetBinContent(lastBin + 1, 0.0);
     pHist->SetBinError(lastBin + 1, 0.0);
+
     pHist->Scale(weight);
     if (fileIndex == 0) hists[canvasIndex] = pHist;
     else hists[canvasIndex]->Add(pHist);
@@ -934,7 +935,7 @@ TH1F* makeDataBkgAgreementHist(const TH1F* data, const TH1F* nomBkg, const TH1F*
     ratioHist->SetBinContent(iBin, binContent);
     ratioHist->SetBinError(iBin, dataNomBkgStatErr/nomBkgStatErr); //meaningless
   }
-  ratioHist->GetYaxis()->SetTitle("#frac{Data - Bkg.}{Bkg. error (excl. resonances)}");
+  ratioHist->GetYaxis()->SetTitle("#frac{Data - Bkg.}{Bkg. error (excl. di-muon decays)}");
   ratioHist->GetYaxis()->SetRangeUser(-3.0, 3.0);
   return ratioHist;
 }
@@ -1215,6 +1216,65 @@ void drawMultipleEfficiencyGraphsOn1Canvas(const string& outputFileName,
 bool lessThan0(int i) { return (i < 0); }
 bool lessThanNeg2(int i) { return (i < -2); }
 
+//get object from canvas
+template<typename T>
+T* getObjectFromCanvas(TFile& file, const string& objName, const string& canvasName, 
+		       const unsigned int pad)
+{
+  TCanvas* canvas = NULL;
+  file.GetObject(canvasName.c_str(), canvas);
+  T* obj = NULL;
+  if (canvas != NULL) {
+    canvas->Draw();
+    obj = (T*)canvas->cd(pad)->GetPrimitive(objName.c_str())/*->Clone()*/;
+  }
+  return obj;
+}
+
+//replace muHadMass histogram  with sum of 3-muon and non-3-muon contributions
+void copyAddOverwrite(const string& inputFileName, const string& outputFileName)
+{
+  TFile outputFile(outputFileName.c_str(), "RECREATE");
+  if (outputFile.IsOpen()) {
+
+    TFile inputFile(inputFileName.c_str());
+    if (inputFile.IsOpen()) {
+
+      //first, copy all objects from original file to new file
+      outputFile.cd();
+      TKey *key;
+      TIter nextkey(inputFile.GetListOfKeys());
+      while ((key = (TKey*)nextkey())) {
+        inputFile.cd();
+	TObject *obj = key->ReadObj();
+	outputFile.cd();
+	obj->Write();
+	delete obj;
+      }
+
+      //next, replace muHadMass histogram with a version summing the 3-muon and non-3-muon components
+      inputFile.cd();
+      TH1F* non3Mu = (TH1F*)getObjectFromCanvas<TH1F>(inputFile, "muHadMass", "muHadMassCanvas", 0)->Clone();
+      TH1F* threeMu = (TH1F*)getObjectFromCanvas<TH1F>(inputFile, "muHadMass3MuShareTrack", 
+						       "muHadMass3MuShareTrackCanvas", 0)->Clone();
+      if ((non3Mu != NULL) && (threeMu != NULL)) non3Mu->Add(threeMu);
+
+      TCanvas muHadMassCanvas("muHadMassCanvas", "muHadMassCanvas", 600, 600);
+      setCanvasOptions(muHadMassCanvas, 0, 0, 0);
+      muHadMassCanvas.cd();
+      if (non3Mu != NULL) non3Mu->Draw();
+
+      outputFile.cd();
+      muHadMassCanvas.Write("muHadMassCanvas", TObject::kOverwrite);
+      outputFile.Write();
+      outputFile.Close();
+      inputFile.Close();
+    }
+    else cerr << "Error opening file " << inputFileName << ".\n";
+  }
+  else cerr << "Error opening file " << outputFileName << ".\n";
+}
+
 //hadd histograms drawn on canvases
 //blindLow = -1 ==> overflow bin
 //blindHigh = -2 ==> don't blind anything
@@ -1476,21 +1536,6 @@ void drawDifferenceGraphsOn1Canvas(const string& outputFileName,
   deleteStreams(inputStreams);
 }
 
-//get object from canvas
-template<typename T>
-T* getObjectFromCanvas(TFile& file, const string& objName, const string& canvasName, 
-		       const unsigned int pad)
-{
-  TCanvas* canvas = NULL;
-  file.GetObject(canvasName.c_str(), canvas);
-  T* obj = NULL;
-  if (canvas != NULL) {
-    canvas->Draw();
-    obj = (T*)canvas->cd(pad)->GetPrimitive(objName.c_str())/*->Clone()*/;
-  }
-  return obj;
-}
-
 //get integral and error from a histogram
 pair<Double_t, Double_t> getIntegralAndError(const string& fileName, 
 					     const pair<Int_t, Int_t>& bins, const string& var, 
@@ -1549,17 +1594,72 @@ pair<Double_t, Double_t> normFactorAndError(const pair<string, string>& numerato
   return pair<Double_t, Double_t>(normFactor, normErr);
 }
 
+//compute normalization factor and error for combined non-3-muon and 3-muon samples
+pair<Double_t, Double_t> 
+combinedNormFactorAndError(const pair<string, string>& numeratorNon3MuSample, 
+			   const pair<string, string>& numerator3MuSample, 
+			   const pair<string, string>& denominatorNon3MuSample, 
+			   const pair<string, string>& denominator3MuSample, 
+			   const pair<Int_t, Int_t>& normReg)
+{
+  //get no. events and stat. error in numerator non-3-muon normalization region
+  pair<Double_t, Double_t> numeratorNon3MuNormRegIntAndErr = 
+    getIntegralAndError(numeratorNon3MuSample.first, normReg, numeratorNon3MuSample.second, 0);
+  Double_t numeratorNon3MuNormReg = numeratorNon3MuNormRegIntAndErr.first;
+  Double_t numeratorNon3MuNormRegErr = numeratorNon3MuNormRegIntAndErr.second;
+
+  //get no. events and stat. error in numerator 3-muon normalization region
+  pair<Double_t, Double_t> numerator3MuNormRegIntAndErr = 
+    getIntegralAndError(numerator3MuSample.first, normReg, numerator3MuSample.second, 0);
+  Double_t numerator3MuNormReg = numerator3MuNormRegIntAndErr.first;
+  Double_t numerator3MuNormRegErr = numerator3MuNormRegIntAndErr.second;
+
+  //get no. events and stat. error in denominator non-3-muon normalization region
+  pair<Double_t, Double_t> denominatorNon3MuNormRegIntAndErr = 
+    getIntegralAndError(denominatorNon3MuSample.first, normReg, denominatorNon3MuSample.second, 0);
+  Double_t denominatorNon3MuNormReg = denominatorNon3MuNormRegIntAndErr.first;
+  Double_t denominatorNon3MuNormRegErr = denominatorNon3MuNormRegIntAndErr.second;
+
+  //get no. events and stat. error in denominator 3-muon normalization region
+  pair<Double_t, Double_t> denominator3MuNormRegIntAndErr = 
+    getIntegralAndError(denominator3MuSample.first, normReg, denominator3MuSample.second, 0);
+  Double_t denominator3MuNormReg = denominator3MuNormRegIntAndErr.first;
+  Double_t denominator3MuNormRegErr = denominator3MuNormRegIntAndErr.second;
+
+  //compute normalization factor
+  const Double_t numeratorNormReg = numeratorNon3MuNormReg + numerator3MuNormReg;
+  const Double_t denominatorNormReg = denominatorNon3MuNormReg + denominator3MuNormReg;
+  const Double_t normFactor = 
+    (denominatorNormReg == 0.0) ? 0.0 : (numeratorNormReg/denominatorNormReg);
+
+  //compute normalization factor error
+  Double_t numeratorFracErr2 = (numeratorNormReg == 0.0) ? 0.0 : 
+    ((numeratorNon3MuNormRegErr*numeratorNon3MuNormRegErr + 
+      numerator3MuNormRegErr*numerator3MuNormRegErr)/(numeratorNormReg*numeratorNormReg));
+  Double_t denominatorFracErr2 = (denominatorNormReg == 0.0) ? 0.0 : 
+    ((denominatorNon3MuNormRegErr*denominatorNon3MuNormRegErr + 
+      denominator3MuNormRegErr*denominator3MuNormRegErr)/(denominatorNormReg*denominatorNormReg));
+  const Double_t normErr = normFactor*sqrt(numeratorFracErr2 + denominatorFracErr2);
+
+  //return
+  return pair<Double_t, Double_t>(normFactor, normErr);
+}
+
 //get Region A QCD histograms
-void drawQCDRegionAHistograms(const string& outputFileA, 
-			      const string& inputFileNameB, 
-			      const vector<string>& canvasNames, 
-			      const vector<string>& graphNames, 
-			      const vector<string>& legendHeaders, 
-			      const vector<Color_t>& colors, 
-			      const vector<Style_t>& styles, 
-			      const vector<string>& legendEntries, 
-			      const vector<float>& weights, const bool setLogY, 
-			      const bool dataMC, const pair<Double_t, Double_t>& SFAndErr)
+void drawQCDHistograms(const string& outputFileA, 
+		       const string& inputFileName, 
+		       const vector<string>& canvasNames, 
+		       const vector<string>& graphNames, 
+		       const vector<string>& legendHeaders, 
+		       const vector<Color_t>& colors, 
+		       const vector<Style_t>& styles, 
+		       const vector<string>& legendEntries, 
+		       const vector<float>& weights, 
+		       const bool setLogY, 
+		       const bool dataMC, 
+		       const pair<Double_t, Double_t>& SFAndErrNon3Mu, 
+		       const pair<Double_t, Double_t>& SFAndErr3Mu, 
+		       const pair<Double_t, Double_t>& SFAndErrCombined)
 { // start routine
   
   if ((canvasNames.size() > graphNames.size()) || (canvasNames.size() > legendHeaders.size())) {
@@ -1575,7 +1675,7 @@ void drawQCDRegionAHistograms(const string& outputFileA,
   }
 
   TFile outStream(outputFileA.c_str(), "RECREATE");
-  TFile inputFileB(inputFileNameB.c_str(), "read");
+  TFile inputFile(inputFileName.c_str(), "read");
   vector<TCanvas*> outputCanvases;
   vector<TLegend*> legends;
   vector<THStack*> stacks;
@@ -1583,39 +1683,66 @@ void drawQCDRegionAHistograms(const string& outputFileA,
   setup(canvasNames, outputCanvases, setLogY, legends, stacks, legendHeaders, hists, 3, dataMC, 
 	false);
 
-  //compute normalization factor and error from muHadMass histogram
-  const Double_t SF = SFAndErr.first;
-  const Double_t SFErr = SFAndErr.second;
-  Double_t SFFracErr2 = SF == 0.0 ? 0.0 : (SFErr/SF);
-  SFFracErr2*=SFFracErr2;
+  //compute normalization factor and error for non-3-muon events
+  const Double_t SFNon3Mu = SFAndErrNon3Mu.first;
+  const Double_t SFErrNon3Mu = SFAndErrNon3Mu.second;
+  Double_t SFNon3MuFracErr2 = SFNon3Mu == 0.0 ? 0.0 : (SFErrNon3Mu/SFNon3Mu);
+  SFNon3MuFracErr2*=SFNon3MuFracErr2;
+
+  //compute normalization factor and error for 3-muon events
+  const Double_t SF3Mu = SFAndErr3Mu.first;
+  const Double_t SFErr3Mu = SFAndErr3Mu.second;
+  Double_t SF3MuFracErr2 = SF3Mu == 0.0 ? 0.0 : (SFErr3Mu/SF3Mu);
+  SF3MuFracErr2*=SF3MuFracErr2;
+
+  //compute normalization factor and error for the sum of non-3-muon and 3-muon events
+  const Double_t SFCombined = SFAndErrCombined.first;
+  const Double_t SFErrCombined = SFAndErrCombined.second;
+  Double_t SFCombinedFracErr2 = SFCombined == 0.0 ? 0.0 : (SFErrCombined/SFCombined);
+  SFCombinedFracErr2*=SFCombinedFracErr2;
 
 //   //debug
-//   cout << "Normalization factor: " << setprecision(3) << SF << " +/- " << SFErr << endl;
+//   cout << "Non-3-muon normalization factor: " << setprecision(3) << SFNon3Mu << " +/- ";
+//   cout << SFErrNon3Mu << endl;
+//   cout << "3-muon normalization factor: " << setprecision(3) << SF3Mu << " +/- ";
+//   cout << SFErr3Mu << endl;
 
   for (vector<string>::const_iterator iCanvasName = canvasNames.begin(); 
        iCanvasName != canvasNames.end(); ++iCanvasName) { // loop over canvases
     const unsigned int canvasIndex = iCanvasName - canvasNames.begin();
-    TCanvas* pCanvasB;
-    inputFileB.GetObject(iCanvasName->c_str(), pCanvasB);
-    TH1F* pHistB = NULL;
-    pHistB = (TH1F*)pCanvasB->GetPrimitive(graphNames[canvasIndex].c_str())->Clone();
+    TCanvas* pCanvas;
+    inputFile.GetObject(iCanvasName->c_str(), pCanvas);
+    TH1F* pHist = NULL;
+    pHist = (TH1F*)pCanvas->GetPrimitive(graphNames[canvasIndex].c_str())->Clone();
+    const string histName(pHist->GetName());
+
+    Double_t SF = SFCombined;
+    Double_t SFFracErr2 = SFCombinedFracErr2;
+    if (histName == "muHadMass") {
+      SF = SFNon3Mu;
+      SFFracErr2 = SFNon3MuFracErr2;
+    }
+    else if (histName == "muHadMass3MuShareTrack") {
+      SF = SF3Mu;
+      SFFracErr2 = SF3MuFracErr2;
+    }
 
     //scale histogram and set total statistical error
-    for (Int_t iBin = 0; iBin <= (pHistB->GetNbinsX() + 1); ++iBin) {
-      Double_t nBErr = pHistB->GetBinError(iBin);
-      Double_t nB = pHistB->GetBinContent(iBin);
+    for (Int_t iBin = 0; iBin <= (pHist->GetNbinsX() + 1); ++iBin) {
+      Double_t nBErr = pHist->GetBinError(iBin);
+      Double_t nB = pHist->GetBinContent(iBin);
       Double_t nBFracStatErr2 = nB == 0.0 ? 0.0 : ((nBErr*nBErr)/(nB*nB));
       Double_t totErr = nB*SF*sqrt(nBFracStatErr2 + SFFracErr2);
-      pHistB->SetBinContent(iBin, nB*SF);
-      pHistB->SetBinError(iBin, totErr);
+      pHist->SetBinContent(iBin, nB*SF);
+      pHist->SetBinError(iBin, totErr);
 
 //       //debug
-//       if (string(pHistB->GetName()) == "muHadMass") {
+//       if ((histName == "muHadMass") || (histName == "muHadMass3MuShareTrack")) {
 // 	Double_t statErr = nB*SF*sqrt(nBFracStatErr2);
 // 	Double_t normErr = nB*SF*sqrt(SFFracErr2);
 // 	Double_t fullFracErr = (totErr/(nB*SF));
 // 	Double_t statFracErr = (statErr/(nB*SF));
-// 	cout << "Bin " << iBin << endl << setprecision(3) << pHistB->GetBinContent(iBin);
+// 	cout << "Bin " << iBin << endl << setprecision(3) << pHist->GetBinContent(iBin);
 // 	cout << " +/- " << statErr << "(stat.) +/- " << normErr << "(norm.)" << endl;
 // 	cout << "Full fractional error: " << fullFracErr << endl;
 // 	cout << "Fractional error neglecting normalization term: " << statFracErr << endl;
@@ -1623,33 +1750,32 @@ void drawQCDRegionAHistograms(const string& outputFileA,
     }
 
     float weight = 1.0;
-    setHistogramOptions(pHistB, colors[0], 0.7, styles[0], 
+    setHistogramOptions(pHist, colors[0], 0.7, styles[0], 
 			weight, 
-			string(pHistB->GetName()) == "muHadPTOverMuHadMass" ? 
-			"p_{T}/m" : pHistB->GetXaxis()->GetTitle(), 
-			pHistB->GetYaxis()->GetTitle());
-    string histName(pHistB->GetName());
-    if (histName == "jet_pt_etacut") pHistB->GetXaxis()->SetTitle("p_{T} (GeV)");
-    if (histName == "jet_eta") pHistB->GetXaxis()->SetTitle("#eta");
-    if (histName == "jet_phi") pHistB->GetXaxis()->SetTitle("#phi");
-    if (histName == "jet_mass_etacut") pHistB->GetXaxis()->SetTitle("m (GeV)");
+			string(pHist->GetName()) == "muHadPTOverMuHadMass" ? 
+			"p_{T}/m" : pHist->GetXaxis()->GetTitle(), 
+			pHist->GetYaxis()->GetTitle());
+    if (histName == "jet_pt_etacut") pHist->GetXaxis()->SetTitle("p_{T} (GeV)");
+    if (histName == "jet_eta") pHist->GetXaxis()->SetTitle("#eta");
+    if (histName == "jet_phi") pHist->GetXaxis()->SetTitle("#phi");
+    if (histName == "jet_mass_etacut") pHist->GetXaxis()->SetTitle("m (GeV)");
     if (histName == "jet_ptmj_etacut") {
-      pHistB->GetXaxis()->SetTitle("#frac{p_{T}}{m}");
+      pHist->GetXaxis()->SetTitle("#frac{p_{T}}{m}");
     }
-    if (setLogY) pHistB->GetYaxis()->SetRangeUser(0.1, 10000.0);
+    if (setLogY) pHist->GetYaxis()->SetRangeUser(0.1, 10000.0);
     string legendStyle("l");
     legends[canvasIndex]->
-      AddEntry(pHistB, legendEntries[0].c_str(), legendStyle.c_str());
+      AddEntry(pHist, legendEntries[0].c_str(), legendStyle.c_str());
     outStream.cd();
     outputCanvases.at(canvasIndex)->cd(dataMC ? 1 : 0);
-    pHistB->Draw();
+    pHist->Draw();
   } // loop over canvases
 
   outStream.cd();
   write(outputCanvases);
   outStream.Write();
   outStream.Close();
-  inputFileB.Close();
+  inputFile.Close();
   deleteObjects(legends);
   deleteObjects(stacks);
   deleteObjects(outputCanvases);
@@ -1701,6 +1827,51 @@ void setRegAQCDMuHadMassEstToResSubtrRegC(const string& regAQCDFileName,
   else cerr << "Error opening file " << regAQCDFileName << ".\n";
   regAQCDFile.Close();
 }
+
+// /*replace muHadMass histogram in region A and B QCD-only files with sum of 3-muon and non-3-muon 
+//   contributions*/
+// void setQCDMuHadMassEst(const string& QCDFileName, const string& outputFileName)
+// {
+//   TFile outputFile(outputFileName.c_str(), "RECREATE");
+//   if (outputFile.IsOpen()) {
+
+//     TFile QCDFile(QCDFileName.c_str());
+//     if (QCDFile.IsOpen()) {
+
+//       //first, copy all objects from original file to new file
+//       outputFile.cd();
+//       TKey *key;
+//       TIter nextkey(QCDFile.GetListOfKeys());
+//       while ((key = (TKey*)nextkey())) {
+//         QCDFile.cd();
+// 	TObject *obj = key->ReadObj();
+// 	outputFile.cd();
+// 	obj->Write();
+// 	delete obj;
+//       }
+
+//       //next, replace muHadMass histogram with a version summing the 3-muon and non-3-muon components
+//       QCDFile.cd();
+//       TH1F* non3Mu = (TH1F*)getObjectFromCanvas<TH1F>(QCDFile, "muHadMass", "muHadMassCanvas", 0)->Clone();
+//       TH1F* threeMu = (TH1F*)getObjectFromCanvas<TH1F>(QCDFile, "muHadMass3MuShareTrack", 
+// 						       "muHadMass3MuShareTrackCanvas", 0)->Clone();
+//       if ((non3Mu != NULL) && (threeMu != NULL)) non3Mu->Add(threeMu);
+
+//       TCanvas QCDCanvas("muHadMassCanvas", "muHadMassCanvas", 600, 600);
+//       setCanvasOptions(QCDCanvas, 0, 0, 0);
+//       QCDCanvas.cd();
+//       if (non3Mu != NULL) non3Mu->Draw();
+
+//       outputFile.cd();
+//       QCDCanvas.Write("muHadMassCanvas", TObject::kOverwrite);
+//       outputFile.Write();
+//       outputFile.Close();
+//       QCDFile.Close();
+//     }
+//     else cerr << "Error opening file " << QCDFileName << ".\n";
+//   }
+//   else cerr << "Error opening file " << outputFileName << ".\n";
+// }
 
 //test data-driven background estimation method with MC on a given variable
 void addClosurePlot(TFile& sigVsBkgIsoStream, const string& var, const string& unit, 
@@ -1902,87 +2073,230 @@ void makeMCClosurePlots(const string& sigVsBkgIsoFileName, const vector<string>&
   bkgNonIsoStream.Close();
 }
 
-void QCDVsMCClosurePlots(const vector<string>& QCDVsMCInputFileNames, const string& var, 
-			 const string& units, const pair<string, string>& legend, 
-			 const int normRegionLowerBin, const int normRegionUpperBin, 
-			 const Double_t xMin, const Double_t xMax, 
-			 const string& outputFileName, const string& outputFileMode)
+void QCDVsMCClosurePlots(const vector<string>& QCDVsMCInputFileNames, const vector<string>& var, 
+			 const vector<string>& units, const pair<string, string>& legend, 
+			 const vector<int> normRegionLowerBin, 
+			 const vector<int> normRegionUpperBin, const vector<Double_t> xMin, 
+			 const vector<Double_t> xMax, const string& outputFileName, 
+			 const string& outputFileMode)
 {
-
-  TFile outStream(outputFileName.c_str(), outputFileMode.c_str());
   vector<TFile*> inputStreams;
-  vector<TCanvas*> outputCanvases;
-  vector<TH1F*> hists(2);
-  string canvasName(var + "Canvas");
+  vector<TCanvas*> outputCanvases(var.size(), NULL);
+  vector<vector<TH1F*> > hists;
 
   for (vector<string>::const_iterator iInputFile = QCDVsMCInputFileNames.begin(); 
        iInputFile != QCDVsMCInputFileNames.end(); ++iInputFile) { // loop over input files
     const unsigned int fileIndex = iInputFile - QCDVsMCInputFileNames.begin();
     inputStreams.push_back(new TFile(iInputFile->c_str()));
-    TCanvas* pCanvas;
-    inputStreams[inputStreams.size() - 1]->GetObject(canvasName.c_str(), pCanvas);
-    TH1F* pHist = (TH1F*)pCanvas->GetPrimitive(var.c_str());
-    if (fileIndex == 0)
-      { // if this is the QCD file
-	hists[0] = (TH1F*)pHist->Clone();
-      } // if this is the QCD file
-    else if (fileIndex == 1)
-      { // if this is the first MC bkg file
-	hists[1] = (TH1F*)pHist->Clone();
-      } // if this is the first MC bkg file
-    else
-      { // if this is another MC bkg file
-	hists[1]->Add(pHist,1.);
-      } // if this is another MC bkg file
-    
+    if (inputStreams[inputStreams.size() - 1]->IsOpen()) {
+      inputStreams[inputStreams.size() - 1]->cd();
+
+      for (vector<string>::const_iterator iVar = var.begin(); iVar != var.end(); ++iVar) {
+	const unsigned int varIndex = iVar - var.begin();
+	TCanvas* pCanvas = NULL;
+	inputStreams[inputStreams.size() - 1]->GetObject((*iVar + "Canvas").c_str(), pCanvas);
+	TH1F* pHist = NULL;
+	if (pCanvas != NULL) pHist = (TH1F*)pCanvas->GetPrimitive(iVar->c_str())->Clone();
+
+	if (fileIndex == 0)
+	  { // if this is the QCD file
+	    hists.push_back(vector<TH1F*>(2, NULL));
+	    hists[varIndex][0] = (TH1F*)pHist->Clone();
+	  } // if this is the QCD file
+	else if (fileIndex == 1)
+	  { // if this is the first MC bkg file
+	    hists[varIndex][1] = (TH1F*)pHist->Clone();
+	  } // if this is the first MC bkg file
+	else
+	  { // if this is another MC bkg file
+	    hists[varIndex][1]->Add(pHist,1.);
+	  } // if this is another MC bkg file
+      }    
+    }
+    else cerr << "Error opening file " << *iInputFile << ".\n";
   } // loop over input files
 
-  hists[0]->SetLineColor(4); // blue for QCD
-  hists[1]->SetLineColor(2); // red for bkg
-  hists[0]->SetMarkerColor(4); // blue for QCD
-  hists[1]->SetMarkerColor(2); // red for bkg
-  hists[0]->Scale(hists[1]->Integral(normRegionLowerBin,normRegionUpperBin)/
-		  hists[0]->Integral(normRegionLowerBin,normRegionUpperBin));
-  //hists[0]->Scale(1./hists[0]->Integral());
-  //hists[1]->Scale(1./hists[1]->Integral());
-  hists[1]->GetXaxis()->SetTitle(units.c_str());
+  TFile outStream(outputFileName.c_str(), outputFileMode.c_str());
 
-  TH1F* ratioHist = (TH1F*)hists[0]->Clone();
-//   ratioHist->Add(hists[1],-1.);
-  ratioHist->Divide(hists[1]);
-  ratioHist->GetYaxis()->SetTitle(/*"Fractional difference"*/"Ratio");
-  ratioHist->GetYaxis()->SetRangeUser(/*-2.0,2.0*/0.0, 2.0);
-  ratioHist->SetLineColor(1);
-  ratioHist->SetMarkerColor(1);
+  for (vector<vector<TH1F*> >::iterator iHist = hists.begin(); iHist != hists.end(); ++iHist) {
+    const unsigned int varIndex = iHist - hists.begin();
 
-  TLegend *leg = new TLegend(0.55, 0.65, 0.95, 0.85, "");
-  setLegendOptions(*leg, "");
-  leg->AddEntry(hists[0], legend.first.c_str(), "lp");
-  leg->AddEntry(hists[1], legend.second.c_str(), "lp");
+    (*iHist)[0]->SetLineColor(4); // blue for QCD
+    (*iHist)[1]->SetLineColor(2); // red for bkg
+    (*iHist)[0]->SetMarkerColor(4); // blue for QCD
+    (*iHist)[1]->SetMarkerColor(2); // red for bkg
+    (*iHist)[0]->Scale((*iHist)[1]->Integral(normRegionLowerBin[varIndex],
+					     normRegionUpperBin[varIndex])/
+		       (*iHist)[0]->Integral(normRegionLowerBin[varIndex],
+					     normRegionUpperBin[varIndex]));
+    //(*iHist)[0]->Scale(1./(*iHist)[0]->Integral());
+    //(*iHist)[1]->Scale(1./(*iHist)[1]->Integral());
+    (*iHist)[1]->GetXaxis()->SetTitle(units[varIndex].c_str());
 
-  //find out which histogram has the maximum bin content so that it can be drawn first
-  TH1F* pHistWithMaxMaxBin = histWithLargestBinContent(hists);
+    TH1F* ratioHist = (TH1F*)(*iHist)[0]->Clone();
+    ratioHist->Divide((*iHist)[1]);
+    ratioHist->GetYaxis()->SetTitle("Ratio");
+    ratioHist->GetYaxis()->SetRangeUser(0.0, 2.0);
+    ratioHist->SetLineColor(1);
+    ratioHist->SetMarkerColor(1);
 
-  //write to file
-  outStream.cd();
-  TCanvas outCanvas(canvasName.c_str(), "", 600, 600);
-  outCanvas.Divide(1,2);
-  outCanvas.cd(1)->SetPad(0.0, 0.33, 1.0, 1.0);
-  outCanvas.cd(2)->SetPad(0.0, 0.0, 1.0, 0.33);
-  outCanvas.cd(1);
-  pHistWithMaxMaxBin->Draw("HISTE");
-  hists[0]->Draw("HISTESAME");
-  hists[1]->Draw("HISTESAME");
-  pHistWithMaxMaxBin->GetXaxis()->SetRangeUser(xMin, xMax);
-  hists[0]->GetXaxis()->SetRangeUser(xMin, xMax);
-  hists[1]->GetXaxis()->SetRangeUser(xMin, xMax);
-  leg->Draw();
-  outCanvas.cd(2);
-  ratioHist->Draw();
-  ratioHist->GetXaxis()->SetRangeUser(xMin, xMax);
-  outCanvas.Write();
+    TLegend *leg = new TLegend(0.55, 0.65, 0.95, 0.85, "");
+    setLegendOptions(*leg, "");
+    leg->AddEntry((*iHist)[0], legend.first.c_str(), "lp");
+    leg->AddEntry((*iHist)[1], legend.second.c_str(), "lp");
+
+    //find out which histogram has the maximum bin content so that it can be drawn first
+    TH1F* pHistWithMaxMaxBin = histWithLargestBinContent(*iHist);
+
+    //write to file
+    outStream.cd();
+    TCanvas outCanvas((var[varIndex] + "Canvas").c_str(), "", 600, 600);
+    outCanvas.Divide(1,2);
+    outCanvas.cd(1)->SetPad(0.0, 0.33, 1.0, 1.0);
+    outCanvas.cd(2)->SetPad(0.0, 0.0, 1.0, 0.33);
+    outCanvas.cd(1);
+    pHistWithMaxMaxBin->Draw("HISTE");
+    (*iHist)[0]->Draw("HISTESAME");
+    (*iHist)[1]->Draw("HISTESAME");
+    pHistWithMaxMaxBin->GetXaxis()->SetRangeUser(xMin[varIndex], xMax[varIndex]);
+    (*iHist)[0]->GetXaxis()->SetRangeUser(xMin[varIndex], xMax[varIndex]);
+    (*iHist)[1]->GetXaxis()->SetRangeUser(xMin[varIndex], xMax[varIndex]);
+    leg->Draw();
+    outCanvas.cd(2);
+    ratioHist->Draw();
+    ratioHist->GetXaxis()->SetRangeUser(xMin[varIndex], xMax[varIndex]);
+    outCanvas.Write();
+  }
+
   outStream.Write();
   outStream.Close();
+  deleteStreams(inputStreams);
+}
+
+void compareTotalMCBToA(const vector<string>& QCDVsMCInputFileNamesB, 
+			const vector<string>& QCDVsMCInputFileNamesA, const vector<string>& var, 
+			const vector<string>& units, const pair<string, string>& legend, 
+			const vector<int> normRegionLowerBin, 
+			const vector<int> normRegionUpperBin, const vector<Double_t> xMin, 
+			const vector<Double_t> xMax, const string& outputFileName, 
+			const string& outputFileMode)
+{
+  vector<TFile*> inputStreamsB;
+  vector<TFile*> inputStreamsA;
+  vector<TCanvas*> outputCanvases(var.size(), NULL);
+  vector<vector<TH1F*> > hists;
+
+  for (vector<string>::const_iterator iInputFile = QCDVsMCInputFileNamesB.begin(); 
+       iInputFile != QCDVsMCInputFileNamesB.end(); ++iInputFile) { // loop over input files
+    const unsigned int fileIndex = iInputFile - QCDVsMCInputFileNamesB.begin();
+    inputStreamsB.push_back(new TFile(iInputFile->c_str()));
+    if (inputStreamsB[inputStreamsB.size() - 1]->IsOpen()) {
+      inputStreamsB[inputStreamsB.size() - 1]->cd();
+
+      for (vector<string>::const_iterator iVar = var.begin(); iVar != var.end(); ++iVar) {
+	const unsigned int varIndex = iVar - var.begin();
+	TCanvas* pCanvas = NULL;
+	inputStreamsB[inputStreamsB.size() - 1]->GetObject((*iVar + "Canvas").c_str(), pCanvas);
+	TH1F* pHist = NULL;
+	if (pCanvas != NULL) pHist = (TH1F*)pCanvas->GetPrimitive(iVar->c_str())->Clone();
+
+	if (fileIndex == 0)
+	  { // if this is the QCD file
+	    hists.push_back(vector<TH1F*>(2, NULL));
+	    hists[varIndex][0] = (TH1F*)pHist->Clone();
+	  } // if this is the QCD file
+	else
+	  { // if this is another MC bkg file
+	    hists[varIndex][0]->Add(pHist,1.);
+	  } // if this is another MC bkg file
+      }    
+    }
+    else cerr << "Error opening file " << *iInputFile << ".\n";
+  } // loop over input files
+
+  for (vector<string>::const_iterator iInputFile = QCDVsMCInputFileNamesA.begin(); 
+       iInputFile != QCDVsMCInputFileNamesA.end(); ++iInputFile) { // loop over input files
+    const unsigned int fileIndex = iInputFile - QCDVsMCInputFileNamesA.begin();
+    inputStreamsA.push_back(new TFile(iInputFile->c_str()));
+    if (inputStreamsA[inputStreamsA.size() - 1]->IsOpen()) {
+      inputStreamsA[inputStreamsA.size() - 1]->cd();
+
+      for (vector<string>::const_iterator iVar = var.begin(); iVar != var.end(); ++iVar) {
+	const unsigned int varIndex = iVar - var.begin();
+	TCanvas* pCanvas = NULL;
+	inputStreamsA[inputStreamsA.size() - 1]->GetObject((*iVar + "Canvas").c_str(), pCanvas);
+	TH1F* pHist = NULL;
+	if (pCanvas != NULL) pHist = (TH1F*)pCanvas->GetPrimitive(iVar->c_str())->Clone();
+
+	if (fileIndex == 0)
+	  { // if this is the QCD file
+	    hists[varIndex][1] = (TH1F*)pHist->Clone();
+	  } // if this is the QCD file
+	else
+	  { // if this is another MC bkg file
+	    hists[varIndex][1]->Add(pHist,1.);
+	  } // if this is another MC bkg file
+      }    
+    }
+    else cerr << "Error opening file " << *iInputFile << ".\n";
+  } // loop over input files
+
+  TFile outStream(outputFileName.c_str(), outputFileMode.c_str());
+
+  for (vector<vector<TH1F*> >::iterator iHist = hists.begin(); iHist != hists.end(); ++iHist) {
+    const unsigned int varIndex = iHist - hists.begin();
+
+    (*iHist)[0]->SetLineColor(4); // blue for region B
+    (*iHist)[1]->SetLineColor(2); // red for region A
+    (*iHist)[0]->SetMarkerColor(4); // blue for region B
+    (*iHist)[1]->SetMarkerColor(2); // red for region A
+    (*iHist)[0]->Scale((*iHist)[1]->Integral(normRegionLowerBin[varIndex],
+					     normRegionUpperBin[varIndex])/
+		       (*iHist)[0]->Integral(normRegionLowerBin[varIndex],
+					     normRegionUpperBin[varIndex]));
+    //(*iHist)[0]->Scale(1./(*iHist)[0]->Integral());
+    //(*iHist)[1]->Scale(1./(*iHist)[1]->Integral());
+    (*iHist)[1]->GetXaxis()->SetTitle(units[varIndex].c_str());
+
+    TH1F* ratioHist = (TH1F*)(*iHist)[0]->Clone();
+    ratioHist->Divide((*iHist)[1]);
+    ratioHist->GetYaxis()->SetTitle("Reg. B / Reg. A");
+    ratioHist->GetYaxis()->SetRangeUser(0.0, 2.0);
+    ratioHist->SetLineColor(1);
+    ratioHist->SetMarkerColor(1);
+
+    TLegend *leg = new TLegend(0.55, 0.65, 0.95, 0.85, "");
+    setLegendOptions(*leg, "");
+    leg->AddEntry((*iHist)[0], legend.first.c_str(), "lp");
+    leg->AddEntry((*iHist)[1], legend.second.c_str(), "lp");
+
+    //find out which histogram has the maximum bin content so that it can be drawn first
+    TH1F* pHistWithMaxMaxBin = histWithLargestBinContent(*iHist);
+
+    //write to file
+    outStream.cd();
+    TCanvas outCanvas((var[varIndex] + "Canvas").c_str(), "", 600, 600);
+    outCanvas.Divide(1,2);
+    outCanvas.cd(1)->SetPad(0.0, 0.33, 1.0, 1.0);
+    outCanvas.cd(2)->SetPad(0.0, 0.0, 1.0, 0.33);
+    outCanvas.cd(1);
+    pHistWithMaxMaxBin->Draw("HISTE");
+    (*iHist)[0]->Draw("HISTESAME");
+    (*iHist)[1]->Draw("HISTESAME");
+    pHistWithMaxMaxBin->GetXaxis()->SetRangeUser(xMin[varIndex], xMax[varIndex]);
+    (*iHist)[0]->GetXaxis()->SetRangeUser(xMin[varIndex], xMax[varIndex]);
+    (*iHist)[1]->GetXaxis()->SetRangeUser(xMin[varIndex], xMax[varIndex]);
+    leg->Draw();
+    outCanvas.cd(2);
+    ratioHist->Draw();
+    ratioHist->GetXaxis()->SetRangeUser(xMin[varIndex], xMax[varIndex]);
+    outCanvas.Write();
+  }
+
+  outStream.Write();
+  outStream.Close();
+  deleteStreams(inputStreamsB);
+  deleteStreams(inputStreamsA);
 }
 
 void compareTotalMCBToA(const vector<string>& QCDVsMCInputFileNames1,
@@ -3049,8 +3363,8 @@ TH1F* makeAndFormatPullHistogram(TH1F* data, TH1F* resBkgTemplate, TH1F* jetFake
   - expected signal
   - full background estimate from regions B and C data
   - background systematic error*/
-void addFinalPlot2(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile, 
-		   pair<TFile*, float>& nonIsoDataFile, pair<TFile*, float>& resBkgFile, 
+void addFinalPlot2(pair<TFile*, float>& isoSigBkgFile, TFile& isoCombinedDataFile, 
+		   pair<TFile*, float>& nonIsoDataFile, pair<TFile*, float>& isoNon3MuDataFile, 
 		   pair<TFile*, float>& nonIsoWNonIsoDataFile, 
 		   const int normRegionLowerBin, const int normRegionUpperBin, TFile& outStream, 
 		   const bool ma9GeV)
@@ -3100,7 +3414,7 @@ void addFinalPlot2(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
     return;
   }
 
-  //get the data histogram, non-isolated tau sample
+  //get the data histogram for non-3-muon events, non-isolated tau sample
   TCanvas* canvasNonIsoData = NULL;
   nonIsoDataFile.first->GetObject(canvasName.c_str(), canvasNonIsoData);
   TH1F* nonIsoData = NULL;
@@ -3121,7 +3435,7 @@ void addFinalPlot2(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
     return;
   }
 
-  //get the MC stack, non-isolated tau sample
+  //get the MC stack for non-3-muon events, non-isolated tau sample
   THStack* nonIsoMCStack = NULL;
   if (canvasNonIsoData != NULL) {
     canvasNonIsoData->Draw();
@@ -3133,7 +3447,7 @@ void addFinalPlot2(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
     return;
   }
 
-  //sum the region B MC into a single histogram
+  //sum the region B MC for non-3-muon events into a single histogram
   TH1F* nonIsoMCHist = NULL;
   if (nonIsoMCStack != NULL) {
     TList* nonIsoMCHists = nonIsoMCStack->GetHists();
@@ -3149,7 +3463,7 @@ void addFinalPlot2(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
   }
   if (nonIsoMCHist != NULL) nonIsoMCHist->SetName("muHadMassRegBMCSyst");
 
-  //get the data histogram, non-isolated W + non-isolated tau sample
+  //get the data histogram for non-3-muon events, non-isolated W + non-isolated tau sample
   TCanvas* canvasNonIsoWNonIsoData = NULL;
   nonIsoWNonIsoDataFile.first->GetObject(canvasName.c_str(), canvasNonIsoWNonIsoData);
   TH1F* nonIsoWNonIsoData = NULL;
@@ -3164,78 +3478,81 @@ void addFinalPlot2(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
     return;
   }
 
-  //get the data histogram, isolated tau sample
-  TCanvas* canvasIsoData = NULL;
-  isoDataFile.GetObject(canvasName.c_str(), canvasIsoData);
-  TH1F* isoData = NULL;
-  if (canvasIsoData != NULL) {
-    isoData = (TH1F*)canvasIsoData->GetPrimitive("muHadMass")->Clone();
-    isoData->SetName("muHadMassDataSearch");
-    isoData->GetYaxis()->SetRangeUser(0.01, 100000.0);
-    legendBkgMain5.AddEntry(isoData, "Data", "p");
+  //get the data histogram for combined 3-muon and non-3-muon events, isolated tau sample
+  TCanvas* canvasIsoCombinedData = NULL;
+  isoCombinedDataFile.GetObject(canvasName.c_str(), canvasIsoCombinedData);
+  TH1F* isoCombinedData = NULL;
+  if (canvasIsoCombinedData != NULL) {
+    isoCombinedData = (TH1F*)canvasIsoCombinedData->GetPrimitive("muHadMass")->Clone();
+    isoCombinedData->SetName("muHadMassDataSearch");
+    isoCombinedData->GetYaxis()->SetRangeUser(0.01, 100000.0);
+    legendBkgMain5.AddEntry(isoCombinedData, "Data", "p");
   }
   else {
-    cerr << "Error opening canvas " << canvasName << " from file " << isoDataFile.GetName();
+    cerr << "Error opening canvas " << canvasName << " from file " << isoCombinedDataFile.GetName();
+    cerr << ".\n";
+    return;
+  }
+
+  //get the data histogram for non-3-muon events only, isolated tau sample
+  TCanvas* canvasIsoNon3MuData = NULL;
+  isoNon3MuDataFile.first->GetObject(canvasName.c_str(), canvasIsoNon3MuData);
+  TH1F* isoNon3MuData = NULL;
+  if (canvasIsoNon3MuData != NULL) {
+    isoNon3MuData = (TH1F*)canvasIsoNon3MuData->GetPrimitive("muHadMass")->Clone();
+    isoNon3MuData->SetName("muHadMassNon3MuDataSearch");
+    isoNon3MuData->GetYaxis()->SetRangeUser(0.01, 100000.0);
+  }
+  else {
+    cerr << "Error opening canvas " << canvasName << " from file " << isoNon3MuDataFile.first->GetName();
     cerr << ".\n";
     return;
   }
 
   //normalize region B MC to region A data
-  normalizeHistogram(const_cast<const TH1F*>(isoData), nonIsoMCHist, 
+  normalizeHistogram(const_cast<const TH1F*>(isoNon3MuData), nonIsoMCHist, 
 		     normRegionLowerBin, normRegionUpperBin);
 
   //normalize region D data to region A data
-  normalizeHistogram(const_cast<const TH1F*>(isoData), nonIsoWNonIsoData, 
+  normalizeHistogram(const_cast<const TH1F*>(isoNon3MuData), nonIsoWNonIsoData, 
 		     normRegionLowerBin, normRegionUpperBin);
 
-  //get the resonance background histograms: nominal, 1st fit type, and 2nd fit type
-  TH1F* resBkg = NULL;
-  TH1F* resBkgRegCkFixed = NULL;
-  TH1F* resBkgRegDkFixed = NULL;
-  TIter iKey(resBkgFile.first->GetListOfKeys());
-  TKey* key;
-  while ((key = (TKey*)iKey()) && 
-	 ((resBkg == NULL) || (resBkgRegCkFixed == NULL) || (resBkgRegDkFixed == NULL))) {
-    string objName(key->GetName());
-    if (objName.find("weightedAvgkFixed_resBkg") != string::npos) {
-      TH1F* obj = NULL;
-      resBkgFile.first->GetObject(objName.c_str(), obj);
-      if (obj != NULL) {
-	resBkg = (TH1F*)obj->Clone();
-	resBkg->SetName("muHadMassResBkg");
-	setHistogramOptions(resBkg, kCyan + 2, 0.7, 20, resBkgFile.second, 
-			    "m_{#mu+had} (GeV)", "");
-	resBkg->SetFillColor(kCyan + 2);
-	resBkg->SetFillStyle(1001);
-	resBkg->GetYaxis()->SetRangeUser(0.01, 100000.0);
-	legendBkgMain5.AddEntry(resBkg, "Resonance background", "f");
-      }
-    }
-    else if (objName.find("regCkFixed_resBkg") != string::npos) {
-      TH1F* obj = NULL;
-      resBkgFile.first->GetObject(objName.c_str(), obj);
-      if (obj != NULL) {
-	resBkgRegCkFixed = (TH1F*)obj->Clone();
-	resBkgRegCkFixed->SetName("muHadMassResBkgRegCkFixedSyst");
-      }
-    }
-    else if (objName.find("regDkFixed_resBkg") != string::npos) {
-      TH1F* obj = NULL;
-      resBkgFile.first->GetObject(objName.c_str(), obj);
-      if (obj != NULL) {
-	resBkgRegDkFixed = (TH1F*)obj->Clone();
-	resBkgRegDkFixed->SetName("muHadMassResBkgRegDkFixedSyst");
-      }
+  //get the QCD estimate from 3-muon events only
+  TCanvas* canvasIsoSigBkg3Mu = NULL;
+  THStack* isoSigBkg3MuStack = NULL;
+  TH1F* QCD3MuHist = NULL;
+  isoSigBkgFile.first->GetObject("muHadMass3MuShareTrackCanvas", canvasIsoSigBkg3Mu);
+  if (canvasIsoSigBkg3Mu != NULL) {
+    canvasIsoSigBkg3Mu->Draw();
+    isoSigBkg3MuStack = (THStack*)canvasIsoSigBkg3Mu->cd(1)->GetPrimitive("muHadMass3MuShareTrackStack")->Clone();
+    if (isoSigBkg3MuStack != NULL) QCD3MuHist = (TH1F*)isoSigBkg3MuStack->GetHists()->At(7)->Clone();
+    else {
+      cerr << "Error opening stack muHadMass3MuShareTrackStack from canvas muHadMass3MuShareTrackCanvas";
+      cerr << " from file " << isoSigBkgFile.first->GetName() << ".\n";
     }
   }
+  else {
+    cerr << "Error opening canvas muHadMass3MuShareTrackCanvas from file ";
+    cerr << isoSigBkgFile.first->GetName() << ".\n";
+    return;
+  }
+  if (QCD3MuHist != NULL) {
+    QCD3MuHist->SetName("muHadMassQCD3Mu");
+    QCD3MuHist->GetYaxis()->SetRangeUser(0.01, 100000.0);
+    setHistogramOptions(QCD3MuHist, kCyan + 2, 0.7, 20, isoSigBkgFile.second, 
+			"m_{#mu+had} (GeV)", "");
+    QCD3MuHist->SetFillColor(kCyan + 2);
+    QCD3MuHist->SetFillStyle(1001);
+    legendBkgMain5.AddEntry(QCD3MuHist, "Di-muon decays background", "f");
+  }
 
-  //normalize region B data to region A data
-  normalizeHistogram(const_cast<const TH1F*>(isoData), nonIsoData, 
+  //normalize region B non-3-mu data to region A non-3-mu data
+  normalizeHistogram(const_cast<const TH1F*>(isoNon3MuData), nonIsoData, 
 		     normRegionLowerBin, normRegionUpperBin);
 
   //stacked histogram for background components
   THStack* totBkg = new THStack("muHadMassStack", "");
-  totBkg->Add(resBkg, "HIST");
+  totBkg->Add(QCD3MuHist, "HIST");
   totBkg->Add(nonIsoData, "HIST");
 
   //write to file
@@ -3265,7 +3582,7 @@ void addFinalPlot2(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
     for (Int_t iBin = 5/*17*/; iBin <= (hist->GetNbinsX() + 1); ++iBin) {
       B+=hist->GetBinContent(iBin);
       if (hist->GetBinContent(iBin) != 0.0) err+=(hist->GetBinError(iBin)*hist->GetBinError(iBin));
-      if (string(hist->GetName()) == "muHadMassResBkg") {
+      if (string(hist->GetName()) == "muHadMassQCD3Mu") {
 	upsilonBkg+=hist->GetBinContent(iBin);
 	if (hist->GetBinContent(iBin) != 0.0) {
 	  upsilonBkgErr+=(hist->GetBinError(iBin)*hist->GetBinError(iBin));
@@ -3278,14 +3595,14 @@ void addFinalPlot2(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
 	}
       }
     }
-    for (Int_t iBin = 1; iBin <= 4/*16*/; ++iBin) {
-      if (string(hist->GetName()) == "muHadMassResBkg") {
+    for (Int_t iBin = 3; iBin <= 4/*16*/; ++iBin) {
+      if (string(hist->GetName()) == "muHadMassQCD3Mu") {
 	JPsiBkg+=hist->GetBinContent(iBin);
 	if (hist->GetBinContent(iBin) != 0.0) {
 	  JPsiBkgErr+=(hist->GetBinError(iBin)*hist->GetBinError(iBin));
 	}
       }
-      if ((string(hist->GetName()) == "muHadMassDataControl") && (iBin > 2/*8*/)) {
+      if (string(hist->GetName()) == "muHadMassDataControl") {
 	jetFakeBkgAroundJPsi+=hist->GetBinContent(iBin);
 	if (hist->GetBinContent(iBin) != 0.0) {
 	  jetFakeBkgAroundJPsiErr+=(hist->GetBinError(iBin)*hist->GetBinError(iBin));
@@ -3332,81 +3649,14 @@ void addFinalPlot2(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
     cout << setprecision(3) << S << " +/- " << statErrIsoSig;
     cout << " (S/sqrt(S+B) = " << S/sqrt(S + B) << ")" << endl;
   }
-  isoData->Draw("ESAME");
-  isoData->GetYaxis()->SetRangeUser(0.01, 100000.0);
+  isoCombinedData->Draw("ESAME");
+  isoCombinedData->GetYaxis()->SetRangeUser(0.01, 100000.0);
   legendBkgMain5.Draw();
 
-  //make pull plots for nominal and systematic variations of jet fake and resonance backgrounds
+  //make pull plots for nominal and systematic variations of jet fake background
   outCanvas.cd(2);
-
-  /*- there are 3 jet fake background shape templates: region B MC, nominal, and region D data
-    - there are 3 resonance background shape templates: exponent fixed from region C mass 
-    sidebands, nominal, and exponent fixed from region D
-    - define pull as pull(resonance bkg. template, jet fake bkg. template) ==> 9 possible pulls
-    -                  reg. B MC | nom. | reg. D data
-    -                  ------------------------------
-    - reg. C sideband |__________|______|____________|
-    - nom.            |__________|______|____________|
-    - reg. D          |          |      |            |
-    -                  ------------------------------
-    - option 1 is to show all 9 separately (current choice)
-    - option 2 is to show the nominal, the min, and the max
-    - this applies to the high-MT bin only*/
-
-  /*- pull(nom., nom.)
-    - note that there is a small correlation between the normalization errors of the jet fake and 
-    resonance backgrounds, but they are far outweighed by the statistical errors so the 
-    correlation is ignored*/
-  cout << "Nominal -- ";
-//   makeAndFormatPullHistogram(isoData, resBkg, nonIsoData, kAzure, "HIST");
-  makeAndFormatPullHistogram(isoData, resBkg, nonIsoData, nonIsoWNonIsoData, nonIsoMCHist, kAzure, 
+  makeAndFormatPullHistogram(isoCombinedData, QCD3MuHist, nonIsoData, nonIsoWNonIsoData, nonIsoMCHist, kAzure, 
 			     "HIST");
-
-//   //high-MT bin only
-//   if (resBkgRegCkFixed != NULL) {
-
-//     //pull(reg. C sideband, reg. B MC)
-//     cout << "J/psi bkg. shape from reg. C, jet fake bkg. shape from reg. B MC -- ";
-//     makeAndFormatPullHistogram(isoData, resBkgRegCkFixed, nonIsoMCHist, kAzure - 1, 
-// 			       "HISTSAME");
-
-//     //pull(reg. C sideband, nom.)
-//     cout << "J/psi bkg. shape from reg. C, nominal jet fake bkg. shape -- ";
-//     makeAndFormatPullHistogram(isoData, resBkgRegCkFixed, nonIsoData, kAzure - 2, 
-// 			       "HISTSAME");
-
-//     //pull(reg. C sideband, reg. D data)
-//     cout << "J/psi bkg. shape from reg. C, jet fake bkg. shape from reg. D MC -- ";
-//     makeAndFormatPullHistogram(isoData, resBkgRegCkFixed, nonIsoWNonIsoData, kAzure - 3, 
-// 			       "HISTSAME");
-//   }
-
-//   //pull(nom, reg. B MC)
-//   cout << "Nominal J/psi bkg. shape, jet fake bkg. shape from reg. B MC -- ";
-//   makeAndFormatPullHistogram(isoData, resBkg, nonIsoMCHist, kAzure - 4, "HISTSAME");
-
-//   //pull(nom, reg. D data)
-//   cout << "Nominal J/psi bkg. shape, jet fake bkg. shape from reg. D data -- ";
-//   makeAndFormatPullHistogram(isoData, resBkg, nonIsoWNonIsoData, kAzure - 5, "HISTSAME");
-
-//   //high-MT bin only
-//   if (resBkgRegDkFixed != NULL) {
-
-//     //pull(reg. D, reg. B MC)
-//     cout << "J/psi bkg. shape from reg. D, jet fake bkg. shape from reg. B MC -- ";
-//     makeAndFormatPullHistogram(isoData, resBkgRegDkFixed, nonIsoMCHist, kAzure - 6, 
-// 			       "HISTSAME");
-
-//     //pull(reg. D, nom.)
-//     cout << "J/psi bkg. shape from reg. D, nominal jet fake bkg. shape -- ";
-//     makeAndFormatPullHistogram(isoData, resBkgRegDkFixed, nonIsoData, kAzure - 7, 
-// 			       "HISTSAME");
-
-//     //pull(reg. D, reg. D data)
-//     cout << "J/psi bkg. shape from reg. D, jet fake bkg. shape from reg. D data -- ";
-//     makeAndFormatPullHistogram(isoData, resBkgRegDkFixed, nonIsoWNonIsoData, kAzure - 8, 
-// 			       "HISTSAME");
-//   }
 
   //write the canvas to file
   outCanvas.Write();
@@ -3436,8 +3686,8 @@ void addFinalPlot2(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFile,
 }
 
 //create a file of properly formatted final plots
-void makeFinalPlot(const pair<string, float>& isoMC, const string& isoDataFileName, 
-		   const pair<string, float>& nonIsoData, const pair<string, float>& resBkg, 
+void makeFinalPlot(const pair<string, float>& isoMC, const string& isoCombinedDataFileName, 
+		   const pair<string, float>& nonIsoData, const pair<string, float>& isoNon3MuData, 
 		   const pair<string, float>& nonIsoWNonIsoData, const vector<string>& vars, 
 		   const vector<string>& units, const vector<int>& normRegionLowerBins, 
 		   const vector<int>& normRegionUpperBins, const string& outputFileName, 
@@ -3445,32 +3695,29 @@ void makeFinalPlot(const pair<string, float>& isoMC, const string& isoDataFileNa
 {
   //open files
   pair<TFile*, float> isoSigBkgFile(new TFile(isoMC.first.c_str()), isoMC.second);
-  TFile isoDataFile(isoDataFileName.c_str());
+  TFile isoCombinedDataFile(isoCombinedDataFileName.c_str());
   pair<TFile*, float> nonIsoDataFile(new TFile(nonIsoData.first.c_str()), nonIsoData.second);
-  pair<TFile*, float> resBkgFile(new TFile(resBkg.first.c_str()), resBkg.second);
+  pair<TFile*, float> isoNon3MuDataFile(new TFile(isoNon3MuData.first.c_str()), isoNon3MuData.second);
   pair<TFile*, float> 
     nonIsoWNonIsoDataFile(new TFile(nonIsoWNonIsoData.first.c_str()), nonIsoWNonIsoData.second);
   TFile outStream(outputFileName.c_str(), "RECREATE");
-  if (isoSigBkgFile.first->IsOpen() && isoDataFile.IsOpen() && nonIsoDataFile.first->IsOpen() && 
-      outStream.IsOpen()) {
+  if (isoSigBkgFile.first->IsOpen() && isoCombinedDataFile.IsOpen() && nonIsoDataFile.first->IsOpen() && 
+      isoNon3MuDataFile.first->IsOpen() && nonIsoWNonIsoDataFile.first->IsOpen() && outStream.IsOpen()) {
 
     //add plots
     for (vector<string>::const_iterator iVar = vars.begin(); iVar != vars.end(); ++iVar) {
       const unsigned int varIndex = iVar - vars.begin();
-      addFinalPlot2(isoSigBkgFile, isoDataFile, nonIsoDataFile, resBkgFile, nonIsoWNonIsoDataFile, 
+      addFinalPlot2(isoSigBkgFile, isoCombinedDataFile, nonIsoDataFile, isoNon3MuDataFile, nonIsoWNonIsoDataFile, 
 		    normRegionLowerBins[varIndex], normRegionUpperBins[varIndex], outStream, 
 		    ma9GeV);
-      addJetFakeBkgFinalPlot(isoSigBkgFile, isoDataFile, nonIsoDataFile, *iVar, units[varIndex], 
-			     normRegionLowerBins[varIndex], normRegionUpperBins[varIndex], option, 
-			     outStream);
-      // addFinalPlot(isoSigBkgFile, isoDataFile, nonIsoDataFile, *iVar, units[varIndex], 
-      // 		   normRegionLowerBins[varIndex], normRegionUpperBins[varIndex], option, 
-      // 		   outStream, ma9GeV);
+//       addJetFakeBkgFinalPlot(isoSigBkgFile, isoDataFile, nonIsoDataFile, *iVar, units[varIndex], 
+// 			     normRegionLowerBins[varIndex], normRegionUpperBins[varIndex], option, 
+// 			     outStream);
     }
   }
   else {
-    cerr << "Error opening files " << isoMC.first << " or " << isoDataFileName << " or ";
-    cerr << nonIsoData.first << " or " << outputFileName << ".\n";
+    cerr << "Error opening files " << isoMC.first << " or " << isoCombinedDataFileName << " or ";
+    cerr << nonIsoData.first << " or " << isoNon3MuDataFile.first << " or " << nonIsoWNonIsoDataFile.first << " or " << outputFileName << ".\n";
     return;
   }
 
@@ -3478,10 +3725,14 @@ void makeFinalPlot(const pair<string, float>& isoMC, const string& isoDataFileNa
   outStream.Write();
   outStream.Close();
   isoSigBkgFile.first->Close();
-  isoDataFile.Close();
+  isoCombinedDataFile.Close();
   nonIsoDataFile.first->Close();
+  isoNon3MuDataFile.first->Close();
+  nonIsoWNonIsoDataFile.first->Close();
   delete isoSigBkgFile.first;
   delete nonIsoDataFile.first;
+  delete isoNon3MuDataFile.first;
+  delete nonIsoWNonIsoDataFile.first;
 }
 
 TH2F* twoDimTotalBackgroundHistogram(const vector<string>& files, const string& histName)
