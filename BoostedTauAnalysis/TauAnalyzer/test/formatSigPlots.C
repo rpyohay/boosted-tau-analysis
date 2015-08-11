@@ -702,7 +702,8 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   string WNJetsToLNuIsoPrefix(analysisFilePath + "WNJetsToLNu/analysis/muHadIsoAnalysis" + MTBin + 
 			      "_W");
   string WNJetsToLNuIsoHaddOutputFile(WNJetsToLNuIsoPrefix + "N" + WNJetsToLNuSuffix);
-  string WNJetsToLNuIsoCombinedHaddOutputFile(WNJetsToLNuIsoPrefix + "_combined" + WNJetsToLNuSuffix);
+  string 
+    WNJetsToLNuIsoCombinedHaddOutputFile(WNJetsToLNuIsoPrefix + "_combined" + WNJetsToLNuSuffix);
   string WNJetsToLNuAllTauPrefix(analysisFilePath + "WNJetsToLNu/analysis/muHadAnalysis" + MTBin + 
 				 "_W");
   string WNJetsToLNuAllTauHaddOutputFile(WNJetsToLNuAllTauPrefix + "N" + WNJetsToLNuSuffix);
@@ -769,27 +770,30 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   sigVsBkgNoHPSIsoCutInputFiles.push_back(TAllHaddOutputFile);
   sigVsBkgNoHPSIsoCutInputFiles.push_back(TTJetsAllHaddOutputFile);
   sigVsBkgNoHPSIsoCutInputFiles.push_back(DYJetsToLLAllHaddOutputFile);
-  cout << "Plot signal vs. background for 3-muon and non-3-muon mu+had mass plots separately normalized to data luminosity\n---\n";
+  cout << "Plot signal vs. background for 3-muon and non-3-muon mu+had mass plots separately ";
+  cout << "normalized to data luminosity\n---\n";
   if (uncTag == "") {
     drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgOutputFile, sigVsBkgInputFiles, 
 					  canvasNames1D, graphNames1D, legendHeaders19p7InvFb, 
 					  colorsSigBkg, styles, legendEntriesSigBkg, 
 					  weightsSigBkg, setLogY, drawStack, sigBkg);
-    cout << "\nPlot signal vs. background for 3-muon and non-3-muon mu+had mass plots separately normalized to 1\n---\n";
+    cout << "\nPlot signal vs. background for 3-muon and non-3-muon mu+had mass plots separately ";
+    cout << "normalized to 1\n---\n";
     drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgOutputFile1, sigVsBkgInputFiles, 
 					  canvasNames1D, graphNames1D, legendHeaders1, 
 					  colorsSigBkg, styles, legendEntriesSigBkg, weights1, 
 					  setLinY, drawSame, sigBkg);
   }
   if (doNoHPSIsoCut) {
-    cout << "\nPlot signal vs. background for 3-muon and non-3-muon mu+had mass plots separately normalized to data luminosity, ";
-    cout << "no cut on tau isolation\n---\n";
+    cout << "\nPlot signal vs. background for 3-muon and non-3-muon mu+had mass plots separately ";
+    cout << "normalized to data luminosity, no cut on tau isolation\n---\n";
     drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgOutputFileNoHPSIsoCut, 
 					  sigVsBkgNoHPSIsoCutInputFiles, canvasNames1D, 
 					  graphNames1D, legendHeaders19p7InvFb, colorsSigBkg, 
 					  styles, legendEntriesSigBkg, weightsSigBkg, setLogY, 
 					  drawStack, sigBkg);
-    cout << "\nPlot signal vs. background for 3-muon and non-3-muon mu+had mass plots separately normalized to 1, no cut on tau isolation\n---\n";
+    cout << "\nPlot signal vs. background for 3-muon and non-3-muon mu+had mass plots separately ";
+    cout << "normalized to 1, no cut on tau isolation\n---\n";
     drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgOutputFileNoHPSIsoCutNorm1, 
 					  sigVsBkgNoHPSIsoCutInputFiles, canvasNames1D, 
 					  graphNames1D, legendHeaders1, colorsSigBkg, styles, 
@@ -798,10 +802,12 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   }
 
   //compare MC signal to background, 3-muon and non-3-muon mu+had mass plots combined
-  string sigVsBkgCombinedOutputFile(analysisFilePath + "results/sigVsBkg_muHadIsoAnalysis_combined" + MTBin + 
+  string sigVsBkgCombinedOutputFile(analysisFilePath + 
+				    "results/sigVsBkg_muHadIsoAnalysis_combined" + MTBin + 
 				    uncTag + a1Mass + tag19p7InvFb + outputVTag + fileExt);
-  string sigVsBkgCombinedOutputFile1(analysisFilePath + "results/sigVsBkg_muHadIsoAnalysis_combined" + MTBin + 
-				     tag1 + uncTag + a1Mass + outputVTag + fileExt);
+  string sigVsBkgCombinedOutputFile1(analysisFilePath + 
+				     "results/sigVsBkg_muHadIsoAnalysis_combined" + MTBin + tag1 + 
+				     uncTag + a1Mass + outputVTag + fileExt);
   vector<string> sigVsBkgCombinedInputFiles;
   sigVsBkgCombinedInputFiles.push_back(Wh1IsoCombinedHaddOutputFile);
   sigVsBkgCombinedInputFiles.push_back(ggIsoCombinedHaddOutputFile);
@@ -816,13 +822,21 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   sigVsBkgCombinedInputFiles.push_back(TIsoCombinedHaddOutputFile);
   sigVsBkgCombinedInputFiles.push_back(TTJetsIsoCombinedHaddOutputFile);
   sigVsBkgCombinedInputFiles.push_back(DYJetsToLLIsoCombinedHaddOutputFile);
-  cout << "Plot signal vs. background for 3-muon and non-3-muon mu+had mass plots combined normalized to data luminosity\n---\n";
+  vector<string> graphNames1DReduced;
+  graphNames1DReduced.push_back("muHadMass");
+  graphNames1DReduced.push_back("muHadMass3MuShareTrack");
+  vector<string> canvasNames1DReduced(graphNames1DReduced);
+  for (vector<string>::iterator i = canvasNames1DReduced.begin(); i != canvasNames1DReduced.end(); 
+       ++i) { *i = *i + "Canvas"; }
+  cout << "Plot signal vs. background for 3-muon and non-3-muon mu+had mass plots combined ";
+  cout << "normalized to data luminosity\n---\n";
   if (uncTag == "") {
     drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgCombinedOutputFile, sigVsBkgCombinedInputFiles, 
 					  canvasNames1D, graphNames1D, legendHeaders19p7InvFb, 
 					  colorsSigBkg, styles, legendEntriesSigBkg, 
 					  weightsSigBkg, setLogY, drawStack, sigBkg);
-    cout << "\nPlot signal vs. background for 3-muon and non-3-muon mu+had mass plots combined normalized to 1\n---\n";
+    cout << "\nPlot signal vs. background for 3-muon and non-3-muon mu+had mass plots combined ";
+    cout << "normalized to 1\n---\n";
     drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgCombinedOutputFile1, sigVsBkgCombinedInputFiles, 
 					  canvasNames1D, graphNames1D, legendHeaders1, 
 					  colorsSigBkg, styles, legendEntriesSigBkg, weights1, 
@@ -830,34 +844,47 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   }
   else {
     drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgCombinedOutputFile, sigVsBkgCombinedInputFiles, 
-					  vector<string>(1, "muHadMassCanvas"), 
-					  vector<string>(1, "muHadMass"), legendHeaders19p7InvFb, 
-					  colorsSigBkg, styles, legendEntriesSigBkg, 
-					  weightsSigBkg, setLogY, drawStack, sigBkg);
-    cout << "\nPlot signal vs. background for 3-muon and non-3-muon mu+had mass plots combined normalized to 1\n---\n";
+					  canvasNames1DReduced, graphNames1DReduced, 
+					  legendHeaders19p7InvFb, colorsSigBkg, styles, 
+					  legendEntriesSigBkg, weightsSigBkg, setLogY, drawStack, 
+					  sigBkg);
+    cout << "\nPlot signal vs. background for 3-muon and non-3-muon mu+had mass plots combined ";
+    cout << "normalized to 1\n---\n";
     drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgCombinedOutputFile1, sigVsBkgCombinedInputFiles, 
-					  vector<string>(1, "muHadMassCanvas"), 
-					  vector<string>(1, "muHadMass"), legendHeaders1, 
-					  colorsSigBkg, styles, legendEntriesSigBkg, weights1, 
-					  setLinY, drawSame, sigBkg);
+					  canvasNames1DReduced, graphNames1DReduced, 
+					  legendHeaders1, colorsSigBkg, styles, 
+					  legendEntriesSigBkg, weights1, setLinY, drawSame, sigBkg);
   }
 
   //compare MC signal + data-driven QCD to background
   string outputFileNameATotQCD(analysisFilePath + "results/dataVsMC_RegionATotQCDEstimate" + 
 			       MTBin + dataVTag + fileExt);
+  string outputFileNameA(analysisFilePath + "results/dataVsMC_RegionAQCDEstimate" + MTBin + 
+			 dataVTag + fileExt);
   string sigVsBkgQCDFromDataOutputFile(analysisFilePath + 
 				       "results/sigVsBkgQCDFromData_muHadIsoAnalysis" + MTBin + 
 				       uncTag + a1Mass + tag19p7InvFb + outputVTag + fileExt);
   string sigVsBkgQCDFromDataOutputFile1(analysisFilePath + 
 					"results/sigVsBkgQCDFromData_muHadIsoAnalysis" + MTBin + 
 					uncTag + a1Mass + tag1 + outputVTag + fileExt);
+  string sigVsBkgQCDFromDataNon3MuOutputFile(analysisFilePath + 
+					     "results/sigVsBkgQCDFromDataNon3Mu_muHadIsoAnalysis" + 
+					     MTBin + uncTag + a1Mass + tag19p7InvFb + outputVTag + 
+					     fileExt);
   vector<string> sigVsBkgQCDFromDataInputFiles(sigVsBkgCombinedInputFiles);
   sigVsBkgQCDFromDataInputFiles.push_back(outputFileNameATotQCD);
+  vector<string> sigVsBkgQCDFromDataNon3MuInputFiles(sigVsBkgInputFiles);
+  sigVsBkgQCDFromDataNon3MuInputFiles.push_back(outputFileNameA);
   cout << "\nPlot signal vs. background with data-driven QCD estimate ";
   cout << "normalized to data luminosity\n---\n";
   if (uncTag == "") {
     drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgQCDFromDataOutputFile, 
 					  sigVsBkgQCDFromDataInputFiles, canvasNames1D, 
+					  graphNames1D, legendHeaders19p7InvFb, colorsSigBkg, 
+					  styles, legendEntriesSigBkgQCDFromData, 
+					  weightsSigBkgQCDFromData, setLogY, drawStack, sigBkg);
+    drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgQCDFromDataNon3MuOutputFile, 
+					  sigVsBkgQCDFromDataNon3MuInputFiles, canvasNames1D, 
 					  graphNames1D, legendHeaders19p7InvFb, colorsSigBkg, 
 					  styles, legendEntriesSigBkgQCDFromData, 
 					  weightsSigBkgQCDFromData, setLogY, drawStack, sigBkg);
@@ -871,17 +898,23 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   else {
     drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgQCDFromDataOutputFile, 
 					  sigVsBkgQCDFromDataInputFiles, 
-					  vector<string>(1, "muHadMassCanvas"), 
-					  vector<string>(1, "muHadMass"), legendHeaders19p7InvFb, 
-					  colorsSigBkg, styles, legendEntriesSigBkgQCDFromData, 
+					  canvasNames1DReduced, graphNames1DReduced, 
+					  legendHeaders19p7InvFb, colorsSigBkg, styles, 
+					  legendEntriesSigBkgQCDFromData, 
+					  weightsSigBkgQCDFromData, setLogY, drawStack, sigBkg);
+    drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgQCDFromDataNon3MuOutputFile, 
+					  sigVsBkgQCDFromDataNon3MuInputFiles, 
+					  canvasNames1DReduced, graphNames1DReduced, 
+					  legendHeaders19p7InvFb, colorsSigBkg, styles, 
+					  legendEntriesSigBkgQCDFromData, 
 					  weightsSigBkgQCDFromData, setLogY, drawStack, sigBkg);
     cout << "\nPlot signal vs. background with data-driven QCD estimate normalized to 1\n---\n";
     drawMultipleEfficiencyGraphsOn1Canvas(sigVsBkgQCDFromDataOutputFile1, 
 					  sigVsBkgQCDFromDataInputFiles, 
-					  vector<string>(1, "muHadMassCanvas"), 
-					  vector<string>(1, "muHadMass"), legendHeaders1, 
-					  colorsSigBkg, styles, legendEntriesSigBkgQCDFromData, 
-					  weights1, setLinY, drawSame, sigBkg);
+					  canvasNames1DReduced, graphNames1DReduced, 
+					  legendHeaders1, colorsSigBkg, styles, 
+					  legendEntriesSigBkgQCDFromData, weights1, setLinY, 
+					  drawSame, sigBkg);
   }
 
   cout << "---\nMaking final plots\n";
@@ -896,6 +929,7 @@ void formatSigPlots(const string& inputVersion, const string& outputVersion,
   string nonIsoWDataNonIsoHaddOutputFile(nonIsoWDataNonIsoPrefix + nonIsoWDataSuffix);
   gStyle->SetErrorX(1);
   makeFinalPlot(pair<string, float>(sigVsBkgQCDFromDataOutputFile, 1.0), 
+		pair<string, float>(sigVsBkgQCDFromDataNon3MuOutputFile, 1.0), 
   		dataIsoCombinedHaddOutputFile, 
   		pair<string, float>(dataVsMCOutputFile, 1.0), 
   		pair<string, float>(dataIsoHaddOutputFile, 1.0), 

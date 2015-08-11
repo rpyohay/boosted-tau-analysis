@@ -2766,7 +2766,7 @@ void addJetFakeBkgFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFi
   string canvasName(var + "Canvas");
   string stackName(var + "Stack");
 
-  //get plots of background MC, isolated tau sample
+  //get plots of background MC for non-3-muon events only, isolated tau sample
   TLegend legendBkgSep(0.35, 0.55, 0.75, 0.95);
   TLegend legendBkgMain5(0.35, 0.55, 0.75, 0.95);
   TLegend legendBkgAll(0.35, 0.55, 0.75, 0.95);
@@ -2876,7 +2876,7 @@ void addJetFakeBkgFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFi
     return;
   }
 
-  //get the data histogram, non-isolated tau sample
+  //get the data histogram for non-3-muon events only, non-isolated tau sample
   TCanvas* canvasNonIsoData = NULL;
   nonIsoDataFile.first->GetObject(canvasName.c_str(), canvasNonIsoData);
   TH1F* nonIsoData = NULL;
@@ -2896,7 +2896,7 @@ void addJetFakeBkgFinalPlot(pair<TFile*, float>& isoSigBkgFile, TFile& isoDataFi
     return;
   }
 
-  //get the data histogram, isolated tau sample
+  //get the data histogram for non-3-muon events only, isolated tau sample
   TCanvas* canvasIsoData = NULL;
   isoDataFile.GetObject(canvasName.c_str(), canvasIsoData);
   TH1F* isoData = NULL;
@@ -3686,8 +3686,9 @@ void addFinalPlot2(pair<TFile*, float>& isoSigBkgFile, TFile& isoCombinedDataFil
 }
 
 //create a file of properly formatted final plots
-void makeFinalPlot(const pair<string, float>& isoMC, const string& isoCombinedDataFileName, 
-		   const pair<string, float>& nonIsoData, const pair<string, float>& isoNon3MuData, 
+void makeFinalPlot(const pair<string, float>& isoMC, const pair<string, float>& isoMCNon3Mu, 
+		   const string& isoCombinedDataFileName, const pair<string, float>& nonIsoData, 
+		   const pair<string, float>& isoNon3MuData, 
 		   const pair<string, float>& nonIsoWNonIsoData, const vector<string>& vars, 
 		   const vector<string>& units, const vector<int>& normRegionLowerBins, 
 		   const vector<int>& normRegionUpperBins, const string& outputFileName, 
@@ -3695,29 +3696,35 @@ void makeFinalPlot(const pair<string, float>& isoMC, const string& isoCombinedDa
 {
   //open files
   pair<TFile*, float> isoSigBkgFile(new TFile(isoMC.first.c_str()), isoMC.second);
+  pair<TFile*, float> isoSigBkgNon3MuFile(new TFile(isoMCNon3Mu.first.c_str()), isoMCNon3Mu.second);
   TFile isoCombinedDataFile(isoCombinedDataFileName.c_str());
   pair<TFile*, float> nonIsoDataFile(new TFile(nonIsoData.first.c_str()), nonIsoData.second);
-  pair<TFile*, float> isoNon3MuDataFile(new TFile(isoNon3MuData.first.c_str()), isoNon3MuData.second);
+  pair<TFile*, float> 
+    isoNon3MuDataFile(new TFile(isoNon3MuData.first.c_str()), isoNon3MuData.second);
   pair<TFile*, float> 
     nonIsoWNonIsoDataFile(new TFile(nonIsoWNonIsoData.first.c_str()), nonIsoWNonIsoData.second);
   TFile outStream(outputFileName.c_str(), "RECREATE");
-  if (isoSigBkgFile.first->IsOpen() && isoCombinedDataFile.IsOpen() && nonIsoDataFile.first->IsOpen() && 
-      isoNon3MuDataFile.first->IsOpen() && nonIsoWNonIsoDataFile.first->IsOpen() && outStream.IsOpen()) {
+  if (isoSigBkgFile.first->IsOpen() && isoSigBkgNon3MuFile.first->IsOpen() && 
+      isoCombinedDataFile.IsOpen() && nonIsoDataFile.first->IsOpen() && 
+      isoNon3MuDataFile.first->IsOpen() && nonIsoWNonIsoDataFile.first->IsOpen() && 
+      outStream.IsOpen()) {
 
     //add plots
     for (vector<string>::const_iterator iVar = vars.begin(); iVar != vars.end(); ++iVar) {
       const unsigned int varIndex = iVar - vars.begin();
-      addFinalPlot2(isoSigBkgFile, isoCombinedDataFile, nonIsoDataFile, isoNon3MuDataFile, nonIsoWNonIsoDataFile, 
-		    normRegionLowerBins[varIndex], normRegionUpperBins[varIndex], outStream, 
-		    ma9GeV);
-//       addJetFakeBkgFinalPlot(isoSigBkgFile, isoDataFile, nonIsoDataFile, *iVar, units[varIndex], 
-// 			     normRegionLowerBins[varIndex], normRegionUpperBins[varIndex], option, 
-// 			     outStream);
+      addFinalPlot2(isoSigBkgFile, isoCombinedDataFile, nonIsoDataFile, isoNon3MuDataFile, 
+		    nonIsoWNonIsoDataFile, normRegionLowerBins[varIndex], 
+		    normRegionUpperBins[varIndex], outStream, ma9GeV);
+      addJetFakeBkgFinalPlot(isoSigBkgNon3MuFile, isoDataFile, nonIsoDataFile, *iVar, units[varIndex], 
+			     normRegionLowerBins[varIndex], normRegionUpperBins[varIndex], option, 
+			     outStream);
     }
   }
   else {
-    cerr << "Error opening files " << isoMC.first << " or " << isoCombinedDataFileName << " or ";
-    cerr << nonIsoData.first << " or " << isoNon3MuDataFile.first << " or " << nonIsoWNonIsoDataFile.first << " or " << outputFileName << ".\n";
+    cerr << "Error opening files " << isoMC.first << " or " << isoMCNon3Mu.first << " or ";
+    cerr << isoCombinedDataFileName << " or " << nonIsoData.first << " or ";
+    cerr << isoNon3MuDataFile.first << " or " << nonIsoWNonIsoDataFile.first << " or ";
+    cerr << outputFileName << ".\n";
     return;
   }
 
@@ -3725,6 +3732,7 @@ void makeFinalPlot(const pair<string, float>& isoMC, const string& isoCombinedDa
   outStream.Write();
   outStream.Close();
   isoSigBkgFile.first->Close();
+  isoSigBkgNon3MuFile.first->Close();
   isoCombinedDataFile.Close();
   nonIsoDataFile.first->Close();
   isoNon3MuDataFile.first->Close();
