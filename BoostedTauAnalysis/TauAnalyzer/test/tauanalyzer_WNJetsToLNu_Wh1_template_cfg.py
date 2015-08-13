@@ -411,7 +411,7 @@ process.corrJetDistinctNonIsoTauSelector.tauTag = cms.InputTag('NonIsoBVetoFilte
 #and tau passing decay mode finding
 #this collection has no memory of the uncorrected jets
 process.corrJetDistinctTauSelector = process.corrJetDistinctIsoTauSelector.clone()
-process.corrJetDistinctTauSelector.tauTag = cms.InputTag('AllBVetoFilter', '', 'MUHADANALYSIS')
+process.corrJetDistinctTauSelector.tauTag = cms.InputTag('AllBVetoFilter')
 
 #produce Type-1 corrected PFMET objects
 process.pfMetType1 = process.pfType1CorrectedMet.clone()
@@ -513,7 +513,7 @@ process.highMTMuHadTauAnalyzer = process.highMTMuHadIsoTauAnalyzer.clone()
 process.highMTMuHadTauAnalyzer.outFileName = cms.string(
     'HIGHMTALLTAUANALYZEROUTFILE'
     )
-process.highMTMuHadTauAnalyzer.tauTag = cms.InputTag('AllBVetoFilter', '', 'MUHADANALYSIS')
+process.highMTMuHadTauAnalyzer.tauTag = cms.InputTag('AllBVetoFilter')
 process.highMTMuHadTauAnalyzer.corrJetTag = cms.InputTag('corrJetDistinctTauSelector')
 process.lowMTMuHadTauAnalyzer = process.highMTMuHadTauAnalyzer.clone()
 process.lowMTMuHadTauAnalyzer.outFileName = cms.string('LOWMTALLTAUANALYZEROUTFILE')
@@ -549,7 +549,7 @@ process.OSSFFilterIso = cms.EDFilter('OSSFFilter',
 process.OSSFFilterNonIso = process.OSSFFilterIso.clone()
 process.OSSFFilterNonIso.tauTag = cms.InputTag('NonIsoBVetoFilter')
 process.OSSFFilter = process.OSSFFilterIso.clone()
-process.OSSFFilter.tauTag = cms.InputTag('AllBVetoFilter', '', 'MUHADANALYSIS')
+process.OSSFFilter.tauTag = cms.InputTag('AllBVetoFilter')
 
 #SS filter for tau_mu tau_had charge product
 process.SSSFFilterIso = cms.EDFilter('SSSFFilter',
@@ -562,7 +562,7 @@ process.SSSFFilterNonIso = process.SSSFFilterIso.clone()
 process.SSSFFilterNonIso.tauTag = cms.InputTag('NonIsoBVetoFilter')
 ## process.SSSFFilterNonIso.passFilter = cms.bool(False)
 process.SSSFFilter = process.SSSFFilterIso.clone()
-process.SSSFFilter.tauTag = cms.InputTag('AllBVetoFilter', '', 'MUHADANALYSIS')
+process.SSSFFilter.tauTag = cms.InputTag('AllBVetoFilter')
 
 #muon trigger object filter
 process.muonTriggerObjectFilter = cms.EDFilter(

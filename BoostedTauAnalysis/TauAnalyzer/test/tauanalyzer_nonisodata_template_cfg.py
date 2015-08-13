@@ -170,7 +170,7 @@ process.WMuonPTSelector = cms.EDFilter('MuonRefSelector',
 
 #search for a loose PF isolated tight muon in |eta| < 2.1 with pT > 25 GeV
 #(see https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Muon_Isolation_AN1 for
-#isolation definition;CMS AN-2012/349 uses loose isolation working point for WHbb muon selection)
+#isolation definition; CMS AN-2012/349 uses loose isolation working point for WHbb muon selection)
 #this will produce a ref to the original muon collection
 process.WIsoMuonSelector = cms.EDFilter('CustomMuonSelector',
                                         baseMuonTag = cms.InputTag('muons'),
@@ -497,7 +497,7 @@ process.OSSFFilterIso = cms.EDFilter('OSSFFilter',
 process.OSSFFilterNonIso = process.OSSFFilterIso.clone()
 process.OSSFFilterNonIso.tauTag = cms.InputTag('NonIsoBVetoFilter')
 process.OSSFFilter = process.OSSFFilterIso.clone()
-process.OSSFFilter.tauTag = cms.InputTag('AllBVetoFilter', '', 'MUHADANALYSIS')
+process.OSSFFilter.tauTag = cms.InputTag('AllBVetoFilter')
 
 #SS filter for tau_mu tau_had charge product
 process.SSSFFilterIso = cms.EDFilter('SSSFFilter',
@@ -510,7 +510,7 @@ process.SSSFFilterNonIso = process.SSSFFilterIso.clone()
 process.SSSFFilterNonIso.tauTag = cms.InputTag('NonIsoBVetoFilter')
 ## process.SSSFFilterNonIso.passFilter = cms.bool(False)
 process.SSSFFilter = process.SSSFFilterIso.clone()
-process.SSSFFilter.tauTag = cms.InputTag('AllBVetoFilter', '', 'MUHADANALYSIS')
+process.SSSFFilter.tauTag = cms.InputTag('AllBVetoFilter')
 
 #muon trigger object filter
 process.muonTriggerObjectFilter = cms.EDFilter(
